@@ -840,7 +840,10 @@
 
     // Si no hay bloques, crear uno vacío
     if (this.blocks.length === 0) {
-      this.addBlock('paragraph');
+      // Crear bloque sin enfocar (addBlock enfoca por defecto via render(blockId))
+      var block = { id: ++this.currentBlockId, type: 'paragraph', content: '' };
+      this.blocks.push(block);
+      this.render(this.options.autoFocus ? block.id : undefined);
     } else {
       this.render();
     }
