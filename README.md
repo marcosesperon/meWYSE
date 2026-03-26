@@ -89,6 +89,7 @@ new meWYSE(options)
 | `contentStyles` | boolean | `true` | Inyectar estilos de contenido. Con `false`, la página define sus propios estilos |
 | `lang` | string/object | `'es'` | Idioma (`'es'`, `'en'`) o objeto de traducciones personalizadas |
 | `mentions` | Array | `[]` | Lista de usuarios para menciones `@` |
+| `autoFocus` | boolean | `false` | Enfocar automáticamente el primer bloque al inicializar |
 | `blocks` | Array | `[]` | Contenido inicial como array de bloques |
 | `onChange` | Function | `function(){}` | Callback cuando cambia el contenido |
 
@@ -129,9 +130,11 @@ editor.moveBlock(fromId, toId);      // Mover bloque a posición de otro
 #### Otros
 
 ```javascript
-editor.undo();       // Deshacer
-editor.redo();       // Rehacer
-editor.destroy();    // Destruir editor y limpiar eventos
+editor.focus();          // Enfocar el primer bloque
+editor.focus(blockId);   // Enfocar un bloque específico por ID
+editor.undo();           // Deshacer
+editor.redo();           // Rehacer
+editor.destroy();        // Destruir editor y limpiar eventos
 ```
 
 ### Callback onChange

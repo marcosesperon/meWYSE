@@ -850,11 +850,13 @@
       this.createSummaryButton();
     }
 
-    // Enfocar el primer bloque automáticamente
+    // Enfocar el primer bloque automáticamente solo si autoFocus está habilitado
     var self = this;
-    setTimeout(function() {
-      self.focusFirstBlock();
-    }, 100);
+    if (this.options.autoFocus) {
+      setTimeout(function() {
+        self.focusFirstBlock();
+      }, 100);
+    }
 
     // Añadir listener para rastrear el último elemento enfocado
     this.container.addEventListener('focusin', function(e) {
@@ -10841,6 +10843,26 @@
     }
 
     this[updateMethod]();
+  };
+
+  /**
+   * Enfoca el editor (primer bloque o bloque especificado)
+   * @param {number} [blockId] - ID del bloque a enfocar. Sin parámetro, enfoca el primer bloque.
+   */
+  meWYSE.prototype.focus = function(blockId) {
+    var targetId = (blockId !== undefined) ? blockId : (this.blocks.length > 0 ? this.blocks[0].id : null);
+    if (targetId === null) return;
+
+    var blockElement = this.container.querySelector('[data-block-id="' + targetId + '"]');
+    if (blockElement) {
+      var contentEditable = blockElement.querySelector('[contenteditable="true"]');
+      if (!contentEditable && blockElement.contentEditable === 'true') {
+        contentEditable = blockElement;
+      }
+      if (contentEditable) {
+        contentEditable.focus();
+      }
+    }
   };
 
   /**
