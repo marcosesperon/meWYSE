@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>meWYSE - Demo</title>
+  <link rel="stylesheet" href="mewyse.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: #f4f4f5;
+      color: #18181b;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ===== Header ===== */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 15px;
+      color: #18181b;
+      text-decoration: none;
+    }
+
+    .header-brand .dot {
+      width: 8px;
+      height: 8px;
+      background: #3b82f6;
+      border-radius: 50%;
+      box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
+    }
+
+    .header-links {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .header-links a {
+      color: #71717a;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .header-links a:hover { color: #18181b; }
+
+    .bmc-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #ffdd00;
+      color: #000;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s;
+      box-shadow: 0 2px 8px rgba(255, 221, 0, 0.2);
+    }
+
+    .bmc-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(255, 221, 0, 0.3);
+    }
+
+    .bmc-btn img {
+      height: 16px;
+      width: 16px;
+    }
+
+    /* ===== Hero ===== */
+    .hero {
+      padding: 120px 24px 60px;
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .hero h1 {
+      font-size: 52px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.1;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #18181b 0%, #52525b 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      font-size: 17px;
+      color: #71717a;
+      line-height: 1.6;
+      max-width: 600px;
+      margin: 0 auto 32px;
+    }
+
+    .hero-badges {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .badge-blue { background: rgba(59, 130, 246, 0.1); color: #2563eb; }
+    .badge-green { background: rgba(34, 197, 94, 0.1); color: #16a34a; }
+    .badge-purple { background: rgba(168, 85, 247, 0.1); color: #9333ea; }
+    .badge-amber { background: rgba(245, 158, 11, 0.1); color: #d97706; }
+
+    /* ===== Container ===== */
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px 60px;
+    }
+
+    /* ===== Demo Section (Card style) ===== */
+    .demo-section {
+      background: #ffffff;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 24px;
+      transition: all 0.25s ease;
+    }
+
+    .demo-section:hover {
+      border-color: rgba(0, 0, 0, 0.12);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+    }
+
+    .demo-section h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #18181b;
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
+    }
+
+    .demo-section > p {
+      color: #71717a;
+      font-size: 14px;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .demo-section code {
+      background: rgba(59, 130, 246, 0.08);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 12px;
+      color: #2563eb;
+    }
+
+    /* ===== Info Box ===== */
+    .info-box {
+      background: rgba(59, 130, 246, 0.05);
+      border: 1px solid rgba(59, 130, 246, 0.15);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin: 16px 0;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #52525b;
+    }
+
+    .info-box strong { color: #2563eb; }
+
+    /* ===== Controls ===== */
+    .controls {
+      margin-top: 20px;
+      padding: 16px;
+      background: #f9fafb;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      border-radius: 10px;
+    }
+
+    .controls h3 {
+      margin-bottom: 12px;
+      color: #71717a;
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      background: rgba(59, 130, 246, 0.08);
+      color: #2563eb;
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      font-family: inherit;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      background: rgba(59, 130, 246, 0.15);
+      border-color: rgba(59, 130, 246, 0.35);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: rgba(239, 68, 68, 0.06);
+      color: #dc2626;
+      border-color: rgba(239, 68, 68, 0.15);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(239, 68, 68, 0.12);
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+
+    /* ===== Output ===== */
+    .output {
+      margin-top: 12px;
+      padding: 14px;
+      background: #f4f4f5;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 8px;
+      max-height: 300px;
+      overflow: auto;
+    }
+
+    .output pre {
+      margin: 0;
+      font-size: 12px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      color: #3f3f46;
+    }
+
+    /* ===== Features ===== */
+    .feature-list {
+      list-style: none;
+      padding: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 8px;
+    }
+
+    .feature-list li {
+      padding: 10px 14px 10px 36px;
+      position: relative;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #52525b;
+      background: rgba(0, 0, 0, 0.01);
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+
+    .feature-list li:hover { background: rgba(0, 0, 0, 0.03); }
+
+    .feature-list li:before {
+      content: "";
+      position: absolute;
+      left: 14px;
+      top: 16px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #3b82f6;
+    }
+
+    .feature-list li strong { color: #18181b; }
+
+    /* ===== Textarea ===== */
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      padding: 12px;
+      background: #fff;
+      border: 1px solid #e4e4e7;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 14px;
+      color: #18181b;
+      resize: vertical;
+    }
+
+    /* ===== Docs Code Blocks ===== */
+    .docs-code {
+      background: #fafafa;
+      padding: 16px;
+      border-radius: 10px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      overflow-x: auto;
+      margin: 12px 0;
+    }
+
+    .docs-code code {
+      background: none;
+      padding: 0;
+      color: #3f3f46;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    /* ===== Compact Theme overrides ===== */
+    .mewyse-editor-compact.mewyse-editor-wrapper { border-radius: 4px; }
+    .mewyse-editor-compact.mewyse-editor-wrapper .mewyse-toolbar { padding: 4px 8px; gap: 4px; }
+    .mewyse-editor-compact.mewyse-editor-wrapper .mewyse-toolbar-button { padding: 3px 6px; min-width: 26px; height: 26px; font-size: 12px; }
+    .mewyse-editor-compact.mewyse-editor-wrapper .mewyse-toolbar-button svg { width: 13px; height: 13px; }
+    .mewyse-editor-compact.mewyse-editor { padding: 8px 12px; min-height: 100px; max-height: 250px; font-size: 13px; border-radius: 4px; }
+    .mewyse-editor-compact.mewyse-editor .mewyse-block { margin-bottom: 4px; }
+    .mewyse-editor-compact.mewyse-editor h1.mewyse-block { font-size: 1.4em; }
+    .mewyse-editor-compact.mewyse-editor h2.mewyse-block { font-size: 1.2em; }
+    .mewyse-editor-compact.mewyse-editor h3.mewyse-block { font-size: 1.05em; }
+    .mewyse-editor-compact.mewyse-editor blockquote.mewyse-block { padding: 4px 8px; margin-left: 0; font-size: 13px; }
+    .mewyse-editor-compact.mewyse-editor pre.mewyse-block { padding: 6px 10px; font-size: 12px; }
+
+    /* ===== Dark theme content overrides ===== */
+    .mewyse-editor-dark.mewyse-editor pre.mewyse-block { color: #c8d6e5; }
+    .mewyse-editor-dark.mewyse-editor table th { background: var(--mewyse-bg-secondary); }
+
+    /* ===== contentStyles demo ===== */
+    #noStylesEditor .mewyse-editor { padding: 16px; min-height: 200px; max-height: 500px; overflow-y: auto; border: 1px solid #e4e4e7; border-radius: 12px; background: #fff; }
+    #noStylesEditor h1 { font-size: 2em; color: #1e40af; border-bottom: 2px solid #3b82f6; padding-bottom: 8px; }
+    #noStylesEditor h2 { font-size: 1.5em; color: #2563eb; }
+    #noStylesEditor h3 { font-size: 1.2em; color: #71717a; }
+    #noStylesEditor blockquote { border-left: 4px solid #3b82f6; background: #eff6ff; padding: 12px 16px; margin: 8px 0; font-style: italic; color: #52525b; }
+    #noStylesEditor pre { background: #1e293b; color: #e2e8f0; padding: 16px; border-radius: 8px; }
+    #noStylesEditor table { border-collapse: collapse; width: 100%; }
+    #noStylesEditor td, #noStylesEditor th { border: 1px solid #e4e4e7; padding: 10px; color: #3f3f46; }
+    #noStylesEditor th { background: #f4f4f5; font-weight: 700; }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 32px; }
+      .hero { padding: 100px 20px 40px; }
+      .container { padding: 0 16px 40px; }
+      .demo-section { padding: 20px; }
+      .feature-list { grid-template-columns: 1fr; }
+      .header-links .gh-link { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <a class="header-brand" href="#">
+      <span class="dot"></span>
+      meWYSE
+    </a>
+    <div class="header-links">
+      <a href="https://github.com/marcosesperon/editor-wysiwyg" class="gh-link" target="_blank">GitHub</a>
+      <a href="https://buymeacoffee.com/niceworkmee" class="bmc-btn" target="_blank">
+        <img src="https://cdn.buymeacoffee.com/buttons/bmc-new-btn-logo.svg" alt="">
+        Buy me a coffee
+      </a>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <h1>meWYSE</h1>
+    <p>Editor de bloques al estilo Notion. ECMAScript 5 puro, sin dependencias, un solo archivo.</p>
+    <div class="hero-badges">
+      <span class="badge badge-blue">ES5 Compatible</span>
+      <span class="badge badge-green">Zero Dependencies</span>
+      <span class="badge badge-purple">Single File</span>
+      <span class="badge badge-amber">Markdown Support</span>
+    </div>
+  </section>
+
+  <div class="container">
+    <!-- Features -->
+    <div class="demo-section">
+      <h2>Funcionalidades</h2>
+      <ul class="feature-list">
+        <li><strong>Funciona con cualquier elemento:</strong> textarea, div, span o cualquier HTML</li>
+        <li><strong>Sistema de bloques:</strong> Inspirado en Notion, cada linea es un bloque independiente</li>
+        <li><strong>12 tipos de bloques:</strong> Parrafo, titulos, citas, codigo, listas, checklists, tablas, imagenes, separadores</li>
+        <li><strong>Formato enriquecido:</strong> Menu flotante con negrita, cursiva, colores, enlaces y mas</li>
+        <li><strong>Menciones (@):</strong> Escribe @ para mencionar usuarios con autocompletado</li>
+        <li><strong>Resumen y estadisticas:</strong> Indice de navegacion, conteo de palabras y tiempo de lectura</li>
+        <li><strong>Menu slash (/):</strong> Menu contextual al estilo Notion para cambiar tipos de bloque</li>
+        <li><strong>Atajos de teclado:</strong> Ctrl+B/I/U/Z/Y/K para formato rapido y undo/redo</li>
+        <li><strong>Exportacion multiple:</strong> JSON, HTML, Markdown y texto plano</li>
+        <li><strong>Soporte Markdown:</strong> Importar y exportar contenido Markdown</li>
+        <li><strong>Internacionalizacion:</strong> Espanol, ingles y traducciones personalizadas</li>
+        <li><strong>Temas y dark mode:</strong> Auto-deteccion del sistema + tema personalizable</li>
+        <li><strong>Content Styles:</strong> Opcion para heredar estilos CSS de la pagina</li>
+        <li><strong>Accesibilidad:</strong> ARIA attributes, focus-visible, keyboard navigation</li>
+      </ul>
+    </div>
+
+    <!-- Demo: Editor Basico -->
+    <div class="demo-section">
+      <h2>Editor Basico</h2>
+      <p>Editor aplicado a un <code>textarea</code>. Ideal para formularios y campos de texto enriquecido.</p>
+      <pre class="docs-code"><code>var editor = new meWYSE({
+  target: '#basicEditor',
+  onChange: function(data) {
+    console.log('Contenido:', data.plainText);
+  }
+});</code></pre>
+      <textarea id="basicEditor" placeholder="Escribe aqui..."></textarea>
+      <div class="controls">
+        <h3>Controles</h3>
+        <div class="button-group">
+          <button class="btn" onclick="getBasicValue()">Obtener Valor</button>
+          <button class="btn btn-secondary" onclick="clearBasicEditor()">Limpiar</button>
+        </div>
+        <div id="basicOutput" class="output" style="display:none;">
+          <pre id="basicOutputContent"></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Demo: Editor con Toolbar -->
+    <div class="demo-section">
+      <h2>Editor con Toolbar</h2>
+      <p>Editor con barra de herramientas superior para acceso rapido a formato.</p>
+      <pre class="docs-code"><code>var editor = new meWYSE({
+  target: '#toolbarEditor',
+  toolbar: true,
+  onChange: function(data) {
+    console.log('Contenido:', data.plainText);
+  }
+});</code></pre>
+      <textarea id="toolbarEditor" placeholder="Editor con toolbar..."></textarea>
+      <div class="controls">
+        <h3>Controles</h3>
+        <div class="button-group">
+          <button class="btn" onclick="getToolbarValue()">Obtener Valor</button>
+          <button class="btn" onclick="loadToolbarContent()">Cargar Contenido</button>
+          <button class="btn btn-secondary" onclick="clearToolbarEditor()">Limpiar</button>
+        </div>
+        <div id="toolbarOutput" class="output" style="display:none;">
+          <pre id="toolbarOutputContent"></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Demo: Editor con Summary -->
+    <div class="demo-section">
+      <h2>Editor con Summary</h2>
+      <p>Editor con boton de resumen, estadisticas e indice de navegacion.</p>
+      <pre class="docs-code"><code>var editor = new meWYSE({
+  target: '#summaryEditor',
+  toolbar: true,
+  summary: true,
+  blocks: [
+    { id: 1, type: 'heading1', content: 'Bienvenido' },
+    { id: 2, type: 'paragraph', content: 'Contenido...' }
+  ]
+});</code></pre>
+      <div id="summaryEditor"></div>
+      <div class="controls">
+        <h3>Controles</h3>
+        <div class="button-group">
+          <button class="btn" onclick="addSampleContent()">Cargar Contenido</button>
+          <button class="btn" onclick="exportJSON()">Exportar JSON</button>
+          <button class="btn" onclick="exportHTML()">Exportar HTML</button>
+          <button class="btn" onclick="exportMarkdown()">Exportar Markdown</button>
+          <button class="btn" onclick="exportText()">Exportar Texto</button>
+          <button class="btn btn-secondary" onclick="clearSummaryEditor()">Limpiar</button>
+        </div>
+        <div id="summaryOutput" class="output" style="display:none;">
+          <pre id="summaryOutputContent"></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Demo: Menciones -->
+    <div class="demo-section">
+      <h2>Sistema de Menciones</h2>
+      <p>Escribe <code>@</code> para mencionar usuarios con autocompletado y avatares.</p>
+      <pre class="docs-code"><code>var editor = new meWYSE({
+  target: '#mentionsEditor',
+  toolbar: true,
+  mentions: [
+    { id: '1', name: 'Juan Garcia', avatar: 'url/avatar.jpg' },
+    { id: '2', name: 'Maria Lopez' }
+  ]
+});</code></pre>
+      <div id="mentionsEditor"></div>
+      <div class="controls">
+        <h3>Controles</h3>
+        <div class="button-group">
+          <button class="btn" onclick="getMentionsHTML()">Ver HTML</button>
+          <button class="btn btn-secondary" onclick="clearMentionsEditor()">Limpiar</button>
+        </div>
+        <div id="mentionsOutput" class="output" style="display:none;">
+          <pre id="mentionsOutputContent"></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Demo: Editor con Div -->
+    <div class="demo-section">
+      <h2>Editor con Div</h2>
+      <p>El editor funciona con cualquier elemento, no solo con <code>textarea</code>.</p>
+      <pre class="docs-code"><code>var editor = new meWYSE({
+  target: '#divEditor',
+  toolbar: true
+});
+
+// Funciona con div, span, p o cualquier elemento HTML</code></pre>
+      <div id="divEditor" style="padding: 10px; border: 1px dashed #d4d4d8; border-radius: 8px; min-height: 50px; color: #52525b;">Este contenido inicial esta en un div.</div>
+      <div class="controls">
+        <h3>Controles</h3>
+        <div class="button-group">
+          <button class="btn" onclick="getDivValue()">Obtener Valor</button>
+          <button class="btn" onclick="getDivHTML()">Ver HTML</button>
+          <button class="btn btn-secondary" onclick="clearDivEditor()">Limpiar</button>
+        </div>
+        <div id="divOutput" class="output" style="display:none;">
+          <pre id="divOutputContent"></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Demo: i18n -->
+    <div class="demo-section">
+      <h2>Internacionalizacion (i18n)</h2>
+      <p>Editor en ingles. Todos los menus y tooltips se muestran en el idioma configurado.</p>
+      <pre class="docs-code"><code>// Ingles
+var editor = new meWYSE({ target: '#editor', lang: 'en' });
+
+// Traducciones personalizadas (parcial o completo)
+var editor = new meWYSE({
+  target: '#editor',
+  lang: {
+    blockTypes: { paragraph: 'Paragraphe', heading1: 'Titre 1' },
+    tooltips: { bold: 'Gras', italic: 'Italique' }
+  }
+});</code></pre>
+      <div id="i18nEditor"></div>
+      <div class="controls">
+        <h3>Controles</h3>
+        <div class="button-group">
+          <button class="btn" onclick="switchToSpanish()">Espanol</button>
+          <button class="btn" onclick="switchToEnglish()">English</button>
+          <button class="btn btn-secondary" onclick="clearI18nEditor()">Limpiar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Demo: Tema Dark -->
+    <div class="demo-section">
+      <h2>Tema Dark</h2>
+      <p>Dark mode se auto-detecta segun el sistema. Tambien puedes forzarlo con <code>theme: 'dark'</code>.</p>
+      <pre class="docs-code"><code>var editor = new meWYSE({
+  target: '#darkEditor',
+  toolbar: true,
+  theme: 'dark'
+});
+
+// Sin theme, auto-detecta prefers-color-scheme del OS</code></pre>
+      <div id="darkEditor"></div>
+      <div class="controls">
+        <h3>Controles</h3>
+        <div class="button-group">
+          <button class="btn" onclick="getDarkValue()">Obtener Valor</button>
+          <button class="btn btn-secondary" onclick="clearDarkEditor()">Limpiar</button>
+        </div>
+        <div id="darkOutput" class="output" style="display:none;">
+          <pre id="darkOutputContent"></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Demo: Tema Compact -->
+    <div class="demo-section">
+      <h2>Tema Compact</h2>
+      <p>Editor compacto con <code>theme: 'compact'</code>. Ideal para sidebars y formularios.</p>
+      <pre class="docs-code"><code>var editor = new meWYSE({
+  target: '#compactEditor',
+  toolbar: true,
+  theme: 'compact'
+});</code></pre>
+      <div id="compactEditor"></div>
+      <div class="controls">
+        <h3>Controles</h3>
+        <div class="button-group">
+          <button class="btn" onclick="getCompactValue()">Obtener Valor</button>
+          <button class="btn btn-secondary" onclick="clearCompactEditor()">Limpiar</button>
+        </div>
+        <div id="compactOutput" class="output" style="display:none;">
+          <pre id="compactOutputContent"></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Demo: Content Styles -->
+    <div class="demo-section">
+      <h2>Sin estilos de contenido</h2>
+      <p>Con <code>contentStyles: false</code>, los headings, blockquotes, tablas, etc. heredan los estilos CSS de la pagina.</p>
+      <pre class="docs-code"><code>var editor = new meWYSE({
+  target: '#noStylesEditor',
+  toolbar: true,
+  contentStyles: false
+});
+
+// La pagina define sus propios estilos:
+// #noStylesEditor h1 { font-size: 2em; color: navy; }
+// #noStylesEditor blockquote { border-left: 4px solid blue; }</code></pre>
+      <div id="noStylesEditor"></div>
+      <div class="controls">
+        <h3>Controles</h3>
+        <div class="button-group">
+          <button class="btn" onclick="getNoStylesValue()">Obtener Valor</button>
+          <button class="btn btn-secondary" onclick="clearNoStylesEditor()">Limpiar</button>
+        </div>
+        <div id="noStylesOutput" class="output" style="display:none;">
+          <pre id="noStylesOutputContent"></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Demo: Markdown -->
+    <div class="demo-section">
+      <h2>Soporte Markdown</h2>
+      <p>Importar y exportar contenido en formato Markdown.</p>
+      <pre class="docs-code"><code>var editor = new meWYSE({
+  target: '#markdownEditor',
+  toolbar: true,
+  onChange: function(data) {
+    console.log(data.markdown); // Markdown del contenido
+  }
+});
+
+// Exportar
+var md = editor.getMarkdown();
+
+// Importar
+editor.loadFromMarkdown('# Titulo\n\nTexto con **negrita**.');
+
+// Round-trip
+editor.loadFromMarkdown(editor.getMarkdown());</code></pre>
+      <div id="markdownEditor"></div>
+      <div class="controls">
+        <h3>Controles</h3>
+        <div class="button-group">
+          <button class="btn" onclick="loadMarkdownSample()">Cargar Ejemplo</button>
+          <button class="btn" onclick="exportMdFromMarkdownEditor()">Exportar Markdown</button>
+          <button class="btn" onclick="roundTripMarkdown()">Round-trip</button>
+          <button class="btn btn-secondary" onclick="clearMarkdownEditor()">Limpiar</button>
+        </div>
+        <div id="markdownOutput" class="output" style="display:none;">
+          <pre id="markdownOutputContent"></pre>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="mewyse.js"></script>
+  <script>
+    // Variables globales para los editores
+    var basicEditor;
+    var toolbarEditor;
+    var summaryEditor;
+    var mentionsEditor;
+    var divEditor;
+    var darkEditor;
+    var compactEditor;
+    var i18nEditor;
+    var noStylesEditor;
+    var markdownEditor;
+    var currentI18nLang = 'en';
+
+    // Inicializar editor basico
+    function initBasicEditor() {
+      basicEditor = new meWYSE({
+        target: '#basicEditor',
+        onChange: function(data) {
+          console.log('Editor basico - Contenido:', data.plainText);
+        }
+      });
+    }
+
+    // Inicializar editor con toolbar
+    function initToolbarEditor() {
+      toolbarEditor = new meWYSE({
+        target: '#toolbarEditor',
+        toolbar: true,
+        onChange: function(data) {
+          console.log('Editor con toolbar - Contenido:', data.plainText);
+        }
+      });
+    }
+
+    // Inicializar editor con summary
+    function initSummaryEditor() {
+      summaryEditor = new meWYSE({
+        target: '#summaryEditor',
+        toolbar: true,
+        summary: true,
+        blocks: [
+          { id: 1, type: 'heading1', content: 'Bienvenido al Editor WYSIWYG' },
+          { id: 2, type: 'paragraph', content: 'Este es un editor de bloques al estilo Notion. Prueba a hacer clic en los iconos de la izquierda para cambiar el tipo de bloque.' }
+        ],
+        onChange: function(data) {
+          console.log('Editor con summary - Contenido:', data);
+        }
+      });
+    }
+
+    // Inicializar editor con menciones
+    function initMentionsEditor() {
+      mentionsEditor = new meWYSE({
+        target: '#mentionsEditor',
+        toolbar: true,
+        mentions: [
+          { id: '1', name: 'Juan Garcia', avatar: 'https://i.pravatar.cc/150?u=juan' },
+          { id: '2', name: 'Maria Lopez', avatar: 'https://i.pravatar.cc/150?u=maria' },
+          { id: '3', name: 'Carlos Ruiz', avatar: 'https://i.pravatar.cc/150?u=carlos' },
+          { id: '4', name: 'Ana Martinez', avatar: 'https://i.pravatar.cc/150?u=ana' },
+          { id: '5', name: 'Pedro Sanchez' },
+          { id: '6', name: 'Laura Fernandez', avatar: 'https://i.pravatar.cc/150?u=laura' }
+        ],
+        blocks: [
+          { id: 1, type: 'paragraph', content: 'Escribe @ para mencionar a alguien del equipo.' }
+        ],
+        onChange: function(data) {
+          console.log('Editor con menciones - Contenido:', data.html);
+        }
+      });
+    }
+
+    // Inicializar editor con div
+    function initDivEditor() {
+      divEditor = new meWYSE({
+        target: '#divEditor',
+        toolbar: true,
+        onChange: function(data) {
+          console.log('Editor con div - Contenido:', data.plainText);
+        }
+      });
+    }
+
+    // Inicializar editor dark
+    function initDarkEditor() {
+      darkEditor = new meWYSE({
+        target: '#darkEditor',
+        toolbar: true,
+        theme: 'dark',
+        blocks: [
+          { id: 1, type: 'heading1', content: 'Tema Dark' },
+          { id: 2, type: 'paragraph', content: 'Este editor usa theme: \'dark\'. Los estilos se aplican via CSS variables sobre la clase mewyse-editor-dark.' },
+          { id: 3, type: 'quote', content: 'Las citas tambien se adaptan al tema oscuro.' },
+          { id: 4, type: 'code', content: 'var editor = new meWYSE({\n  target: \'#editor\',\n  theme: \'dark\'\n});' }
+        ],
+        onChange: function(data) {
+          console.log('Editor dark - Contenido:', data.plainText);
+        }
+      });
+    }
+
+    // Inicializar editor compact
+    function initCompactEditor() {
+      compactEditor = new meWYSE({
+        target: '#compactEditor',
+        toolbar: true,
+        theme: 'compact',
+        blocks: [
+          { id: 1, type: 'heading1', content: 'Tema Compact' },
+          { id: 2, type: 'paragraph', content: 'Editor compacto con padding y fuentes reducidas. Ideal para espacios limitados.' },
+          { id: 3, type: 'bulletList', content: 'Toolbar mas compacta' },
+          { id: 4, type: 'bulletList', content: 'Bloques con menos margen' },
+          { id: 5, type: 'bulletList', content: 'Tipografia mas pequena' }
+        ],
+        onChange: function(data) {
+          console.log('Editor compact - Contenido:', data.plainText);
+        }
+      });
+    }
+
+    // Inicializar editor i18n
+    function initI18nEditor(lang) {
+      var container = document.getElementById('i18nEditor');
+      container.innerHTML = '';
+
+      i18nEditor = new meWYSE({
+        target: '#i18nEditor',
+        toolbar: true,
+        summary: true,
+        lang: lang || 'en',
+        blocks: [
+          { id: 1, type: 'heading1', content: lang === 'es' ? 'Editor en Espanol' : 'Editor in English' },
+          { id: 2, type: 'paragraph', content: lang === 'es' ? 'Este editor esta configurado en espanol. Prueba los menus y tooltips.' : 'This editor is configured in English. Try the menus and tooltips.' },
+          { id: 3, type: 'heading2', content: lang === 'es' ? 'Prueba las funciones' : 'Test the features' },
+          { id: 4, type: 'bulletList', content: lang === 'es' ? 'Escribe / para ver el menu de bloques' : 'Type / to see the block menu' },
+          { id: 5, type: 'bulletList', content: lang === 'es' ? 'Selecciona texto para ver opciones de formato' : 'Select text to see format options' },
+          { id: 6, type: 'bulletList', content: lang === 'es' ? 'Haz clic en el handle para mas opciones' : 'Click the handle for more options' }
+        ],
+        onChange: function(data) {
+          console.log('Editor i18n - Contenido:', data);
+        }
+      });
+      currentI18nLang = lang || 'en';
+    }
+
+    // Funciones de control para editor basico
+    function getBasicValue() {
+      var text = basicEditor.getPlainText();
+      showOutput('basicOutput', 'basicOutputContent', text);
+    }
+
+    function clearBasicEditor() {
+      if (confirm('Limpiar editor?')) {
+        basicEditor.loadFromJSON([]);
+        basicEditor.addBlock('paragraph');
+      }
+    }
+
+    // Funciones de control para editor con toolbar
+    function getToolbarValue() {
+      var text = toolbarEditor.getPlainText();
+      var json = toolbarEditor.getJSON();
+      showOutput('toolbarOutput', 'toolbarOutputContent', 'Texto:\n' + text + '\n\nJSON:\n' + json);
+    }
+
+    function loadToolbarContent() {
+      var sampleBlocks = [
+        { id: 1, type: 'heading1', content: 'Editor con Toolbar' },
+        { id: 2, type: 'paragraph', content: 'Este es un ejemplo de contenido cargado dinamicamente.' },
+        { id: 3, type: 'quote', content: 'La toolbar proporciona acceso rapido a las herramientas de formato.' }
+      ];
+      toolbarEditor.loadFromJSON(sampleBlocks);
+    }
+
+    function clearToolbarEditor() {
+      if (confirm('Limpiar editor?')) {
+        toolbarEditor.loadFromJSON([]);
+        toolbarEditor.addBlock('paragraph');
+      }
+    }
+
+    // Funciones de control para editor con summary
+    function addSampleContent() {
+      var sampleBlocks = [
+        { id: 1, type: 'heading1', content: 'Mi Documento' },
+        { id: 2, type: 'paragraph', content: 'Este es un ejemplo de documento con diferentes tipos de bloques.' },
+        { id: 3, type: 'heading2', content: 'Seccion 1: Introduccion' },
+        { id: 4, type: 'paragraph', content: 'Los editores basados en bloques ofrecen una experiencia de edicion moderna y flexible.' },
+        { id: 5, type: 'quote', content: 'La simplicidad es la maxima sofisticacion - Leonardo da Vinci' },
+        { id: 6, type: 'heading3', content: 'Caracteristicas principales' },
+        { id: 7, type: 'bulletList', content: 'Facil de usar' },
+        { id: 8, type: 'bulletList', content: 'Altamente personalizable' },
+        { id: 9, type: 'bulletList', content: 'Compatible con ES5' },
+        { id: 10, type: 'divider', content: '' },
+        { id: 11, type: 'heading2', content: 'Seccion 2: Codigo' },
+        { id: 12, type: 'code', content: 'function hola() {\n  console.log("Hola mundo");\n}' },
+        { id: 13, type: 'paragraph', content: 'Este editor soporta multiples formatos de exportacion.' }
+      ];
+      summaryEditor.loadFromJSON(sampleBlocks);
+    }
+
+    function exportJSON() {
+      var json = summaryEditor.getJSON();
+      showOutput('summaryOutput', 'summaryOutputContent', json);
+    }
+
+    function exportHTML() {
+      var html = summaryEditor.getHTML();
+      showOutput('summaryOutput', 'summaryOutputContent', html);
+    }
+
+    function exportMarkdown() {
+      var md = summaryEditor.getMarkdown();
+      showOutput('summaryOutput', 'summaryOutputContent', md);
+    }
+
+    function exportText() {
+      var text = summaryEditor.getPlainText();
+      showOutput('summaryOutput', 'summaryOutputContent', text);
+    }
+
+    function clearSummaryEditor() {
+      if (confirm('Limpiar editor?')) {
+        summaryEditor.loadFromJSON([]);
+        summaryEditor.addBlock('paragraph');
+      }
+    }
+
+    // Funciones de control para editor con menciones
+    function getMentionsHTML() {
+      var html = mentionsEditor.getHTML();
+      showOutput('mentionsOutput', 'mentionsOutputContent', html);
+    }
+
+    function clearMentionsEditor() {
+      if (confirm('Limpiar editor?')) {
+        mentionsEditor.loadFromJSON([]);
+        mentionsEditor.addBlock('paragraph');
+      }
+    }
+
+    // Funciones de control para editor con div
+    function getDivValue() {
+      var text = divEditor.getPlainText();
+      showOutput('divOutput', 'divOutputContent', text);
+    }
+
+    function getDivHTML() {
+      var html = divEditor.getHTML();
+      showOutput('divOutput', 'divOutputContent', html);
+    }
+
+    function clearDivEditor() {
+      if (confirm('Limpiar editor?')) {
+        divEditor.loadFromJSON([]);
+        divEditor.addBlock('paragraph');
+      }
+    }
+
+    // Funciones de control para editor dark
+    function getDarkValue() {
+      var text = darkEditor.getPlainText();
+      showOutput('darkOutput', 'darkOutputContent', text);
+    }
+
+    function clearDarkEditor() {
+      if (confirm('Limpiar editor?')) {
+        darkEditor.loadFromJSON([]);
+        darkEditor.addBlock('paragraph');
+      }
+    }
+
+    // Funciones de control para editor compact
+    function getCompactValue() {
+      var text = compactEditor.getPlainText();
+      showOutput('compactOutput', 'compactOutputContent', text);
+    }
+
+    function clearCompactEditor() {
+      if (confirm('Limpiar editor?')) {
+        compactEditor.loadFromJSON([]);
+        compactEditor.addBlock('paragraph');
+      }
+    }
+
+    // Funciones de control para editor i18n
+    function switchToSpanish() {
+      if (i18nEditor) i18nEditor.destroy();
+      initI18nEditor('es');
+    }
+
+    function switchToEnglish() {
+      if (i18nEditor) i18nEditor.destroy();
+      initI18nEditor('en');
+    }
+
+    function clearI18nEditor() {
+      if (confirm('Limpiar editor?')) {
+        i18nEditor.loadFromJSON([]);
+        i18nEditor.addBlock('paragraph');
+      }
+    }
+
+    // Inicializar editor sin estilos de contenido
+    function initNoStylesEditor() {
+      noStylesEditor = new meWYSE({
+        target: '#noStylesEditor',
+        toolbar: true,
+        contentStyles: false,
+        blocks: [
+          { id: 1, type: 'heading1', content: 'Heredando estilos de la pagina' },
+          { id: 2, type: 'paragraph', content: 'Este editor usa <code>contentStyles: false</code>. Los headings, citas y codigo usan los estilos CSS definidos en la pagina.' },
+          { id: 3, type: 'heading2', content: 'Subtitulo con estilos de la pagina' },
+          { id: 4, type: 'quote', content: 'Esta cita usa los estilos de blockquote de la pagina.' },
+          { id: 5, type: 'code', content: 'var editor = new meWYSE({\n  target: \'#editor\',\n  contentStyles: false\n});' },
+          { id: 6, type: 'bulletList', content: 'Los estilos de lista tambien se heredan' },
+          { id: 7, type: 'bulletList', content: 'Cada editor puede tener su propia configuracion' }
+        ],
+        onChange: function(data) {
+          console.log('Editor sin estilos - Contenido:', data.plainText);
+        }
+      });
+    }
+
+    function getNoStylesValue() {
+      var text = noStylesEditor.getPlainText();
+      showOutput('noStylesOutput', 'noStylesOutputContent', text);
+    }
+
+    function clearNoStylesEditor() {
+      if (confirm('Limpiar editor?')) {
+        noStylesEditor.loadFromJSON([]);
+        noStylesEditor.addBlock('paragraph');
+      }
+    }
+
+    // Inicializar editor Markdown
+    function initMarkdownEditor() {
+      markdownEditor = new meWYSE({
+        target: '#markdownEditor',
+        toolbar: true,
+        blocks: [
+          { id: 1, type: 'heading1', content: 'Soporte Markdown' },
+          { id: 2, type: 'paragraph', content: 'Escribe contenido y usa los botones para exportar como Markdown o importar desde Markdown.' }
+        ],
+        onChange: function(data) {
+          console.log('Editor Markdown - onChange incluye data.markdown:', !!data.markdown);
+        }
+      });
+    }
+
+    // Funciones de control para editor Markdown
+    function loadMarkdownSample() {
+      var sampleMd = [
+        '# Mi Documento',
+        '',
+        'Un parrafo con **negrita**, *cursiva* y ~~tachado~~.',
+        '',
+        'Tambien soporta `codigo inline` y [enlaces](https://ejemplo.com).',
+        '',
+        '## Lista de tareas',
+        '',
+        '- [x] Implementar getMarkdown()',
+        '- [x] Implementar loadFromMarkdown()',
+        '- [ ] Escribir tests',
+        '',
+        '## Listas',
+        '',
+        '- Manzanas',
+        '- Naranjas',
+        '- Platanos',
+        '',
+        '1. Primero',
+        '2. Segundo',
+        '3. Tercero',
+        '',
+        '> La simplicidad es la maxima sofisticacion.',
+        '',
+        '## Tabla',
+        '',
+        '| Nombre | Lenguaje | Estrellas |',
+        '| --- | --- | --- |',
+        '| React | JavaScript | 200k |',
+        '| Vue | JavaScript | 200k |',
+        '| Svelte | JavaScript | 70k |',
+        '',
+        '## Codigo',
+        '',
+        '```',
+        'function saludar(nombre) {',
+        '  return "Hola, " + nombre + "!";',
+        '}',
+        '```',
+        '',
+        '---',
+        '',
+        'Fin del documento.'
+      ].join('\n');
+
+      markdownEditor.loadFromMarkdown(sampleMd);
+      showOutput('markdownOutput', 'markdownOutputContent', 'Markdown cargado.\n\n' + sampleMd);
+    }
+
+    function exportMdFromMarkdownEditor() {
+      var md = markdownEditor.getMarkdown();
+      showOutput('markdownOutput', 'markdownOutputContent', md);
+    }
+
+    function roundTripMarkdown() {
+      var md = markdownEditor.getMarkdown();
+      markdownEditor.loadFromMarkdown(md);
+      showOutput('markdownOutput', 'markdownOutputContent', 'Round-trip completado.\n\n' + md);
+    }
+
+    function clearMarkdownEditor() {
+      if (confirm('Limpiar editor?')) {
+        markdownEditor.loadFromJSON([]);
+        markdownEditor.addBlock('paragraph');
+      }
+    }
+
+    // Mostrar salida
+    function showOutput(containerId, contentId, content) {
+      var container = document.getElementById(containerId);
+      var contentEl = document.getElementById(contentId);
+      contentEl.textContent = content;
+      container.style.display = 'block';
+      container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // Inicializar editores al cargar la pagina
+    window.onload = function() {
+      initBasicEditor();
+      initToolbarEditor();
+      initSummaryEditor();
+      initMentionsEditor();
+      initDivEditor();
+      initDarkEditor();
+      initCompactEditor();
+      initI18nEditor('en');
+      initNoStylesEditor();
+      initMarkdownEditor();
+    };
+  </script>
+</body>
+</html>
