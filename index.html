@@ -3,7 +3,26 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>meWYSE - Demo</title>
+  <title>meWYSE — WYSIWYG Editor</title>
+  <meta name="description" content="Editor WYSIWYG basado en bloques al estilo Notion, desarrollado en JavaScript ECMAScript 5 puro. Sin dependencias, sin build system, un solo archivo">
+  <meta name="author" content="Marcos Esperon">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="meWYSE — WYSIWYG Editor">
+  <meta property="og:description" content="Editor WYSIWYG basado en bloques al estilo Notion, desarrollado en JavaScript ECMAScript 5 puro. Sin dependencias, sin build system, un solo archivo">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://github.com/marcosesperon/meWYSE">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="meWYSE — WYSIWYG Editor">
+  <meta name="twitter:description" content="Editor WYSIWYG basado en bloques al estilo Notion, desarrollado en JavaScript ECMAScript 5 puro. Sin dependencias, sin build system, un solo archivo">
+  <meta name="twitter:creator" content="@marcosesperon">
+
+  <!-- Author -->
+  <link rel="author" href="https://github.com/marcosesperon">
+  <link rel="author" href="/humans.txt" type="text/plain">
+
   <link rel="stylesheet" href="mewyse.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -72,29 +91,21 @@
     .header-links a:hover { color: #18181b; }
 
     .bmc-btn {
-      display: inline-flex;
+      display: flex;
       align-items: center;
       gap: 6px;
       background: #ffdd00;
-      color: #000;
+      color: #000 !important;
       padding: 6px 12px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 600;
-      text-decoration: none;
-      transition: all 0.2s;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
       box-shadow: 0 2px 8px rgba(255, 221, 0, 0.2);
     }
-
-    .bmc-btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 16px rgba(255, 221, 0, 0.3);
-    }
-
-    .bmc-btn img {
-      height: 16px;
-      width: 16px;
-    }
+    .bmc-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(255, 221, 0, 0.3); }
+    .bmc-btn:active { transform: scale(0.96); }
+    .bmc-btn svg { width: 14px; height: 14px; }
 
     /* ===== Hero ===== */
     .hero {
@@ -377,6 +388,28 @@
     #noStylesEditor td, #noStylesEditor th { border: 1px solid #e4e4e7; padding: 10px; color: #3f3f46; }
     #noStylesEditor th { background: #f4f4f5; font-weight: 700; }
 
+    /* ── Footer ───────────────────────────────────── */
+
+    .page-footer {
+      text-align: center;
+      padding: 32px 24px 48px;
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+      color: #3f3f46;
+      font-size: 13px;
+    }
+
+    body.light-mode .page-footer {
+      border-top-color: rgba(0, 0, 0, 0.06);
+      color: #a1a1aa;
+    }
+
+    .page-footer a {
+      color: #71717a;
+      transition: color 0.2s;
+    }
+    .page-footer a:hover { color: #e4e4e7; }
+    body.light-mode .page-footer a:hover { color: #18181b; }
+
     /* ===== Responsive ===== */
     @media (max-width: 768px) {
       .hero h1 { font-size: 32px; }
@@ -396,9 +429,9 @@
       meWYSE
     </a>
     <div class="header-links">
-      <a href="https://github.com/marcosesperon/editor-wysiwyg" class="gh-link" target="_blank">GitHub</a>
-      <a href="https://buymeacoffee.com/niceworkmee" class="bmc-btn" target="_blank">
-        <img src="https://cdn.buymeacoffee.com/buttons/bmc-new-btn-logo.svg" alt="">
+      <a href="https://github.com/marcosesperon/meWYSE" target="_blank" rel="noopener" class="github-link">GitHub</a>
+      <a class="bmc-btn" href="https://buymeacoffee.com/marcosesperon" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
         Buy me a coffee
       </a>
     </div>
@@ -699,6 +732,11 @@ editor.loadFromMarkdown(editor.getMarkdown());</code></pre>
     </div>
 
   </div>
+
+  <!-- ── Footer ──────────────────────────────────── -->
+  <footer class="page-footer">
+    <p>Creado por <a href="https://buymeacoffee.com/marcosesperon" target="_blank" rel="noopener">Marcos Esper&oacute;n</a> &middot; MIT License</p>
+  </footer>
 
   <script src="mewyse.js"></script>
   <script>
