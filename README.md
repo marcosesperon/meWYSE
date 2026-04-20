@@ -28,6 +28,12 @@ Si este proyecto te resulta util, puedes apoyar su desarrollo:
 - **Undo/Redo**: Historial de hasta 50 estados con debounce
 - **Exportación múltiple**: JSON, HTML, Markdown y texto plano
 - **Importación Markdown**: Carga contenido desde cadenas Markdown
+- **Buscar y reemplazar**: Panel flotante (`Ctrl/Cmd+F`) con navegación prev/next, case-sensitive, palabra completa y reemplazo masivo
+- **Pantalla completa**: Botón en toolbar para expandir el editor a toda la ventana (Escape para salir)
+- **Mostrar bloques**: Modo debug que muestra los límites y tipo de cada bloque
+- **Contador persistente**: Barra inferior con palabras, caracteres y tiempo de lectura en tiempo real
+- **Soporte RTL**: Direccionalidad derecha-a-izquierda para árabe, hebreo, etc.
+- **Paste inteligente**: Limpieza automática de markup de Microsoft Word/Excel/Google Docs; convierte listas simuladas con viñetas a `<ul>`/`<ol>` reales; preserva bold/italic/underline inferidos de estilos inline
 - **Internacionalización (i18n)**: Español, inglés y traducciones personalizadas
 - **Temas**: Dark mode con auto-detección del sistema, tema compact, temas custom
 - **Content Styles**: Opción para heredar estilos CSS de la página
@@ -85,6 +91,11 @@ new meWYSE(options)
 | `target` | string | *requerido* | Selector CSS del elemento (`'#miEditor'`, `'.editor'`) |
 | `toolbar` | boolean | `false` | Mostrar barra de herramientas superior |
 | `summary` | boolean | `false` | Mostrar botón de resumen con estadísticas e índice |
+| `charCounter` | boolean | `false` | Mostrar barra inferior con contador de palabras, caracteres y tiempo de lectura |
+| `findReplace` | boolean | `true` | Habilitar buscar/reemplazar con atajo `Ctrl/Cmd+F` y botón en toolbar |
+| `fullscreen` | boolean | `true` | Mostrar botón de pantalla completa en toolbar |
+| `showBlocksToggle` | boolean | `true` | Mostrar botón de "mostrar bloques" (modo debug) en toolbar |
+| `rtl` | boolean | `false` | Activar dirección derecha-a-izquierda (árabe, hebreo) |
 | `theme` | string | auto | Tema: `'dark'`, `'compact'`, o cualquier nombre custom. Sin tema, auto-detecta `prefers-color-scheme` del OS |
 | `contentStyles` | boolean | `true` | Inyectar estilos de contenido. Con `false`, la página define sus propios estilos |
 | `lang` | string/object | `'es'` | Idioma (`'es'`, `'en'`) o objeto de traducciones personalizadas |
@@ -206,6 +217,7 @@ Para bloques de imagen, `content` es un objeto:
 | `Ctrl/Cmd+I` | Cursiva |
 | `Ctrl/Cmd+U` | Subrayado |
 | `Ctrl/Cmd+K` | Insertar enlace |
+| `Ctrl/Cmd+F` | Buscar y reemplazar |
 | `Ctrl/Cmd+Z` | Deshacer |
 | `Ctrl/Cmd+Y` o `Ctrl/Cmd+Shift+Z` | Rehacer |
 | `Enter` | Nuevo bloque (o nueva línea en listas) |
@@ -532,6 +544,85 @@ var editor = new meWYSE({
 | `alerts` | Mensajes de alerta |
 | `misc` | Textos varios |
 
+## Herramientas Avanzadas
+
+### Buscar y Reemplazar
+
+Atajo `Ctrl/Cmd+F` (o botón de la lupa en la toolbar) abre un panel flotante con:
+
+- Campo de búsqueda con resaltado en tiempo real
+- Campo de reemplazo
+- Opciones: distinguir mayúsculas, palabra completa
+- Navegación **↑/↓** entre coincidencias (también Shift+Enter para anterior, Enter para siguiente)
+- Botones de reemplazar uno / reemplazar todos
+- Contador `actual de total` o `sin resultados`
+
+```javascript
+// Habilitado por defecto. Para desactivar:
+var editor = new meWYSE({
+  target: '#editor',
+  findReplace: false
+});
+```
+
+### Pantalla Completa
+
+Expande el editor a toda la ventana del navegador. Pulsa **Escape** para salir.
+
+```javascript
+// Habilitado por defecto. Para desactivar el botón:
+var editor = new meWYSE({
+  target: '#editor',
+  fullscreen: false
+});
+```
+
+### Mostrar Bloques (debug view)
+
+Modo que dibuja bordes punteados alrededor de cada bloque y muestra su tipo. Útil para diseñadores, QA, o al entender la estructura de un documento.
+
+```javascript
+var editor = new meWYSE({
+  target: '#editor',
+  showBlocksToggle: true  // default true
+});
+```
+
+### Contador de Palabras / Caracteres
+
+Barra inferior que muestra palabras, caracteres y tiempo estimado de lectura en tiempo real.
+
+```javascript
+var editor = new meWYSE({
+  target: '#editor',
+  toolbar: true,
+  charCounter: true  // default false
+});
+```
+
+### Soporte RTL (derecha-a-izquierda)
+
+Para idiomas como árabe, hebreo o urdu:
+
+```javascript
+var editor = new meWYSE({
+  target: '#editor',
+  toolbar: true,
+  rtl: true,
+  lang: 'ar'  // si tienes traducción al árabe
+});
+```
+
+### Pegado desde Word / Excel / Google Docs
+
+meWYSE limpia automáticamente el HTML pegado desde aplicaciones Office:
+
+- Elimina namespaces `mso-*`, `v:*`, `w:*`, `m:*`, comentarios XML y metadatos
+- Convierte párrafos simulando listas (con viñetas `·`, `•`, `o` o numeración) en `<ul>`/`<ol>` reales
+- Preserva bold/italic/underline inferidos de estilos inline antes de limpiar
+- Desenvuelve `<span>` y `<font>` sin atributos útiles
+- Elimina párrafos vacíos y zero-width chars
+
 ## Personalización CSS
 
 El editor usa clases CSS con prefijo `mewyse-` y CSS custom properties con prefijo `--mewyse-`.
@@ -552,6 +643,13 @@ El editor usa clases CSS con prefijo `mewyse-` y CSS custom properties con prefi
 | `.mewyse-options-menu` | Menú contextual de bloque |
 | `.mewyse-table-wrapper` | Wrapper de tablas |
 | `.mewyse-image-wrapper` | Wrapper de imágenes |
+| `.mewyse-find-replace` | Diálogo flotante de buscar/reemplazar |
+| `.mewyse-search-highlight` | Marca una coincidencia de búsqueda |
+| `.mewyse-search-highlight.current` | Coincidencia actualmente seleccionada |
+| `.mewyse-fullscreen` | Editor en modo pantalla completa |
+| `.mewyse-show-blocks` | Modo debug con bordes visibles |
+| `.mewyse-char-counter` | Barra inferior con contador |
+| `.mewyse-rtl` | Editor en modo RTL |
 
 ### CSS Variables
 

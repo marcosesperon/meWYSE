@@ -704,6 +704,33 @@ var editor = new meWYSE({
       </div>
     </div>
 
+    <!-- Demo: Nuevas features (SunEditor inspired) -->
+    <div class="demo-section">
+      <h2>Buscar y Reemplazar &middot; Fullscreen &middot; Show Blocks &middot; Contador</h2>
+      <p>Atajo <code>Ctrl+F</code> / <code>Cmd+F</code> para abrir el panel de busqueda. El boton &quot;pantalla completa&quot; expande el editor sobre toda la ventana. &quot;Mostrar bloques&quot; muestra los limites de cada bloque y su tipo para debugging. La barra inferior muestra el contador de palabras, caracteres y tiempo de lectura en tiempo real.</p>
+      <pre class="docs-code"><code>var editor = new meWYSE({
+  target: '#toolsEditor',
+  toolbar: true,
+  charCounter: true,     // barra inferior con palabras/caracteres/tiempo
+  findReplace: true,     // Ctrl+F abre buscar y reemplazar (default true)
+  fullscreen: true,      // muestra boton de pantalla completa (default true)
+  showBlocksToggle: true // muestra boton de &quot;mostrar bloques&quot; (default true)
+});</code></pre>
+      <div id="toolsEditor"></div>
+    </div>
+
+    <!-- Demo: RTL support -->
+    <div class="demo-section">
+      <h2>Soporte RTL (derecha-a-izquierda)</h2>
+      <p>Para idiomas como &aacute;rabe, hebreo o urdu. Pasa <code>rtl: true</code> en las opciones.</p>
+      <pre class="docs-code"><code>var editor = new meWYSE({
+  target: '#rtlEditor',
+  toolbar: true,
+  rtl: true
+});</code></pre>
+      <div id="rtlEditor"></div>
+    </div>
+
     <!-- Demo: Markdown -->
     <div class="demo-section">
       <h2>Soporte Markdown</h2>
@@ -759,6 +786,8 @@ editor.loadFromMarkdown(editor.getMarkdown());</code></pre>
     var i18nEditor;
     var noStylesEditor;
     var markdownEditor;
+    var toolsEditor;
+    var rtlEditor;
     var currentI18nLang = 'en';
 
     // Inicializar editor basico
@@ -1084,6 +1113,45 @@ editor.loadFromMarkdown(editor.getMarkdown());</code></pre>
       }
     }
 
+    // Inicializar editor con todas las herramientas (find, fullscreen, show blocks, counter)
+    function initToolsEditor() {
+      toolsEditor = new meWYSE({
+        target: '#toolsEditor',
+        toolbar: true,
+        charCounter: true,
+        findReplace: true,
+        fullscreen: true,
+        showBlocksToggle: true,
+        blocks: [
+          { id: 1, type: 'heading1', content: 'Herramientas avanzadas' },
+          { id: 2, type: 'paragraph', content: 'Este editor incluye <b>buscar y reemplazar</b> (Ctrl+F), <b>pantalla completa</b>, <b>mostrar bloques</b> y un <b>contador de palabras</b> persistente en la parte inferior.' },
+          { id: 3, type: 'heading2', content: 'Prueba estos atajos' },
+          { id: 4, type: 'bulletList', content: 'Pulsa Ctrl+F / Cmd+F para buscar texto' },
+          { id: 5, type: 'bulletList', content: 'Usa los botones de la barra superior para activar fullscreen' },
+          { id: 6, type: 'bulletList', content: 'Activa "mostrar bloques" para ver los limites de cada bloque y su tipo' },
+          { id: 7, type: 'paragraph', content: 'Observa el contador en la parte inferior: se actualiza automaticamente al escribir.' },
+          { id: 8, type: 'quote', content: 'La simplicidad es la maxima sofisticacion.' }
+        ]
+      });
+    }
+
+    // Inicializar editor RTL
+    function initRtlEditor() {
+      rtlEditor = new meWYSE({
+        target: '#rtlEditor',
+        toolbar: true,
+        rtl: true,
+        blocks: [
+          { id: 1, type: 'heading1', content: 'مرحبا بك في meWYSE' },
+          { id: 2, type: 'paragraph', content: 'هذا محرر يدعم الكتابة من اليمين إلى اليسار. جرب كتابة نص عربي أو عبري.' },
+          { id: 3, type: 'paragraph', content: 'También funciona con texto en espanol mezclado con العربية en la misma linea.' },
+          { id: 4, type: 'bulletList', content: 'العنصر الأول' },
+          { id: 5, type: 'bulletList', content: 'العنصر الثاني' },
+          { id: 6, type: 'bulletList', content: 'العنصر الثالث' }
+        ]
+      });
+    }
+
     // Inicializar editor Markdown
     function initMarkdownEditor() {
       markdownEditor = new meWYSE({
@@ -1189,6 +1257,8 @@ editor.loadFromMarkdown(editor.getMarkdown());</code></pre>
       initCompactEditor();
       initI18nEditor('en');
       initNoStylesEditor();
+      initToolsEditor();
+      initRtlEditor();
       initMarkdownEditor();
     };
   </script>

@@ -65,7 +65,11 @@
         undo: 'Deshacer',
         redo: 'Rehacer',
         moveBlockUp: 'Mover bloque arriba',
-        moveBlockDown: 'Mover bloque abajo'
+        moveBlockDown: 'Mover bloque abajo',
+        findReplace: 'Buscar y reemplazar',
+        fullscreen: 'Pantalla completa',
+        fullscreenExit: 'Salir de pantalla completa',
+        showBlocks: 'Mostrar bloques'
       },
       blockMenu: {
         insertAbove: 'Insertar bloque arriba',
@@ -140,6 +144,26 @@
         text: 'Texto',
         addBlock: '+ Añadir bloque',
         image: 'Imagen'
+      },
+      findReplace: {
+        title: 'Buscar y reemplazar',
+        findPlaceholder: 'Buscar...',
+        replacePlaceholder: 'Reemplazar con...',
+        caseSensitive: 'Distinguir mayúsculas',
+        wholeWord: 'Palabra completa',
+        findNext: 'Siguiente',
+        findPrev: 'Anterior',
+        replace: 'Reemplazar',
+        replaceAll: 'Reemplazar todo',
+        close: 'Cerrar',
+        noMatches: 'Sin resultados',
+        matchesCount: '{current} de {total}',
+        replacedCount: '{count} coincidencias reemplazadas'
+      },
+      counter: {
+        words: 'Palabras',
+        characters: 'Caracteres',
+        readingTime: 'Lectura'
       }
     },
     en: {
@@ -196,7 +220,11 @@
         undo: 'Undo',
         redo: 'Redo',
         moveBlockUp: 'Move block up',
-        moveBlockDown: 'Move block down'
+        moveBlockDown: 'Move block down',
+        findReplace: 'Find and replace',
+        fullscreen: 'Fullscreen',
+        fullscreenExit: 'Exit fullscreen',
+        showBlocks: 'Show blocks'
       },
       blockMenu: {
         insertAbove: 'Insert block above',
@@ -271,6 +299,26 @@
         text: 'Text',
         addBlock: '+ Add block',
         image: 'Image'
+      },
+      findReplace: {
+        title: 'Find and replace',
+        findPlaceholder: 'Find...',
+        replacePlaceholder: 'Replace with...',
+        caseSensitive: 'Match case',
+        wholeWord: 'Whole word',
+        findNext: 'Next',
+        findPrev: 'Previous',
+        replace: 'Replace',
+        replaceAll: 'Replace all',
+        close: 'Close',
+        noMatches: 'No results',
+        matchesCount: '{current} of {total}',
+        replacedCount: '{count} matches replaced'
+      },
+      counter: {
+        words: 'Words',
+        characters: 'Characters',
+        readingTime: 'Reading'
       }
     }
   };
@@ -536,7 +584,11 @@
     plus: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" xmlns="http://www.w3.org/2000/svg"><line x1="8" y1="3" x2="8" y2="13"/><line x1="3" y1="8" x2="13" y2="8"/></svg>',
     resetWidth: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><line x1="3" y1="8" x2="13" y2="8"/><polyline points="5,5.5 2,8 5,10.5"/><polyline points="11,5.5 14,8 11,10.5"/></svg>',
     undo: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><polyline points="4,7 2,5 4,3"/><path d="M2,5 H10 A4,4 0 0 1 10,13 H6"/></svg>',
-    redo: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><polyline points="12,7 14,5 12,3"/><path d="M14,5 H6 A4,4 0 0 0 6,13 H10"/></svg>'
+    redo: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><polyline points="12,7 14,5 12,3"/><path d="M14,5 H6 A4,4 0 0 0 6,13 H10"/></svg>',
+    search: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><circle cx="7" cy="7" r="5"/><line x1="10.5" y1="10.5" x2="14" y2="14"/></svg>',
+    fullscreen: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><polyline points="3,6 3,3 6,3"/><polyline points="10,3 13,3 13,6"/><polyline points="13,10 13,13 10,13"/><polyline points="6,13 3,13 3,10"/></svg>',
+    fullscreenExit: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><polyline points="6,3 6,6 3,6"/><polyline points="13,6 10,6 10,3"/><polyline points="10,13 10,10 13,10"/><polyline points="3,10 6,10 6,13"/></svg>',
+    showBlocks: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="12" height="3" rx="0.5"/><rect x="2" y="6.5" width="12" height="3" rx="0.5"/><rect x="2" y="11" width="12" height="3" rx="0.5"/></svg>'
   };
 
   /**
@@ -551,6 +603,18 @@
     this.options = options || {};
     this.showToolbar = this.options.toolbar === true; // Nueva opción para toolbar en modo minimal
     this.showSummary = this.options.summary === true; // Nueva opción para mostrar resumen
+    this.showCharCounter = this.options.charCounter === true; // Barra inferior con contador de palabras/caracteres
+    this.enableFullscreen = this.options.fullscreen !== false; // Habilitar botón fullscreen (default: true)
+    this.enableFindReplace = this.options.findReplace !== false; // Habilitar Ctrl+F para buscar (default: true)
+    this.enableShowBlocks = this.options.showBlocksToggle !== false; // Habilitar toggle de bloques (default: true)
+    this.rtl = this.options.rtl === true; // Dirección derecha-a-izquierda
+
+    // Estado para nuevas features
+    this.isFullscreen = false;
+    this.showingBlocks = false;
+    this.findReplaceDialog = null;
+    this.findReplaceState = null;
+    this.charCounterBar = null;
     this.target = document.querySelector(this.options.target);
     this.blocks = this.options.blocks || [];
     this.onChange = this.options.onChange || function() {};
@@ -853,6 +917,11 @@
       this.createSummaryButton();
     }
 
+    // Inicializar valores del contador de palabras/caracteres
+    if (this.showCharCounter) {
+      this.updateCharCounter();
+    }
+
     // Enfocar el primer bloque automáticamente solo si autoFocus está habilitado
     var self = this;
     if (this.options.autoFocus) {
@@ -1038,6 +1107,11 @@
       if (this.options.theme) {
         editorWrapper.classList.add('mewyse-editor-' + this.options.theme);
       }
+      if (this.rtl) {
+        editorWrapper.classList.add('mewyse-rtl');
+        editorWrapper.setAttribute('dir', 'rtl');
+      }
+      this.editorWrapper = editorWrapper;
 
       // Crear y añadir toolbar
       this.toolbar = this.createToolbar();
@@ -1051,7 +1125,17 @@
       if (this.options.theme) {
         this.container.classList.add('mewyse-editor-' + this.options.theme);
       }
+      if (this.rtl) {
+        this.container.classList.add('mewyse-rtl');
+        this.container.setAttribute('dir', 'rtl');
+      }
       editorWrapper.appendChild(this.container);
+
+      // Barra de contador de palabras/caracteres (opcional)
+      if (this.showCharCounter) {
+        this.charCounterBar = this.createCharCounterBar();
+        editorWrapper.appendChild(this.charCounterBar);
+      }
 
       // Insertar el wrapper después del textarea
       this.target.parentNode.insertBefore(editorWrapper, this.target.nextSibling);
@@ -1064,7 +1148,17 @@
       if (this.options.theme) {
         this.container.classList.add('mewyse-editor-' + this.options.theme);
       }
+      if (this.rtl) {
+        this.container.classList.add('mewyse-rtl');
+        this.container.setAttribute('dir', 'rtl');
+      }
       this.target.parentNode.insertBefore(this.container, this.target.nextSibling);
+
+      // Barra de contador sin toolbar: se añade debajo del container
+      if (this.showCharCounter) {
+        this.charCounterBar = this.createCharCounterBar();
+        this.container.parentNode.insertBefore(this.charCounterBar, this.container.nextSibling);
+      }
     }
 
     // Inyectar estilos de contenido si la opción lo permite (por defecto: true)
@@ -1395,6 +1489,67 @@
     insertGroup.appendChild(imageButton);
 
     toolbar.appendChild(insertGroup);
+
+    // Separador antes del grupo de vistas
+    var separatorView = document.createElement('div');
+    separatorView.className = 'mewyse-toolbar-separator';
+    toolbar.appendChild(separatorView);
+
+    // Grupo de vistas/herramientas (find, showBlocks, fullscreen)
+    var viewGroup = document.createElement('div');
+    viewGroup.className = 'mewyse-toolbar-group';
+
+    // Botón de Buscar y reemplazar
+    if (this.enableFindReplace) {
+      var findBtn = document.createElement('button');
+      findBtn.className = 'mewyse-toolbar-button';
+      findBtn.innerHTML = WYSIWYG_ICONS.search;
+      findBtn.title = this.t('tooltips.findReplace') + ' (Ctrl+F)';
+      findBtn.setAttribute('aria-label', this.t('tooltips.findReplace'));
+      findBtn.onclick = function(e) {
+        e.preventDefault();
+        self.showFindReplace();
+      };
+      viewGroup.appendChild(findBtn);
+    }
+
+    // Botón de Mostrar bloques (show blocks)
+    if (this.enableShowBlocks) {
+      var showBlocksBtn = document.createElement('button');
+      showBlocksBtn.className = 'mewyse-toolbar-button';
+      showBlocksBtn.innerHTML = WYSIWYG_ICONS.showBlocks;
+      showBlocksBtn.title = this.t('tooltips.showBlocks');
+      showBlocksBtn.setAttribute('aria-label', this.t('tooltips.showBlocks'));
+      showBlocksBtn.setAttribute('aria-pressed', 'false');
+      showBlocksBtn.onclick = function(e) {
+        e.preventDefault();
+        self.toggleShowBlocks();
+        showBlocksBtn.setAttribute('aria-pressed', self.showingBlocks ? 'true' : 'false');
+        showBlocksBtn.classList.toggle('active', self.showingBlocks);
+      };
+      this.showBlocksButton = showBlocksBtn;
+      viewGroup.appendChild(showBlocksBtn);
+    }
+
+    // Botón de Pantalla completa (fullscreen)
+    if (this.enableFullscreen) {
+      var fullscreenBtn = document.createElement('button');
+      fullscreenBtn.className = 'mewyse-toolbar-button';
+      fullscreenBtn.innerHTML = WYSIWYG_ICONS.fullscreen;
+      fullscreenBtn.title = this.t('tooltips.fullscreen');
+      fullscreenBtn.setAttribute('aria-label', this.t('tooltips.fullscreen'));
+      fullscreenBtn.setAttribute('aria-pressed', 'false');
+      fullscreenBtn.onclick = function(e) {
+        e.preventDefault();
+        self.toggleFullscreen();
+      };
+      this.fullscreenButton = fullscreenBtn;
+      viewGroup.appendChild(fullscreenBtn);
+    }
+
+    if (viewGroup.children.length > 0) {
+      toolbar.appendChild(viewGroup);
+    }
 
     // Spacer para empujar los botones de mover a la derecha
     var spacer = document.createElement('div');
@@ -4279,35 +4434,86 @@
    * @param {Document} doc
    */
   meWYSE.prototype.cleanPastedDocument = function(doc) {
-    // Eliminar comentarios de Word
-    var comments = doc.querySelectorAll('o\\:p, xml, style, meta');
-    for (var i = 0; i < comments.length; i++) {
-      comments[i].remove();
+    // 1. Eliminar elementos de Word/Office completamente (+ XML, style, meta, script, link)
+    var junkSelector = 'o\\:p, v\\:*, w\\:*, m\\:*, xml, style, meta, link, script, title, head > *';
+    var junkNodes;
+    try {
+      junkNodes = doc.querySelectorAll(junkSelector);
+    } catch (e) {
+      junkNodes = doc.querySelectorAll('xml, style, meta, link, script');
+    }
+    for (var i = 0; i < junkNodes.length; i++) {
+      if (junkNodes[i].parentNode) junkNodes[i].remove();
     }
 
-    // Eliminar clases y estilos de Microsoft Office
+    // 2. Eliminar comentarios condicionales de Word (aparecen como texto "[if gte mso ...]")
+    var allNodes = doc.querySelectorAll('*');
+    for (var ci = 0; ci < allNodes.length; ci++) {
+      var cn = allNodes[ci];
+      // Nodo de comentario IE/Word
+      if (cn.nodeType === 8) cn.remove();
+    }
+
+    // 3. Convertir párrafos "ListParagraph" de Word (que simulan listas con texto) en items reales
+    this._convertWordListsToReal(doc);
+
+    // 4. Eliminar clases y estilos de Microsoft Office + atributos propietarios
     var allElements = doc.querySelectorAll('*');
     for (var j = 0; j < allElements.length; j++) {
       var el = allElements[j];
+
+      // Detectar si tenía ciertos estilos útiles antes de limpiar (bold/italic implícitos de Word)
+      var styleStr = el.getAttribute('style') || '';
+      var inheritedBold = /font-weight\s*:\s*(bold|[6-9]00)/i.test(styleStr);
+      var inheritedItalic = /font-style\s*:\s*italic/i.test(styleStr);
+      var inheritedUnderline = /text-decoration[^;]*underline/i.test(styleStr);
+
       el.removeAttribute('class');
       el.removeAttribute('style');
       el.removeAttribute('id');
-      // Eliminar atributos de Word
+      el.removeAttribute('lang');
+      el.removeAttribute('align');
+      el.removeAttribute('width');
+      el.removeAttribute('height');
+
+      // Eliminar atributos MS Office (mso-*), datos internos, xmlns, namespaces
       var attrs = el.attributes;
       var attrsToRemove = [];
       for (var k = 0; k < attrs.length; k++) {
         var attrName = attrs[k].name;
         if (attrName.indexOf('mso-') === 0 || attrName.indexOf('data-') === 0 ||
-            attrName.indexOf('xmlns') === 0 || attrName.indexOf('o:') === 0) {
+            attrName.indexOf('xmlns') === 0 || attrName.indexOf('o:') === 0 ||
+            attrName.indexOf('v:') === 0 || attrName.indexOf('w:') === 0 ||
+            attrName.indexOf('m:') === 0 || attrName === 'bgcolor' ||
+            attrName === 'cellpadding' || attrName === 'cellspacing' || attrName === 'border') {
           attrsToRemove.push(attrName);
         }
       }
       for (var l = 0; l < attrsToRemove.length; l++) {
         el.removeAttribute(attrsToRemove[l]);
       }
+
+      // Preservar formato inline inferido de estilos (bold/italic/underline) envolviendo el contenido
+      if (inheritedBold && el.tagName !== 'B' && el.tagName !== 'STRONG' && el.tagName !== 'H1' &&
+          el.tagName !== 'H2' && el.tagName !== 'H3' && el.tagName !== 'H4' && el.tagName !== 'H5' &&
+          el.tagName !== 'H6' && el.tagName !== 'TH' && el.childNodes.length > 0) {
+        var bWrap = doc.createElement('b');
+        while (el.firstChild) bWrap.appendChild(el.firstChild);
+        el.appendChild(bWrap);
+      }
+      if (inheritedItalic && el.tagName !== 'I' && el.tagName !== 'EM' && el.childNodes.length > 0) {
+        var iWrap = doc.createElement('i');
+        while (el.firstChild) iWrap.appendChild(el.firstChild);
+        el.appendChild(iWrap);
+      }
+      if (inheritedUnderline && el.tagName !== 'U' && el.childNodes.length > 0) {
+        var uWrap = doc.createElement('u');
+        while (el.firstChild) uWrap.appendChild(el.firstChild);
+        el.appendChild(uWrap);
+      }
     }
 
-    // Reemplazar &nbsp; con espacios normales
+    // 5. Reemplazar &nbsp; con espacios normales y normalizar saltos de línea
     var walker = document.createTreeWalker(
       doc.body,
       NodeFilter.SHOW_TEXT,
@@ -4316,19 +4522,89 @@
     );
     var textNode;
     while (textNode = walker.nextNode()) {
-      textNode.textContent = textNode.textContent.replace(/\u00A0/g, ' ');
+      textNode.textContent = textNode.textContent
+        .replace(/\u00A0/g, ' ')       // nbsp → espacio
+        .replace(/\u2028|\u2029/g, '') // separadores de línea/párrafo Unicode
+        .replace(/[\u200B-\u200D\uFEFF]/g, ''); // zero-width chars
     }
 
-    // Desenvolver SPANs vacíos o que solo contienen formato
-    var spans = doc.querySelectorAll('span');
-    for (var m = spans.length - 1; m >= 0; m--) {
-      var span = spans[m];
-      // Si el span no tiene atributos útiles, desenvolverlo
-      if (!span.getAttribute('href')) {
-        while (span.firstChild) {
-          span.parentNode.insertBefore(span.firstChild, span);
+    // 6. Desenvolver SPANs/FONTs vacíos o que solo contienen formato (no aportan nada)
+    var unwrapTags = ['SPAN', 'FONT'];
+    for (var ut = 0; ut < unwrapTags.length; ut++) {
+      var toUnwrap = doc.querySelectorAll(unwrapTags[ut].toLowerCase());
+      for (var m = toUnwrap.length - 1; m >= 0; m--) {
+        var elUnwrap = toUnwrap[m];
+        if (!elUnwrap.getAttribute('href')) {
+          while (elUnwrap.firstChild) {
+            elUnwrap.parentNode.insertBefore(elUnwrap.firstChild, elUnwrap);
+          }
+          elUnwrap.remove();
         }
-        span.remove();
+      }
+    }
+
+    // 7. Eliminar párrafos/divs completamente vacíos (resultado típico de Word)
+    var emptyCandidates = doc.querySelectorAll('p, div');
+    for (var ec = emptyCandidates.length - 1; ec >= 0; ec--) {
+      var candidate = emptyCandidates[ec];
+      var txt = (candidate.textContent || '').replace(/\s/g, '');
+      if (txt === '' && candidate.querySelectorAll('img, br, hr, table').length === 0) {
+        candidate.remove();
+      }
+    }
+  };
+
+  /**
+   * Convierte párrafos "ListParagraph" de Word (con viñetas visuales como texto) en
+   * verdaderos <ul>/<ol>. Word suele exportar listas como <p class="MsoListParagraph">
+   * con un bullet "·" o "o" al principio del texto.
+   */
+  meWYSE.prototype._convertWordListsToReal = function(doc) {
+    var paragraphs = doc.querySelectorAll('p');
+    // Patrones típicos de Word/Excel al inicio del texto de una "lista"
+    var bulletPattern = /^[\s\u00A0]*[·•●○◦o\u25CF\u25E6\u2022\u2043\u2219\u25AA\u25AB]\s+/;
+    var numberPattern = /^[\s\u00A0]*(\d+|[a-zA-Z])[.)\-]\s+/;
+
+    var currentList = null;
+    var currentType = null;
+
+    for (var i = 0; i < paragraphs.length; i++) {
+      var p = paragraphs[i];
+      var text = p.textContent || '';
+      var cls = p.getAttribute('class') || '';
+      var isWordList = /MsoList|ListParagraph/i.test(cls);
+
+      var matchBullet = bulletPattern.exec(text);
+      var matchNumber = numberPattern.exec(text);
+
+      if (isWordList || matchBullet || matchNumber) {
+        var listType = matchNumber ? 'ol' : 'ul';
+
+        // Crear o continuar lista
+        if (!currentList || currentType !== listType) {
+          currentList = doc.createElement(listType);
+          currentType = listType;
+          p.parentNode.insertBefore(currentList, p);
+        }
+
+        // Crear <li> y mover contenido (eliminando el bullet/numeración visual)
+        var li = doc.createElement('li');
+        // Remover el bullet/número del primer nodo de texto
+        if (p.firstChild && p.firstChild.nodeType === 3) {
+          var firstText = p.firstChild.textContent;
+          if (matchBullet) {
+            p.firstChild.textContent = firstText.replace(bulletPattern, '');
+          } else if (matchNumber) {
+            p.firstChild.textContent = firstText.replace(numberPattern, '');
+          }
+        }
+        while (p.firstChild) li.appendChild(p.firstChild);
+        currentList.appendChild(li);
+        p.remove();
+      } else {
+        // Cualquier párrafo normal rompe la lista actual
+        currentList = null;
+        currentType = null;
       }
     }
   };
@@ -6991,6 +7267,11 @@
         this.createLink();
         return;
       }
+      if (this.enableFindReplace && (e.key === 'f' || e.key === 'F')) {
+        e.preventDefault();
+        this.showFindReplace();
+        return;
+      }
     }
 
     // Enter: crear nuevo bloque
@@ -8498,6 +8779,11 @@
       }
     }
 
+    // Actualizar contador de palabras/caracteres si está visible
+    if (this.showCharCounter) {
+      this.updateCharCounter();
+    }
+
     this.onChange({
       blocks: this.blocks,
       plainText: this.getPlainText(),
@@ -8517,6 +8803,20 @@
     this.closeToolbarMenu();
     this.closeMentionMenu();
     this.closeEmojiMenu();
+
+    // Cerrar find/replace si estaba abierto
+    this.closeFindReplace();
+
+    // Salir de fullscreen si estaba activo
+    if (this.isFullscreen) {
+      this.exitFullscreen();
+    }
+
+    // Limpiar barra de contador
+    if (this.charCounterBar && this.charCounterBar.parentNode) {
+      this.charCounterBar.remove();
+      this.charCounterBar = null;
+    }
 
     // Limpiar estilos de contenido inyectados
     this._removeContentStyles();
@@ -9658,14 +9958,40 @@
       }, 200);
     });
 
-    // Posicionar tooltip
-    var buttonRect = this.summaryButton.getBoundingClientRect();
-    tooltip.style.position = 'fixed';
-    tooltip.style.top = (buttonRect.bottom + 5) + 'px';
-    tooltip.style.right = '10px';
-
+    // Añadir al DOM primero para poder medir dimensiones reales
     document.body.appendChild(tooltip);
     this.summaryTooltip = tooltip;
+
+    // Aplicar clase de tema si procede (para CSS variables dark)
+    this._applyMenuTheme && this._applyMenuTheme(tooltip);
+
+    // Posicionar tooltip anclado al botón de summary
+    var buttonRect = this.summaryButton.getBoundingClientRect();
+    var tooltipRect = tooltip.getBoundingClientRect();
+    var margin = 8;
+    var viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+    var viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+
+    // Alinear el borde derecho del tooltip al borde derecho del botón por defecto
+    var left = buttonRect.right - tooltipRect.width;
+    var top = buttonRect.bottom + 5;
+
+    // Si se sale por la izquierda del viewport, alinear al borde izquierdo del botón
+    if (left < margin) {
+      left = Math.min(buttonRect.left, viewportWidth - tooltipRect.width - margin);
+      if (left < margin) left = margin;
+    }
+
+    // Si se sale por abajo, mostrar arriba del botón
+    if (top + tooltipRect.height > viewportHeight - margin) {
+      top = buttonRect.top - tooltipRect.height - 5;
+      if (top < margin) top = margin;
+    }
+
+    tooltip.style.position = 'fixed';
+    tooltip.style.top = top + 'px';
+    tooltip.style.left = left + 'px';
+    tooltip.style.right = 'auto';
   };
 
   /**
@@ -10866,6 +11192,446 @@
         contentEditable.focus();
       }
     }
+  };
+
+  /**
+   * ============================================
+   * FULLSCREEN MODE
+   * ============================================
+   * Alterna el modo pantalla completa del editor
+   */
+  meWYSE.prototype.toggleFullscreen = function() {
+    if (this.isFullscreen) {
+      this.exitFullscreen();
+    } else {
+      this.enterFullscreen();
+    }
+  };
+
+  meWYSE.prototype.enterFullscreen = function() {
+    // Determinar qué elemento expandir: wrapper si hay toolbar, container si no
+    var target = this.editorWrapper || this.container;
+    if (!target) return;
+
+    target.classList.add('mewyse-fullscreen');
+    document.body.classList.add('mewyse-fullscreen-lock');
+    this.isFullscreen = true;
+
+    if (this.fullscreenButton) {
+      this.fullscreenButton.innerHTML = WYSIWYG_ICONS.fullscreenExit;
+      this.fullscreenButton.title = this.t('tooltips.fullscreenExit');
+      this.fullscreenButton.setAttribute('aria-label', this.t('tooltips.fullscreenExit'));
+      this.fullscreenButton.setAttribute('aria-pressed', 'true');
+      this.fullscreenButton.classList.add('active');
+    }
+
+    // Escape para salir
+    var self = this;
+    this._fullscreenEscHandler = function(e) {
+      if (e.key === 'Escape' && self.isFullscreen && !self.findReplaceDialog) {
+        self.exitFullscreen();
+      }
+    };
+    document.addEventListener('keydown', this._fullscreenEscHandler);
+  };
+
+  meWYSE.prototype.exitFullscreen = function() {
+    var target = this.editorWrapper || this.container;
+    if (!target) return;
+
+    target.classList.remove('mewyse-fullscreen');
+    document.body.classList.remove('mewyse-fullscreen-lock');
+    this.isFullscreen = false;
+
+    if (this.fullscreenButton) {
+      this.fullscreenButton.innerHTML = WYSIWYG_ICONS.fullscreen;
+      this.fullscreenButton.title = this.t('tooltips.fullscreen');
+      this.fullscreenButton.setAttribute('aria-label', this.t('tooltips.fullscreen'));
+      this.fullscreenButton.setAttribute('aria-pressed', 'false');
+      this.fullscreenButton.classList.remove('active');
+    }
+
+    if (this._fullscreenEscHandler) {
+      document.removeEventListener('keydown', this._fullscreenEscHandler);
+      this._fullscreenEscHandler = null;
+    }
+  };
+
+  /**
+   * ============================================
+   * SHOW BLOCKS (Debug view)
+   * ============================================
+   * Alterna la visualización de bordes en cada bloque
+   */
+  meWYSE.prototype.toggleShowBlocks = function() {
+    this.showingBlocks = !this.showingBlocks;
+    if (this.container) {
+      this.container.classList.toggle('mewyse-show-blocks', this.showingBlocks);
+    }
+  };
+
+  /**
+   * ============================================
+   * CHARACTER COUNTER BAR
+   * ============================================
+   * Crea la barra inferior con contador de palabras, caracteres y tiempo de lectura
+   */
+  meWYSE.prototype.createCharCounterBar = function() {
+    var bar = document.createElement('div');
+    bar.className = 'mewyse-char-counter';
+    if (this.options.theme) {
+      bar.classList.add('mewyse-editor-' + this.options.theme);
+    }
+    bar.setAttribute('role', 'status');
+    bar.setAttribute('aria-live', 'polite');
+
+    bar.innerHTML =
+      '<span class="mewyse-char-counter-item"><span class="label">' + this.t('counter.words') + ':</span> <span class="value" data-counter="words">0</span></span>' +
+      '<span class="mewyse-char-counter-item"><span class="label">' + this.t('counter.characters') + ':</span> <span class="value" data-counter="chars">0</span></span>' +
+      '<span class="mewyse-char-counter-item"><span class="label">' + this.t('counter.readingTime') + ':</span> <span class="value" data-counter="time">0 min</span></span>';
+
+    return bar;
+  };
+
+  /**
+   * Actualiza los valores del contador
+   */
+  meWYSE.prototype.updateCharCounter = function() {
+    if (!this.showCharCounter || !this.charCounterBar) return;
+
+    var words = this.getWordCount ? this.getWordCount() : 0;
+    var chars = this.getCharacterCount ? this.getCharacterCount() : 0;
+    var readingTime = this.getReadingTime ? this.getReadingTime() : 0;
+
+    var wordsEl = this.charCounterBar.querySelector('[data-counter="words"]');
+    var charsEl = this.charCounterBar.querySelector('[data-counter="chars"]');
+    var timeEl = this.charCounterBar.querySelector('[data-counter="time"]');
+
+    if (wordsEl) wordsEl.textContent = words;
+    if (charsEl) charsEl.textContent = chars;
+    if (timeEl) timeEl.textContent = readingTime + ' min';
+  };
+
+  /**
+   * ============================================
+   * FIND & REPLACE
+   * ============================================
+   * Muestra el diálogo de buscar y reemplazar
+   */
+  meWYSE.prototype.showFindReplace = function() {
+    if (this.findReplaceDialog) {
+      // Ya abierto: enfocar el campo
+      var input = this.findReplaceDialog.querySelector('.mewyse-fr-find-input');
+      if (input) input.focus();
+      return;
+    }
+
+    var self = this;
+    var t = function(key) { return self.t('findReplace.' + key); };
+
+    var dialog = document.createElement('div');
+    dialog.className = 'mewyse-find-replace';
+    if (this.options.theme) {
+      dialog.classList.add('mewyse-dark');
+    }
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-label', t('title'));
+
+    dialog.innerHTML =
+      '<div class="mewyse-fr-header">' +
+        '<span class="mewyse-fr-title">' + t('title') + '</span>' +
+        '<button class="mewyse-fr-close" aria-label="' + t('close') + '" title="' + t('close') + '">' + WYSIWYG_ICONS.close + '</button>' +
+      '</div>' +
+      '<div class="mewyse-fr-row">' +
+        '<input type="text" class="mewyse-fr-find-input" placeholder="' + t('findPlaceholder') + '" aria-label="' + t('findPlaceholder') + '">' +
+        '<span class="mewyse-fr-counter" aria-live="polite">0</span>' +
+      '</div>' +
+      '<div class="mewyse-fr-row">' +
+        '<input type="text" class="mewyse-fr-replace-input" placeholder="' + t('replacePlaceholder') + '" aria-label="' + t('replacePlaceholder') + '">' +
+      '</div>' +
+      '<div class="mewyse-fr-options">' +
+        '<label><input type="checkbox" class="mewyse-fr-case"> ' + t('caseSensitive') + '</label>' +
+        '<label><input type="checkbox" class="mewyse-fr-whole"> ' + t('wholeWord') + '</label>' +
+      '</div>' +
+      '<div class="mewyse-fr-actions">' +
+        '<button class="mewyse-fr-btn mewyse-fr-prev" title="' + t('findPrev') + '" aria-label="' + t('findPrev') + '">' + WYSIWYG_ICONS.arrowUp + '</button>' +
+        '<button class="mewyse-fr-btn mewyse-fr-next" title="' + t('findNext') + '" aria-label="' + t('findNext') + '">' + WYSIWYG_ICONS.arrowDown + '</button>' +
+        '<button class="mewyse-fr-btn mewyse-fr-replace">' + t('replace') + '</button>' +
+        '<button class="mewyse-fr-btn mewyse-fr-replace-all">' + t('replaceAll') + '</button>' +
+      '</div>';
+
+    document.body.appendChild(dialog);
+    this.findReplaceDialog = dialog;
+    this.findReplaceState = { matches: [], currentIndex: -1 };
+
+    // Posicionar en top-right del editor
+    this._positionFindReplace();
+
+    // Event bindings
+    var findInput = dialog.querySelector('.mewyse-fr-find-input');
+    var replaceInput = dialog.querySelector('.mewyse-fr-replace-input');
+    var caseInput = dialog.querySelector('.mewyse-fr-case');
+    var wholeInput = dialog.querySelector('.mewyse-fr-whole');
+
+    findInput.addEventListener('input', function() { self._searchInEditor(); });
+    caseInput.addEventListener('change', function() { self._searchInEditor(); });
+    wholeInput.addEventListener('change', function() { self._searchInEditor(); });
+
+    findInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (e.shiftKey) self._findNavigate(-1);
+        else self._findNavigate(1);
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        self.closeFindReplace();
+      }
+    });
+    replaceInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        self._replaceCurrent();
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        self.closeFindReplace();
+      }
+    });
+
+    dialog.querySelector('.mewyse-fr-close').onclick = function() { self.closeFindReplace(); };
+    dialog.querySelector('.mewyse-fr-prev').onclick = function() { self._findNavigate(-1); };
+    dialog.querySelector('.mewyse-fr-next').onclick = function() { self._findNavigate(1); };
+    dialog.querySelector('.mewyse-fr-replace').onclick = function() { self._replaceCurrent(); };
+    dialog.querySelector('.mewyse-fr-replace-all').onclick = function() { self._replaceAll(); };
+
+    setTimeout(function() { findInput.focus(); }, 10);
+  };
+
+  meWYSE.prototype._positionFindReplace = function() {
+    if (!this.findReplaceDialog || !this.container) return;
+    var rect;
+    // En fullscreen posicionar respecto al viewport
+    if (this.isFullscreen) {
+      this.findReplaceDialog.style.position = 'fixed';
+      this.findReplaceDialog.style.top = '16px';
+      this.findReplaceDialog.style.right = '16px';
+      this.findReplaceDialog.style.left = 'auto';
+      return;
+    }
+    this.findReplaceDialog.style.position = 'absolute';
+    rect = this.container.getBoundingClientRect();
+    this.findReplaceDialog.style.top = (rect.top + window.scrollY + 8) + 'px';
+    this.findReplaceDialog.style.left = (rect.right + window.scrollX - 360) + 'px';
+    this.findReplaceDialog.style.right = 'auto';
+  };
+
+  meWYSE.prototype.closeFindReplace = function() {
+    this._clearSearchHighlights();
+    if (this.findReplaceDialog) {
+      this.findReplaceDialog.remove();
+      this.findReplaceDialog = null;
+    }
+    this.findReplaceState = null;
+  };
+
+  meWYSE.prototype._clearSearchHighlights = function() {
+    if (!this.container) return;
+    var highlights = this.container.querySelectorAll('.mewyse-search-highlight');
+    for (var i = 0; i < highlights.length; i++) {
+      var h = highlights[i];
+      var parent = h.parentNode;
+      while (h.firstChild) parent.insertBefore(h.firstChild, h);
+      parent.removeChild(h);
+      parent.normalize();
+    }
+  };
+
+  meWYSE.prototype._searchInEditor = function() {
+    if (!this.findReplaceDialog) return;
+    this._clearSearchHighlights();
+
+    var query = this.findReplaceDialog.querySelector('.mewyse-fr-find-input').value;
+    var caseSensitive = this.findReplaceDialog.querySelector('.mewyse-fr-case').checked;
+    var wholeWord = this.findReplaceDialog.querySelector('.mewyse-fr-whole').checked;
+    var counter = this.findReplaceDialog.querySelector('.mewyse-fr-counter');
+
+    if (!query) {
+      counter.textContent = '0';
+      this.findReplaceState = { matches: [], currentIndex: -1 };
+      return;
+    }
+
+    // Construir regex segura
+    var escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    if (wholeWord) escaped = '\\b' + escaped + '\\b';
+    var flags = caseSensitive ? 'g' : 'gi';
+    var regex;
+    try { regex = new RegExp(escaped, flags); } catch (e) { return; }
+
+    // Iterar por todos los text nodes del editor y envolver matches
+    var matches = [];
+    var walker = document.createTreeWalker(this.container, NodeFilter.SHOW_TEXT, null, false);
+    var textNodes = [];
+    var n;
+    while ((n = walker.nextNode())) {
+      // No buscar dentro de elementos ya highlight
+      if (n.parentNode && !n.parentNode.closest('.mewyse-search-highlight')) {
+        textNodes.push(n);
+      }
+    }
+
+    for (var i = 0; i < textNodes.length; i++) {
+      var tn = textNodes[i];
+      var text = tn.textContent;
+      if (!text) continue;
+      var local = new RegExp(escaped, flags);
+      var m, lastIndex = 0;
+      var parent = tn.parentNode;
+      if (!parent) continue;
+      var frag = document.createDocumentFragment();
+      var found = false;
+      while ((m = local.exec(text)) !== null) {
+        if (m.index > lastIndex) {
+          frag.appendChild(document.createTextNode(text.substring(lastIndex, m.index)));
+        }
+        var span = document.createElement('span');
+        span.className = 'mewyse-search-highlight';
+        span.textContent = m[0];
+        frag.appendChild(span);
+        matches.push(span);
+        lastIndex = m.index + m[0].length;
+        found = true;
+        // Evitar bucle infinito con regex de match vacío
+        if (m[0].length === 0) local.lastIndex++;
+      }
+      if (found) {
+        if (lastIndex < text.length) {
+          frag.appendChild(document.createTextNode(text.substring(lastIndex)));
+        }
+        parent.replaceChild(frag, tn);
+      }
+    }
+
+    this.findReplaceState = {
+      matches: matches,
+      currentIndex: matches.length > 0 ? 0 : -1
+    };
+    this._highlightCurrentMatch();
+    this._updateFindCounter();
+  };
+
+  meWYSE.prototype._highlightCurrentMatch = function() {
+    if (!this.findReplaceState) return;
+    var matches = this.findReplaceState.matches;
+    for (var i = 0; i < matches.length; i++) {
+      matches[i].classList.remove('current');
+    }
+    var idx = this.findReplaceState.currentIndex;
+    if (idx >= 0 && idx < matches.length) {
+      matches[idx].classList.add('current');
+      try { matches[idx].scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) {}
+    }
+  };
+
+  meWYSE.prototype._updateFindCounter = function() {
+    if (!this.findReplaceDialog || !this.findReplaceState) return;
+    var counter = this.findReplaceDialog.querySelector('.mewyse-fr-counter');
+    var total = this.findReplaceState.matches.length;
+    if (total === 0) {
+      counter.textContent = this.t('findReplace.noMatches');
+    } else {
+      counter.textContent = this.t('findReplace.matchesCount', {
+        current: this.findReplaceState.currentIndex + 1,
+        total: total
+      });
+    }
+  };
+
+  meWYSE.prototype._findNavigate = function(dir) {
+    if (!this.findReplaceState || this.findReplaceState.matches.length === 0) return;
+    var total = this.findReplaceState.matches.length;
+    this.findReplaceState.currentIndex =
+      (this.findReplaceState.currentIndex + dir + total) % total;
+    this._highlightCurrentMatch();
+    this._updateFindCounter();
+  };
+
+  meWYSE.prototype._replaceCurrent = function() {
+    if (!this.findReplaceState || this.findReplaceState.currentIndex < 0) return;
+    var idx = this.findReplaceState.currentIndex;
+    var span = this.findReplaceState.matches[idx];
+    if (!span || !span.parentNode) return;
+
+    var replaceInput = this.findReplaceDialog.querySelector('.mewyse-fr-replace-input');
+    var replacement = replaceInput ? replaceInput.value : '';
+
+    this.pushHistory(true);
+
+    // Reemplazar el span por un text node con el nuevo valor
+    var parent = span.parentNode;
+    var textNode = document.createTextNode(replacement);
+    parent.replaceChild(textNode, span);
+    parent.normalize();
+
+    // Actualizar el bloque correspondiente en el array de blocks
+    var blockElement = parent.closest && parent.closest('[data-block-id]');
+    if (blockElement) {
+      var blockId = parseInt(blockElement.getAttribute('data-block-id'));
+      var contentEditable = blockElement.querySelector('[contenteditable="true"]') ||
+                            (blockElement.getAttribute('contenteditable') === 'true' ? blockElement : null);
+      if (contentEditable) {
+        this.updateBlockContent(blockId, contentEditable.innerHTML);
+      }
+    }
+
+    // Re-buscar para actualizar posiciones
+    this._searchInEditor();
+    this.triggerChange();
+  };
+
+  meWYSE.prototype._replaceAll = function() {
+    if (!this.findReplaceState || this.findReplaceState.matches.length === 0) return;
+    var replaceInput = this.findReplaceDialog.querySelector('.mewyse-fr-replace-input');
+    var replacement = replaceInput ? replaceInput.value : '';
+    var count = this.findReplaceState.matches.length;
+
+    this.pushHistory(true);
+
+    // Recolectar bloques afectados para actualizar el modelo después
+    var affectedBlockIds = {};
+    for (var i = 0; i < this.findReplaceState.matches.length; i++) {
+      var span = this.findReplaceState.matches[i];
+      if (!span || !span.parentNode) continue;
+
+      var blockElement = span.parentNode.closest && span.parentNode.closest('[data-block-id]');
+      if (blockElement) {
+        affectedBlockIds[blockElement.getAttribute('data-block-id')] = blockElement;
+      }
+
+      var parent = span.parentNode;
+      parent.replaceChild(document.createTextNode(replacement), span);
+      parent.normalize();
+    }
+
+    // Actualizar el modelo
+    for (var id in affectedBlockIds) {
+      if (affectedBlockIds.hasOwnProperty(id)) {
+        var el = affectedBlockIds[id];
+        var ce = el.querySelector('[contenteditable="true"]') ||
+                 (el.getAttribute('contenteditable') === 'true' ? el : null);
+        if (ce) {
+          this.updateBlockContent(parseInt(id), ce.innerHTML);
+        }
+      }
+    }
+
+    // Feedback al usuario via contador
+    if (this.findReplaceDialog) {
+      var counter = this.findReplaceDialog.querySelector('.mewyse-fr-counter');
+      counter.textContent = this.t('findReplace.replacedCount', { count: count });
+    }
+
+    this.findReplaceState = { matches: [], currentIndex: -1 };
+    this.triggerChange();
   };
 
   /**

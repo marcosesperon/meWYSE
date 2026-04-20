@@ -1633,3 +1633,345 @@
   --mewyse-danger-bg: #3a2020;
   --mewyse-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
+
+/* ============================================
+   Toolbar button — estado activo (toggle)
+   ============================================ */
+.mewyse-toolbar-button.active {
+  background: var(--mewyse-bg-active);
+  color: var(--mewyse-accent);
+}
+
+/* ============================================
+   FULLSCREEN MODE
+   ============================================ */
+.mewyse-editor-wrapper.mewyse-fullscreen,
+.mewyse-editor.mewyse-fullscreen {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9998;
+  border-radius: 0;
+  background: var(--mewyse-bg-primary);
+  margin: 0;
+  border: none;
+}
+
+.mewyse-editor-wrapper.mewyse-fullscreen > .mewyse-editor {
+  flex: 1;
+  max-height: none;
+  height: auto;
+  min-height: 0;
+}
+
+.mewyse-editor.mewyse-fullscreen {
+  max-height: 100vh !important;
+  overflow-y: auto;
+  padding: 32px;
+}
+
+body.mewyse-fullscreen-lock {
+  overflow: hidden;
+}
+
+/* ============================================
+   SHOW BLOCKS (Debug view)
+   ============================================ */
+.mewyse-editor.mewyse-show-blocks {
+  padding-top: 28px;
+}
+
+.mewyse-editor.mewyse-show-blocks .mewyse-block {
+  outline: 1px dashed rgba(102, 126, 234, 0.5);
+  outline-offset: 2px;
+  position: relative;
+  margin-top: 20px !important;
+}
+
+.mewyse-editor.mewyse-show-blocks .mewyse-block::after {
+  content: attr(data-block-type);
+  position: absolute;
+  top: -18px;
+  left: 0;
+  font-size: 10px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  background: var(--mewyse-accent);
+  color: #fff;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.85;
+  z-index: 1;
+  pointer-events: none;
+  line-height: 1.4;
+}
+
+.mewyse-editor.mewyse-show-blocks.mewyse-rtl .mewyse-block::after {
+  left: auto;
+  right: 0;
+}
+
+.mewyse-editor.mewyse-show-blocks .mewyse-list-group,
+.mewyse-editor.mewyse-show-blocks .mewyse-checklist-group {
+  outline: 1px dotted rgba(102, 126, 234, 0.3);
+  outline-offset: 4px;
+}
+
+/* ============================================
+   CHARACTER COUNTER BAR
+   ============================================ */
+.mewyse-char-counter {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 6px 14px;
+  font-size: 12px;
+  color: var(--mewyse-text-secondary);
+  background: var(--mewyse-bg-secondary);
+  border-top: 1px solid var(--mewyse-border-light);
+  border-bottom-left-radius: var(--mewyse-radius-xl);
+  border-bottom-right-radius: var(--mewyse-radius-xl);
+  user-select: none;
+  font-feature-settings: 'tnum' 1;
+}
+
+.mewyse-char-counter-item {
+  display: inline-flex;
+  gap: 4px;
+  align-items: baseline;
+}
+
+.mewyse-char-counter-item .label {
+  color: var(--mewyse-text-muted);
+}
+
+.mewyse-char-counter-item .value {
+  font-weight: 600;
+  color: var(--mewyse-text-primary);
+}
+
+/* ============================================
+   RTL SUPPORT
+   ============================================ */
+.mewyse-rtl {
+  direction: rtl;
+}
+
+.mewyse-rtl .mewyse-editor {
+  text-align: right;
+}
+
+.mewyse-rtl .mewyse-toolbar {
+  flex-direction: row-reverse;
+}
+
+.mewyse-rtl .mewyse-char-counter {
+  flex-direction: row-reverse;
+}
+
+.mewyse-rtl .mewyse-list-group {
+  padding-right: 24px;
+  padding-left: 0;
+}
+
+/* La toolbar nativa RTL invierte el orden, pero los spacers flex siguen funcionando */
+.mewyse-editor-wrapper.mewyse-rtl .mewyse-toolbar > div[style*="flex: 1"] {
+  /* spacer mantiene su rol de empujar elementos al extremo contrario */
+}
+
+/* ============================================
+   FIND & REPLACE DIALOG
+   ============================================ */
+.mewyse-find-replace {
+  position: absolute;
+  width: 340px;
+  background: var(--mewyse-bg-primary);
+  border: 1px solid var(--mewyse-border-light);
+  border-radius: var(--mewyse-radius-lg);
+  box-shadow: var(--mewyse-shadow-lg);
+  padding: 12px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-family: inherit;
+  color: var(--mewyse-text-primary);
+}
+
+.mewyse-find-replace.mewyse-dark {
+  --mewyse-text-primary: #ddd;
+  --mewyse-text-secondary: #aaa;
+  --mewyse-text-muted: #777;
+  --mewyse-bg-primary: #1e1e2e;
+  --mewyse-bg-secondary: #2a2a3d;
+  --mewyse-bg-hover: #383850;
+  --mewyse-border-light: #383850;
+  --mewyse-border-medium: #44445a;
+  --mewyse-accent: #7b8ff0;
+}
+
+.mewyse-fr-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--mewyse-border-light);
+}
+
+.mewyse-fr-title {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--mewyse-text-primary);
+}
+
+.mewyse-fr-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--mewyse-text-muted);
+  padding: 4px;
+  border-radius: var(--mewyse-radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mewyse-fr-close:hover {
+  background: var(--mewyse-bg-hover);
+  color: var(--mewyse-text-primary);
+}
+
+.mewyse-fr-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mewyse-fr-find-input,
+.mewyse-fr-replace-input {
+  flex: 1;
+  padding: 6px 10px;
+  border: 1px solid var(--mewyse-border-medium);
+  border-radius: var(--mewyse-radius-md);
+  font-size: 13px;
+  font-family: inherit;
+  background: var(--mewyse-bg-primary);
+  color: var(--mewyse-text-primary);
+  outline: none;
+}
+
+.mewyse-fr-find-input:focus,
+.mewyse-fr-replace-input:focus {
+  border-color: var(--mewyse-accent);
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.15);
+}
+
+.mewyse-fr-counter {
+  font-size: 11px;
+  color: var(--mewyse-text-muted);
+  min-width: 70px;
+  text-align: right;
+  font-feature-settings: 'tnum' 1;
+}
+
+.mewyse-fr-options {
+  display: flex;
+  gap: 14px;
+  font-size: 12px;
+  color: var(--mewyse-text-secondary);
+}
+
+.mewyse-fr-options label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.mewyse-fr-options input[type="checkbox"] {
+  cursor: pointer;
+  accent-color: var(--mewyse-accent);
+}
+
+.mewyse-fr-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.mewyse-fr-btn {
+  padding: 5px 10px;
+  border: 1px solid var(--mewyse-border-medium);
+  background: var(--mewyse-bg-secondary);
+  color: var(--mewyse-text-primary);
+  border-radius: var(--mewyse-radius-md);
+  cursor: pointer;
+  font-size: 12px;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.mewyse-fr-btn:hover {
+  background: var(--mewyse-bg-hover);
+  border-color: var(--mewyse-border-dark);
+}
+
+.mewyse-fr-prev,
+.mewyse-fr-next {
+  padding: 5px 8px;
+}
+
+.mewyse-fr-replace-all {
+  background: var(--mewyse-accent);
+  color: #fff;
+  border-color: var(--mewyse-accent);
+}
+
+.mewyse-fr-replace-all:hover {
+  background: var(--mewyse-accent-hover);
+  border-color: var(--mewyse-accent-hover);
+}
+
+/* Highlights dentro del contenido del editor */
+.mewyse-search-highlight {
+  background: rgba(255, 221, 0, 0.4);
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px rgba(255, 221, 0, 0.6);
+}
+
+.mewyse-search-highlight.current {
+  background: rgba(255, 152, 0, 0.6);
+  box-shadow: 0 0 0 1px rgba(255, 152, 0, 0.9);
+}
+
+/* Dark mode para highlights */
+.mewyse-editor-dark .mewyse-search-highlight,
+.mewyse-editor.mewyse-editor-dark .mewyse-search-highlight {
+  background: rgba(255, 221, 0, 0.25);
+  box-shadow: 0 0 0 1px rgba(255, 221, 0, 0.4);
+  color: inherit;
+}
+
+.mewyse-editor-dark .mewyse-search-highlight.current,
+.mewyse-editor.mewyse-editor-dark .mewyse-search-highlight.current {
+  background: rgba(255, 152, 0, 0.4);
+  box-shadow: 0 0 0 1px rgba(255, 152, 0, 0.6);
+}
+
+/* Responsive: en móvil el diálogo ocupa toda la parte superior */
+@media (max-width: 480px) {
+  .mewyse-find-replace {
+    width: calc(100vw - 20px);
+    left: 10px !important;
+    right: 10px;
+  }
+}
