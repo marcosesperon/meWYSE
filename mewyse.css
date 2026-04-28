@@ -1967,11 +1967,285 @@ body.mewyse-fullscreen-lock {
   box-shadow: 0 0 0 1px rgba(255, 152, 0, 0.6);
 }
 
+/* ============================================
+   Drag & drop de imágenes (visual feedback)
+   ============================================ */
+.mewyse-editor.mewyse-image-drop-target {
+  outline: 2px dashed var(--mewyse-accent);
+  outline-offset: -8px;
+  background-color: rgba(102, 126, 234, 0.05);
+}
+
+/* Imagen siendo arrastrada */
+.mewyse-image.mewyse-image-dragging {
+  opacity: 0.4;
+  cursor: grabbing !important;
+}
+
+/* Cursor grab sobre imágenes (pista visual de que son arrastrables) */
+.mewyse-image {
+  cursor: grab;
+}
+
+.mewyse-image:active {
+  cursor: grabbing;
+}
+
+/* Celda destino de drop */
+td.mewyse-image-drop-target-cell,
+th.mewyse-image-drop-target-cell {
+  outline: 2px solid var(--mewyse-accent);
+  outline-offset: -2px;
+  background-color: rgba(102, 126, 234, 0.1);
+}
+
+/* ============================================
+   Menú de tipos de bloque: separator + preview de styleFormats
+   ============================================ */
+.mewyse-type-menu-separator {
+  height: 1px;
+  background: var(--mewyse-border-light);
+  margin: 4px 0;
+}
+
+.mewyse-style-preview {
+  /* El usuario define los estilos de las classes en su CSS. Este
+     selector solo asegura que la clase se aplica al preview. */
+  flex: 1;
+}
+
+/* ============================================
+   MODAL: Panel avanzado colapsable (imagen)
+   ============================================ */
+.mewyse-modal-advanced-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 8px 12px;
+  margin: 8px 0;
+  background: var(--mewyse-bg-secondary);
+  border: 1px solid var(--mewyse-border-light);
+  border-radius: var(--mewyse-radius-md);
+  color: var(--mewyse-text-secondary);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.mewyse-modal-advanced-toggle:hover {
+  background: var(--mewyse-bg-hover);
+  color: var(--mewyse-text-primary);
+}
+
+.mewyse-modal-advanced-toggle .dropdown-arrow {
+  display: inline-flex;
+  transition: transform 0.2s ease;
+}
+
+.mewyse-modal-advanced-toggle.expanded .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+.mewyse-modal-advanced-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px 4px;
+  margin-bottom: 8px;
+}
+
+.mewyse-modal-advanced-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mewyse-modal-advanced-row label {
+  flex: 0 0 100px;
+  font-size: 12px;
+  color: var(--mewyse-text-secondary);
+  font-weight: 500;
+}
+
+.mewyse-modal-advanced-inline {
+  display: flex;
+  gap: 6px;
+  flex: 1;
+  align-items: center;
+}
+
+.mewyse-modal-advanced-inline select,
+.mewyse-modal-advanced-inline input[type="number"] {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ============================================
+   BLOQUE VIDEO — responsive 16:9
+   ============================================ */
+.mewyse-video-wrapper {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  max-width: 100%;
+  margin: 8px 0;
+  border-radius: var(--mewyse-radius-md);
+  overflow: hidden;
+  background-color: #000;
+}
+
+.mewyse-video-wrapper iframe,
+.mewyse-video-wrapper video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.mewyse-video-placeholder,
+.mewyse-audio-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  color: var(--mewyse-text-muted);
+  font-style: italic;
+  background: var(--mewyse-bg-secondary);
+  border-radius: var(--mewyse-radius-md);
+}
+
+/* ============================================
+   BLOQUE AUDIO
+   ============================================ */
+.mewyse-audio-wrapper {
+  display: block;
+  margin: 8px 0;
+}
+
+.mewyse-audio-wrapper audio {
+  width: 100%;
+}
+
 /* Responsive: en móvil el diálogo ocupa toda la parte superior */
 @media (max-width: 480px) {
   .mewyse-find-replace {
     width: calc(100vw - 20px);
     left: 10px !important;
     right: 10px;
+  }
+}
+
+/* ============================================
+   MODAL: Propiedades de la tabla
+   ============================================ */
+.mewyse-table-properties-modal {
+  min-width: 480px;
+  max-width: 580px;
+}
+
+.mewyse-table-properties-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 18px;
+  margin: 16px 0;
+}
+
+.mewyse-table-properties-modal .mewyse-modal-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mewyse-table-properties-modal .mewyse-modal-input-group label {
+  font-size: 12px;
+  color: var(--mewyse-text-secondary);
+  font-weight: 500;
+}
+
+.mewyse-table-properties-modal .mewyse-modal-input {
+  padding: 6px 10px;
+  font-size: 13px;
+  font-family: inherit;
+  border: 1px solid var(--mewyse-border-medium);
+  border-radius: var(--mewyse-radius-md);
+  background: var(--mewyse-bg-primary);
+  color: var(--mewyse-text-primary);
+  outline: none;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+}
+
+.mewyse-table-properties-modal select.mewyse-modal-input {
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+                    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: calc(100% - 14px) calc(50% - 2px),
+                       calc(100% - 10px) calc(50% - 2px);
+  background-size: 4px 4px, 4px 4px;
+  background-repeat: no-repeat;
+  padding-right: 26px;
+}
+
+.mewyse-table-properties-modal .mewyse-modal-input:focus {
+  border-color: var(--mewyse-accent);
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.15);
+}
+
+.mewyse-modal-color {
+  height: 32px;
+  padding: 2px;
+  cursor: pointer;
+}
+
+.mewyse-modal-color-wrap {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.mewyse-modal-color-wrap .mewyse-modal-color {
+  flex: 1;
+}
+
+.mewyse-modal-btn-small {
+  padding: 4px 10px;
+  font-size: 11px;
+  font-family: inherit;
+  border: 1px solid var(--mewyse-border-medium);
+  background: var(--mewyse-bg-secondary);
+  color: var(--mewyse-text-secondary);
+  border-radius: var(--mewyse-radius-md);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.mewyse-modal-btn-small:hover {
+  background: var(--mewyse-bg-hover);
+  color: var(--mewyse-text-primary);
+}
+
+/* Dark mode del modal de propiedades */
+.mewyse-table-properties-modal.mewyse-editor-dark {
+  background: var(--mewyse-bg-primary);
+  color: var(--mewyse-text-primary);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .mewyse-table-properties-modal {
+    min-width: auto;
+    width: calc(100vw - 32px);
+  }
+  .mewyse-table-properties-grid {
+    grid-template-columns: 1fr;
   }
 }

@@ -24,7 +24,9 @@
         checklist: 'Lista de tareas',
         table: 'Tabla',
         image: 'Imagen',
-        divider: 'Separador'
+        divider: 'Separador',
+        video: 'Vídeo',
+        audio: 'Audio'
       },
       blockTypeDescriptions: {
         paragraph: 'Texto normal',
@@ -38,7 +40,9 @@
         checklist: 'Tareas con checkbox',
         table: 'Tabla de datos',
         image: 'Insertar imagen',
-        divider: 'Línea divisoria'
+        divider: 'Línea divisoria',
+        video: 'YouTube, Vimeo o archivo .mp4',
+        audio: 'Archivo de audio (mp3, ogg...)'
       },
       tooltips: {
         dragToReorder: 'Arrastrar para reordenar o hacer clic para opciones',
@@ -69,7 +73,15 @@
         findReplace: 'Buscar y reemplazar',
         fullscreen: 'Pantalla completa',
         fullscreenExit: 'Salir de pantalla completa',
-        showBlocks: 'Mostrar bloques'
+        showBlocks: 'Mostrar bloques',
+        removeFormat: 'Limpiar formato',
+        insertVideo: 'Insertar vídeo',
+        insertAudio: 'Insertar audio',
+        caseUpper: 'MAYÚSCULAS',
+        caseLower: 'minúsculas',
+        caseTitle: 'Tipo Título',
+        caseSentence: 'Tipo oración',
+        caseToggle: 'Invertir tipo'
       },
       blockMenu: {
         insertAbove: 'Insertar bloque arriba',
@@ -79,7 +91,8 @@
         deleteMultiple: 'Eliminar {count} bloques',
         changeType: 'Cambiar tipo de bloque',
         changeTypeMultiple: 'Cambiar tipo de {count} bloques',
-        resetTableWidth: 'Ajustar tabla al 100%'
+        resetTableWidth: 'Ajustar tabla al 100%',
+        tableProperties: 'Propiedades de la tabla'
       },
       tableMenu: {
         rowOptions: 'Opciones de fila',
@@ -113,7 +126,15 @@
         cancel: 'Cancelar',
         insert: 'Insertar',
         save: 'Guardar',
-        update: 'Actualizar'
+        update: 'Actualizar',
+        videoUrl: 'URL del vídeo (YouTube, Vimeo, .mp4, .webm)',
+        audioUrl: 'URL del audio (mp3, ogg...)',
+        insertVideoTitle: 'Insertar vídeo',
+        insertAudioTitle: 'Insertar audio',
+        advancedOptions: 'Opciones avanzadas',
+        imageBorder: 'Borde',
+        imageMargin: 'Márgenes',
+        imageAlignment: 'Alineación'
       },
       summary: {
         title: 'Resumen del documento',
@@ -138,7 +159,10 @@
       },
       alerts: {
         cannotDeleteLastRow: 'No se puede eliminar la única fila de la tabla',
-        cannotDeleteLastColumn: 'No se puede eliminar la única columna de la tabla'
+        cannotDeleteLastColumn: 'No se puede eliminar la única columna de la tabla',
+        imageTooLarge: 'La imagen no puede superar {size} de peso.',
+        invalidVideoUrl: 'URL de vídeo no válida. Usa YouTube, Vimeo o un archivo .mp4/.webm/.ogg.',
+        invalidAudioUrl: 'URL de audio no válida. Usa un archivo .mp3/.ogg/.wav.'
       },
       misc: {
         text: 'Texto',
@@ -164,6 +188,33 @@
         words: 'Palabras',
         characters: 'Caracteres',
         readingTime: 'Lectura'
+      },
+      tableProperties: {
+        title: 'Propiedades de la tabla',
+        width: 'Ancho',
+        height: 'Alto',
+        cellSpacing: 'Espacio entre celdas',
+        cellPadding: 'Relleno de celda',
+        border: 'Borde',
+        borderWidth: 'Grosor del borde',
+        borderStyle: 'Estilo de borde',
+        borderColor: 'Color del borde',
+        alignment: 'Alineación',
+        backgroundColor: 'Color de fondo',
+        alignLeft: 'Izquierda',
+        alignCenter: 'Centrado',
+        alignRight: 'Derecha',
+        styleSolid: 'Sólido',
+        styleDashed: 'Discontinuo',
+        styleDotted: 'Punteado',
+        styleDouble: 'Doble',
+        styleNone: 'Sin borde',
+        unitPx: 'px',
+        unitPct: '%',
+        unitAuto: 'Auto',
+        apply: 'Aplicar',
+        cancel: 'Cancelar',
+        reset: 'Restablecer'
       }
     },
     en: {
@@ -179,7 +230,9 @@
         checklist: 'Checklist',
         table: 'Table',
         image: 'Image',
-        divider: 'Divider'
+        divider: 'Divider',
+        video: 'Video',
+        audio: 'Audio'
       },
       blockTypeDescriptions: {
         paragraph: 'Normal text',
@@ -193,7 +246,9 @@
         checklist: 'Tasks with checkbox',
         table: 'Data table',
         image: 'Insert image',
-        divider: 'Dividing line'
+        divider: 'Dividing line',
+        video: 'YouTube, Vimeo or .mp4 file',
+        audio: 'Audio file (mp3, ogg...)'
       },
       tooltips: {
         dragToReorder: 'Drag to reorder or click for options',
@@ -224,7 +279,15 @@
         findReplace: 'Find and replace',
         fullscreen: 'Fullscreen',
         fullscreenExit: 'Exit fullscreen',
-        showBlocks: 'Show blocks'
+        showBlocks: 'Show blocks',
+        removeFormat: 'Clear formatting',
+        insertVideo: 'Insert video',
+        insertAudio: 'Insert audio',
+        caseUpper: 'UPPERCASE',
+        caseLower: 'lowercase',
+        caseTitle: 'Title Case',
+        caseSentence: 'Sentence case',
+        caseToggle: 'tOGGLE cASE'
       },
       blockMenu: {
         insertAbove: 'Insert block above',
@@ -234,7 +297,8 @@
         deleteMultiple: 'Delete {count} blocks',
         changeType: 'Change block type',
         changeTypeMultiple: 'Change type of {count} blocks',
-        resetTableWidth: 'Fit table to 100%'
+        resetTableWidth: 'Fit table to 100%',
+        tableProperties: 'Table properties'
       },
       tableMenu: {
         rowOptions: 'Row options',
@@ -268,7 +332,15 @@
         cancel: 'Cancel',
         insert: 'Insert',
         save: 'Save',
-        update: 'Update'
+        update: 'Update',
+        videoUrl: 'Video URL (YouTube, Vimeo, .mp4, .webm)',
+        audioUrl: 'Audio URL (mp3, ogg...)',
+        insertVideoTitle: 'Insert video',
+        insertAudioTitle: 'Insert audio',
+        advancedOptions: 'Advanced options',
+        imageBorder: 'Border',
+        imageMargin: 'Margin',
+        imageAlignment: 'Alignment'
       },
       summary: {
         title: 'Document summary',
@@ -293,7 +365,10 @@
       },
       alerts: {
         cannotDeleteLastRow: 'Cannot delete the only row in the table',
-        cannotDeleteLastColumn: 'Cannot delete the only column in the table'
+        cannotDeleteLastColumn: 'Cannot delete the only column in the table',
+        imageTooLarge: 'Image size must not exceed {size}.',
+        invalidVideoUrl: 'Invalid video URL. Use YouTube, Vimeo or a .mp4/.webm/.ogg file.',
+        invalidAudioUrl: 'Invalid audio URL. Use a .mp3/.ogg/.wav file.'
       },
       misc: {
         text: 'Text',
@@ -319,6 +394,33 @@
         words: 'Words',
         characters: 'Characters',
         readingTime: 'Reading'
+      },
+      tableProperties: {
+        title: 'Table properties',
+        width: 'Width',
+        height: 'Height',
+        cellSpacing: 'Cell spacing',
+        cellPadding: 'Cell padding',
+        border: 'Border',
+        borderWidth: 'Border width',
+        borderStyle: 'Border style',
+        borderColor: 'Border color',
+        alignment: 'Alignment',
+        backgroundColor: 'Background color',
+        alignLeft: 'Left',
+        alignCenter: 'Center',
+        alignRight: 'Right',
+        styleSolid: 'Solid',
+        styleDashed: 'Dashed',
+        styleDotted: 'Dotted',
+        styleDouble: 'Double',
+        styleNone: 'None',
+        unitPx: 'px',
+        unitPct: '%',
+        unitAuto: 'Auto',
+        apply: 'Apply',
+        cancel: 'Cancel',
+        reset: 'Reset'
       }
     }
   };
@@ -588,7 +690,10 @@
     search: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><circle cx="7" cy="7" r="5"/><line x1="10.5" y1="10.5" x2="14" y2="14"/></svg>',
     fullscreen: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><polyline points="3,6 3,3 6,3"/><polyline points="10,3 13,3 13,6"/><polyline points="13,10 13,13 10,13"/><polyline points="6,13 3,13 3,10"/></svg>',
     fullscreenExit: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><polyline points="6,3 6,6 3,6"/><polyline points="13,6 10,6 10,3"/><polyline points="10,13 10,10 13,10"/><polyline points="3,10 6,10 6,13"/></svg>',
-    showBlocks: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="12" height="3" rx="0.5"/><rect x="2" y="6.5" width="12" height="3" rx="0.5"/><rect x="2" y="11" width="12" height="3" rx="0.5"/></svg>'
+    showBlocks: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="12" height="3" rx="0.5"/><rect x="2" y="6.5" width="12" height="3" rx="0.5"/><rect x="2" y="11" width="12" height="3" rx="0.5"/></svg>',
+    removeFormat: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M3 3h9M6 3v10M5 13h4"/><line x1="11" y1="10" x2="15" y2="14"/><line x1="15" y1="10" x2="11" y2="14"/></svg>',
+    video: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="3" width="12" height="10" rx="1.5"/><polygon points="6.5,6 6.5,10 10,8" fill="currentColor"/></svg>',
+    audio: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M9 3 L9 11 a2 2 0 1 1 -2 -1.7 L7 5 L12 3.5 z"/></svg>'
   };
 
   /**
@@ -608,6 +713,36 @@
     this.enableFindReplace = this.options.findReplace !== false; // Habilitar Ctrl+F para buscar (default: true)
     this.enableShowBlocks = this.options.showBlocksToggle !== false; // Habilitar toggle de bloques (default: true)
     this.rtl = this.options.rtl === true; // Dirección derecha-a-izquierda
+    this.pasteAsText = this.options.pasteAsText === true; // Forzar paste solo como texto plano
+    this.imageMaxSize = (typeof this.options.imageMaxSize === 'number' && this.options.imageMaxSize > 0)
+      ? this.options.imageMaxSize : 0; // Tamaño máx. de imagen en bytes (0 = sin límite)
+
+    // styleFormats: lista de estilos custom definidos por el consumidor.
+    // Cada uno: { title, block, className }
+    this.styleFormats = [];
+    this._customClassWhitelist = {};
+    if (Array.isArray(this.options.styleFormats)) {
+      for (var sfi = 0; sfi < this.options.styleFormats.length; sfi++) {
+        var sf = this.options.styleFormats[sfi];
+        if (!sf || typeof sf !== 'object') continue;
+        // Validar: title, block (tipo válido), className (string alfanumérico)
+        if (typeof sf.title !== 'string' || !sf.title) continue;
+        var validTypes = {
+          paragraph: 1, heading1: 1, heading2: 1, heading3: 1,
+          quote: 1, bulletList: 1, numberList: 1, checklist: 1
+        };
+        // Aceptar 'blockquote' como alias de 'quote' (compatibilidad TinyMCE)
+        var blockType = sf.block === 'blockquote' ? 'quote' :
+                        (validTypes[sf.block] ? sf.block : 'paragraph');
+        if (typeof sf.className !== 'string' || !/^[a-zA-Z_][\w-]*$/.test(sf.className)) continue;
+        this.styleFormats.push({
+          title: sf.title,
+          block: blockType,
+          className: sf.className
+        });
+        this._customClassWhitelist[sf.className] = 1;
+      }
+    }
 
     // Estado para nuevas features
     this.isFullscreen = false;
@@ -616,15 +751,20 @@
     this.findReplaceState = null;
     this.charCounterBar = null;
     this.target = document.querySelector(this.options.target);
-    this.blocks = this.options.blocks || [];
     this.onChange = this.options.onChange || function() {};
+    this.onFocus = this.options.onFocus || function() {};
+    this.onBlur = this.options.onBlur || function() {};
+    this._hasFocus = false; // estado actual de foco (para evitar disparar onFocus/onBlur duplicado)
     this.currentBlockId = 0;
     this.container = null;
+    // NOTA: this.blocks se asigna más abajo tras sanitizar (necesita this.currentBlockId inicializado)
 
     // ID único de instancia para scoping de estilos de contenido
     this.instanceId = 'mewyse-' + Math.random().toString(36).substr(2, 9);
     this._contentStyleElement = null;
     this.toolbar = null;
+    this.draggedBlockId = null; // ID del bloque siendo arrastrado (reorder)
+    this._draggedImage = null;  // estado del drag de imagen interna
     this.slashMenu = null;
     this.formatMenu = null;
     this.formatMenuTimeout = null;
@@ -676,16 +816,8 @@
       throw new Error('Target element not found');
     }
 
-    // Actualizar currentBlockId si hay bloques iniciales
-    if (this.blocks.length > 0) {
-      var maxId = 0;
-      for (var i = 0; i < this.blocks.length; i++) {
-        if (this.blocks[i].id > maxId) {
-          maxId = this.blocks[i].id;
-        }
-      }
-      this.currentBlockId = maxId;
-    }
+    // Sanitizar bloques iniciales contra XSS (maneja currentBlockId internamente)
+    this.blocks = this._sanitizeBlocks(this.options.blocks || []);
 
     // Historial undo/redo
     this.history = [];
@@ -940,6 +1072,40 @@
         self.lastFocusedElement = target;
         self._updateMoveButtons();
       }
+
+      // Disparar onFocus solo cuando el foco entra al editor desde fuera
+      // (no cuando se mueve entre bloques internamente)
+      if (!self._hasFocus) {
+        self._hasFocus = true;
+        self._fireFocusCallback(target);
+      }
+    });
+
+    // focusout: detectar cuando el foco sale del editor a algún elemento externo
+    this.container.addEventListener('focusout', function(e) {
+      // Usar setTimeout para esperar a que el activeElement se actualice. Si tras
+      // el evento el nuevo activeElement está dentro del container o de cualquier
+      // UI del editor (toolbar, menús flotantes, modales, picker, etc.), el foco
+      // solo se movió internamente y no hay que disparar onBlur.
+      setTimeout(function() {
+        if (!self.container) return;
+        var active = document.activeElement;
+        // body o null: typically el browser perdió el foco — disparar onBlur
+        if (!active || active === document.body) {
+          if (self._hasFocus) {
+            self._hasFocus = false;
+            self._fireBlurCallback(e.target);
+          }
+          return;
+        }
+
+        if (self._isPartOfEditorUI(active)) return;
+
+        if (self._hasFocus) {
+          self._hasFocus = false;
+          self._fireBlurCallback(e.target);
+        }
+      }, 0);
     });
 
     // Añadir listener para deseleccionar imagen al hacer clic fuera
@@ -1170,6 +1336,108 @@
     if (this.target.value) {
       this.loadFromText(this.target.value);
     }
+
+    // Habilitar drag & drop de imágenes sobre el editor
+    this._attachImageDropHandlers();
+  };
+
+  /**
+   * Habilita drag & drop de archivos de imagen sobre el container del editor.
+   * No interfiere con el drag de bloques (distintos tipos en dataTransfer).
+   */
+  meWYSE.prototype._attachImageDropHandlers = function() {
+    var self = this;
+    if (!this.container) return;
+
+    var hasImageFile = function(dt) {
+      if (!dt) return false;
+      // types puede ser un DOMStringList o array
+      if (dt.types && dt.types.length) {
+        for (var i = 0; i < dt.types.length; i++) {
+          if (dt.types[i] === 'Files') return true;
+        }
+      }
+      return false;
+    };
+
+    this._imageDragEnterHandler = function(e) {
+      // Aceptar tanto archivos OS como imágenes internas arrastradas
+      if (hasImageFile(e.dataTransfer) || self._draggedImage) {
+        e.preventDefault();
+        self.container.classList.add('mewyse-image-drop-target');
+      }
+    };
+    this._imageDragOverHandler = function(e) {
+      if (hasImageFile(e.dataTransfer)) {
+        e.preventDefault();
+        try { e.dataTransfer.dropEffect = 'copy'; } catch (err) {}
+      } else if (self._draggedImage) {
+        e.preventDefault();
+        try { e.dataTransfer.dropEffect = 'move'; } catch (err) {}
+      }
+    };
+    this._imageDragLeaveHandler = function(e) {
+      // Solo quitar la clase si el leave es fuera del container (no a un hijo)
+      if (e.target === self.container) {
+        self.container.classList.remove('mewyse-image-drop-target');
+      }
+    };
+    this._imageDropHandler = function(e) {
+      // Caso 1: imagen interna arrastrada a un bloque (no celda)
+      if (self._draggedImage) {
+        // Si el drop ocurre dentro de una celda, dejarlo al handler de la celda
+        var cellTarget = e.target && e.target.closest ? e.target.closest('td, th') : null;
+        if (cellTarget) return; // el handler de la celda se encarga
+
+        var targetBlockEl = e.target && e.target.closest ? e.target.closest('[data-block-id]') : null;
+        if (!targetBlockEl) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+        self.container.classList.remove('mewyse-image-drop-target');
+        self._dropImageIntoBlock(targetBlockEl);
+        return;
+      }
+
+      // Caso 2: archivos OS (comportamiento existente)
+      if (!hasImageFile(e.dataTransfer)) return;
+      var files = e.dataTransfer.files;
+      if (!files || files.length === 0) return;
+
+      // Solo procesar si al menos un archivo es imagen
+      var imageFile = null;
+      for (var i = 0; i < files.length; i++) {
+        if (files[i].type && files[i].type.indexOf('image/') === 0) {
+          imageFile = files[i];
+          break;
+        }
+      }
+      if (!imageFile) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+      self.container.classList.remove('mewyse-image-drop-target');
+
+      // Calcular insertIndex: después del bloque sobre el que se soltó, o al final
+      var insertIndex = self.blocks.length;
+      var targetBlock = e.target && e.target.closest ? e.target.closest('[data-block-id]') : null;
+      if (targetBlock) {
+        var blockId = parseInt(targetBlock.getAttribute('data-block-id'), 10);
+        if (!isNaN(blockId)) {
+          insertIndex = self.getBlockIndex(blockId) + 1;
+        }
+      }
+
+      self._processImageFile(imageFile, function(imgData) {
+        if (!imgData) return;
+        self.createImageBlock(imageFile, imgData.blob, imgData.width, imgData.height, insertIndex);
+      });
+    };
+
+    this.container.addEventListener('dragenter', this._imageDragEnterHandler);
+    this.container.addEventListener('dragover', this._imageDragOverHandler);
+    this.container.addEventListener('dragleave', this._imageDragLeaveHandler);
+    this.container.addEventListener('drop', this._imageDropHandler);
   };
 
   /**
@@ -1369,18 +1637,23 @@
       { action: 'italic', labelKey: 'tooltips.italic', icon: '<em>I</em>', command: 'italic' },
       { action: 'underline', labelKey: 'tooltips.underline', icon: '<u>U</u>', command: 'underline' },
       { action: 'strikethrough', labelKey: 'tooltips.strikethrough', icon: '<s>S</s>', command: 'strikeThrough' },
-      { action: 'toggleCase', labelKey: 'tooltips.toggleCase', icon: '<span style="font-size:13px;font-weight:600">Aa</span>', type: 'toggleCase' }
+      { action: 'caseMenu', labelKey: 'tooltips.toggleCase', icon: '<span style="font-size:13px;font-weight:600">Aa</span> <span class="dropdown-arrow">' + WYSIWYG_ICONS.chevronDown + '</span>', type: 'caseMenu' },
+      { action: 'removeFormat', labelKey: 'tooltips.removeFormat', icon: WYSIWYG_ICONS.removeFormat, type: 'removeFormat' }
     ];
 
     formatTools.forEach(function(tool) {
       var button = document.createElement('button');
       button.className = 'mewyse-toolbar-button';
+      if (tool.type === 'caseMenu') button.className += ' mewyse-toolbar-dropdown';
       button.innerHTML = tool.icon;
       button.title = self.t(tool.labelKey);
       button.onclick = function(e) {
         e.preventDefault();
-        if (tool.type === 'toggleCase') {
-          self.toggleSelectionCase();
+        e.stopPropagation();
+        if (tool.type === 'caseMenu') {
+          self.showCaseMenu(button);
+        } else if (tool.type === 'removeFormat') {
+          self.removeFormat();
         } else {
           document.execCommand(tool.command, false, null);
           self.triggerChange();
@@ -1487,6 +1760,32 @@
       self.insertImageBlock();
     };
     insertGroup.appendChild(imageButton);
+
+    // Botón de vídeo (YouTube, Vimeo, archivo .mp4)
+    var videoButton = document.createElement('button');
+    videoButton.className = 'mewyse-toolbar-button';
+    videoButton.innerHTML = WYSIWYG_ICONS.video;
+    videoButton.title = self.t('tooltips.insertVideo');
+    videoButton.setAttribute('aria-label', self.t('tooltips.insertVideo'));
+    videoButton.onclick = function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      self.insertVideoBlock();
+    };
+    insertGroup.appendChild(videoButton);
+
+    // Botón de audio
+    var audioButton = document.createElement('button');
+    audioButton.className = 'mewyse-toolbar-button';
+    audioButton.innerHTML = WYSIWYG_ICONS.audio;
+    audioButton.title = self.t('tooltips.insertAudio');
+    audioButton.setAttribute('aria-label', self.t('tooltips.insertAudio'));
+    audioButton.onclick = function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      self.insertAudioBlock();
+    };
+    insertGroup.appendChild(audioButton);
 
     toolbar.appendChild(insertGroup);
 
@@ -1679,64 +1978,58 @@
       }
     }
 
-    // Si estamos en una celda de tabla, insertar la imagen directamente en la celda
-    if (tableCellElement) {
-      var fileInput = document.createElement('input');
-      fileInput.type = 'file';
-      fileInput.accept = 'image/*';
-      fileInput.style.display = 'none';
-
-      fileInput.onchange = function(e) {
-        var file = e.target.files[0];
-        if (file && file.type.startsWith('image/')) {
-          self.insertImageInTableCell(file, tableCellElement);
-        }
-        document.body.removeChild(fileInput);
-      };
-
-      fileInput.oncancel = function() {
-        document.body.removeChild(fileInput);
-      };
-
-      document.body.appendChild(fileInput);
-      fileInput.click();
-      return;
-    }
-
-    // Si no estamos en una tabla, determinar la posición de inserción
+    // Calcular insertIndex para el caso fuera de tabla
     var insertIndex;
-
     if (lastFocusedBlock) {
-      // Insertar después del último bloque
       var blockId = parseInt(lastFocusedBlock.getAttribute('data-block-id'));
       insertIndex = this.getBlockIndex(blockId) + 1;
     } else {
-      // Si no hay bloques, insertar al principio
-      insertIndex = 0;
+      insertIndex = this.blocks.length;
     }
 
-    // Crear input file oculto para seleccionar imagen
-    var fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.accept = 'image/*';
-    fileInput.style.display = 'none';
+    // Usar el file input persistente (se crea lazy en _getFileInput).
+    // Evita acumular inputs colgantes en el DOM y mejora fiabilidad del picker.
+    var fileInput = this._getFileInput();
 
-    fileInput.onchange = function(e) {
-      var file = e.target.files[0];
-      if (file && file.type.startsWith('image/')) {
+    // Asignar el handler al input antes de dispararlo
+    fileInput.onchange = function() {
+      var file = fileInput.files && fileInput.files[0];
+      // Reset inmediato del valor para que el próximo click re-dispare change
+      // aunque el usuario elija el mismo archivo
+      fileInput.value = '';
+      if (!file || !/^image\//.test(file.type)) return;
+      if (!self._validateImageSize(file)) return;
+
+      if (tableCellElement) {
+        self.insertImageInTableCell(file, tableCellElement);
+      } else {
         self.showImageDimensionsModal(file, insertIndex);
       }
-      // Limpiar el input
-      document.body.removeChild(fileInput);
     };
 
-    // Cancelar si no se selecciona archivo
-    fileInput.oncancel = function() {
-      document.body.removeChild(fileInput);
-    };
-
-    document.body.appendChild(fileInput);
+    // Disparar el file picker
     fileInput.click();
+  };
+
+  /**
+   * Devuelve el input file persistente del editor (lazy). Se reusa entre clicks
+   * para evitar acumulación en el DOM y problemas de compatibilidad con display:none.
+   */
+  meWYSE.prototype._getFileInput = function() {
+    if (this._fileInput && this._fileInput.parentNode) return this._fileInput;
+    var input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    // Posicionar fuera de la pantalla (más robusto que display:none en algunos navegadores)
+    input.style.position = 'fixed';
+    input.style.left = '-9999px';
+    input.style.top = '-9999px';
+    input.style.opacity = '0';
+    input.setAttribute('aria-hidden', 'true');
+    input.setAttribute('tabindex', '-1');
+    document.body.appendChild(input);
+    this._fileInput = input;
+    return input;
   };
 
   /**
@@ -1985,6 +2278,9 @@
           imgElement.setAttribute('data-in-table', 'true');
           imgElement.setAttribute('tabindex', '0'); // Permitir foco con teclado
 
+          // Habilitar drag & drop para mover entre celdas/bloques
+          self._attachImageDragHandlers(imgElement, { source: 'cell', tableCell: tableCell });
+
           // Insertar el wrapper en la celda
           tableCell.appendChild(imageWrapper);
 
@@ -2190,6 +2486,257 @@
   /**
    * Selecciona una imagen y la marca visualmente como seleccionada
    */
+  /**
+   * Habilita drag & drop en una imagen del editor (celda o bloque independiente).
+   * Permite mover la imagen a otra celda o entre celda y bloque.
+   *
+   * @param {HTMLImageElement} img
+   * @param {Object} meta - { source: 'cell'|'block', blockId?, tableCell? }
+   */
+  meWYSE.prototype._attachImageDragHandlers = function(img, meta) {
+    var self = this;
+    img.setAttribute('draggable', 'true');
+
+    img.addEventListener('dragstart', function(e) {
+      // Capturar estado de la imagen al inicio del drag
+      var imageSnapshot = {
+        src: img.src,
+        width: parseInt(img.style.width || img.getAttribute('width'), 10) || parseInt(img.getAttribute('data-original-width'), 10) || 300,
+        height: parseInt(img.style.height || img.getAttribute('height'), 10) || parseInt(img.getAttribute('data-original-height'), 10) || 200,
+        alt: img.getAttribute('alt') || 'image',
+        inlineStyle: img.getAttribute('style') || ''
+      };
+
+      self._draggedImage = {
+        img: img,
+        source: meta.source,
+        blockId: meta.blockId || null,
+        tableCell: meta.tableCell || null,
+        snapshot: imageSnapshot
+      };
+
+      // Marcar visualmente la imagen como siendo arrastrada
+      img.classList.add('mewyse-image-dragging');
+
+      // Usar un tipo custom para distinguir de files OS; el valor es irrelevante
+      try {
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('application/x-mewyse-image', '1');
+        // Algunos navegadores (Firefox) requieren setData('text/plain') también
+        e.dataTransfer.setData('text/plain', 'mewyse-image');
+      } catch (err) {}
+    });
+
+    img.addEventListener('dragend', function() {
+      img.classList.remove('mewyse-image-dragging');
+      // Limpiar el estado tras un pequeño delay para que los drop handlers
+      // puedan leerlo primero
+      setTimeout(function() {
+        self._draggedImage = null;
+        // Quitar cualquier marcador visual de drop-target restante
+        var targets = document.querySelectorAll('.mewyse-image-drop-target-cell');
+        for (var i = 0; i < targets.length; i++) {
+          targets[i].classList.remove('mewyse-image-drop-target-cell');
+        }
+      }, 50);
+    });
+  };
+
+  /**
+   * Procesa el drop de una imagen arrastrada en una celda de tabla.
+   * Mueve la imagen: elimina del origen (celda o bloque) y la inserta en la celda destino.
+   */
+  meWYSE.prototype._dropImageIntoCell = function(destCell, destBlockId) {
+    var drag = this._draggedImage;
+    if (!drag) return;
+
+    // No hacer nada si se suelta en la misma celda de origen
+    if (drag.source === 'cell' && drag.tableCell === destCell) return;
+
+    this.pushHistory(true);
+
+    var snapshot = drag.snapshot;
+
+    // 1. Eliminar del origen
+    if (drag.source === 'cell' && drag.tableCell) {
+      // Limpiar la celda origen (dejar <p contenteditable> vacío)
+      drag.tableCell.innerHTML = '';
+      var emptyP = document.createElement('p');
+      emptyP.contentEditable = true;
+      emptyP.setAttribute('data-placeholder', '');
+      drag.tableCell.appendChild(emptyP);
+      this.attachTableCellEvents(emptyP, this._getBlockIdForCell(drag.tableCell));
+
+      // Update del bloque origen
+      var srcTable = drag.tableCell.closest('table');
+      if (srcTable) {
+        var srcBlockId = this._getBlockIdForCell(drag.tableCell);
+        if (srcBlockId != null) {
+          this.updateBlockContent(srcBlockId, srcTable.innerHTML);
+        }
+      }
+    } else if (drag.source === 'block' && drag.blockId != null) {
+      // Eliminar el bloque imagen independiente del modelo
+      var blockIdx = this.getBlockIndex(drag.blockId);
+      if (blockIdx !== -1) {
+        this.blocks.splice(blockIdx, 1);
+      }
+    }
+
+    // 2. Insertar en la celda destino (reusando la estructura de imagen en celda)
+    this._createImageInCellFromSnapshot(destCell, snapshot);
+
+    // 3. Update del bloque destino
+    var destTable = destCell.closest('table');
+    if (destTable) {
+      var destTableBlockId = this._getBlockIdForCell(destCell);
+      if (destTableBlockId != null) {
+        this.updateBlockContent(destTableBlockId, destTable.innerHTML);
+      }
+    }
+
+    // 4. Re-render si eliminamos un bloque (para evitar DOM inconsistente)
+    if (drag.source === 'block') {
+      this.render();
+    }
+
+    this._draggedImage = null;
+    this.triggerChange();
+  };
+
+  /**
+   * Procesa el drop de una imagen arrastrada en un bloque (fuera de celda).
+   * Crea un nuevo bloque imagen en la posición del bloque destino y elimina origen.
+   */
+  meWYSE.prototype._dropImageIntoBlock = function(destBlockElement) {
+    var drag = this._draggedImage;
+    if (!drag) return;
+
+    // No hacer nada si se suelta en el mismo bloque de origen
+    var destBlockId = parseInt(destBlockElement.getAttribute('data-block-id'), 10);
+    if (isNaN(destBlockId)) return;
+    if (drag.source === 'block' && drag.blockId === destBlockId) return;
+
+    this.pushHistory(true);
+
+    var snapshot = drag.snapshot;
+
+    // 1. Crear nuevo bloque imagen con el snapshot
+    var insertIndex = this.getBlockIndex(destBlockId) + 1;
+    var newBlock = {
+      id: ++this.currentBlockId,
+      type: 'image',
+      content: {
+        blob: snapshot.src,
+        fileName: snapshot.alt || 'image',
+        width: snapshot.width,
+        height: snapshot.height
+      }
+    };
+
+    // 2. Eliminar del origen
+    if (drag.source === 'cell' && drag.tableCell) {
+      var sourceCell = drag.tableCell;
+      sourceCell.innerHTML = '';
+      var emptyP = document.createElement('p');
+      emptyP.contentEditable = true;
+      emptyP.setAttribute('data-placeholder', '');
+      sourceCell.appendChild(emptyP);
+      this.attachTableCellEvents(emptyP, this._getBlockIdForCell(sourceCell));
+
+      var srcTable = sourceCell.closest('table');
+      if (srcTable) {
+        var srcBlockId = this._getBlockIdForCell(sourceCell);
+        if (srcBlockId != null) {
+          this.updateBlockContent(srcBlockId, srcTable.innerHTML);
+        }
+      }
+    } else if (drag.source === 'block' && drag.blockId != null) {
+      var blockIdx = this.getBlockIndex(drag.blockId);
+      if (blockIdx !== -1) {
+        this.blocks.splice(blockIdx, 1);
+        // Ajustar insertIndex si el bloque origen era anterior al destino
+        if (blockIdx < insertIndex) insertIndex--;
+      }
+    }
+
+    // 3. Insertar en modelo
+    this.blocks.splice(insertIndex, 0, newBlock);
+
+    // 4. Re-render
+    this.render();
+
+    this._draggedImage = null;
+    this.triggerChange();
+  };
+
+  /**
+   * Helper: obtiene el blockId de la tabla que contiene una celda.
+   */
+  meWYSE.prototype._getBlockIdForCell = function(cell) {
+    var tableEl = cell.closest('table');
+    if (!tableEl) return null;
+    var wrapper = tableEl.closest('.mewyse-table-wrapper');
+    if (!wrapper) return null;
+    var blockEl = wrapper.closest('[data-block-id]');
+    if (!blockEl) return null;
+    var id = parseInt(blockEl.getAttribute('data-block-id'), 10);
+    return isNaN(id) ? null : id;
+  };
+
+  /**
+   * Helper: crea la estructura de imagen en una celda a partir de un snapshot.
+   * Reusa la lógica de insertImageInTableCell pero sin modal (para drop directo).
+   */
+  meWYSE.prototype._createImageInCellFromSnapshot = function(tableCell, snapshot) {
+    var self = this;
+
+    // Limpiar contenido previo de la celda
+    tableCell.innerHTML = '';
+
+    var imageWrapper = document.createElement('div');
+    imageWrapper.className = 'mewyse-image-wrapper';
+    var imageContainer = document.createElement('div');
+    imageContainer.className = 'mewyse-image-container';
+
+    var imgElement = document.createElement('img');
+    imgElement.src = snapshot.src;
+    imgElement.alt = snapshot.alt || 'image';
+    imgElement.className = 'mewyse-image';
+    imgElement.style.width = snapshot.width + 'px';
+    imgElement.style.height = snapshot.height + 'px';
+    imgElement.setAttribute('data-original-width', snapshot.width);
+    imgElement.setAttribute('data-original-height', snapshot.height);
+    imgElement.setAttribute('data-in-table', 'true');
+    imgElement.setAttribute('tabindex', '0');
+
+    imageContainer.appendChild(imgElement);
+
+    // Botón edit
+    var editButton = document.createElement('button');
+    editButton.className = 'mewyse-image-edit-btn';
+    editButton.innerHTML = WYSIWYG_ICONS.gear;
+    editButton.title = self.t('tooltips.editDimensions');
+    editButton.onclick = function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      self.editImageInTableCell(imgElement, tableCell);
+    };
+    imageContainer.appendChild(editButton);
+
+    // Click: seleccionar
+    imgElement.onclick = function(e) {
+      e.stopPropagation();
+      self.selectImage(imgElement, null, true, tableCell);
+    };
+
+    // Drag handlers
+    self._attachImageDragHandlers(imgElement, { source: 'cell', tableCell: tableCell });
+
+    imageWrapper.appendChild(imageContainer);
+    tableCell.appendChild(imageWrapper);
+  };
+
   meWYSE.prototype.selectImage = function(imgElement, blockId, isInTable, tableCell) {
     var self = this;
 
@@ -2345,6 +2892,340 @@
   };
 
   /**
+   * Construye el HTML anidado de una lista consecutiva del mismo tipo.
+   * Se usa desde getHTML y getHTMLSource.
+   *
+   * @param {Array} blocks - array de bloques filtrados
+   * @param {number} startIndex - índice del primer bloque de la lista
+   * @param {Function} classAttrFn - función que devuelve ' class="..."' por bloque
+   * @returns {Object} { html, consumed }
+   */
+  meWYSE.prototype._buildNestedListHTML = function(blocks, startIndex, classAttrFn) {
+    var startType = blocks[startIndex].type;
+    var tag = startType === 'numberList' ? 'ol' : 'ul';
+    var listClass = startType === 'checklist' ? ' class="checklist"' : '';
+
+    var renderLi = function(block) {
+      var content = block.content || '';
+      var classStr = classAttrFn(block);
+      if (startType === 'checklist') {
+        var checked = block.checked ? ' checked' : '';
+        return '<li' + classStr + '><input type="checkbox"' + checked + ' disabled> ' + content;
+      }
+      return '<li' + classStr + '>' + content;
+    };
+
+    // Stack basado en niveles. Emite HTML progresivamente.
+    var html = '<' + tag + listClass + '>';
+    var stack = [{ level: blocks[startIndex].indentLevel || 0, openLi: false }];
+    var i = startIndex;
+
+    while (i < blocks.length && blocks[i].type === startType) {
+      var level = blocks[i].indentLevel || 0;
+
+      // Si subimos de nivel: abrir listas anidadas dentro del último <li>
+      while (level > stack[stack.length - 1].level) {
+        // Para que el nested <ul> esté DENTRO del <li>, el anterior <li> no debe tener </li> aún
+        html += '<' + tag + listClass + '>';
+        stack.push({ level: stack[stack.length - 1].level + 1, openLi: false });
+      }
+
+      // Si bajamos de nivel: cerrar listas
+      while (level < stack[stack.length - 1].level) {
+        if (stack[stack.length - 1].openLi) html += '</li>';
+        html += '</' + tag + '>';
+        stack.pop();
+        // Cerrar el <li> del padre al que volvemos (había quedado abierto para el nested)
+        if (stack.length > 0 && stack[stack.length - 1].openLi) {
+          html += '</li>';
+          stack[stack.length - 1].openLi = false;
+        }
+      }
+
+      // Si hay un <li> abierto al mismo nivel, cerrarlo antes de abrir el nuevo
+      if (stack[stack.length - 1].openLi) {
+        html += '</li>';
+      }
+
+      html += renderLi(blocks[i]);
+      stack[stack.length - 1].openLi = true;
+      i++;
+    }
+
+    // Cerrar todos los <li> y <ul> restantes
+    while (stack.length > 0) {
+      if (stack[stack.length - 1].openLi) html += '</li>';
+      html += '</' + tag + '>';
+      stack.pop();
+    }
+
+    return { html: html, consumed: i - startIndex };
+  };
+
+  /**
+   * Cambia el nivel de indentación de un bloque de lista.
+   * @param {number} blockId
+   * @param {number} delta - +1 para indent, -1 para outdent
+   */
+  meWYSE.prototype.indentBlock = function(blockId, delta) {
+    var block = this.getBlock(blockId);
+    if (!block) return;
+    if (block.type !== 'bulletList' && block.type !== 'numberList' && block.type !== 'checklist') return;
+
+    var currentLevel = block.indentLevel || 0;
+    var newLevel = Math.max(0, Math.min(5, currentLevel + delta));
+    if (newLevel === currentLevel) return;
+
+    // Validación: no se puede indent si no hay un item anterior en el mismo grupo
+    // con nivel >= al nuevo que sería nuestro padre.
+    if (delta > 0) {
+      var index = this.getBlockIndex(blockId);
+      if (index <= 0) return; // primer bloque del editor no puede anidar
+      var prevBlock = this.blocks[index - 1];
+      if (prevBlock.type !== block.type) return; // no hay padre del mismo tipo
+      var prevLevel = prevBlock.indentLevel || 0;
+      if (newLevel > prevLevel + 1) return; // no se puede saltar niveles
+    }
+
+    this.pushHistory(true);
+    block.indentLevel = newLevel;
+    this.render();
+    this.triggerChange();
+
+    // Restaurar foco al bloque
+    var self = this;
+    setTimeout(function() {
+      var el = self.container.querySelector('[data-block-id="' + blockId + '"]');
+      if (el) {
+        var editable = el.querySelector('[contenteditable="true"]') || el;
+        if (editable) editable.focus();
+      }
+    }, 0);
+  };
+
+  /**
+   * Construye una estructura de lista anidada a partir de bloques consecutivos
+   * tipo bulletList/numberList/checklist. Agrupa por tipo y anida según indentLevel.
+   *
+   * @param {Array} blocks - array completo de bloques del editor
+   * @param {number} startIndex - índice desde donde empezar
+   * @returns {Object} { wrapper: HTMLElement, consumed: number }
+   */
+  meWYSE.prototype._buildNestedListWrapper = function(blocks, startIndex) {
+    var self = this;
+    var startType = blocks[startIndex].type;
+
+    var createListEl = function(type) {
+      var el;
+      if (type === 'bulletList') {
+        el = document.createElement('ul');
+        el.className = 'mewyse-list-group';
+      } else if (type === 'numberList') {
+        el = document.createElement('ol');
+        el.className = 'mewyse-list-group';
+      } else { // checklist
+        el = document.createElement('ul');
+        el.className = 'mewyse-list-group mewyse-checklist-group';
+      }
+      return el;
+    };
+
+    // Crear root al nivel 0 del primer ítem
+    var rootLevel = blocks[startIndex].indentLevel || 0;
+    var root = createListEl(startType);
+    // Stack de { level, list, lastLi }
+    var stack = [{ level: rootLevel, list: root, lastLi: null, type: startType }];
+
+    var i = startIndex;
+    while (i < blocks.length && blocks[i].type === startType) {
+      var item = blocks[i];
+      var level = item.indentLevel || 0;
+
+      // Pop stack hasta encontrar un nivel <= current
+      while (stack.length > 1 && stack[stack.length - 1].level > level) {
+        stack.pop();
+      }
+
+      var currentFrame = stack[stack.length - 1];
+
+      // Si necesitamos subir un nivel (anidar)
+      if (level > currentFrame.level && currentFrame.lastLi) {
+        var nested = createListEl(startType);
+        currentFrame.lastLi.appendChild(nested);
+        currentFrame = { level: level, list: nested, lastLi: null, type: startType };
+        stack.push(currentFrame);
+      }
+
+      // Crear el <li> y añadirlo a la lista actual
+      var li = self.createBlockElement(item);
+      currentFrame.list.appendChild(li);
+      currentFrame.lastLi = li;
+      i++;
+    }
+
+    return { wrapper: root, consumed: i - startIndex };
+  };
+
+  /**
+   * Aplica estilos avanzados (border/margin/alignment) al <img> y wrapper.
+   * @param {HTMLImageElement} img
+   * @param {HTMLElement} wrapper - .mewyse-image-wrapper
+   * @param {Object} advanced - { border, margin, alignment } o null/undefined
+   */
+  meWYSE.prototype._applyImageAdvancedStyles = function(img, wrapper, advanced) {
+    if (!advanced) return;
+    if (advanced.border && advanced.border.width) {
+      var b = advanced.border;
+      img.style.border = b.width + 'px ' + (b.style || 'solid') + ' ' + (b.color || '#000000');
+    }
+    if (advanced.margin && typeof advanced.margin.all === 'number') {
+      img.style.margin = advanced.margin.all + 'px';
+    }
+    if (advanced.alignment) {
+      // Alineación: left/right usan float; center usa margin auto + display block
+      if (advanced.alignment === 'left') {
+        wrapper.style.float = 'left';
+        wrapper.style.marginRight = '16px';
+      } else if (advanced.alignment === 'right') {
+        wrapper.style.float = 'right';
+        wrapper.style.marginLeft = '16px';
+      } else if (advanced.alignment === 'center') {
+        wrapper.style.textAlign = 'center';
+        img.style.marginLeft = 'auto';
+        img.style.marginRight = 'auto';
+        img.style.display = 'block';
+      }
+    }
+  };
+
+  /**
+   * Crea el panel de "Opciones avanzadas" para el modal de imagen.
+   * Incluye: borde (width/style/color), margin, alineación.
+   *
+   * @param {Object} initial - valores iniciales { border, margin, alignment }
+   * @returns {Object} { panel: HTMLElement, getValues: Function, toggle: Function }
+   */
+  meWYSE.prototype._createImageAdvancedPanel = function(initial) {
+    var self = this;
+    initial = initial || {};
+    var iBorder = initial.border || {};
+    var iMargin = initial.margin || {};
+    var iAlignment = initial.alignment || '';
+
+    // Toggle button (colapsable)
+    var toggleBtn = document.createElement('button');
+    toggleBtn.type = 'button';
+    toggleBtn.className = 'mewyse-modal-advanced-toggle';
+    toggleBtn.innerHTML = '<span class="dropdown-arrow">' + WYSIWYG_ICONS.chevronDown + '</span> ' + self.t('modals.advancedOptions');
+
+    var panel = document.createElement('div');
+    panel.className = 'mewyse-modal-advanced-panel';
+    panel.style.display = 'none';
+
+    // --- Borde: width / style / color ---
+    var borderGroup = document.createElement('div');
+    borderGroup.className = 'mewyse-modal-advanced-row';
+    var borderLabel = document.createElement('label');
+    borderLabel.textContent = self.t('modals.imageBorder');
+    var borderWidthInput = document.createElement('input');
+    borderWidthInput.type = 'number';
+    borderWidthInput.min = '0';
+    borderWidthInput.className = 'mewyse-modal-input';
+    borderWidthInput.placeholder = '0';
+    borderWidthInput.value = iBorder.width || '';
+    borderWidthInput.style.width = '70px';
+    var borderStyleSelect = document.createElement('select');
+    borderStyleSelect.className = 'mewyse-modal-input';
+    ['solid', 'dashed', 'dotted', 'double'].forEach(function(s) {
+      var opt = document.createElement('option');
+      opt.value = s;
+      opt.textContent = s;
+      if (iBorder.style === s) opt.selected = true;
+      borderStyleSelect.appendChild(opt);
+    });
+    var borderColorInput = document.createElement('input');
+    borderColorInput.type = 'color';
+    borderColorInput.className = 'mewyse-modal-input mewyse-modal-color';
+    borderColorInput.value = iBorder.color || '#000000';
+    borderColorInput.dataset.userSet = iBorder.color ? 'true' : 'false';
+    borderColorInput.oninput = function() { borderColorInput.dataset.userSet = 'true'; };
+    var borderRow = document.createElement('div');
+    borderRow.className = 'mewyse-modal-advanced-inline';
+    borderRow.appendChild(borderWidthInput);
+    borderRow.appendChild(borderStyleSelect);
+    borderRow.appendChild(borderColorInput);
+    borderGroup.appendChild(borderLabel);
+    borderGroup.appendChild(borderRow);
+    panel.appendChild(borderGroup);
+
+    // --- Margin (shorthand: un número aplicado a los 4 lados) ---
+    var marginGroup = document.createElement('div');
+    marginGroup.className = 'mewyse-modal-advanced-row';
+    var marginLabel = document.createElement('label');
+    marginLabel.textContent = self.t('modals.imageMargin');
+    var marginInput = document.createElement('input');
+    marginInput.type = 'number';
+    marginInput.min = '0';
+    marginInput.className = 'mewyse-modal-input';
+    marginInput.placeholder = '0';
+    marginInput.value = (typeof iMargin.all === 'number' ? iMargin.all : '');
+    marginInput.style.width = '70px';
+    marginGroup.appendChild(marginLabel);
+    marginGroup.appendChild(marginInput);
+    panel.appendChild(marginGroup);
+
+    // --- Alineación ---
+    var alignGroup = document.createElement('div');
+    alignGroup.className = 'mewyse-modal-advanced-row';
+    var alignLabel = document.createElement('label');
+    alignLabel.textContent = self.t('modals.imageAlignment');
+    var alignSelect = document.createElement('select');
+    alignSelect.className = 'mewyse-modal-input';
+    ['', 'left', 'center', 'right'].forEach(function(a) {
+      var opt = document.createElement('option');
+      opt.value = a;
+      opt.textContent = a || '—';
+      if (iAlignment === a) opt.selected = true;
+      alignSelect.appendChild(opt);
+    });
+    alignGroup.appendChild(alignLabel);
+    alignGroup.appendChild(alignSelect);
+    panel.appendChild(alignGroup);
+
+    // Toggle open/close
+    toggleBtn.onclick = function(e) {
+      e.preventDefault();
+      var isOpen = panel.style.display !== 'none';
+      panel.style.display = isOpen ? 'none' : 'block';
+      toggleBtn.classList.toggle('expanded', !isOpen);
+    };
+
+    return {
+      toggle: toggleBtn,
+      panel: panel,
+      getValues: function() {
+        var result = {};
+        var bw = parseInt(borderWidthInput.value, 10);
+        if (!isNaN(bw) && bw > 0) {
+          result.border = {
+            width: bw,
+            style: borderStyleSelect.value,
+            color: borderColorInput.dataset.userSet === 'true' ? borderColorInput.value : '#000000'
+          };
+        }
+        var m = parseInt(marginInput.value, 10);
+        if (!isNaN(m) && m >= 0 && marginInput.value !== '') {
+          result.margin = { all: m };
+        }
+        if (alignSelect.value) {
+          result.alignment = alignSelect.value;
+        }
+        return result;
+      }
+    };
+  };
+
+  /**
    * Muestra el modal para editar las dimensiones de la imagen
    */
   meWYSE.prototype.showImageDimensionsModal = function(file, insertIndex) {
@@ -2450,6 +3331,11 @@
           }
         };
 
+        // Opciones avanzadas (colapsables)
+        var advanced = self._createImageAdvancedPanel({});
+        modalContainer.appendChild(advanced.toggle);
+        modalContainer.appendChild(advanced.panel);
+
         // Botones
         var buttonsContainer = document.createElement('div');
         buttonsContainer.className = 'mewyse-modal-buttons';
@@ -2468,8 +3354,8 @@
           var width = parseInt(widthInput.value);
           var height = parseInt(heightInput.value);
 
-          // Crear el bloque de imagen con el blob
-          self.createImageBlock(file, e.target.result, width, height, insertIndex);
+          // Crear el bloque de imagen con el blob + opciones avanzadas
+          self.createImageBlock(file, e.target.result, width, height, insertIndex, advanced.getValues());
 
           document.body.removeChild(modalOverlay);
         };
@@ -2494,26 +3380,45 @@
   };
 
   /**
-   * Crea un bloque de imagen con el archivo seleccionado
+   * Crea un bloque de imagen con el archivo seleccionado.
+   * Si options.onImageUpload está definido, delega el upload al consumidor
+   * y usa la URL devuelta como blob. Si no, usa el dataURL base64 local.
+   *
+   * @param {Object} advanced - Opciones avanzadas opcionales: { border, margin, alignment }
    */
-  meWYSE.prototype.createImageBlock = function(file, dataUrl, width, height, insertIndex) {
+  meWYSE.prototype.createImageBlock = function(file, dataUrl, width, height, insertIndex, advanced) {
+    var self = this;
 
-    // Crear un nuevo bloque de imagen
-    var newBlock = {
-      id: ++this.currentBlockId,
-      type: 'image',
-      content: {
-        blob: dataUrl, // Guardamos el dataURL (blob) de la imagen
+    var doCreate = function(finalBlob, finalWidth, finalHeight) {
+      var content = {
+        blob: finalBlob,
         fileName: file.name,
         fileType: file.type,
-        width: width,
-        height: height
+        width: finalWidth || width,
+        height: finalHeight || height
+      };
+      // Adjuntar opciones avanzadas si hay
+      if (advanced && (advanced.border || advanced.margin || advanced.alignment)) {
+        content.advanced = advanced;
       }
+      var newBlock = {
+        id: ++self.currentBlockId,
+        type: 'image',
+        content: content
+      };
+      self.blocks.splice(insertIndex, 0, newBlock);
+      self.render();
+      self.triggerChange();
     };
 
-    this.blocks.splice(insertIndex, 0, newBlock);
-    this.render();
-    this.triggerChange();
+    if (typeof this.options.onImageUpload === 'function') {
+      this.options.onImageUpload(file, function(result) {
+        if (!result || !result.url) return; // hook rechazó → abortar
+        doCreate(result.url, result.width, result.height);
+      });
+    } else {
+      doCreate(dataUrl);
+    }
   };
 
   /**
@@ -2767,6 +3672,28 @@
       menu.appendChild(item);
     });
 
+    // Estilos custom (styleFormats) — se añaden después de los types estándar
+    if (this.styleFormats && this.styleFormats.length > 0) {
+      var sep = document.createElement('div');
+      sep.className = 'mewyse-type-menu-separator';
+      menu.appendChild(sep);
+
+      this.styleFormats.forEach(function(sf) {
+        var item = document.createElement('div');
+        item.className = 'mewyse-type-menu-item';
+        // Preview: aplicar la clase al span del label para que el usuario vea el estilo
+        item.innerHTML = '<span class="icon">' + (WYSIWYG_ICONS[sf.block] || WYSIWYG_ICONS.paragraph) +
+                        '</span><span class="mewyse-style-preview ' + sf.className + '">' + sf.title + '</span>';
+        item.onclick = function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          self.changeBlockTypeFromToolbar(sf.block, sf.className);
+          self.closeToolbarMenu();
+        };
+        menu.appendChild(item);
+      });
+    }
+
     self._applyMenuTheme(menu);
     document.body.appendChild(menu);
     this.activeToolbarMenu = menu;
@@ -2785,7 +3712,7 @@
   /**
    * Cambia el tipo de bloque desde la toolbar y restaura el foco
    */
-  meWYSE.prototype.changeBlockTypeFromToolbar = function(type) {
+  meWYSE.prototype.changeBlockTypeFromToolbar = function(type, customClass) {
     var self = this;
 
     // Si hay contexto guardado, usarlo
@@ -2822,6 +3749,18 @@
 
       // Cambiar el tipo de bloque
       this.changeBlockType(blockId, type);
+
+      // Aplicar customClass (styleFormats) si se pasó. Se asigna al block tras
+      // el cambio de tipo para que sobreviva al render.
+      var targetBlock = this.getBlock(blockId);
+      if (targetBlock) {
+        if (customClass && this._customClassWhitelist && this._customClassWhitelist[customClass]) {
+          targetBlock.customClass = customClass;
+        } else {
+          delete targetBlock.customClass;
+        }
+        this.render();
+      }
 
       // Restaurar el foco y la selección después del render
       setTimeout(function() {
@@ -3202,36 +4141,16 @@
 
     this.container.innerHTML = '';
 
-    // Renderizar bloques con agrupacion de listas
+    // Renderizar bloques con agrupacion de listas (incluyendo anidación por indentLevel)
     var i = 0;
     while (i < this.blocks.length) {
       var block = this.blocks[i];
 
       // Verificar si es un tipo de lista que necesita agrupacion
       if (block.type === 'bulletList' || block.type === 'numberList' || block.type === 'checklist') {
-        var listType = block.type;
-        var listWrapper;
-
-        // Crear el wrapper apropiado
-        if (listType === 'bulletList') {
-          listWrapper = document.createElement('ul');
-          listWrapper.className = 'mewyse-list-group';
-        } else if (listType === 'numberList') {
-          listWrapper = document.createElement('ol');
-          listWrapper.className = 'mewyse-list-group';
-        } else { // checklist
-          listWrapper = document.createElement('ul');
-          listWrapper.className = 'mewyse-list-group mewyse-checklist-group';
-        }
-
-        // Agregar todos los elementos consecutivos del mismo tipo
-        while (i < this.blocks.length && this.blocks[i].type === listType) {
-          var listItem = this.createBlockElement(this.blocks[i]);
-          listWrapper.appendChild(listItem);
-          i++;
-        }
-
-        self.container.appendChild(listWrapper);
+        var result = this._buildNestedListWrapper(this.blocks, i);
+        self.container.appendChild(result.wrapper);
+        i += result.consumed;
       } else {
         // Bloque normal (no es lista)
         var blockElement = self.createBlockElement(block);
@@ -3404,6 +4323,14 @@
         element = this.createImageElement(block);
         break;
 
+      case 'video':
+        element = this.createVideoElement(block);
+        break;
+
+      case 'audio':
+        element = this.createAudioElement(block);
+        break;
+
       case 'divider':
         element = document.createElement('hr');
         break;
@@ -3420,6 +4347,11 @@
     element.classList.add('mewyse-block');
     element.setAttribute('data-block-id', block.id);
     element.setAttribute('data-block-type', block.type);
+
+    // Aplicar customClass (styleFormats) si existe
+    if (block.customClass && typeof block.customClass === 'string') {
+      element.classList.add(block.customClass);
+    }
 
     // Eventos para drag & drop
     this.attachDragDropEvents(element, block.id);
@@ -3438,12 +4370,26 @@
   meWYSE.prototype.attachDragDropEvents = function(element, blockId) {
     var self = this;
 
+    // Helper para comprobar si hay un bloque siendo arrastrado (compatible con null/undefined)
+    var hasActiveBlockDrag = function() {
+      return self.draggedBlockId != null && self.draggedBlockId !== blockId;
+    };
+
     element.ondragover = function(e) {
-      if (self.draggedBlockId !== null && self.draggedBlockId !== blockId) {
+      // Drag de bloque (reordenar)
+      if (hasActiveBlockDrag()) {
         e.preventDefault();
         e.dataTransfer.dropEffect = 'move';
         element.classList.add('drag-over');
+        return;
       }
+      // Drag de imagen interna (mover entre bloques)
+      if (self._draggedImage) {
+        e.preventDefault();
+        try { e.dataTransfer.dropEffect = 'move'; } catch (err) {}
+      }
+      // Para drag de archivos externos, NO hacer preventDefault aquí — el handler
+      // del container se encarga (evita que el block intercepte el drop).
     };
 
     element.ondragleave = function(e) {
@@ -3451,13 +4397,30 @@
     };
 
     element.ondrop = function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      element.classList.remove('drag-over');
-
-      if (self.draggedBlockId !== null && self.draggedBlockId !== blockId) {
-        self.moveBlock(self.draggedBlockId, blockId);
+      // Si es drag de imagen interna, delegar al manejo específico
+      if (self._draggedImage) {
+        // Si el target está dentro de una celda, el handler de la celda se encargará
+        var cellTarget = e.target && e.target.closest ? e.target.closest('td, th') : null;
+        if (cellTarget) return; // dejar propagar al handler de la celda
+        e.preventDefault();
+        e.stopPropagation();
+        self._dropImageIntoBlock(element);
+        return;
       }
+
+      // Si es reordenamiento de bloque, manejar aquí
+      if (hasActiveBlockDrag()) {
+        e.preventDefault();
+        e.stopPropagation();
+        element.classList.remove('drag-over');
+        self.moveBlock(self.draggedBlockId, blockId);
+        return;
+      }
+
+      // Caso: drag de archivos externos (imágenes del OS).
+      // NO hacer preventDefault ni stopPropagation — dejar que burbujee al
+      // handler del container (_imageDropHandler) para procesar el archivo.
+      element.classList.remove('drag-over');
     };
   };
 
@@ -3507,24 +4470,51 @@
     tableWrapper.className = 'mewyse-table-wrapper';
 
     var table = document.createElement('table');
-    table.style.width = '100%';
-    table.style.borderCollapse = 'collapse';
-    table.style.border = '1px solid #ddd';
+    // Solo aplicar inline el tableStyle personalizado (desde "Propiedades de la tabla").
+    // Sin tableStyle: sin style inline — los defaults visuales vienen del CSS inyectado
+    // (.mewyse-block-content table { width:100%; border-collapse:collapse }).
+    if (typeof block.tableStyle === 'string' && block.tableStyle) {
+      table.setAttribute('style', block.tableStyle);
+    }
 
     // Si ya hay contenido (tabla cargada), parsearlo
     if (block.content && block.content !== '') {
       table.innerHTML = block.content;
 
       // Hacer todas las celdas editables y añadir controles
+      // NO aplicamos border/padding default inline: los cubre el CSS inyectado
+      // durante la edición, pero el export queda limpio si el user no configuró nada.
       var cells = table.querySelectorAll('td, th');
       for (var c = 0; c < cells.length; c++) {
         var cell = cells[c];
-        cell.style.border = '1px solid #ddd';
-        cell.style.padding = '0';
 
-        // Verificar si la celda contiene una imagen
-        var imgInCell = cell.querySelector('img.mewyse-image');
+        // Verificar si la celda contiene una imagen (con o sin la clase mewyse-image)
+        var imgInCell = cell.querySelector('img');
         if (imgInCell) {
+          // Asegurar que tenga la clase para que los selectores funcionen
+          if (!imgInCell.classList.contains('mewyse-image')) {
+            imgInCell.classList.add('mewyse-image');
+          }
+          // Si la imagen está dentro de un <p> (HTML legacy), envolverla en el wrapper estándar
+          if (!imgInCell.closest('.mewyse-image-wrapper')) {
+            var wrapper = document.createElement('div');
+            wrapper.className = 'mewyse-image-wrapper';
+            var container = document.createElement('div');
+            container.className = 'mewyse-image-container';
+            imgInCell.parentNode.replaceChild(wrapper, imgInCell);
+            container.appendChild(imgInCell);
+            wrapper.appendChild(container);
+            // Limpiar el <p> o texto vacío que quedó alrededor
+            var pParent = wrapper.parentNode;
+            if (pParent && pParent.tagName === 'P') {
+              // Sacar el wrapper fuera del <p>
+              var cellEl = pParent.parentNode;
+              cellEl.insertBefore(wrapper, pParent);
+              if (!pParent.textContent.trim() && pParent.children.length === 0) {
+                cellEl.removeChild(pParent);
+              }
+            }
+          }
           imgInCell.onclick = function(e) {
             e.stopPropagation();
             var cellElement = this.closest('td, th');
@@ -3532,6 +4522,8 @@
           };
           imgInCell.setAttribute('data-in-table', 'true');
           imgInCell.setAttribute('tabindex', '0');
+          // Habilitar drag & drop
+          self._attachImageDragHandlers(imgInCell, { source: 'cell', tableCell: cell });
           continue;
         }
 
@@ -3548,27 +4540,20 @@
         }
 
         cellContent.contentEditable = true;
-        cellContent.style.padding = '8px';
-        cellContent.style.margin = '0';
-        cellContent.style.minHeight = '1em';
+        // Estilos del <p> interno cubiertos por CSS inyectado (table td > p)
 
         this.attachTableCellEvents(cellContent, block.id);
       }
     } else {
-      // Crear tabla 3x3 por defecto
+      // Crear tabla 3x3 por defecto (sin border/padding inline — los cubre el CSS inyectado)
       var tbody = document.createElement('tbody');
       for (var r = 0; r < 3; r++) {
         var row = document.createElement('tr');
         for (var col = 0; col < 3; col++) {
           var cell = document.createElement('td');
-          cell.style.border = '1px solid #ddd';
-          cell.style.padding = '0';
 
           var cellContent = document.createElement('p');
           cellContent.contentEditable = true;
-          cellContent.style.padding = '8px';
-          cellContent.style.margin = '0';
-          cellContent.style.minHeight = '1em';
           cellContent.setAttribute('data-placeholder', '');
 
           cell.appendChild(cellContent);
@@ -3638,6 +4623,9 @@
       img.style.height = block.content.height + 'px';
       img.setAttribute('data-original-width', block.content.width);
       img.setAttribute('data-original-height', block.content.height);
+
+      // Aplicar opciones avanzadas (border/margin/alignment)
+      this._applyImageAdvancedStyles(img, imageWrapper, block.content.advanced);
     }
 
     imageContainer.appendChild(img);
@@ -3726,6 +4714,9 @@
     img.setAttribute('data-block-id', block.id);
     img.setAttribute('tabindex', '0');
 
+    // Habilitar drag & drop para mover entre bloques/celdas
+    self._attachImageDragHandlers(img, { source: 'block', blockId: block.id });
+
     return imageWrapper;
   };
 
@@ -3800,20 +4791,21 @@
         tableWrapper.className = 'mewyse-table-wrapper';
 
         element = document.createElement('table');
-        element.style.width = '100%';
-        element.style.borderCollapse = 'collapse';
-        element.style.border = '1px solid #ddd';
+        // Solo aplicar inline el tableStyle personalizado. Sin él, los defaults
+        // vienen del CSS inyectado y quedan fuera del export.
+        if (typeof block.tableStyle === 'string' && block.tableStyle) {
+          element.setAttribute('style', block.tableStyle);
+        }
 
         // Si ya hay contenido (tabla cargada), parsearlo
         if (block.content && block.content !== '') {
           element.innerHTML = block.content;
 
           // Hacer todas las celdas editables y añadir controles
+          // Estilos default cubiertos por CSS inyectado (no inline para que el export quede limpio)
           var cells = element.querySelectorAll('td, th');
           for (var c = 0; c < cells.length; c++) {
             var cell = cells[c];
-            cell.style.border = '1px solid #ddd';
-            cell.style.padding = '0'; // Sin padding en la celda, lo tendrá el elemento interno
 
             // Verificar si la celda contiene una imagen
             var imgInCell = cell.querySelector('img.mewyse-image');
@@ -3826,6 +4818,8 @@
               };
               imgInCell.setAttribute('data-in-table', 'true');
               imgInCell.setAttribute('tabindex', '0');
+              // Habilitar drag & drop
+              self._attachImageDragHandlers(imgInCell, { source: 'cell', tableCell: cell });
               continue; // Saltar al siguiente elemento, esta celda ya está procesada
             }
 
@@ -3844,28 +4838,19 @@
             }
 
             cellContent.contentEditable = true;
-            cellContent.style.padding = '8px';
-            cellContent.style.margin = '0';
-            cellContent.style.minHeight = '1em';
 
             this.attachTableCellEvents(cellContent, block.id);
           }
         } else {
-          // Crear tabla 3x3 por defecto
+          // Crear tabla 3x3 por defecto (sin estilos inline — CSS inyectado)
           var tbody = document.createElement('tbody');
           for (var r = 0; r < 3; r++) {
             var row = document.createElement('tr');
             for (var col = 0; col < 3; col++) {
               var cell = document.createElement('td');
-              cell.style.border = '1px solid #ddd';
-              cell.style.padding = '0'; // Sin padding en la celda
 
-              // Crear párrafo interno editable
               var cellContent = document.createElement('p');
               cellContent.contentEditable = true;
-              cellContent.style.padding = '8px';
-              cellContent.style.margin = '0';
-              cellContent.style.minHeight = '1em';
               cellContent.setAttribute('data-placeholder', '');
 
               cell.appendChild(cellContent);
@@ -4033,6 +5018,10 @@
         element.setAttribute('tabindex', '0'); // Permitir foco con teclado
 
         return imageWrapper;
+      case 'video':
+        return this.createVideoElement(block);
+      case 'audio':
+        return this.createAudioElement(block);
       case 'divider':
         element = document.createElement('hr');
         return element;
@@ -4091,12 +5080,48 @@
    */
   meWYSE.prototype.handlePaste = function(e, blockId, element) {
     e.preventDefault();
+    var self = this;
 
     // Obtener el contenido del portapapeles
     var clipboardData = e.clipboardData || (window.clipboardData ? window.clipboardData : null);
     if (!clipboardData) return;
+
+    // Detectar imagen en el clipboard (Ctrl+V tras copiar imagen)
+    // Iterar items y si hay un image/*, procesarlo e insertar un bloque imagen.
+    if (clipboardData.items && clipboardData.items.length > 0) {
+      for (var i = 0; i < clipboardData.items.length; i++) {
+        var item = clipboardData.items[i];
+        if (item.kind === 'file' && item.type && item.type.indexOf('image/') === 0) {
+          var file = item.getAsFile();
+          if (!file) continue;
+          var insertIndex = this.getBlockIndex(blockId);
+          if (insertIndex < 0) insertIndex = this.blocks.length - 1;
+          insertIndex++;
+          self._processImageFile(file, function(imgData) {
+            if (!imgData) return;
+            self.createImageBlock(file, imgData.blob, imgData.width, imgData.height, insertIndex);
+          });
+          return;
+        }
+      }
+    }
+
     var htmlData = clipboardData.getData('text/html');
     var plainText = clipboardData.getData('text/plain');
+
+    // Si pasteAsText está habilitado, forzar siempre plaintext
+    if (this.pasteAsText) {
+      // Si solo hay HTML, extraer el texto visible
+      if (!plainText && htmlData) {
+        var tmp = document.createElement('div');
+        tmp.innerHTML = htmlData;
+        plainText = tmp.textContent || tmp.innerText || '';
+      }
+      if (plainText && plainText.trim()) {
+        this.processPastedPlainText(plainText, blockId, element);
+      }
+      return;
+    }
 
     // Si hay HTML del portapapeles, procesarlo
     if (htmlData && htmlData.trim()) {
@@ -4202,22 +5227,23 @@
   };
 
   /**
-   * Procesa HTML pegado y crea bloques apropiados
-   * @param {string} html
-   * @param {number} currentBlockId
-   * @param {HTMLElement} element
+   * Convierte un string HTML en un array de bloques listos para insertar en el modelo.
+   * Detecta automáticamente iframes de YouTube/Vimeo y tags <video>/<audio> y los
+   * convierte a bloques 'video'/'audio' respectivamente.
+   *
+   * @param {string} html - HTML a convertir
+   * @returns {Array} array de bloques sin ids (los asigna _sanitizeBlocks o el caller)
    */
-  meWYSE.prototype.processPastedHTML = function(html, currentBlockId, element) {
-    this.pushHistory(true);
+  meWYSE.prototype._htmlToBlocks = function(html) {
     var self = this;
     var parser, doc;
     try {
       parser = new DOMParser();
       doc = parser.parseFromString(html, 'text/html');
     } catch (e) {
-      // Fallback: tratar como texto plano
-      this.processPastedPlainText(html.replace(/<[^>]*>/g, ''), currentBlockId, element);
-      return;
+      // Fallback: texto plano
+      var text = (html || '').replace(/<[^>]*>/g, '').trim();
+      return text ? [{ type: 'paragraph', content: escapeHtml(text) }] : [];
     }
 
     // Preprocesar: limpiar elementos de Word/Google Docs
@@ -4274,7 +5300,87 @@
 
       // Manejar BR como separador de bloques
       if (tagName === 'BR') {
-        // Si hay contenido acumulado antes del BR, ya se habrá procesado
+        return;
+      }
+
+      // Iframe: detectar YouTube/Vimeo → bloque video
+      if (tagName === 'IFRAME') {
+        var src = node.getAttribute('src') || '';
+        var info = self._detectVideoProvider(src);
+        if (info && (info.provider === 'youtube' || info.provider === 'vimeo')) {
+          var w = parseInt(node.getAttribute('width'), 10);
+          var h = parseInt(node.getAttribute('height'), 10);
+          blocksToInsert.push({
+            type: 'video',
+            content: {
+              provider: info.provider,
+              videoId: info.videoId,
+              url: info.url,
+              width: (isNaN(w) || w < 1) ? 640 : w,
+              height: (isNaN(h) || h < 1) ? 360 : h
+            }
+          });
+        }
+        // iframes de otros dominios se descartan (Sprint 2 para iframe genérico)
+        return;
+      }
+
+      // Video nativo → bloque video (provider file)
+      if (tagName === 'VIDEO') {
+        var vsrc = node.getAttribute('src');
+        if (!vsrc) {
+          var sourceEl = node.querySelector('source');
+          if (sourceEl) vsrc = sourceEl.getAttribute('src');
+        }
+        if (vsrc && self._isSafeMediaUrl(vsrc)) {
+          var vw = parseInt(node.getAttribute('width'), 10);
+          var vh = parseInt(node.getAttribute('height'), 10);
+          blocksToInsert.push({
+            type: 'video',
+            content: {
+              provider: 'file',
+              videoId: null,
+              url: vsrc,
+              width: (isNaN(vw) || vw < 1) ? 640 : vw,
+              height: (isNaN(vh) || vh < 1) ? 360 : vh
+            }
+          });
+        }
+        return;
+      }
+
+      // Audio nativo → bloque audio
+      if (tagName === 'AUDIO') {
+        var asrc = node.getAttribute('src');
+        if (!asrc) {
+          var asource = node.querySelector('source');
+          if (asource) asrc = asource.getAttribute('src');
+        }
+        if (asrc && self._isSafeMediaUrl(asrc)) {
+          blocksToInsert.push({
+            type: 'audio',
+            content: { url: asrc, title: node.getAttribute('title') || '' }
+          });
+        }
+        return;
+      }
+
+      // IMG suelto (no dentro de un bloque) → bloque image
+      if (tagName === 'IMG') {
+        var imgSrc = node.getAttribute('src');
+        if (imgSrc && self._isSafeImageUrl(imgSrc)) {
+          var imgW = parseInt(node.getAttribute('width'), 10);
+          var imgH = parseInt(node.getAttribute('height'), 10);
+          blocksToInsert.push({
+            type: 'image',
+            content: {
+              blob: imgSrc,
+              fileName: node.getAttribute('alt') || 'image',
+              width: (isNaN(imgW) || imgW < 1) ? 300 : imgW,
+              height: (isNaN(imgH) || imgH < 1) ? 200 : imgH
+            }
+          });
+        }
         return;
       }
 
@@ -4297,12 +5403,16 @@
       // Manejar tablas - convertir a bloque de tabla
       if (tagName === 'TABLE') {
         var tableContent = self.cleanTableHTML(node);
-        if (tableContent) {
-          blocksToInsert.push({
-            type: 'table',
-            content: tableContent
-          });
+        var tableStyle = node.getAttribute('style') || '';
+        var tableBlock = {
+          type: 'table',
+          content: tableContent
+        };
+        if (tableStyle) {
+          var cleanStyle = self._sanitizeStyle(tableStyle);
+          if (cleanStyle) tableBlock.tableStyle = cleanStyle;
         }
+        if (tableContent) blocksToInsert.push(tableBlock);
         return;
       }
 
@@ -4340,7 +5450,8 @@
           if (child.nodeType === Node.ELEMENT_NODE) {
             var childTag = child.tagName;
             if (tagToBlockType[childTag] || childTag === 'UL' || childTag === 'OL' ||
-                childTag === 'TABLE' || childTag === 'BR') {
+                childTag === 'TABLE' || childTag === 'BR' || childTag === 'IFRAME' ||
+                childTag === 'VIDEO' || childTag === 'AUDIO' || childTag === 'IMG') {
               hasBlockChildren = true;
               break;
             }
@@ -4379,21 +5490,36 @@
       processNode(bodyChildren[i]);
     }
 
+    // Filtrar bloques vacíos pero preservar dividers, imágenes, videos, audios
+    blocksToInsert = blocksToInsert.filter(function(block) {
+      if (block.type === 'divider' || block.type === 'image' ||
+          block.type === 'video' || block.type === 'audio') return true;
+      if (typeof block.content === 'string') return block.content.trim() !== '';
+      return !!block.content;
+    });
+
+    return blocksToInsert;
+  };
+
+  /**
+   * Procesa HTML pegado y crea bloques apropiados (inserta en posición actual).
+   * @param {string} html
+   * @param {number} currentBlockId
+   * @param {HTMLElement} element
+   */
+  meWYSE.prototype.processPastedHTML = function(html, currentBlockId, element) {
+    this.pushHistory(true);
+
+    var blocksToInsert = this._htmlToBlocks(html);
+
     // Si no hay bloques, intentar con el texto plano
     if (blocksToInsert.length === 0) {
+      var parser = new DOMParser();
+      var doc = parser.parseFromString(html, 'text/html');
       var plainText = doc.body.textContent || '';
       if (plainText.trim()) {
         this.processPastedPlainText(plainText, currentBlockId, element);
       }
-      return;
-    }
-
-    // Filtrar bloques vacíos y limpiar contenido
-    blocksToInsert = blocksToInsert.filter(function(block) {
-      return block.content.trim() !== '' || block.type === 'divider';
-    });
-
-    if (blocksToInsert.length === 0) {
       return;
     }
 
@@ -4544,11 +5670,12 @@
     }
 
     // 7. Eliminar párrafos/divs completamente vacíos (resultado típico de Word)
+    // Preservar los que contienen medios (img, iframe, video, audio, table, hr, br)
     var emptyCandidates = doc.querySelectorAll('p, div');
     for (var ec = emptyCandidates.length - 1; ec >= 0; ec--) {
       var candidate = emptyCandidates[ec];
       var txt = (candidate.textContent || '').replace(/\s/g, '');
-      if (txt === '' && candidate.querySelectorAll('img, br, hr, table').length === 0) {
+      if (txt === '' && candidate.querySelectorAll('img, br, hr, table, iframe, video, audio').length === 0) {
         candidate.remove();
       }
     }
@@ -4812,6 +5939,31 @@
         // Guardar la celda donde se hizo clic para posible inicio de selección
         self.tableCellMouseDownCell = tdCell;
         self.tableCellMouseDownBlockId = blockId;
+      });
+
+      // Drag & drop de imágenes sobre la celda
+      tdCell.addEventListener('dragover', function(e) {
+        if (!self._draggedImage) return;
+        // Detectar que es una imagen interna del editor
+        e.preventDefault();
+        e.stopPropagation();
+        try { e.dataTransfer.dropEffect = 'move'; } catch (err) {}
+        tdCell.classList.add('mewyse-image-drop-target-cell');
+      });
+
+      tdCell.addEventListener('dragleave', function(e) {
+        // Solo quitar la clase si se sale de la celda (no de un hijo)
+        if (e.target === tdCell || !tdCell.contains(e.relatedTarget)) {
+          tdCell.classList.remove('mewyse-image-drop-target-cell');
+        }
+      });
+
+      tdCell.addEventListener('drop', function(e) {
+        if (!self._draggedImage) return;
+        e.preventDefault();
+        e.stopPropagation();
+        tdCell.classList.remove('mewyse-image-drop-target-cell');
+        self._dropImageIntoCell(tdCell, blockId);
       });
     }
   };
@@ -6170,6 +7322,8 @@
       { type: 'checklist', icon: WYSIWYG_ICONS.checklist },
       { type: 'table', icon: WYSIWYG_ICONS.table },
       { type: 'image', icon: WYSIWYG_ICONS.image },
+      { type: 'video', icon: WYSIWYG_ICONS.video },
+      { type: 'audio', icon: WYSIWYG_ICONS.audio },
       { type: 'divider', icon: WYSIWYG_ICONS.divider }
     ];
 
@@ -6340,26 +7494,24 @@
         blockIndex++;
       }
 
-      // Crear input de archivo
-      var fileInput = document.createElement('input');
-      fileInput.type = 'file';
-      fileInput.accept = 'image/*';
-      fileInput.style.display = 'none';
-
-      fileInput.onchange = function(e) {
-        var file = e.target.files[0];
-        if (file && file.type.startsWith('image/')) {
-          self.showImageDimensionsModal(file, blockIndex);
-        }
-        document.body.removeChild(fileInput);
+      // Usar el file input persistente
+      var fileInput = this._getFileInput();
+      fileInput.onchange = function() {
+        var file = fileInput.files && fileInput.files[0];
+        fileInput.value = '';
+        if (!file || !/^image\//.test(file.type)) return;
+        if (!self._validateImageSize(file)) return;
+        self.showImageDimensionsModal(file, blockIndex);
       };
-
-      fileInput.oncancel = function() {
-        document.body.removeChild(fileInput);
-      };
-
-      document.body.appendChild(fileInput);
       fileInput.click();
+    } else if (typeInfo.type === 'video' || typeInfo.type === 'audio') {
+      // video/audio: si el bloque actual está vacío, eliminarlo y abrir modal.
+      // insertVideoBlock/insertAudioBlock calculan el insertIndex por su cuenta.
+      if (block && (!block.content || (typeof block.content === 'string' && block.content.trim() === ''))) {
+        this.deleteBlock(blockId);
+      }
+      if (typeInfo.type === 'video') this.insertVideoBlock();
+      else this.insertAudioBlock();
     } else {
       // Para otros tipos, cambiar el tipo de bloque normalmente
       this.changeBlockType(blockId, typeInfo.type);
@@ -7230,7 +8382,61 @@
       return;
     }
 
-    if (isCtrlOrCmd && !e.shiftKey) {
+    // Ctrl+Shift+...: atajos con Shift
+    if (isCtrlOrCmd && e.shiftKey) {
+      // Ctrl+Shift+K → removeFormat
+      if (e.key === 'k' || e.key === 'K') {
+        e.preventDefault();
+        this.removeFormat();
+        return;
+      }
+      // Ctrl+Shift+X → strikethrough
+      if (e.key === 'x' || e.key === 'X') {
+        e.preventDefault();
+        document.execCommand('strikeThrough', false, null);
+        this.updateBlockContent(blockId, element.innerHTML);
+        this.triggerChange();
+        return;
+      }
+      // Ctrl+Shift+7 → lista numerada
+      if (e.key === '7' || e.key === '&' || e.key === '/') {
+        e.preventDefault();
+        this.changeBlockType(blockId, 'numberList');
+        return;
+      }
+      // Ctrl+Shift+8 → lista con viñetas
+      if (e.key === '8' || e.key === '*' || e.key === '(') {
+        e.preventDefault();
+        this.changeBlockType(blockId, 'bulletList');
+        return;
+      }
+    }
+
+    // Ctrl+Alt+...: cambio rápido a headings
+    if (isCtrlOrCmd && e.altKey && !e.shiftKey) {
+      if (e.key === '1' || e.code === 'Digit1') {
+        e.preventDefault();
+        this.changeBlockType(blockId, 'heading1');
+        return;
+      }
+      if (e.key === '2' || e.code === 'Digit2') {
+        e.preventDefault();
+        this.changeBlockType(blockId, 'heading2');
+        return;
+      }
+      if (e.key === '3' || e.code === 'Digit3') {
+        e.preventDefault();
+        this.changeBlockType(blockId, 'heading3');
+        return;
+      }
+      if (e.key === '0' || e.code === 'Digit0') {
+        e.preventDefault();
+        this.changeBlockType(blockId, 'paragraph');
+        return;
+      }
+    }
+
+    if (isCtrlOrCmd && !e.shiftKey && !e.altKey) {
       if (e.key === 'b' || e.key === 'B') {
         e.preventDefault();
         document.execCommand('bold', false, null);
@@ -7248,6 +8454,14 @@
       if (e.key === 'u' || e.key === 'U') {
         e.preventDefault();
         document.execCommand('underline', false, null);
+        this.updateBlockContent(blockId, element.innerHTML);
+        this.triggerChange();
+        return;
+      }
+      // Ctrl+E → code inline (envuelve selección en <code>)
+      if (e.key === 'e' || e.key === 'E') {
+        e.preventDefault();
+        this._wrapSelectionInTag('code');
         this.updateBlockContent(blockId, element.innerHTML);
         this.triggerChange();
         return;
@@ -7270,6 +8484,18 @@
       if (this.enableFindReplace && (e.key === 'f' || e.key === 'F')) {
         e.preventDefault();
         this.showFindReplace();
+        return;
+      }
+    }
+
+    // Tab / Shift+Tab: indentar/desindentar en listas
+    if (e.key === 'Tab') {
+      var currentBlock = this.getBlock(blockId);
+      if (currentBlock && (currentBlock.type === 'bulletList' ||
+                           currentBlock.type === 'numberList' ||
+                           currentBlock.type === 'checklist')) {
+        e.preventDefault();
+        this.indentBlock(blockId, e.shiftKey ? -1 : 1);
         return;
       }
     }
@@ -7504,9 +8730,13 @@
       }
     ];
 
-    // Si es una tabla, añadir la opción de "Ajustar al 100%"
+    // Si es una tabla, añadir opciones específicas de tabla
     if (isTable && !hasMultipleSelection) {
       options.splice(2, 0, {
+        action: 'tableProperties',
+        label: this.t('blockMenu.tableProperties'),
+        icon: WYSIWYG_ICONS.gear
+      }, {
         action: 'resetTableWidth',
         label: this.t('blockMenu.resetTableWidth'),
         icon: WYSIWYG_ICONS.resetWidth
@@ -7552,6 +8782,11 @@
           if (menu._cancelAnchor) menu._cancelAnchor();
           if (menu._cleanupSelection) menu._cleanupSelection();
           menu.remove();
+        } else if (option.action === 'tableProperties') {
+          if (menu._cancelAnchor) menu._cancelAnchor();
+          if (menu._cleanupSelection) menu._cleanupSelection();
+          menu.remove();
+          self.showTablePropertiesModal(blockId);
         } else if (option.action === 'delete') {
           // Si hay selección múltiple, eliminar todos los seleccionados
           if (self.selectedBlocks.length > 1) {
@@ -7776,6 +9011,11 @@
         type: block.type,
         content: block.content
       };
+      // Preservar propiedades opcionales (tableStyle, checked, alignment)
+      if (typeof block.tableStyle === 'string') duplicatedBlock.tableStyle = block.tableStyle;
+      if (block.checked === true) duplicatedBlock.checked = true;
+      if (typeof block.alignment === 'string') duplicatedBlock.alignment = block.alignment;
+
       this.blocks.splice(index + 1, 0, duplicatedBlock);
       this.render();
       this.triggerChange();
@@ -7852,6 +9092,11 @@
   meWYSE.prototype.updateBlockContent = function(blockId, content) {
     var block = this.getBlock(blockId);
     if (block) {
+      // Para bloques de tabla, limpiar controles del editor antes de guardar
+      // en el modelo (botones row/col-control, resize-handle, etc.)
+      if (block.type === 'table' && typeof content === 'string') {
+        content = this._cleanTableContent(content);
+      }
       block.content = content;
       this.triggerChange();
     }
@@ -8137,6 +9382,25 @@
   meWYSE.prototype.getFilteredBlocks = function() {
     var blocks = this.blocks.slice();
 
+    // Red de seguridad: limpiar controles de editor en tablas (por si algún
+    // path no pasó por updateBlockContent o el contenido viene de un guardado
+    // anterior al fix).
+    for (var i = 0; i < blocks.length; i++) {
+      if (blocks[i].type === 'table' && typeof blocks[i].content === 'string') {
+        var cleaned = this._cleanTableContent(blocks[i].content);
+        if (cleaned !== blocks[i].content) {
+          // No mutar el bloque original, devolver una copia
+          blocks[i] = {
+            id: blocks[i].id,
+            type: blocks[i].type,
+            content: cleaned,
+            checked: blocks[i].checked,
+            alignment: blocks[i].alignment
+          };
+        }
+      }
+    }
+
     // Si el último bloque está vacío, no incluirlo
     if (blocks.length > 0) {
       var lastBlock = blocks[blocks.length - 1];
@@ -8157,7 +9421,26 @@
    */
   meWYSE.prototype.getPlainText = function() {
     return this.getFilteredBlocks().map(function(block) {
-      return block.content || '';
+      var c = block.content;
+
+      // Bloques con content como objeto: extraer texto representativo
+      // (evita que Object.toString() produzca "[object Object]")
+      if (block.type === 'image') {
+        return (c && typeof c === 'object') ? (c.fileName || c.alt || '') : '';
+      }
+      if (block.type === 'video') {
+        return (c && typeof c === 'object') ? (c.url || '') : '';
+      }
+      if (block.type === 'audio') {
+        return (c && typeof c === 'object') ? (c.title || c.url || '') : '';
+      }
+      if (block.type === 'divider') {
+        return '';
+      }
+
+      // Bloques con content HTML string — devolver tal cual para compat
+      // (el consumidor puede hacer el strip si quiere solo texto)
+      return (typeof c === 'string') ? c : '';
     }).join('\n');
   };
 
@@ -8170,64 +9453,103 @@
     var blocks = this.getFilteredBlocks();
     var i = 0;
 
+    // Helper: devuelve ' class="custom"' si block.customClass existe, '' si no
+    var classAttr = function(b) {
+      return b.customClass ? ' class="' + b.customClass + '"' : '';
+    };
+
     while (i < blocks.length) {
       var block = blocks[i];
       var content = block.content || '';
 
-      // Agrupar listas consecutivas del mismo tipo
+      // Agrupar listas consecutivas del mismo tipo (con anidación por indentLevel)
       if (block.type === 'bulletList' || block.type === 'numberList' || block.type === 'checklist') {
-        var listType = block.type;
-        var listTag = listType === 'numberList' ? 'ol' : 'ul';
-        var listClass = listType === 'checklist' ? ' class="checklist"' : '';
-        html += '<' + listTag + listClass + '>';
-
-        // Añadir todos los elementos de lista consecutivos del mismo tipo
-        while (i < blocks.length && blocks[i].type === listType) {
-          var listContent = blocks[i].content || '';
-          if (listType === 'checklist') {
-            var checked = blocks[i].checked ? ' checked' : '';
-            html += '<li><input type="checkbox"' + checked + ' disabled> ' + listContent + '</li>';
-          } else {
-            html += '<li>' + listContent + '</li>';
-          }
-          i++;
-        }
-
-        html += '</' + listTag + '>';
+        var listRes = this._buildNestedListHTML(blocks, i, classAttr);
+        html += listRes.html;
+        i += listRes.consumed;
+        continue;
       } else {
         // Procesar bloques que no son listas
         switch (block.type) {
           case 'heading1':
-            html += '<h1>' + content + '</h1>';
+            html += '<h1' + classAttr(block) + '>' + content + '</h1>';
             break;
           case 'heading2':
-            html += '<h2>' + content + '</h2>';
+            html += '<h2' + classAttr(block) + '>' + content + '</h2>';
             break;
           case 'heading3':
-            html += '<h3>' + content + '</h3>';
+            html += '<h3' + classAttr(block) + '>' + content + '</h3>';
             break;
           case 'quote':
-            html += '<blockquote>' + content + '</blockquote>';
+            html += '<blockquote' + classAttr(block) + '>' + content + '</blockquote>';
             break;
           case 'code':
             // Solo escapar HTML en bloques de código
             html += '<pre><code>' + escapeHtml(content) + '</code></pre>';
             break;
           case 'table':
-            html += '<table style="width:100%;border-collapse:collapse;border:1px solid #ddd">';
+            // Solo incluir style si el usuario configuró propiedades de tabla
+            if (typeof block.tableStyle === 'string' && block.tableStyle) {
+              html += '<table style="' + block.tableStyle + '">';
+            } else {
+              html += '<table>';
+            }
             html += content;
             html += '</table>';
             break;
           case 'image':
             if (typeof block.content === 'object' && block.content.blob) {
-              html += '<img src="' + block.content.blob + '" alt="' + escapeHtml(block.content.fileName || 'Imagen') + '" width="' + block.content.width + '" height="' + block.content.height + '" />';
+              // Construir atributo style con las opciones avanzadas
+              var imgStyle = '';
+              var adv = block.content.advanced;
+              if (adv) {
+                var parts = [];
+                if (adv.border && adv.border.width) {
+                  parts.push('border: ' + adv.border.width + 'px ' + (adv.border.style || 'solid') + ' ' + (adv.border.color || '#000000'));
+                }
+                if (adv.margin && typeof adv.margin.all === 'number') {
+                  parts.push('margin: ' + adv.margin.all + 'px');
+                }
+                if (adv.alignment === 'center') {
+                  parts.push('display: block');
+                  parts.push('margin-left: auto');
+                  parts.push('margin-right: auto');
+                } else if (adv.alignment === 'left') {
+                  parts.push('float: left');
+                  parts.push('margin-right: 16px');
+                } else if (adv.alignment === 'right') {
+                  parts.push('float: right');
+                  parts.push('margin-left: 16px');
+                }
+                if (parts.length) imgStyle = ' style="' + parts.join('; ') + '"';
+              }
+              html += '<img src="' + block.content.blob + '" alt="' + escapeHtml(block.content.fileName || 'Imagen') + '" width="' + block.content.width + '" height="' + block.content.height + '"' + imgStyle + ' />';
+            }
+            break;
+          case 'video':
+            if (typeof block.content === 'object') {
+              var vc = block.content;
+              if (vc.provider === 'youtube' && vc.videoId) {
+                html += '<iframe src="https://www.youtube-nocookie.com/embed/' + encodeURIComponent(vc.videoId) +
+                        '" frameborder="0" allowfullscreen width="' + (vc.width || 640) + '" height="' + (vc.height || 360) + '"></iframe>';
+              } else if (vc.provider === 'vimeo' && vc.videoId) {
+                html += '<iframe src="https://player.vimeo.com/video/' + encodeURIComponent(vc.videoId) +
+                        '" frameborder="0" allowfullscreen width="' + (vc.width || 640) + '" height="' + (vc.height || 360) + '"></iframe>';
+              } else if (vc.provider === 'file' && vc.url) {
+                html += '<video controls src="' + escapeHtml(vc.url) + '" width="' + (vc.width || 640) + '" height="' + (vc.height || 360) + '"></video>';
+              }
+            }
+            break;
+          case 'audio':
+            if (typeof block.content === 'object' && block.content.url) {
+              html += '<audio controls src="' + escapeHtml(block.content.url) + '"></audio>';
             }
             break;
           case 'divider':
             html += '<hr>';
             break;
           default:
-            html += '<p>' + content + '</p>';
+            html += '<p' + classAttr(block) + '>' + content + '</p>';
         }
         i++;
       }
@@ -8244,30 +9566,17 @@
     var html = '';
     var blocks = this.getFilteredBlocks();
     var i = 0;
+    var classAttr = function(b) { return b.customClass ? ' class="' + b.customClass + '"' : ''; };
 
     while (i < blocks.length) {
       var block = blocks[i];
 
-      // Agrupar listas consecutivas del mismo tipo
+      // Agrupar listas consecutivas del mismo tipo (con anidación por indentLevel)
       if (block.type === 'bulletList' || block.type === 'numberList' || block.type === 'checklist') {
-        var listType = block.type;
-        var listTag = listType === 'numberList' ? 'ol' : 'ul';
-        var listClass = listType === 'checklist' ? ' class="checklist"' : '';
-        html += '<' + listTag + listClass + '>';
-
-        // Añadir todos los elementos de lista consecutivos del mismo tipo
-        while (i < blocks.length && blocks[i].type === listType) {
-          var content = blocks[i].content || '';
-          if (listType === 'checklist') {
-            var checked = blocks[i].checked ? ' checked' : '';
-            html += '<li><input type="checkbox"' + checked + ' disabled> ' + content + '</li>';
-          } else {
-            html += '<li>' + content + '</li>';
-          }
-          i++;
-        }
-
-        html += '</' + listTag + '>';
+        var listRes = this._buildNestedListHTML(blocks, i, classAttr);
+        html += listRes.html;
+        i += listRes.consumed;
+        continue;
       } else {
         // Para el código fuente HTML, usamos el contenido directo sin escapar
         // ya que el contenido puede contener etiquetas HTML de formato
@@ -8276,35 +9585,83 @@
         // Procesar bloques que no son listas
         switch (block.type) {
           case 'heading1':
-            html += '<h1>' + content + '</h1>';
+            html += '<h1' + classAttr(block) + '>' + content + '</h1>';
             break;
           case 'heading2':
-            html += '<h2>' + content + '</h2>';
+            html += '<h2' + classAttr(block) + '>' + content + '</h2>';
             break;
           case 'heading3':
-            html += '<h3>' + content + '</h3>';
+            html += '<h3' + classAttr(block) + '>' + content + '</h3>';
             break;
           case 'quote':
-            html += '<blockquote>' + content + '</blockquote>';
+            html += '<blockquote' + classAttr(block) + '>' + content + '</blockquote>';
             break;
           case 'code':
             html += '<pre><code>' + escapeHtml(content) + '</code></pre>';
             break;
           case 'table':
-            html += '<table style="width:100%;border-collapse:collapse;border:1px solid #ddd">';
+            // Solo incluir style si el usuario configuró propiedades de tabla
+            if (typeof block.tableStyle === 'string' && block.tableStyle) {
+              html += '<table style="' + block.tableStyle + '">';
+            } else {
+              html += '<table>';
+            }
             html += content;
             html += '</table>';
             break;
           case 'image':
             if (typeof block.content === 'object' && block.content.blob) {
-              html += '<img src="' + block.content.blob + '" alt="' + escapeHtml(block.content.fileName || 'Imagen') + '" width="' + block.content.width + '" height="' + block.content.height + '" />';
+              // Construir atributo style con las opciones avanzadas
+              var imgStyle = '';
+              var adv = block.content.advanced;
+              if (adv) {
+                var parts = [];
+                if (adv.border && adv.border.width) {
+                  parts.push('border: ' + adv.border.width + 'px ' + (adv.border.style || 'solid') + ' ' + (adv.border.color || '#000000'));
+                }
+                if (adv.margin && typeof adv.margin.all === 'number') {
+                  parts.push('margin: ' + adv.margin.all + 'px');
+                }
+                if (adv.alignment === 'center') {
+                  parts.push('display: block');
+                  parts.push('margin-left: auto');
+                  parts.push('margin-right: auto');
+                } else if (adv.alignment === 'left') {
+                  parts.push('float: left');
+                  parts.push('margin-right: 16px');
+                } else if (adv.alignment === 'right') {
+                  parts.push('float: right');
+                  parts.push('margin-left: 16px');
+                }
+                if (parts.length) imgStyle = ' style="' + parts.join('; ') + '"';
+              }
+              html += '<img src="' + block.content.blob + '" alt="' + escapeHtml(block.content.fileName || 'Imagen') + '" width="' + block.content.width + '" height="' + block.content.height + '"' + imgStyle + ' />';
+            }
+            break;
+          case 'video':
+            if (typeof block.content === 'object') {
+              var vc = block.content;
+              if (vc.provider === 'youtube' && vc.videoId) {
+                html += '<iframe src="https://www.youtube-nocookie.com/embed/' + encodeURIComponent(vc.videoId) +
+                        '" frameborder="0" allowfullscreen width="' + (vc.width || 640) + '" height="' + (vc.height || 360) + '"></iframe>';
+              } else if (vc.provider === 'vimeo' && vc.videoId) {
+                html += '<iframe src="https://player.vimeo.com/video/' + encodeURIComponent(vc.videoId) +
+                        '" frameborder="0" allowfullscreen width="' + (vc.width || 640) + '" height="' + (vc.height || 360) + '"></iframe>';
+              } else if (vc.provider === 'file' && vc.url) {
+                html += '<video controls src="' + escapeHtml(vc.url) + '" width="' + (vc.width || 640) + '" height="' + (vc.height || 360) + '"></video>';
+              }
+            }
+            break;
+          case 'audio':
+            if (typeof block.content === 'object' && block.content.url) {
+              html += '<audio controls src="' + escapeHtml(block.content.url) + '"></audio>';
             }
             break;
           case 'divider':
             html += '<hr>';
             break;
           default:
-            html += '<p>' + content + '</p>';
+            html += '<p' + classAttr(block) + '>' + content + '</p>';
         }
         i++;
       }
@@ -8498,6 +9855,16 @@
               lines.push('![' + alt + '](' + content.blob + ')');
             }
             break;
+          case 'video':
+            if (typeof content === 'object' && content.url) {
+              lines.push('[Video](' + content.url + ')');
+            }
+            break;
+          case 'audio':
+            if (typeof content === 'object' && content.url) {
+              lines.push('[Audio](' + content.url + ')');
+            }
+            break;
           default:
             // paragraph
             lines.push(self.htmlToMarkdownInline(content));
@@ -8516,17 +9883,44 @@
    */
   meWYSE.prototype.markdownInlineToHtml = function(text) {
     if (!text) return '';
+    var self = this;
 
-    // Proteger bloques de código inline con placeholders
+    // Proteger bloques de código inline con placeholders (ANTES de escapar)
+    // El contenido dentro de `code` se escapa como texto también.
     var codeBlocks = [];
     text = text.replace(/`([^`]+)`/g, function(match, code) {
       var idx = codeBlocks.length;
-      codeBlocks.push('<code>' + code + '</code>');
+      codeBlocks.push('<code>' + escapeHtml(code) + '</code>');
       return '\x00CODE' + idx + '\x00';
     });
 
-    // Links: [texto](url)
-    text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+    // Escapar HTML del texto restante ANTES de aplicar transformaciones MD
+    // Esto evita que `**<img onerror=...>**` se convierta en HTML peligroso.
+    text = escapeHtml(text);
+
+    // Los marcadores de Markdown que el usuario escribió ahora están en texto plano,
+    // pero los propios asteriscos/guiones no se escapan (no son HTML).
+    // Los <, >, & que el usuario escribió ya están como &lt; &gt; &amp;.
+
+    // Links: [texto](url) con validación de esquema URL
+    text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, function(_, linkText, url) {
+      // url y linkText ya están escapados por escapeHtml, pero hay que decodificar
+      // los placeholders markdown en url si los hay (no debería pero por seguridad)
+      var decodedUrl = url
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'");
+      var safe = self._isSafeUrl(decodedUrl) ? decodedUrl : '#';
+      // Re-escape el href final
+      var safeHref = safe
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+      return '<a href="' + safeHref + '">' + linkText + '</a>';
+    });
 
     // Bold: **texto** o __texto__
     text = text.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
@@ -8734,8 +10128,10 @@
       });
     }
 
-    this.blocks = newBlocks;
+    // Pasar por sanitizer (defensa final: aunque markdownInlineToHtml ya escapa,
+    // confirmamos whitelist de tags y validamos URLs/imágenes)
     this.currentBlockId = blockId;
+    this.blocks = this._sanitizeBlocks(newBlocks);
     this.render();
     this.triggerChange();
   };
@@ -8746,19 +10142,38 @@
    */
   meWYSE.prototype.loadFromJSON = function(json) {
     this.pushHistory(true);
-    var data = typeof json === 'string' ? JSON.parse(json) : json;
-    this.blocks = data;
-
-    // Actualizar currentBlockId
-    var maxId = 0;
-    for (var i = 0; i < this.blocks.length; i++) {
-      if (this.blocks[i].id > maxId) {
-        maxId = this.blocks[i].id;
-      }
+    var data;
+    try {
+      data = typeof json === 'string' ? JSON.parse(json) : json;
+    } catch (e) {
+      data = [];
     }
-    this.currentBlockId = maxId;
+    if (!Array.isArray(data)) data = [];
+
+    // Sanitizar contra XSS (maneja currentBlockId internamente)
+    this.blocks = this._sanitizeBlocks(data);
 
     this.render();
+  };
+
+  /**
+   * Carga contenido desde una cadena HTML.
+   * Útil para migrar contenido guardado por editores WYSIWYG previos (TinyMCE, CKEditor).
+   * Detecta automáticamente iframes de YouTube/Vimeo, <video>, <audio>, <img>, tablas
+   * y listas, y los convierte al modelo de bloques de meWYSE.
+   *
+   * @param {string} html - HTML source
+   */
+  meWYSE.prototype.loadFromHTML = function(html) {
+    this.pushHistory(true);
+    var blocks = this._htmlToBlocks(html || '');
+    this.blocks = this._sanitizeBlocks(blocks);
+    // Garantizar que siempre haya al menos un bloque
+    if (this.blocks.length === 0) {
+      this.blocks.push({ id: ++this.currentBlockId, type: 'paragraph', content: '' });
+    }
+    this.render();
+    this.triggerChange();
   };
 
   /**
@@ -8791,6 +10206,97 @@
       json: this.getJSON(),
       markdown: this.getMarkdown()
     });
+  };
+
+  /**
+   * Determina si un elemento pertenece a la UI de este editor (wrapper, toolbar,
+   * char counter, menús flotantes, modales, pickers, tooltips, etc).
+   * Usado para evitar disparar onBlur cuando el foco se mueve a UI propia del editor.
+   *
+   * @param {Element} el
+   * @returns {boolean}
+   */
+  meWYSE.prototype._isPartOfEditorUI = function(el) {
+    if (!el || !el.closest) return false;
+
+    // 1. Dentro del wrapper completo del editor (incluye toolbar + container + char counter)
+    if (this.editorWrapper && (this.editorWrapper === el || this.editorWrapper.contains(el))) {
+      return true;
+    }
+
+    // 2. Dentro del container del editor (caso sin toolbar/wrapper)
+    if (this.container && (this.container === el || this.container.contains(el))) {
+      return true;
+    }
+
+    // 3. Dentro del floating handle (no está en el container, está en body)
+    if (this.floatingHandle && this.floatingHandle.contains(el)) {
+      return true;
+    }
+
+    // 4. Dentro de algún menú/modal/picker flotante del editor (todos en body, todos
+    //    con clase prefijo mewyse-). Selector amplio que cubre todos los casos:
+    var floatingSelector =
+      '.mewyse-slash-menu, .mewyse-mention-menu, .mewyse-emoji-menu, ' +
+      '.mewyse-format-menu, .mewyse-options-menu, .mewyse-type-menu, ' +
+      '.mewyse-toolbar-menu, .mewyse-table-menu, .mewyse-cell-menu, ' +
+      '.mewyse-color-picker, .mewyse-unified-color-picker, ' +
+      '.mewyse-modal-overlay, .mewyse-find-replace, ' +
+      '.mewyse-summary-tooltip, .mewyse-floating-handle, ' +
+      '[class*="mewyse-"][class*="-menu"], [class*="mewyse-"][class*="-modal"], ' +
+      '[class*="mewyse-"][class*="-picker"], [class*="mewyse-"][class*="-tooltip"]';
+    try {
+      if (el.closest(floatingSelector)) return true;
+    } catch (e) {}
+
+    return false;
+  };
+
+  /**
+   * Construye el payload estándar pasado a callbacks (onChange/onFocus/onBlur).
+   * Incluye el snapshot del contenido + info opcional del bloque enfocado.
+   */
+  meWYSE.prototype._buildEventPayload = function(focusedElement) {
+    var payload = {
+      blocks: this.blocks,
+      plainText: this.getPlainText(),
+      html: this.getHTML(),
+      json: this.getJSON(),
+      markdown: this.getMarkdown(),
+      focusedBlockId: null,
+      focusedBlockType: null
+    };
+    if (focusedElement && focusedElement.closest) {
+      var blockEl = focusedElement.closest('[data-block-id]');
+      if (blockEl) {
+        var bid = parseInt(blockEl.getAttribute('data-block-id'), 10);
+        if (!isNaN(bid)) {
+          payload.focusedBlockId = bid;
+          payload.focusedBlockType = blockEl.getAttribute('data-block-type') || null;
+        }
+      }
+    }
+    return payload;
+  };
+
+  /**
+   * Dispara onFocus con el payload estándar.
+   */
+  meWYSE.prototype._fireFocusCallback = function(focusedElement) {
+    if (typeof this.onFocus !== 'function') return;
+    try {
+      this.onFocus(this._buildEventPayload(focusedElement));
+    } catch (e) {}
+  };
+
+  /**
+   * Dispara onBlur con el payload estándar.
+   */
+  meWYSE.prototype._fireBlurCallback = function(blurredElement) {
+    if (typeof this.onBlur !== 'function') return;
+    try {
+      this.onBlur(this._buildEventPayload(blurredElement));
+    } catch (e) {}
   };
 
   /**
@@ -8877,6 +10383,20 @@
     }
     if (this.closeToolbarMenuHandler) {
       document.removeEventListener('click', this.closeToolbarMenuHandler);
+    }
+
+    // Remove image drop handlers
+    if (this.container) {
+      if (this._imageDragEnterHandler) this.container.removeEventListener('dragenter', this._imageDragEnterHandler);
+      if (this._imageDragOverHandler) this.container.removeEventListener('dragover', this._imageDragOverHandler);
+      if (this._imageDragLeaveHandler) this.container.removeEventListener('dragleave', this._imageDragLeaveHandler);
+      if (this._imageDropHandler) this.container.removeEventListener('drop', this._imageDropHandler);
+    }
+
+    // Limpiar file input persistente
+    if (this._fileInput && this._fileInput.parentNode) {
+      this._fileInput.parentNode.removeChild(this._fileInput);
+      this._fileInput = null;
     }
 
     if (this.originalTarget) {
@@ -9004,7 +10524,8 @@
       { action: 'italic', label: 'I', titleKey: 'tooltips.italic', command: 'italic' },
       { action: 'underline', label: 'U', titleKey: 'tooltips.underline', command: 'underline' },
       { action: 'strikethrough', label: 'S', titleKey: 'tooltips.strikethrough', command: 'strikeThrough' },
-      { action: 'toggleCase', label: 'Aa', titleKey: 'tooltips.toggleCase', type: 'toggleCase' },
+      { action: 'caseMenu', label: 'Aa', titleKey: 'tooltips.toggleCase', type: 'caseMenu' },
+      { action: 'removeFormat', label: WYSIWYG_ICONS.removeFormat, titleKey: 'tooltips.removeFormat', type: 'removeFormat' },
       { action: 'separator', type: 'separator' },
       { action: 'link', label: WYSIWYG_ICONS.link, titleKey: 'tooltips.insertLink', command: 'createLink' },
       { action: 'separator', type: 'separator' },
@@ -9044,8 +10565,10 @@
 
         if (self.crossBlockSelection) {
           // Cross-block: delegar al sistema cross-block
-          if (tool.type === 'toggleCase') {
-            self.toggleCrossBlockCase();
+          if (tool.type === 'caseMenu') {
+            self.showCaseMenu(button);
+          } else if (tool.type === 'removeFormat') {
+            self.removeFormat();
           } else if (tool.type === 'colorPicker') {
             self.showUnifiedColorPicker(button);
           } else if (tool.command === 'createLink') {
@@ -9055,8 +10578,10 @@
           }
         } else {
           // Normal single-block
-          if (tool.type === 'toggleCase') {
-            self.toggleSelectionCase();
+          if (tool.type === 'caseMenu') {
+            self.showCaseMenu(button);
+          } else if (tool.type === 'removeFormat') {
+            self.removeFormat();
           } else if (tool.type === 'colorPicker') {
             self.showUnifiedColorPicker(button);
           } else if (tool.command === 'createLink') {
@@ -9776,39 +11301,191 @@
    * Alterna el texto seleccionado entre mayúsculas y minúsculas
    */
   meWYSE.prototype.toggleSelectionCase = function() {
-    // Delegar a cross-block si hay selección activa
+    // Mantener compatibilidad: toggle binario (smart: si tiene alguna minúscula → UPPER, si no → lower)
+    this.applyCaseTransform('smart');
+  };
+
+  /**
+   * Helpers puros de transformación de texto por modo.
+   * Usados por applyCaseTransform para normal y cross-block selection.
+   */
+  var CASE_TRANSFORMERS = {
+    'upper': function(s) { return s.toUpperCase(); },
+    'lower': function(s) { return s.toLowerCase(); },
+    'title': function(s) {
+      // Primera letra de cada palabra en mayúscula, resto en minúscula
+      return s.toLowerCase().replace(/\b([a-záéíóúñü])/gi, function(m) {
+        return m.toUpperCase();
+      });
+    },
+    'sentence': function(s) {
+      // Primera letra de cada oración en mayúscula (inicio y tras . ? !)
+      var lowered = s.toLowerCase();
+      return lowered.replace(/(^|[.?!]\s+)([a-záéíóúñü])/g, function(m, prefix, letter) {
+        return prefix + letter.toUpperCase();
+      });
+    },
+    'toggle': function(s) {
+      // Invierte case letra por letra
+      var out = '';
+      for (var i = 0; i < s.length; i++) {
+        var ch = s.charAt(i);
+        var up = ch.toUpperCase();
+        var lo = ch.toLowerCase();
+        out += (ch === up && ch !== lo) ? lo : up;
+      }
+      return out;
+    },
+    'smart': function(s) {
+      // Comportamiento legacy: UPPER si tiene minúsculas, si no LOWER
+      return s !== s.toUpperCase() ? s.toUpperCase() : s.toLowerCase();
+    }
+  };
+
+  /**
+   * Aplica una transformación de caso al texto seleccionado.
+   * @param {string} mode - 'upper' | 'lower' | 'title' | 'sentence' | 'toggle' | 'smart'
+   */
+  meWYSE.prototype.applyCaseTransform = function(mode) {
+    var transformer = CASE_TRANSFORMERS[mode];
+    if (!transformer) return;
+
+    // Cross-block selection: aplicar bloque por bloque
     if (this.crossBlockSelection) {
-      this.toggleCrossBlockCase();
+      var sel = this.crossBlockSelection;
+      this.pushHistory(true);
+      for (var j = 0; j < sel.blockIds.length; j++) {
+        var blockId = sel.blockIds[j];
+        var range2 = this.getRangeForBlock(blockId, sel);
+        if (!range2) continue;
+        var text = range2.toString();
+        if (!text) continue;
+        range2.deleteContents();
+        range2.insertNode(document.createTextNode(transformer(text)));
+      }
+      this.clearCrossBlockSelection();
+      this.closeFormatMenu();
+      this.triggerChange();
       return;
     }
 
+    // Selección normal en un bloque
     var selection = window.getSelection();
     if (!selection.rangeCount) return;
-
     var range = selection.getRangeAt(0);
     var selectedText = range.toString();
     if (!selectedText) return;
 
-    // Determinar la transformación: si tiene alguna minúscula, pasar a mayúsculas; si no, a minúsculas
-    var transformed;
-    if (selectedText !== selectedText.toUpperCase()) {
-      transformed = selectedText.toUpperCase();
-    } else {
-      transformed = selectedText.toLowerCase();
-    }
-
-    // Insertar el texto transformado manteniendo la selección
+    this.pushHistory(true);
     range.deleteContents();
-    var textNode = document.createTextNode(transformed);
+    var textNode = document.createTextNode(transformer(selectedText));
     range.insertNode(textNode);
 
-    // Restaurar la selección sobre el texto transformado
     var newRange = document.createRange();
     newRange.selectNodeContents(textNode);
     selection.removeAllRanges();
     selection.addRange(newRange);
 
     this.triggerChange();
+  };
+
+  /**
+   * Envuelve la selección actual en un tag inline simple (ej: <code>).
+   * Si ya está envuelta en ese tag, lo desenvuelve (toggle).
+   */
+  meWYSE.prototype._wrapSelectionInTag = function(tagName) {
+    var selection = window.getSelection();
+    if (!selection || !selection.rangeCount) return;
+    var range = selection.getRangeAt(0);
+    if (range.collapsed) return;
+
+    // Detectar si la selección ya está dentro de este tag → desenvolver (toggle)
+    var anchorNode = selection.anchorNode;
+    var ancestor = anchorNode && anchorNode.nodeType === 1 ? anchorNode : (anchorNode && anchorNode.parentNode);
+    while (ancestor && ancestor.tagName) {
+      if (ancestor.tagName.toLowerCase() === tagName.toLowerCase()) {
+        // Desenvolver: mover hijos al padre
+        var parent = ancestor.parentNode;
+        while (ancestor.firstChild) parent.insertBefore(ancestor.firstChild, ancestor);
+        parent.removeChild(ancestor);
+        parent.normalize();
+        return;
+      }
+      ancestor = ancestor.parentNode;
+    }
+
+    // Envolver: extraer contents y meterlos en el nuevo tag
+    try {
+      var wrapper = document.createElement(tagName);
+      wrapper.appendChild(range.extractContents());
+      range.insertNode(wrapper);
+      // Restaurar selección sobre el nuevo tag
+      var newRange = document.createRange();
+      newRange.selectNodeContents(wrapper);
+      selection.removeAllRanges();
+      selection.addRange(newRange);
+    } catch (e) {}
+  };
+
+  /**
+   * Muestra el dropdown de opciones de caso (UPPER/lower/Title/Sentence/Toggle).
+   * Anclado al botón "Aa" del toolbar o del format menu.
+   */
+  meWYSE.prototype.showCaseMenu = function(button) {
+    var self = this;
+    // Si ya hay uno abierto, cerrarlo (toggle)
+    if (this._caseMenu && this._caseMenu.parentNode) {
+      this._caseMenu.remove();
+      this._caseMenu = null;
+      return;
+    }
+
+    var menu = document.createElement('div');
+    menu.className = 'mewyse-options-menu';
+    menu.setAttribute('role', 'menu');
+
+    var options = [
+      { mode: 'upper',    label: this.t('tooltips.caseUpper'),    sample: 'AA' },
+      { mode: 'lower',    label: this.t('tooltips.caseLower'),    sample: 'aa' },
+      { mode: 'title',    label: this.t('tooltips.caseTitle'),    sample: 'Aa' },
+      { mode: 'sentence', label: this.t('tooltips.caseSentence'), sample: 'A.' },
+      { mode: 'toggle',   label: this.t('tooltips.caseToggle'),   sample: 'aA' }
+    ];
+
+    options.forEach(function(opt) {
+      var item = document.createElement('div');
+      item.className = 'mewyse-options-menu-item';
+      item.setAttribute('role', 'menuitem');
+      item.innerHTML = '<span class="icon" style="font-family: var(--mewyse-font-mono, monospace); font-weight: 600; font-size: 12px">' + opt.sample + '</span> ' + opt.label;
+      item.onclick = function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        // Guardar selección antes de perder foco por el click
+        self.applyCaseTransform(opt.mode);
+        if (self._caseMenu && self._caseMenu.parentNode) {
+          self._caseMenu.remove();
+          self._caseMenu = null;
+        }
+      };
+      menu.appendChild(item);
+    });
+
+    self._applyMenuTheme(menu);
+    document.body.appendChild(menu);
+    this._caseMenu = menu;
+    this.anchorMenu(menu, button, { offsetY: 5 });
+
+    // Cerrar al hacer click fuera
+    setTimeout(function() {
+      var closeHandler = function(e) {
+        if (!menu.contains(e.target) && !button.contains(e.target)) {
+          if (menu.parentNode) menu.remove();
+          self._caseMenu = null;
+          document.removeEventListener('click', closeHandler);
+        }
+      };
+      document.addEventListener('click', closeHandler);
+    }, 0);
   };
 
   /**
@@ -10649,37 +12326,8 @@
    * Toggle case para la selección cross-block
    */
   meWYSE.prototype.toggleCrossBlockCase = function() {
-    if (!this.crossBlockSelection) return;
-
-    var sel = this.crossBlockSelection;
-
-    // Primero, recolectar todo el texto para determinar la transformación
-    var allText = '';
-    for (var i = 0; i < sel.blockIds.length; i++) {
-      var range = this.getRangeForBlock(sel.blockIds[i], sel);
-      if (range) allText += range.toString();
-    }
-
-    var toUpper = (allText !== allText.toUpperCase());
-
-    // Ahora aplicar la transformación bloque por bloque
-    for (var j = 0; j < sel.blockIds.length; j++) {
-      var blockId = sel.blockIds[j];
-      var range2 = this.getRangeForBlock(blockId, sel);
-      if (!range2) continue;
-
-      var text = range2.toString();
-      if (!text) continue;
-
-      var transformed = toUpper ? text.toUpperCase() : text.toLowerCase();
-      range2.deleteContents();
-      range2.insertNode(document.createTextNode(transformed));
-    }
-
-    // Limpiar estado cross-block y cerrar menú de formato
-    this.clearCrossBlockSelection();
-    this.closeFormatMenu();
-    this.triggerChange();
+    // Compat: toggle binario smart
+    this.applyCaseTransform('smart');
   };
 
   /**
@@ -10940,21 +12588,23 @@
       s + ' pre.mewyse-block code { display: block; outline: none; }\n' +
       s + ' div.mewyse-block.mewyse-table-wrapper, ' + s + ' div.mewyse-block.mewyse-image-wrapper { display: block; }\n' +
       s + ' .mewyse-table-wrapper { position: relative; display: inline-block; width: 100%; }\n' +
-      s + ' .mewyse-block-content table { width: 100%; border-collapse: collapse; border: 1px solid #ddd; margin: 4px 0; position: relative; }\n' +
-      s + ' .mewyse-block-content table td, ' + s + ' .mewyse-block-content table th { border: 1px solid #ddd; padding: 8px; min-width: 50px; outline: none; position: relative; }\n' +
-      s + ' .mewyse-block-content table td:focus, ' + s + ' .mewyse-block-content table th:focus { background-color: #f0f8ff; }\n' +
-      s + ' .mewyse-block-content table td:empty:before, ' + s + ' .mewyse-block-content table th:empty:before { content: ""; color: #aaa; }\n' +
-      s + ' table td > p, ' + s + ' table td > h1, ' + s + ' table td > h2, ' + s + ' table td > h3, ' +
-        s + ' table td > blockquote, ' + s + ' table td > pre, ' + s + ' table td > ul, ' + s + ' table td > ol, ' +
-        s + ' table th > p, ' + s + ' table th > h1, ' + s + ' table th > h2, ' + s + ' table th > h3, ' +
-        s + ' table th > blockquote, ' + s + ' table th > pre, ' + s + ' table th > ul, ' + s + ' table th > ol ' +
-        '{ outline: none; width: 100%; min-height: 1em; margin: 0; padding: 8px; }\n' +
-      s + ' table td > p:focus, ' + s + ' table th > p:focus { background-color: transparent; }\n' +
-      s + ' table td > p:empty:before, ' + s + ' table th > p:empty:before { content: attr(data-placeholder); color: #aaa; pointer-events: none; }\n' +
+      // Defaults visuales para tabla durante edición (los estilos inline del usuario ganan por especificidad)
+      s + ' .mewyse-table-wrapper table { width: 100%; border-collapse: collapse; margin: 4px 0; position: relative; }\n' +
+      s + ' .mewyse-table-wrapper table td, ' + s + ' .mewyse-table-wrapper table th { border: 1px solid var(--mewyse-border-medium); padding: 8px; min-width: 50px; outline: none; position: relative; vertical-align: top; }\n' +
+      s + ' .mewyse-table-wrapper table td:focus, ' + s + ' .mewyse-table-wrapper table th:focus { background-color: var(--mewyse-bg-hover); }\n' +
+      s + ' .mewyse-table-wrapper table td:empty:before, ' + s + ' .mewyse-table-wrapper table th:empty:before { content: ""; color: var(--mewyse-text-muted); }\n' +
+      s + ' .mewyse-table-wrapper table td > p, ' + s + ' .mewyse-table-wrapper table td > h1, ' + s + ' .mewyse-table-wrapper table td > h2, ' + s + ' .mewyse-table-wrapper table td > h3, ' +
+        s + ' .mewyse-table-wrapper table td > blockquote, ' + s + ' .mewyse-table-wrapper table td > pre, ' + s + ' .mewyse-table-wrapper table td > ul, ' + s + ' .mewyse-table-wrapper table td > ol, ' +
+        s + ' .mewyse-table-wrapper table th > p, ' + s + ' .mewyse-table-wrapper table th > h1, ' + s + ' .mewyse-table-wrapper table th > h2, ' + s + ' .mewyse-table-wrapper table th > h3, ' +
+        s + ' .mewyse-table-wrapper table th > blockquote, ' + s + ' .mewyse-table-wrapper table th > pre, ' + s + ' .mewyse-table-wrapper table th > ul, ' + s + ' .mewyse-table-wrapper table th > ol ' +
+        '{ outline: none; width: 100%; min-height: 1em; margin: 0; }\n' +
+      s + ' .mewyse-table-wrapper table td > p:focus, ' + s + ' .mewyse-table-wrapper table th > p:focus { background-color: transparent; }\n' +
+      s + ' .mewyse-table-wrapper table td > p:empty:before, ' + s + ' .mewyse-table-wrapper table th > p:empty:before { content: attr(data-placeholder); color: var(--mewyse-text-muted); pointer-events: none; }\n' +
       s + ' .mewyse-mention { background-color: #e8f0fe; color: #1a73e8; padding: 2px 6px; border-radius: 4px; font-weight: 500; cursor: default; user-select: all; display: inline; white-space: nowrap; }\n' +
       s + ' .mewyse-mention:hover { background-color: #d2e3fc; }\n' +
       s + ' .mewyse-emoji { display: inline; cursor: default; user-select: all; }\n' +
       s + ' .mewyse-list-group { margin: 0; padding-left: 24px; }\n' +
+      s + ' .mewyse-list-group .mewyse-list-group { padding-left: 24px; margin-top: 4px; }\n' +
       s + ' .mewyse-list-group > li.mewyse-block { display: list-item; margin-bottom: 4px; }\n' +
       s + ' .mewyse-list-group > li.mewyse-block:focus { outline: none; }\n' +
       s + ' ul.mewyse-checklist-group { list-style: none; padding-left: 0; }\n' +
@@ -11632,6 +13282,1614 @@
 
     this.findReplaceState = { matches: [], currentIndex: -1 };
     this.triggerChange();
+  };
+
+  /**
+   * ============================================
+   * SANITIZACIÓN (XSS PROTECTION)
+   * ============================================
+   * Whitelist estricto aplicado a todo block.content que entra al modelo.
+   * Ver plan en /plans/refactored-beaming-turing.md.
+   */
+
+  // Tags que se eliminan completamente (con su contenido)
+  var DANGEROUS_TAGS = {
+    'SCRIPT': 1, 'STYLE': 1, 'IFRAME': 1, 'OBJECT': 1, 'EMBED': 1,
+    'FORM': 1, 'INPUT': 1, 'BUTTON': 1, 'TEXTAREA': 1, 'SELECT': 1,
+    'OPTION': 1, 'META': 1, 'LINK': 1, 'BASE': 1, 'SVG': 1, 'MATH': 1,
+    'VIDEO': 1, 'AUDIO': 1, 'SOURCE': 1, 'TRACK': 1, 'PORTAL': 1
+  };
+
+  // Tags inline permitidos en cualquier bloque
+  var INLINE_TAGS = {
+    'B': 1, 'STRONG': 1, 'I': 1, 'EM': 1, 'U': 1, 'S': 1, 'STRIKE': 1,
+    'DEL': 1, 'CODE': 1, 'MARK': 1, 'SUB': 1, 'SUP': 1, 'BR': 1,
+    'A': 1, 'SPAN': 1, 'FONT': 1
+  };
+
+  // Tags de estructura dentro de celdas de tabla
+  var BLOCK_TAGS_IN_CELL = {
+    'P': 1, 'H1': 1, 'H2': 1, 'H3': 1, 'H4': 1, 'H5': 1, 'H6': 1,
+    'BLOCKQUOTE': 1, 'PRE': 1, 'UL': 1, 'OL': 1, 'LI': 1, 'DIV': 1
+  };
+
+  // Tags de tabla
+  var TABLE_TAGS = {
+    'TABLE': 1, 'TBODY': 1, 'THEAD': 1, 'TFOOT': 1, 'TR': 1,
+    'TD': 1, 'TH': 1, 'COLGROUP': 1, 'COL': 1, 'CAPTION': 1
+  };
+
+  // Whitelist de atributos por tag (además de los comunes globales)
+  var ATTR_WHITELIST = {
+    'A': { 'href': 1, 'title': 1, 'target': 1, 'rel': 1 },
+    'SPAN': { 'class': 1, 'style': 1, 'contenteditable': 1,
+              'data-mention-id': 1, 'data-mention-name': 1,
+              'data-name': 1, 'data-type': 1 },
+    'FONT': { 'color': 1, 'face': 1, 'size': 1 },
+    'TD': { 'colspan': 1, 'rowspan': 1, 'style': 1 },
+    'TH': { 'colspan': 1, 'rowspan': 1, 'style': 1 },
+    'TABLE': { 'style': 1 },
+    'COL': { 'span': 1, 'style': 1 },
+    'IMG': { 'src': 1, 'alt': 1, 'width': 1, 'height': 1, 'title': 1 },
+    'IFRAME': { 'src': 1, 'width': 1, 'height': 1, 'frameborder': 1, 'allowfullscreen': 1, 'allow': 1, 'title': 1 },
+    'VIDEO': { 'src': 1, 'width': 1, 'height': 1, 'controls': 1, 'poster': 1, 'preload': 1 },
+    'AUDIO': { 'src': 1, 'controls': 1, 'preload': 1 },
+    'SOURCE': { 'src': 1, 'type': 1 }
+  };
+
+  // Clases CSS permitidas en SPAN (whitelisted por meWYSE)
+  var ALLOWED_SPAN_CLASSES = {
+    'mewyse-mention': 1,
+    'mewyse-emoji': 1,
+    'mewyse-search-highlight': 1
+  };
+
+  // Propiedades CSS permitidas en el atributo style
+  var ALLOWED_CSS_PROPS = {
+    'color': 1, 'background-color': 1, 'background': 1,
+    'font-weight': 1, 'font-style': 1, 'font-size': 1, 'font-family': 1,
+    'text-decoration': 1, 'text-align': 1,
+    'width': 1, 'height': 1, 'min-width': 1, 'min-height': 1,
+    'max-width': 1, 'max-height': 1,
+    'padding': 1, 'padding-top': 1, 'padding-right': 1,
+    'padding-bottom': 1, 'padding-left': 1,
+    'margin': 1, 'margin-top': 1, 'margin-right': 1,
+    'margin-bottom': 1, 'margin-left': 1,
+    'border': 1, 'border-color': 1, 'border-width': 1, 'border-style': 1,
+    'border-collapse': 1, 'border-spacing': 1,
+    'vertical-align': 1
+  };
+
+  // Tipos de bloque válidos
+  var VALID_BLOCK_TYPES = {
+    'paragraph': 1, 'heading1': 1, 'heading2': 1, 'heading3': 1,
+    'quote': 1, 'code': 1, 'bulletList': 1, 'numberList': 1,
+    'checklist': 1, 'table': 1, 'image': 1, 'divider': 1,
+    'video': 1, 'audio': 1
+  };
+
+  /**
+   * Valida un URL contra esquemas peligrosos (XSS via javascript:)
+   * Permite: http(s), mailto, tel, relativos (/, ./, ../), anchors (#), sin protocolo
+   * Bloquea: javascript:, vbscript:, data:text/html, file:
+   */
+  meWYSE.prototype._isSafeUrl = function(url) {
+    if (!url || typeof url !== 'string') return false;
+    var trimmed = url.trim().toLowerCase();
+    // Bloquear esquemas peligrosos (con o sin espacios/control chars al inicio)
+    // Normalizar: eliminar caracteres de control (tabs, newlines) que eluden filtros
+    var normalized = trimmed.replace(/[\x00-\x20]/g, '');
+    if (normalized.indexOf('javascript:') === 0) return false;
+    if (normalized.indexOf('vbscript:') === 0) return false;
+    if (normalized.indexOf('livescript:') === 0) return false;
+    if (normalized.indexOf('data:text/html') === 0) return false;
+    if (normalized.indexOf('data:application') === 0) return false;
+    if (normalized.indexOf('file:') === 0) return false;
+    return true;
+  };
+
+  /**
+   * Valida URL de imagen: solo http(s) y data:image/*
+   */
+  meWYSE.prototype._isSafeImageUrl = function(url) {
+    if (!url || typeof url !== 'string') return false;
+    var normalized = url.trim().toLowerCase().replace(/[\x00-\x20]/g, '');
+    if (normalized.indexOf('http://') === 0) return true;
+    if (normalized.indexOf('https://') === 0) return true;
+    if (normalized.indexOf('data:image/') === 0) return true;
+    // Rutas relativas
+    if (normalized.indexOf('/') === 0 || normalized.indexOf('./') === 0 ||
+        normalized.indexOf('../') === 0) return true;
+    return false;
+  };
+
+  /**
+   * Sanitiza un string de CSS style, devolviendo solo las propiedades seguras
+   */
+  meWYSE.prototype._sanitizeStyle = function(styleStr) {
+    if (!styleStr || typeof styleStr !== 'string') return '';
+    var parts = styleStr.split(';');
+    var clean = [];
+    for (var i = 0; i < parts.length; i++) {
+      var part = parts[i];
+      var colonIdx = part.indexOf(':');
+      if (colonIdx < 0) continue;
+      var prop = part.substring(0, colonIdx).trim().toLowerCase();
+      var value = part.substring(colonIdx + 1).trim();
+      if (!ALLOWED_CSS_PROPS[prop]) continue;
+      // Bloquear valores peligrosos
+      var valueLower = value.toLowerCase();
+      if (valueLower.indexOf('url(') >= 0) continue;
+      if (valueLower.indexOf('expression(') >= 0) continue;
+      if (valueLower.indexOf('@import') >= 0) continue;
+      if (valueLower.indexOf('javascript:') >= 0) continue;
+      if (valueLower.indexOf('vbscript:') >= 0) continue;
+      if (value.indexOf('<') >= 0 || value.indexOf('>') >= 0) continue;
+      // value razonablemente corto (anti-DoS)
+      if (value.length > 200) continue;
+      clean.push(prop + ': ' + value);
+    }
+    return clean.join('; ');
+  };
+
+  /**
+   * ============================================
+   * IMAGE PIPELINE
+   * ============================================
+   * Helpers centralizados para validación de tamaño y upload de imágenes.
+   * Usados por insertImageBlock (toolbar), paste de imagen, drag&drop.
+   */
+
+  /**
+   * Formatea bytes en una unidad legible (KB/MB).
+   */
+  meWYSE.prototype._formatFileSize = function(bytes) {
+    if (bytes >= 1048576) return (bytes / 1048576).toFixed(bytes % 1048576 === 0 ? 0 : 1) + ' MB';
+    if (bytes >= 1024) return Math.round(bytes / 1024) + ' KB';
+    return bytes + ' B';
+  };
+
+  /**
+   * Valida que un File no supere this.imageMaxSize.
+   * Si falla, muestra alert con mensaje configurable y devuelve false.
+   * @returns {boolean} true si el archivo es válido
+   */
+  meWYSE.prototype._validateImageSize = function(file) {
+    if (!this.imageMaxSize) return true;
+    if (!file || typeof file.size !== 'number') return true;
+    if (file.size <= this.imageMaxSize) return true;
+    var msg = this.options.imageMaxSizeError ||
+              this.t('alerts.imageTooLarge', { size: this._formatFileSize(this.imageMaxSize) });
+    try { window.alert(msg); } catch (e) {}
+    return false;
+  };
+
+  /**
+   * Procesa un File de imagen: valida tamaño, obtiene URL final (upload o base64)
+   * y resuelve dimensiones. Callback recibe { blob, fileName, width, height } o null si rechaza.
+   *
+   * Si options.onImageUpload está definido, se delega el upload al consumidor.
+   * Si no, se convierte a base64 inline (comportamiento por defecto).
+   */
+  meWYSE.prototype._processImageFile = function(file, callback) {
+    var self = this;
+    if (!file) { callback(null); return; }
+    if (!this._validateImageSize(file)) { callback(null); return; }
+
+    var resolveWithDimensions = function(url, fileName, knownW, knownH) {
+      if (knownW && knownH) {
+        callback({ blob: url, fileName: fileName, width: knownW, height: knownH });
+        return;
+      }
+      var tmp = new Image();
+      tmp.onload = function() {
+        callback({ blob: url, fileName: fileName, width: tmp.width, height: tmp.height });
+      };
+      tmp.onerror = function() {
+        callback({ blob: url, fileName: fileName, width: 300, height: 200 });
+      };
+      tmp.src = url;
+    };
+
+    if (typeof this.options.onImageUpload === 'function') {
+      // Hook externo: el consumidor sube al servidor y devuelve la URL
+      this.options.onImageUpload(file, function(result) {
+        if (!result || !result.url) { callback(null); return; }
+        resolveWithDimensions(
+          result.url,
+          result.fileName || file.name,
+          result.width, result.height
+        );
+      });
+    } else {
+      // Comportamiento por defecto: base64 inline
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        resolveWithDimensions(e.target.result, file.name);
+      };
+      reader.onerror = function() { callback(null); };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  /**
+   * ============================================
+   * MEDIA BLOCKS (video / audio)
+   * ============================================
+   * Soporta embeds de YouTube/Vimeo y archivos nativos (.mp4/.webm/.ogg para video,
+   * .mp3/.ogg/.wav para audio). Sin upload local — solo URL externa.
+   */
+
+  // Whitelist estricto de hosts permitidos para iframe embeds
+  var EMBED_HOSTS = {
+    'www.youtube.com': 1, 'youtube.com': 1, 'youtu.be': 1,
+    'www.youtube-nocookie.com': 1, 'youtube-nocookie.com': 1,
+    'www.vimeo.com': 1, 'vimeo.com': 1, 'player.vimeo.com': 1
+  };
+
+  /**
+   * Detecta el proveedor y extrae el ID del vídeo desde una URL.
+   * @returns {Object|null} { provider: 'youtube'|'vimeo'|'file', videoId: string|null, url: string }
+   */
+  meWYSE.prototype._detectVideoProvider = function(url) {
+    if (!url || typeof url !== 'string') return null;
+    var trimmed = url.trim();
+    if (!trimmed) return null;
+
+    // YouTube: youtube.com/watch?v=ID, youtu.be/ID, youtube.com/embed/ID, youtube-nocookie.com/embed/ID
+    var ytMatch = trimmed.match(/(?:(?:www\.)?youtube(?:-nocookie)?\.com\/(?:watch\?(?:.*&)?v=|embed\/|v\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    if (ytMatch) return { provider: 'youtube', videoId: ytMatch[1], url: trimmed };
+
+    // Vimeo: vimeo.com/ID, player.vimeo.com/video/ID
+    var vmMatch = trimmed.match(/(?:player\.)?vimeo\.com\/(?:video\/)?(\d+)/);
+    if (vmMatch) return { provider: 'vimeo', videoId: vmMatch[1], url: trimmed };
+
+    // Archivo de vídeo: extensiones comunes
+    if (/\.(mp4|webm|ogg|ogv|mov|m4v)($|\?|#)/i.test(trimmed)) {
+      return { provider: 'file', videoId: null, url: trimmed };
+    }
+
+    return null;
+  };
+
+  /**
+   * Valida URL de iframe embed: debe ser https y host whitelisted.
+   */
+  meWYSE.prototype._isSafeEmbedUrl = function(url) {
+    if (!url || typeof url !== 'string') return false;
+    var m = url.trim().match(/^https:\/\/([^\/]+)/i);
+    if (!m) return false;
+    return EMBED_HOSTS.hasOwnProperty(m[1].toLowerCase());
+  };
+
+  /**
+   * Valida URL de media file (video/audio): http(s) o data:video/audio.
+   */
+  meWYSE.prototype._isSafeMediaUrl = function(url) {
+    if (!url || typeof url !== 'string') return false;
+    var normalized = url.trim().toLowerCase().replace(/[\x00-\x20]/g, '');
+    if (normalized.indexOf('http://') === 0) return true;
+    if (normalized.indexOf('https://') === 0) return true;
+    if (normalized.indexOf('data:video/') === 0) return true;
+    if (normalized.indexOf('data:audio/') === 0) return true;
+    return false;
+  };
+
+  /**
+   * Valida URL de audio file: extensiones comunes + esquema seguro.
+   */
+  meWYSE.prototype._isAudioUrl = function(url) {
+    if (!this._isSafeMediaUrl(url)) return false;
+    return /\.(mp3|ogg|oga|wav|m4a|aac|flac)($|\?|#)/i.test(url);
+  };
+
+  /**
+   * Muestra un modal pidiendo URL para insertar media (video o audio).
+   */
+  meWYSE.prototype.showMediaUrlModal = function(type, onAccept) {
+    var self = this;
+    var t = function(key) { return self.t(key); };
+
+    var overlay = document.createElement('div');
+    overlay.className = 'mewyse-modal-overlay';
+    var modal = document.createElement('div');
+    modal.className = 'mewyse-modal-container';
+    if (self.options.theme) modal.classList.add('mewyse-editor-' + self.options.theme);
+
+    var title = document.createElement('h3');
+    title.className = 'mewyse-modal-title';
+    title.textContent = type === 'audio' ? t('modals.insertAudioTitle') : t('modals.insertVideoTitle');
+    modal.appendChild(title);
+
+    var inputsContainer = document.createElement('div');
+    inputsContainer.className = 'mewyse-modal-inputs';
+
+    var group = document.createElement('div');
+    group.className = 'mewyse-modal-input-group';
+    var label = document.createElement('label');
+    label.textContent = type === 'audio' ? t('modals.audioUrl') : t('modals.videoUrl');
+    var urlInput = document.createElement('input');
+    urlInput.type = 'url';
+    urlInput.className = 'mewyse-modal-input';
+    urlInput.placeholder = type === 'audio'
+      ? 'https://.../audio.mp3'
+      : 'https://www.youtube.com/watch?v=...';
+    group.appendChild(label);
+    group.appendChild(urlInput);
+    inputsContainer.appendChild(group);
+    modal.appendChild(inputsContainer);
+
+    var buttons = document.createElement('div');
+    buttons.className = 'mewyse-modal-buttons';
+    var cancelBtn = document.createElement('button');
+    cancelBtn.type = 'button';
+    cancelBtn.className = 'mewyse-modal-button mewyse-modal-button-cancel';
+    cancelBtn.textContent = t('modals.cancel');
+    cancelBtn.onclick = function() { document.body.removeChild(overlay); };
+    var okBtn = document.createElement('button');
+    okBtn.type = 'button';
+    okBtn.className = 'mewyse-modal-button mewyse-modal-button-primary';
+    okBtn.textContent = t('modals.insert');
+    var submit = function() {
+      var url = urlInput.value.trim();
+      if (!url) return;
+      // Validación según tipo
+      if (type === 'audio') {
+        if (!self._isAudioUrl(url)) {
+          try { window.alert(t('alerts.invalidAudioUrl')); } catch (e) {}
+          return;
+        }
+        document.body.removeChild(overlay);
+        onAccept({ url: url });
+        return;
+      }
+      // video
+      var info = self._detectVideoProvider(url);
+      if (!info) {
+        try { window.alert(t('alerts.invalidVideoUrl')); } catch (e) {}
+        return;
+      }
+      document.body.removeChild(overlay);
+      onAccept(info);
+    };
+    okBtn.onclick = submit;
+    urlInput.onkeydown = function(e) {
+      if (e.key === 'Enter') { e.preventDefault(); submit(); }
+      else if (e.key === 'Escape') { e.preventDefault(); document.body.removeChild(overlay); }
+    };
+
+    buttons.appendChild(cancelBtn);
+    buttons.appendChild(okBtn);
+    modal.appendChild(buttons);
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+    setTimeout(function() { urlInput.focus(); }, 10);
+  };
+
+  /**
+   * Inserta un bloque de vídeo abriendo un modal de URL.
+   */
+  meWYSE.prototype.insertVideoBlock = function() {
+    var self = this;
+    var insertIndex = this._getInsertIndexForNewBlock();
+    this.showMediaUrlModal('video', function(info) {
+      self.pushHistory(true);
+      var block = {
+        id: ++self.currentBlockId,
+        type: 'video',
+        content: {
+          provider: info.provider,
+          videoId: info.videoId,
+          url: info.url,
+          width: 640,
+          height: 360
+        }
+      };
+      self.blocks.splice(insertIndex, 0, block);
+      self.render();
+      self.triggerChange();
+    });
+  };
+
+  /**
+   * Inserta un bloque de audio abriendo un modal de URL.
+   */
+  meWYSE.prototype.insertAudioBlock = function() {
+    var self = this;
+    var insertIndex = this._getInsertIndexForNewBlock();
+    this.showMediaUrlModal('audio', function(info) {
+      self.pushHistory(true);
+      var block = {
+        id: ++self.currentBlockId,
+        type: 'audio',
+        content: {
+          url: info.url,
+          title: ''
+        }
+      };
+      self.blocks.splice(insertIndex, 0, block);
+      self.render();
+      self.triggerChange();
+    });
+  };
+
+  /**
+   * Calcula el índice donde insertar un nuevo bloque (después del último enfocado).
+   */
+  meWYSE.prototype._getInsertIndexForNewBlock = function() {
+    var activeElem = this.lastFocusedElement || document.activeElement;
+    if (activeElem && activeElem.closest) {
+      var blockElement = activeElem.closest('[data-block-id]');
+      if (blockElement) {
+        var blockId = parseInt(blockElement.getAttribute('data-block-id'), 10);
+        if (!isNaN(blockId)) return this.getBlockIndex(blockId) + 1;
+      }
+    }
+    return this.blocks.length;
+  };
+
+  /**
+   * Crea el elemento DOM para un bloque de video.
+   */
+  meWYSE.prototype.createVideoElement = function(block) {
+    var wrapper = document.createElement('div');
+    wrapper.className = 'mewyse-video-wrapper';
+    wrapper.contentEditable = 'false';
+
+    var c = block.content || {};
+    var media;
+
+    if (c.provider === 'youtube' && c.videoId) {
+      media = document.createElement('iframe');
+      media.src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(c.videoId);
+      media.setAttribute('frameborder', '0');
+      media.setAttribute('allowfullscreen', 'true');
+      media.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+    } else if (c.provider === 'vimeo' && c.videoId) {
+      media = document.createElement('iframe');
+      media.src = 'https://player.vimeo.com/video/' + encodeURIComponent(c.videoId);
+      media.setAttribute('frameborder', '0');
+      media.setAttribute('allowfullscreen', 'true');
+    } else if (c.provider === 'file' && this._isSafeMediaUrl(c.url)) {
+      media = document.createElement('video');
+      media.controls = true;
+      media.src = c.url;
+    } else {
+      // fallback: placeholder si los datos no son válidos
+      media = document.createElement('div');
+      media.className = 'mewyse-video-placeholder';
+      media.textContent = '(video no disponible)';
+    }
+
+    wrapper.appendChild(media);
+    return wrapper;
+  };
+
+  /**
+   * Crea el elemento DOM para un bloque de audio.
+   */
+  meWYSE.prototype.createAudioElement = function(block) {
+    var wrapper = document.createElement('div');
+    wrapper.className = 'mewyse-audio-wrapper';
+    wrapper.contentEditable = 'false';
+
+    var c = block.content || {};
+    if (this._isSafeMediaUrl(c.url)) {
+      var audio = document.createElement('audio');
+      audio.controls = true;
+      audio.src = c.url;
+      wrapper.appendChild(audio);
+    } else {
+      var placeholder = document.createElement('div');
+      placeholder.className = 'mewyse-audio-placeholder';
+      placeholder.textContent = '(audio no disponible)';
+      wrapper.appendChild(placeholder);
+    }
+
+    return wrapper;
+  };
+
+  /**
+   * ============================================
+   * REMOVE FORMAT
+   * ============================================
+   * Elimina todo el formato inline (bold, italic, color, etc.) de la selección actual.
+   * Funciona con selección normal y cross-block selection.
+   */
+  meWYSE.prototype.removeFormat = function() {
+    var self = this;
+
+    // Caso 1: selección cross-block → limpiar cada bloque seleccionado
+    if (this.crossBlockSelection && this.crossBlockSelection.blockIds && this.crossBlockSelection.blockIds.length > 0) {
+      this.pushHistory(true);
+      var ids = this.crossBlockSelection.blockIds.slice();
+      for (var i = 0; i < ids.length; i++) {
+        var block = this.getBlock(ids[i]);
+        if (!block || typeof block.content !== 'string') continue;
+        // Convertir HTML a texto plano preservando <br> como \n
+        var tmp = document.createElement('div');
+        tmp.innerHTML = block.content;
+        // Reemplazar <br> por saltos de línea antes de extraer texto
+        var brs = tmp.querySelectorAll('br');
+        for (var b = 0; b < brs.length; b++) brs[b].replaceWith('\n');
+        var plainText = tmp.textContent || '';
+        // Escapar HTML del texto resultante
+        block.content = escapeHtml(plainText).replace(/\n/g, '<br>');
+      }
+      this.clearCrossBlockSelection();
+      this.render();
+      this.triggerChange();
+      return;
+    }
+
+    // Caso 2: selección normal dentro de un bloque
+    var selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) return;
+
+    this.pushHistory(true);
+
+    // execCommand removeFormat quita b/i/u/s/font y attrs básicos
+    document.execCommand('removeFormat', false, null);
+
+    // execCommand no quita spans con style (colores custom) ni algunas clases.
+    // Iterar el bloque actual y desenvolver spans residuales con style.
+    var activeElement = document.activeElement;
+    var blockElement = activeElement && activeElement.closest ? activeElement.closest('[data-block-id]') : null;
+    if (blockElement) {
+      var editable = blockElement.querySelector('[contenteditable="true"]') ||
+                     (blockElement.getAttribute('contenteditable') === 'true' ? blockElement : null);
+      if (editable) {
+        self._unwrapResidualFormatting(editable);
+
+        // Persistir en modelo
+        var blockId = parseInt(blockElement.getAttribute('data-block-id'), 10);
+        if (!isNaN(blockId)) {
+          self.updateBlockContent(blockId, editable.innerHTML);
+        }
+      }
+    }
+
+    this.triggerChange();
+  };
+
+  /**
+   * Desenvuelve spans/fonts/marks residuales tras removeFormat
+   * Preserva links (no se consideran "formato")
+   */
+  meWYSE.prototype._unwrapResidualFormatting = function(root) {
+    // Seleccionar spans con style, font, mark, code inline (pero NO dentro de bloques de código)
+    var selectors = ['span[style]', 'span.mewyse-search-highlight', 'font', 'mark'];
+    for (var s = 0; s < selectors.length; s++) {
+      var nodes = root.querySelectorAll(selectors[s]);
+      for (var n = nodes.length - 1; n >= 0; n--) {
+        var node = nodes[n];
+        // Preservar mentions/emojis (tienen clase específica)
+        if (node.className && (node.className.indexOf('mewyse-mention') >= 0 ||
+                               node.className.indexOf('mewyse-emoji') >= 0)) continue;
+        // Desenvolver: mover hijos al padre y eliminar el nodo
+        var parent = node.parentNode;
+        if (!parent) continue;
+        while (node.firstChild) parent.insertBefore(node.firstChild, node);
+        parent.removeChild(node);
+      }
+    }
+  };
+
+  // Clases de la UI del editor que NO deben persistir en block.content de tablas
+  // (se añaden dinámicamente en createTableElement/addTableControls/enableColumnResizing)
+  var EDITOR_UI_CLASSES = [
+    'mewyse-table-row-control',
+    'mewyse-table-col-control',
+    'mewyse-table-resize-handle',
+    'mewyse-table-add-row',
+    'mewyse-table-add-col',
+    'mewyse-cell-selected'
+  ];
+
+  /**
+   * Limpia el HTML de una tabla (block.content de tipo 'table') de los controles
+   * que el editor añade dinámicamente al renderizar. Este método garantiza que
+   * block.content contiene solo el markup semántico de la tabla, no la UI del editor.
+   *
+   * Qué elimina:
+   * - <button class="mewyse-table-*-control"> (botones de fila/columna con SVG hamburger)
+   * - <div class="mewyse-table-resize-handle"> (handles de redimensionado)
+   * - <button class="mewyse-table-add-row|col"> (botones +row/+col)
+   * - atributos tabindex="-1", contenteditable="false" en controles ya eliminados
+   * - style inline generado por el editor en <td>/<th> (position:relative usado por los controles)
+   * - contenteditable="true" y data-placeholder en los <p> de las celdas
+   *
+   * Preserva:
+   * - Estructura <tbody>/<tr>/<td>/<th> + colspan/rowspan
+   * - Contenido de texto e inline formatting
+   * - Estilos de usuario (color, background-color, border, width, height) — ver _sanitizeStyle
+   */
+  meWYSE.prototype._cleanTableContent = function(html) {
+    if (typeof html !== 'string' || !html) return html;
+
+    // Envolver directamente en <table> — el navegador genera/normaliza tbody según contenido.
+    // Si el input ya tiene <tbody>, se usa; si no, lo genera.
+    var doc;
+    try {
+      doc = new DOMParser().parseFromString(
+        '<!DOCTYPE html><html><body><table>' + html + '</table></body></html>',
+        'text/html'
+      );
+    } catch (e) {
+      return html;
+    }
+    var table = doc.querySelector('table');
+    if (!table) return html;
+    // Obtener el tbody (generado por el navegador o presente en el input)
+    var tbody = table.querySelector('tbody');
+    if (!tbody) {
+      // Caso raro: si no hay tbody, trabajar directamente con la tabla
+      tbody = table;
+    }
+
+    // 1. Eliminar botones/divs con clases de UI del editor
+    for (var i = 0; i < EDITOR_UI_CLASSES.length; i++) {
+      var uiNodes = tbody.querySelectorAll('.' + EDITOR_UI_CLASSES[i]);
+      for (var j = uiNodes.length - 1; j >= 0; j--) {
+        if (uiNodes[j].parentNode) uiNodes[j].parentNode.removeChild(uiNodes[j]);
+      }
+    }
+
+    // 2. Limpiar atributos innecesarios del editor en <td>/<th>
+    var cells = tbody.querySelectorAll('td, th');
+    for (var c = 0; c < cells.length; c++) {
+      var cell = cells[c];
+      // Limpiar style: preservar solo propiedades de usuario (background-color, border, etc.)
+      // pero eliminar position:relative que pone el editor para los controles
+      var styleAttr = cell.getAttribute('style');
+      if (styleAttr) {
+        var cleanStyle = this._sanitizeStyle(styleAttr);
+        // Eliminar también position:relative que es exclusivo del editor
+        cleanStyle = cleanStyle.replace(/\bposition\s*:\s*relative\s*;?/gi, '').trim();
+        if (cleanStyle) {
+          cell.setAttribute('style', cleanStyle);
+        } else {
+          cell.removeAttribute('style');
+        }
+      }
+    }
+
+    // 3. Limpiar atributos del editor en los <p> dentro de celdas
+    var paragraphs = tbody.querySelectorAll('td > p, th > p');
+    for (var p = 0; p < paragraphs.length; p++) {
+      var para = paragraphs[p];
+      para.removeAttribute('contenteditable');
+      para.removeAttribute('data-placeholder');
+      para.removeAttribute('tabindex');
+      // Limpiar style: eliminar padding/margin/min-height del editor
+      var pStyle = para.getAttribute('style');
+      if (pStyle) {
+        // Eliminar las props que el editor fuerza en los <p> de celdas
+        pStyle = pStyle
+          .replace(/\bpadding\s*:[^;]+;?/gi, '')
+          .replace(/\bmargin\s*:[^;]+;?/gi, '')
+          .replace(/\bmin-height\s*:[^;]+;?/gi, '')
+          .trim();
+        if (pStyle && pStyle !== ';') {
+          para.setAttribute('style', pStyle);
+        } else {
+          para.removeAttribute('style');
+        }
+      }
+    }
+
+    return tbody.innerHTML;
+  };
+
+  /**
+   * Sanitiza HTML string contra whitelist.
+   * @param {string} html - HTML a sanitizar
+   * @param {Object} opts - { allowTable: boolean, allowImg: boolean }
+   * @returns {string} HTML sanitizado seguro para innerHTML
+   */
+  meWYSE.prototype._sanitizeBlockContent = function(html, opts) {
+    if (typeof html !== 'string') return html; // no string: devolver tal cual
+    if (html === '') return '';
+    opts = opts || {};
+    var allowTable = opts.allowTable === true;
+    var allowImg = opts.allowImg === true;
+    var allowMedia = opts.allowMedia === true;
+    var self = this;
+
+    // Parsear en DOM desechable.
+    // Si se permite contenido de tabla (tbody/tr/td son hijos), envolver en <table>
+    // porque <div> no es un padre válido para ellos y el navegador los descartaría.
+    var doc;
+    var wrapperOpen, wrapperClose, rootSelector;
+    if (allowTable) {
+      wrapperOpen = '<table id="__mewyse_root__">';
+      wrapperClose = '</table>';
+      rootSelector = 'table#__mewyse_root__';
+    } else {
+      wrapperOpen = '<div id="__mewyse_root__">';
+      wrapperClose = '</div>';
+      rootSelector = '#__mewyse_root__';
+    }
+    try {
+      doc = new DOMParser().parseFromString(
+        '<!DOCTYPE html><html><body>' + wrapperOpen + html + wrapperClose + '</body></html>',
+        'text/html'
+      );
+    } catch (e) {
+      return '';
+    }
+    var root = doc.querySelector(rootSelector);
+    if (!root) return '';
+
+    // Recorrer el árbol en profundidad y sanitizar cada elemento
+    // Usamos un recorrido manual para poder eliminar/unwrapp nodos con seguridad
+    function processNode(node) {
+      // Nodo de texto: seguro tal cual
+      if (node.nodeType === 3) return;
+      // Nodo de comentario: eliminar
+      if (node.nodeType === 8) {
+        node.parentNode.removeChild(node);
+        return;
+      }
+      if (node.nodeType !== 1) return;
+
+      var tag = node.tagName.toUpperCase();
+
+      // 1. Tag peligroso: eliminar con todos sus hijos
+      // Excepción: si allowMedia=true, permitir IFRAME/VIDEO/AUDIO/SOURCE con src validado
+      var isMediaTag = (tag === 'IFRAME' || tag === 'VIDEO' || tag === 'AUDIO' || tag === 'SOURCE');
+      if (DANGEROUS_TAGS[tag] && !(allowMedia && isMediaTag)) {
+        node.parentNode.removeChild(node);
+        return;
+      }
+
+      // 2. Determinar si el tag está permitido según contexto
+      var isAllowed = false;
+      if (INLINE_TAGS[tag]) {
+        isAllowed = true;
+      } else if (allowTable && (TABLE_TAGS[tag] || BLOCK_TAGS_IN_CELL[tag])) {
+        isAllowed = true;
+      } else if (allowImg && tag === 'IMG') {
+        isAllowed = true;
+      } else if (allowTable && tag === 'IMG') {
+        // Permitir imágenes dentro de celdas de tabla (valida src por seguridad)
+        var imgSrc = node.getAttribute('src');
+        if (self._isSafeImageUrl(imgSrc)) isAllowed = true;
+        if (!isAllowed) { node.parentNode.removeChild(node); return; }
+      } else if (allowMedia && isMediaTag) {
+        // Validar src según tipo: IFRAME solo whitelist, VIDEO/AUDIO/SOURCE URLs seguras
+        var srcAttr = node.getAttribute('src');
+        if (tag === 'IFRAME') {
+          if (self._isSafeEmbedUrl(srcAttr)) isAllowed = true;
+        } else {
+          if (self._isSafeMediaUrl(srcAttr)) isAllowed = true;
+        }
+        if (!isAllowed) {
+          // Si no pasa validación, eliminar el nodo completo
+          node.parentNode.removeChild(node);
+          return;
+        }
+      }
+
+      // Procesar hijos primero (antes de posible unwrap del padre)
+      var child = node.firstChild;
+      while (child) {
+        var next = child.nextSibling;
+        processNode(child);
+        child = next;
+      }
+
+      if (!isAllowed) {
+        // Unwrap: mover hijos al padre y eliminar el nodo
+        var parent = node.parentNode;
+        if (parent) {
+          while (node.firstChild) {
+            parent.insertBefore(node.firstChild, node);
+          }
+          parent.removeChild(node);
+        }
+        return;
+      }
+
+      // 3. Tag permitido: limpiar atributos
+      var tagWhitelist = ATTR_WHITELIST[tag] || {};
+      // Recorrer atributos a la inversa (mutación segura)
+      for (var i = node.attributes.length - 1; i >= 0; i--) {
+        var attr = node.attributes[i];
+        var attrName = attr.name.toLowerCase();
+
+        // Event handlers: eliminar siempre (doble seguridad)
+        if (attrName.indexOf('on') === 0) {
+          node.removeAttribute(attr.name);
+          continue;
+        }
+        // xmlns: eliminar
+        if (attrName.indexOf('xmlns') === 0) {
+          node.removeAttribute(attr.name);
+          continue;
+        }
+        // Atributo no whitelisteado
+        if (!tagWhitelist[attrName]) {
+          node.removeAttribute(attr.name);
+          continue;
+        }
+
+        // Validaciones especiales
+        if (tag === 'A' && attrName === 'href') {
+          if (!self._isSafeUrl(attr.value)) {
+            node.setAttribute('href', '#');
+          }
+        } else if (tag === 'IMG' && attrName === 'src') {
+          if (!self._isSafeImageUrl(attr.value)) {
+            node.removeAttribute(attr.name);
+          }
+        } else if (attrName === 'style') {
+          var clean = self._sanitizeStyle(attr.value);
+          if (clean) {
+            node.setAttribute('style', clean);
+          } else {
+            node.removeAttribute(attr.name);
+          }
+        } else if (tag === 'SPAN' && attrName === 'class') {
+          // Filtrar clases: solo whitelisteadas
+          var classes = attr.value.split(/\s+/);
+          var okClasses = [];
+          for (var j = 0; j < classes.length; j++) {
+            if (ALLOWED_SPAN_CLASSES[classes[j]]) okClasses.push(classes[j]);
+          }
+          if (okClasses.length > 0) {
+            node.setAttribute('class', okClasses.join(' '));
+          } else {
+            node.removeAttribute('class');
+          }
+        } else if (attrName === 'contenteditable') {
+          // Solo permitir "false" (para mentions/emojis)
+          if (attr.value !== 'false') node.removeAttribute(attr.name);
+        } else if (attrName === 'target') {
+          // Forzar rel="noopener noreferrer" si target="_blank"
+          if (attr.value === '_blank') {
+            node.setAttribute('rel', 'noopener noreferrer');
+          }
+        } else if (attrName === 'colspan' || attrName === 'rowspan') {
+          // Asegurar que sea un número positivo razonable
+          var num = parseInt(attr.value, 10);
+          if (isNaN(num) || num < 1 || num > 1000) {
+            node.removeAttribute(attr.name);
+          } else {
+            node.setAttribute(attrName, String(num));
+          }
+        }
+      }
+    }
+
+    // Procesar hijos directos de root
+    var c = root.firstChild;
+    while (c) {
+      var n = c.nextSibling;
+      processNode(c);
+      c = n;
+    }
+
+    return root.innerHTML;
+  };
+
+  /**
+   * Sanitiza un bloque individual: valida type, id, content según tipo.
+   * @returns {Object|null} bloque sanitizado o null si es inválido
+   */
+  meWYSE.prototype._sanitizeBlock = function(block, fallbackId) {
+    if (!block || typeof block !== 'object') return null;
+
+    // Validar type
+    var type = VALID_BLOCK_TYPES[block.type] ? block.type : 'paragraph';
+
+    // Validar id
+    var id = (typeof block.id === 'number' && isFinite(block.id)) ? block.id : fallbackId;
+    if (typeof id !== 'number') id = ++this.currentBlockId;
+    if (id > this.currentBlockId) this.currentBlockId = id;
+
+    // Construir bloque limpio (descartando cualquier propiedad no esperada)
+    var clean = { id: id, type: type, content: '' };
+
+    // Procesar content según tipo
+    if (type === 'image') {
+      // content debe ser objeto con blob/fileName/width/height
+      var c = block.content;
+      if (!c || typeof c !== 'object') return null;
+      if (typeof c.blob !== 'string' || !this._isSafeImageUrl(c.blob)) return null;
+      var w = parseInt(c.width, 10);
+      var h = parseInt(c.height, 10);
+      clean.content = {
+        blob: c.blob,
+        fileName: typeof c.fileName === 'string' ? c.fileName.substring(0, 200) : 'image',
+        width: (isNaN(w) || w < 1) ? 300 : Math.min(w, 10000),
+        height: (isNaN(h) || h < 1) ? 200 : Math.min(h, 10000)
+      };
+      // Preservar opciones avanzadas (border/margin/alignment) si existen y son válidas
+      if (c.advanced && typeof c.advanced === 'object') {
+        var adv = {};
+        if (c.advanced.border && typeof c.advanced.border === 'object') {
+          var bw = parseInt(c.advanced.border.width, 10);
+          if (!isNaN(bw) && bw >= 0 && bw <= 50) {
+            var validStyles = { solid: 1, dashed: 1, dotted: 1, double: 1, none: 1 };
+            adv.border = {
+              width: bw,
+              style: validStyles[c.advanced.border.style] ? c.advanced.border.style : 'solid',
+              color: /^#[0-9a-fA-F]{3,6}$/.test(c.advanced.border.color) ? c.advanced.border.color : '#000000'
+            };
+          }
+        }
+        if (c.advanced.margin && typeof c.advanced.margin === 'object') {
+          var m = parseInt(c.advanced.margin.all, 10);
+          if (!isNaN(m) && m >= 0 && m <= 200) {
+            adv.margin = { all: m };
+          }
+        }
+        if (typeof c.advanced.alignment === 'string') {
+          var validAligns = { left: 1, center: 1, right: 1 };
+          if (validAligns[c.advanced.alignment]) {
+            adv.alignment = c.advanced.alignment;
+          }
+        }
+        if (adv.border || adv.margin || adv.alignment) {
+          clean.content.advanced = adv;
+        }
+      }
+    } else if (type === 'code') {
+      // No es HTML, solo texto. Igual escapamos para seguridad.
+      clean.content = typeof block.content === 'string' ? block.content : '';
+    } else if (type === 'table') {
+      clean.content = this._sanitizeBlockContent(
+        typeof block.content === 'string' ? block.content : '',
+        { allowTable: true }
+      );
+      // Preservar estilos de tabla (aplicados vía "Propiedades de la tabla")
+      if (typeof block.tableStyle === 'string' && block.tableStyle) {
+        var cleanTableStyle = this._sanitizeStyle(block.tableStyle);
+        if (cleanTableStyle) clean.tableStyle = cleanTableStyle;
+      }
+    } else if (type === 'divider') {
+      clean.content = '';
+    } else if (type === 'video') {
+      // content: { provider, videoId, url, width, height }
+      var vc = block.content;
+      if (!vc || typeof vc !== 'object') return null;
+      var provider = (vc.provider === 'youtube' || vc.provider === 'vimeo' || vc.provider === 'file')
+        ? vc.provider : null;
+      if (!provider) return null;
+
+      var videoId = null;
+      if (provider === 'youtube' || provider === 'vimeo') {
+        if (typeof vc.videoId !== 'string' || !/^[a-zA-Z0-9_-]{1,20}$/.test(vc.videoId)) return null;
+        videoId = vc.videoId;
+      }
+
+      var url = (typeof vc.url === 'string') ? vc.url : '';
+      if (provider === 'file' && !this._isSafeMediaUrl(url)) return null;
+
+      var w = parseInt(vc.width, 10);
+      var h = parseInt(vc.height, 10);
+      clean.content = {
+        provider: provider,
+        videoId: videoId,
+        url: url,
+        width: (isNaN(w) || w < 1) ? 640 : Math.min(w, 10000),
+        height: (isNaN(h) || h < 1) ? 360 : Math.min(h, 10000)
+      };
+    } else if (type === 'audio') {
+      // content: { url, title }
+      var ac = block.content;
+      if (!ac || typeof ac !== 'object') return null;
+      if (!this._isSafeMediaUrl(ac.url)) return null;
+      clean.content = {
+        url: ac.url,
+        title: (typeof ac.title === 'string') ? ac.title.substring(0, 200) : ''
+      };
+    } else {
+      // paragraph, heading1-3, quote, bulletList, numberList, checklist
+      clean.content = this._sanitizeBlockContent(
+        typeof block.content === 'string' ? block.content : ''
+      );
+    }
+
+    // Preservar propiedades opcionales whitelisteadas
+    if (type === 'checklist' && block.checked === true) {
+      clean.checked = true;
+    }
+    if (typeof block.alignment === 'string') {
+      var align = block.alignment.toLowerCase();
+      if (align === 'left' || align === 'center' || align === 'right' || align === 'justify') {
+        clean.alignment = align;
+      }
+    }
+    // Preservar customClass (estilos custom via styleFormats) solo si está en el whitelist
+    if (typeof block.customClass === 'string' && this._customClassWhitelist &&
+        this._customClassWhitelist[block.customClass]) {
+      clean.customClass = block.customClass;
+    }
+    // Preservar indentLevel en listas (0-5)
+    if ((type === 'bulletList' || type === 'numberList' || type === 'checklist') &&
+        typeof block.indentLevel === 'number') {
+      var lvl = Math.floor(block.indentLevel);
+      if (!isNaN(lvl) && lvl >= 0 && lvl <= 5) {
+        clean.indentLevel = lvl;
+      }
+    }
+
+    return clean;
+  };
+
+  /**
+   * Sanitiza un array de bloques. Filtra los inválidos.
+   */
+  meWYSE.prototype._sanitizeBlocks = function(blocks) {
+    if (!Array.isArray(blocks)) return [];
+    var result = [];
+    // Primera pasada: actualizar currentBlockId con todos los ids válidos
+    for (var i = 0; i < blocks.length; i++) {
+      var b = blocks[i];
+      if (b && typeof b.id === 'number' && b.id > this.currentBlockId) {
+        this.currentBlockId = b.id;
+      }
+    }
+    // Segunda pasada: sanitizar
+    for (var j = 0; j < blocks.length; j++) {
+      var clean = this._sanitizeBlock(blocks[j], ++this.currentBlockId);
+      if (clean) result.push(clean);
+    }
+    return result;
+  };
+
+  /**
+   * Devuelve el HTML de salida ya sanitizado, seguro para insertar en otra app.
+   */
+  meWYSE.prototype.getSafeHTML = function() {
+    var raw = this.getHTML();
+    return this._sanitizeBlockContent(raw, { allowTable: true, allowImg: true, allowMedia: true });
+  };
+
+  /**
+   * ============================================
+   * MODAL DE PROPIEDADES DE TABLA
+   * ============================================
+   * Permite editar: width, height, cell-spacing, cell-padding,
+   * border (width/style/color), alignment, background-color
+   */
+  meWYSE.prototype.showTablePropertiesModal = function(blockId) {
+    var self = this;
+    var block = this.getBlock(blockId);
+    if (!block || block.type !== 'table') return;
+
+    var blockElement = this.getBlockElementById(blockId);
+    if (!blockElement) return;
+    var table = blockElement.querySelector('table');
+    if (!table) return;
+
+    var t = function(key) { return self.t('tableProperties.' + key); };
+
+    // Leer valores actuales de la tabla
+    var current = self._readTableProperties(table);
+
+    // Crear overlay
+    var overlay = document.createElement('div');
+    overlay.className = 'mewyse-modal-overlay';
+
+    // Contenedor
+    var modal = document.createElement('div');
+    modal.className = 'mewyse-modal-container mewyse-table-properties-modal';
+    if (self.options.theme) modal.classList.add('mewyse-editor-' + self.options.theme);
+
+    // Título
+    var title = document.createElement('h3');
+    title.className = 'mewyse-modal-title';
+    title.textContent = t('title');
+    modal.appendChild(title);
+
+    // Contenedor de campos (grid 2 columnas)
+    var grid = document.createElement('div');
+    grid.className = 'mewyse-table-properties-grid';
+
+    // --- Ancho / Alto (aceptan px, %, auto o vacío) ---
+    var widthInput = self._makeDimensionInput(current.width, '500px / 100% / auto');
+    var heightInput = self._makeDimensionInput(current.height, '300px / auto');
+    grid.appendChild(self._makeField(t('width'), widthInput));
+    grid.appendChild(self._makeField(t('height'), heightInput));
+
+    // --- Espacio entre celdas / Relleno de celda ---
+    // Vacíos = no modificar el valor actual de las celdas / tabla
+    var spacingInput = self._makeNumberInput(current.cellSpacing, 0);
+    var paddingInput = self._makeNumberInput(current.cellPadding, 0);
+    grid.appendChild(self._makeField(t('cellSpacing'), spacingInput));
+    grid.appendChild(self._makeField(t('cellPadding'), paddingInput));
+
+    // --- Borde: grosor / estilo / color ---
+    // Vacío = no modificar el borde de las celdas
+    var borderWidthInput = self._makeNumberInput(current.borderWidth, 0);
+    var borderStyleSelect = document.createElement('select');
+    borderStyleSelect.className = 'mewyse-modal-input';
+    var styles = [
+      { value: 'solid', label: t('styleSolid') },
+      { value: 'dashed', label: t('styleDashed') },
+      { value: 'dotted', label: t('styleDotted') },
+      { value: 'double', label: t('styleDouble') },
+      { value: 'none', label: t('styleNone') }
+    ];
+    styles.forEach(function(s) {
+      var opt = document.createElement('option');
+      opt.value = s.value;
+      opt.textContent = s.label;
+      if (s.value === current.borderStyle) opt.selected = true;
+      borderStyleSelect.appendChild(opt);
+    });
+    // Border color con tracking userSet (patrón similar al bg)
+    var borderColorInput = document.createElement('input');
+    borderColorInput.type = 'color';
+    borderColorInput.className = 'mewyse-modal-input mewyse-modal-color';
+    borderColorInput.value = current.borderColor || '#dddddd';
+    var borderColorWrapper = document.createElement('div');
+    borderColorWrapper.className = 'mewyse-modal-color-wrap';
+    borderColorWrapper.appendChild(borderColorInput);
+    var borderColorClearBtn = document.createElement('button');
+    borderColorClearBtn.type = 'button';
+    borderColorClearBtn.className = 'mewyse-modal-btn-small';
+    borderColorClearBtn.textContent = t('reset');
+    borderColorClearBtn.onclick = function() {
+      borderColorInput.value = '#dddddd';
+      borderColorInput.dataset.userSet = 'false';
+    };
+    borderColorInput.oninput = function() {
+      borderColorInput.dataset.userSet = 'true';
+    };
+    borderColorInput.dataset.userSet = current.borderColor ? 'true' : 'false';
+    borderColorWrapper.appendChild(borderColorClearBtn);
+
+    grid.appendChild(self._makeField(t('borderWidth'), borderWidthInput));
+    grid.appendChild(self._makeField(t('borderStyle'), borderStyleSelect));
+    grid.appendChild(self._makeField(t('borderColor'), borderColorWrapper));
+
+    // --- Alineación ---
+    var alignSelect = document.createElement('select');
+    alignSelect.className = 'mewyse-modal-input';
+    var aligns = [
+      { value: 'left', label: t('alignLeft') },
+      { value: 'center', label: t('alignCenter') },
+      { value: 'right', label: t('alignRight') }
+    ];
+    aligns.forEach(function(a) {
+      var opt = document.createElement('option');
+      opt.value = a.value;
+      opt.textContent = a.label;
+      if (a.value === current.alignment) opt.selected = true;
+      alignSelect.appendChild(opt);
+    });
+    grid.appendChild(self._makeField(t('alignment'), alignSelect));
+
+    // --- Color de fondo ---
+    var bgColorInput = document.createElement('input');
+    bgColorInput.type = 'color';
+    bgColorInput.className = 'mewyse-modal-input mewyse-modal-color';
+    bgColorInput.value = current.backgroundColor || '#ffffff';
+    // Checkbox para "sin fondo"
+    var bgWrapper = document.createElement('div');
+    bgWrapper.className = 'mewyse-modal-color-wrap';
+    bgWrapper.appendChild(bgColorInput);
+    var bgClearBtn = document.createElement('button');
+    bgClearBtn.type = 'button';
+    bgClearBtn.className = 'mewyse-modal-btn-small';
+    bgClearBtn.textContent = t('reset');
+    bgClearBtn.onclick = function() {
+      bgColorInput.value = '#ffffff';
+      bgColorInput.removeAttribute('data-user-set');
+      bgColorInput.dataset.userSet = 'false';
+    };
+    bgColorInput.oninput = function() {
+      bgColorInput.dataset.userSet = 'true';
+    };
+    // Marcar si había color al abrir
+    bgColorInput.dataset.userSet = current.backgroundColor ? 'true' : 'false';
+    bgWrapper.appendChild(bgClearBtn);
+    grid.appendChild(self._makeField(t('backgroundColor'), bgWrapper));
+
+    modal.appendChild(grid);
+
+    // --- Botones Aplicar / Cancelar ---
+    var buttons = document.createElement('div');
+    buttons.className = 'mewyse-modal-buttons';
+
+    var cancelBtn = document.createElement('button');
+    cancelBtn.type = 'button';
+    cancelBtn.className = 'mewyse-modal-button mewyse-modal-button-cancel';
+    cancelBtn.textContent = t('cancel');
+    cancelBtn.onclick = function() { document.body.removeChild(overlay); };
+
+    var applyBtn = document.createElement('button');
+    applyBtn.type = 'button';
+    applyBtn.className = 'mewyse-modal-button mewyse-modal-button-primary';
+    applyBtn.textContent = t('apply');
+    applyBtn.onclick = function() {
+      self.pushHistory(true);
+      self._applyTableProperties(blockId, table, {
+        width: widthInput.value,
+        height: heightInput.value,
+        cellSpacing: spacingInput.value,
+        cellPadding: paddingInput.value,
+        borderWidth: borderWidthInput.value,
+        borderStyle: borderStyleSelect.value,
+        borderColor: borderColorInput.value,
+        borderColorUserSet: borderColorInput.dataset.userSet === 'true',
+        alignment: alignSelect.value,
+        backgroundColor: bgColorInput.value,
+        backgroundColorUserSet: bgColorInput.dataset.userSet === 'true'
+      });
+      document.body.removeChild(overlay);
+    };
+
+    buttons.appendChild(cancelBtn);
+    buttons.appendChild(applyBtn);
+    modal.appendChild(buttons);
+
+    overlay.appendChild(modal);
+    // Cerrar al click fuera
+    overlay.onclick = function(e) {
+      if (e.target === overlay) document.body.removeChild(overlay);
+    };
+    // Escape para cerrar
+    var escHandler = function(e) {
+      if (e.key === 'Escape') {
+        if (overlay.parentNode) document.body.removeChild(overlay);
+        document.removeEventListener('keydown', escHandler);
+      }
+    };
+    document.addEventListener('keydown', escHandler);
+
+    document.body.appendChild(overlay);
+  };
+
+  /**
+   * Helper: crea un <input type="number"> con valor inicial
+   */
+  meWYSE.prototype._makeNumberInput = function(value, min) {
+    var input = document.createElement('input');
+    input.type = 'number';
+    input.className = 'mewyse-modal-input';
+    if (typeof min === 'number') input.min = String(min);
+    if (value !== undefined && value !== null && value !== '') {
+      input.value = String(value);
+    }
+    return input;
+  };
+
+  /**
+   * Helper: crea un <input type="text"> para dimensiones CSS (px/%/auto/vacío)
+   * Acepta: "500", "500px", "100%", "auto", "" (vacío = sin declaración)
+   */
+  meWYSE.prototype._makeDimensionInput = function(value, placeholder) {
+    var input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'mewyse-modal-input';
+    if (placeholder) input.placeholder = placeholder;
+    if (value !== undefined && value !== null && value !== '') {
+      input.value = String(value);
+    }
+    return input;
+  };
+
+  /**
+   * Normaliza un valor de dimensión del usuario a un string CSS válido.
+   * - "" / null → null (no aplicar)
+   * - "500" → "500px"
+   * - "500px", "100%", "auto" → tal cual
+   * - "abc" → null (inválido)
+   */
+  meWYSE.prototype._normalizeDimension = function(value) {
+    if (value === undefined || value === null) return null;
+    var trimmed = String(value).trim();
+    if (trimmed === '') return null;
+    if (/^auto$/i.test(trimmed)) return 'auto';
+    if (/^\d+(\.\d+)?%$/.test(trimmed)) return trimmed;
+    if (/^\d+(\.\d+)?px$/.test(trimmed)) return trimmed;
+    if (/^\d+(\.\d+)?$/.test(trimmed)) return trimmed + 'px';
+    return null;
+  };
+
+  /**
+   * Helper: crea un <div> con label + input
+   */
+  meWYSE.prototype._makeField = function(labelText, inputEl) {
+    var wrap = document.createElement('div');
+    wrap.className = 'mewyse-modal-input-group';
+    var label = document.createElement('label');
+    label.textContent = labelText;
+    wrap.appendChild(label);
+    wrap.appendChild(inputEl);
+    return wrap;
+  };
+
+  /**
+   * Lee las propiedades visuales actuales de una tabla
+   * @returns {Object} { width, height, cellSpacing, cellPadding,
+   *                     borderWidth, borderStyle, borderColor,
+   *                     alignment, backgroundColor }
+   */
+  meWYSE.prototype._readTableProperties = function(table) {
+    var self = this;
+    var result = {
+      width: '', height: '',
+      cellSpacing: '', cellPadding: '',
+      borderWidth: '', borderStyle: 'solid', borderColor: '',
+      alignment: 'left', backgroundColor: ''
+    };
+
+    // Ancho/alto: preservar la unidad original (px, %, auto) si está declarada inline
+    var inlineStyle = table.getAttribute('style') || '';
+    var widthMatch = inlineStyle.match(/\bwidth\s*:\s*([^;]+)/i);
+    var heightMatch = inlineStyle.match(/\bheight\s*:\s*([^;]+)/i);
+    if (widthMatch) {
+      result.width = widthMatch[1].trim();
+    }
+    if (heightMatch) {
+      result.height = heightMatch[1].trim();
+    }
+
+    // Border-collapse y spacing
+    var bc = inlineStyle.match(/\bborder-collapse\s*:\s*([^;]+)/i);
+    var collapsed = !bc || /collapse/i.test(bc[1]);
+    if (!collapsed) {
+      var sp = inlineStyle.match(/\bborder-spacing\s*:\s*([^;]+)/i);
+      if (sp) result.cellSpacing = parseInt(sp[1], 10) || 0;
+    }
+
+    // Cell padding: leer del primer <td>/<th>
+    var firstCell = table.querySelector('td, th');
+    if (firstCell) {
+      var cellInline = firstCell.getAttribute('style') || '';
+      var padMatch = cellInline.match(/\bpadding\s*:\s*([^;]+)/i);
+      if (padMatch) {
+        result.cellPadding = parseInt(padMatch[1], 10) || 0;
+      }
+    }
+
+    // Borde: leer del primer <td>/<th> (preferencia) o de la tabla
+    var borderTarget = firstCell || table;
+    var btInline = borderTarget.getAttribute('style') || '';
+    var borderShort = btInline.match(/\bborder\s*:\s*([^;]+)/i);
+    if (borderShort) {
+      var bv = borderShort[1];
+      var wm = bv.match(/(\d+)px/);
+      var sm = bv.match(/\b(solid|dashed|dotted|double|none)\b/);
+      var cm = bv.match(/#[0-9a-fA-F]{3,6}|rgb\([^)]+\)/);
+      if (wm) result.borderWidth = parseInt(wm[1], 10);
+      if (sm) result.borderStyle = sm[1];
+      if (cm) result.borderColor = self._colorToHex(cm[0]);
+    } else {
+      var bw = btInline.match(/\bborder-width\s*:\s*(\d+)/i);
+      var bs = btInline.match(/\bborder-style\s*:\s*([a-z]+)/i);
+      var bcl = btInline.match(/\bborder-color\s*:\s*([^;]+)/i);
+      if (bw) result.borderWidth = parseInt(bw[1], 10);
+      if (bs) result.borderStyle = bs[1];
+      if (bcl) result.borderColor = self._colorToHex(bcl[1].trim());
+    }
+
+    // Alineación: margin-left: auto & margin-right: auto → center. float → left/right.
+    var ma = inlineStyle.match(/\bmargin\s*:\s*([^;]+)/i);
+    var mLeft = inlineStyle.match(/\bmargin-left\s*:\s*([^;]+)/i);
+    var mRight = inlineStyle.match(/\bmargin-right\s*:\s*([^;]+)/i);
+    var flt = inlineStyle.match(/\bfloat\s*:\s*([^;]+)/i);
+    if (flt) {
+      if (/left/i.test(flt[1])) result.alignment = 'left';
+      else if (/right/i.test(flt[1])) result.alignment = 'right';
+    } else if ((mLeft && /auto/i.test(mLeft[1]) && mRight && /auto/i.test(mRight[1])) ||
+               (ma && /auto/i.test(ma[1]))) {
+      result.alignment = 'center';
+    } else {
+      result.alignment = 'left';
+    }
+
+    // Background color
+    var bgMatch = inlineStyle.match(/\bbackground-color\s*:\s*([^;]+)/i);
+    if (bgMatch) {
+      result.backgroundColor = self._colorToHex(bgMatch[1].trim());
+    }
+
+    return result;
+  };
+
+  /**
+   * Convierte color CSS (rgb, nombre, hex3) a hex6
+   */
+  meWYSE.prototype._colorToHex = function(color) {
+    if (!color) return '';
+    color = color.trim();
+    if (color.indexOf('#') === 0) {
+      if (color.length === 4) {
+        // #abc → #aabbcc
+        return '#' + color[1] + color[1] + color[2] + color[2] + color[3] + color[3];
+      }
+      return color.toLowerCase();
+    }
+    var rgbMatch = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
+    if (rgbMatch) {
+      var toHex = function(n) {
+        var h = parseInt(n, 10).toString(16);
+        return h.length === 1 ? '0' + h : h;
+      };
+      return '#' + toHex(rgbMatch[1]) + toHex(rgbMatch[2]) + toHex(rgbMatch[3]);
+    }
+    // Nombres CSS: usar un div temporal para que el navegador los normalice
+    var tmp = document.createElement('div');
+    tmp.style.color = color;
+    document.body.appendChild(tmp);
+    var computed = window.getComputedStyle(tmp).color;
+    document.body.removeChild(tmp);
+    var computedMatch = computed.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+    if (computedMatch) {
+      var toHex2 = function(n) {
+        var h = parseInt(n, 10).toString(16);
+        return h.length === 1 ? '0' + h : h;
+      };
+      return '#' + toHex2(computedMatch[1]) + toHex2(computedMatch[2]) + toHex2(computedMatch[3]);
+    }
+    return '';
+  };
+
+  /**
+   * Aplica las propiedades seleccionadas a la tabla del DOM y actualiza el modelo.
+   * Los estilos del <table> se guardan en block.tableStyle (persistido en el modelo);
+   * los estilos de las celdas van en el innerHTML como hasta ahora.
+   */
+  meWYSE.prototype._applyTableProperties = function(blockId, table, props) {
+    // Construir style string para la tabla (se guarda en block.tableStyle)
+    // Reglas: si un campo está vacío, se omite la declaración CSS correspondiente.
+    var tableStyles = [];
+
+    // Width: normalizar unidad (px/%/auto). Vacío → no declarar.
+    var normWidth = this._normalizeDimension(props.width);
+    if (normWidth) tableStyles.push('width: ' + normWidth);
+
+    var normHeight = this._normalizeDimension(props.height);
+    if (normHeight) tableStyles.push('height: ' + normHeight);
+
+    // Cell spacing — si vacío, no declarar border-collapse/spacing
+    var spacingStr = (props.cellSpacing || '').toString().trim();
+    if (spacingStr !== '') {
+      var spacing = parseInt(spacingStr, 10);
+      if (!isNaN(spacing) && spacing > 0) {
+        tableStyles.push('border-collapse: separate');
+        tableStyles.push('border-spacing: ' + spacing + 'px');
+      } else {
+        tableStyles.push('border-collapse: collapse');
+      }
+    }
+
+    // Alineación: solo generar declaración si != 'left' (default del navegador)
+    if (props.alignment === 'center') {
+      tableStyles.push('margin-left: auto');
+      tableStyles.push('margin-right: auto');
+    } else if (props.alignment === 'right') {
+      tableStyles.push('margin-left: auto');
+      tableStyles.push('margin-right: 0');
+    }
+    // alignment === 'left' → no añadir margins (es el comportamiento default)
+
+    // Background color: solo si userSet=true
+    if (props.backgroundColorUserSet && props.backgroundColor) {
+      tableStyles.push('background-color: ' + props.backgroundColor);
+    }
+
+    var tableStyleStr = tableStyles.join('; ');
+
+    // ---- Aplicar a celdas ----
+    // Semántica: si borderWidth/cellPadding están VACÍOS, preservar el valor
+    // inline actual de cada celda. Solo si el usuario puso un valor explícito,
+    // sobreescribir. Para borderColor: si userSet=false, preservar el color actual.
+    var cells = table.querySelectorAll('td, th');
+    var borderWidthStr = (props.borderWidth || '').toString().trim();
+    var cellPaddingStr = (props.cellPadding || '').toString().trim();
+    var borderWidth = parseInt(borderWidthStr, 10);
+    var cellPadding = parseInt(cellPaddingStr, 10);
+    var hasBorderWidth = borderWidthStr !== '' && !isNaN(borderWidth);
+    var hasCellPadding = cellPaddingStr !== '' && !isNaN(cellPadding);
+    var borderStyleChanged = !!props.borderStyle;
+
+    for (var i = 0; i < cells.length; i++) {
+      var cell = cells[i];
+      var existingStyle = cell.getAttribute('style') || '';
+
+      // Extraer declaraciones existentes
+      var existingMap = this._parseStyleMap(existingStyle);
+
+      // Aplicar border solo si el usuario puso width o cambió color (userSet)
+      if (hasBorderWidth || props.borderColorUserSet ||
+          (borderStyleChanged && existingMap.border)) {
+        // Componer el border nuevo, mezclando user values con defaults razonables
+        var useWidth = hasBorderWidth ? borderWidth :
+          (this._extractBorderWidth(existingMap.border) || 1);
+        var useStyle = props.borderStyle || 'solid';
+        var useColor = props.borderColorUserSet ? props.borderColor :
+          (this._extractBorderColor(existingMap.border) || '#dddddd');
+
+        if (useStyle === 'none' || useWidth === 0) {
+          existingMap.border = 'none';
+        } else {
+          existingMap.border = useWidth + 'px ' + useStyle + ' ' + useColor;
+        }
+      }
+
+      // Aplicar padding solo si el usuario puso valor
+      if (hasCellPadding) {
+        existingMap.padding = cellPadding + 'px';
+      }
+
+      // Reconstruir style string (conservando otras props como background-color
+      // que pudieran estar ya definidas por el color-picker de celda)
+      cell.setAttribute('style', this._serializeStyleMap(existingMap));
+    }
+
+    // Guardar el estilo de la tabla en el modelo
+    var block = this.getBlock(blockId);
+    if (block) {
+      if (tableStyleStr) {
+        block.tableStyle = tableStyleStr;
+      } else {
+        delete block.tableStyle;
+      }
+    }
+
+    // Guardar innerHTML con los estilos de celdas (updateBlockContent limpia controles)
+    this.updateBlockContent(blockId, table.innerHTML);
+
+    // Re-renderizar para aplicar todos los estilos y regenerar controles del editor
+    this.render();
+  };
+
+  /**
+   * Parsea un string CSS inline a un objeto { prop: value }.
+   * Las keys se guardan en lowercase para comparación consistente.
+   */
+  meWYSE.prototype._parseStyleMap = function(styleStr) {
+    var map = {};
+    if (!styleStr) return map;
+    var parts = styleStr.split(';');
+    for (var i = 0; i < parts.length; i++) {
+      var part = parts[i];
+      var colonIdx = part.indexOf(':');
+      if (colonIdx < 0) continue;
+      var prop = part.substring(0, colonIdx).trim().toLowerCase();
+      var value = part.substring(colonIdx + 1).trim();
+      if (prop && value) map[prop] = value;
+    }
+    return map;
+  };
+
+  /**
+   * Serializa un objeto { prop: value } a un string CSS inline.
+   */
+  meWYSE.prototype._serializeStyleMap = function(map) {
+    var parts = [];
+    for (var prop in map) {
+      if (map.hasOwnProperty(prop)) {
+        parts.push(prop + ': ' + map[prop]);
+      }
+    }
+    return parts.join('; ');
+  };
+
+  /**
+   * Extrae el width de una declaración border shorthand (ej. "2px dashed #ff0000")
+   */
+  meWYSE.prototype._extractBorderWidth = function(borderValue) {
+    if (!borderValue) return null;
+    var m = borderValue.match(/(\d+)px/);
+    return m ? parseInt(m[1], 10) : null;
+  };
+
+  /**
+   * Extrae el color de una declaración border shorthand
+   */
+  meWYSE.prototype._extractBorderColor = function(borderValue) {
+    if (!borderValue) return null;
+    var m = borderValue.match(/#[0-9a-fA-F]{3,6}|rgb\([^)]+\)/);
+    return m ? m[0] : null;
   };
 
   /**

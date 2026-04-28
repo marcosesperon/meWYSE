@@ -15,10 +15,17 @@ Si este proyecto te resulta util, puedes apoyar su desarrollo:
 
 - **Funciona con cualquier elemento**: `textarea`, `div`, `span`, o cualquier otro elemento HTML
 - **Sistema de bloques**: Cada línea es un bloque independiente que puede ser de diferentes tipos
-- **12 tipos de bloques**: Párrafo, H1, H2, H3, Cita, Código, Lista con viñetas, Lista numerada, Checklist, Tabla, Imagen, Separador
-- **Tablas avanzadas**: Selección de celdas, merge/unmerge, añadir/eliminar filas y columnas, redimensionar columnas, color de fondo
-- **Imágenes**: Inserción desde archivo, redimensionado con drag, edición de dimensiones
-- **Formato de texto enriquecido**: Menú flotante con negrita, cursiva, subrayado, tachado, enlaces, colores y alineación
+- **14 tipos de bloques**: Párrafo, H1, H2, H3, Cita, Código, Lista con viñetas, Lista numerada, Checklist, Tabla, Imagen, Separador, **Vídeo** (YouTube/Vimeo/archivo), **Audio**
+- **Tablas avanzadas**: Selección de celdas, merge/unmerge, añadir/eliminar filas y columnas, redimensionar columnas, color de fondo, modal de propiedades (ancho/alto, borde, padding, spacing, alineación)
+- **Imágenes**: Inserción desde archivo, drag & drop, paste desde clipboard, redimensionado con drag, edición de dimensiones, validación de tamaño (`imageMaxSize`), hook custom de upload (`onImageUpload`)
+- **Formato de texto enriquecido**: Menú flotante con negrita, cursiva, subrayado, tachado, enlaces, colores, alineación y **limpiar formato** (removeFormat)
+- **Transformación de caso**: Dropdown con 5 opciones (UPPERCASE, lowercase, Title Case, Sentence case, tOGGLE cASE)
+- **Listas anidadas**: `Tab`/`Shift+Tab` para indentar/desindentar ítems hasta 5 niveles
+- **Estilos custom**: Opción `styleFormats` para definir estilos con clase CSS propia (ej. "Destacado", "Aviso")
+- **Imágenes con estilos avanzados**: Modal con border, margin y alineación (left/center/right)
+- **Vídeo embed**: YouTube/Vimeo (auto-detección por URL) + archivos locales .mp4/.webm vía `<video>` nativo
+- **Audio embed**: archivos .mp3/.ogg/.wav vía `<audio>` nativo
+- **Migración desde TinyMCE/CKEditor**: método `loadFromHTML()` que importa HTML legacy y convierte iframes/tablas/imágenes a bloques nativos
 - **Sistema de menciones (@)**: Escribe `@` para mencionar usuarios con autocompletado y avatares
 - **Emoji picker**: Escribe `:` para insertar emojis con autocompletado
 - **Menú slash (/)**: Menú contextual al estilo Notion para insertar cualquier tipo de bloque
@@ -33,7 +40,8 @@ Si este proyecto te resulta util, puedes apoyar su desarrollo:
 - **Mostrar bloques**: Modo debug que muestra los límites y tipo de cada bloque
 - **Contador persistente**: Barra inferior con palabras, caracteres y tiempo de lectura en tiempo real
 - **Soporte RTL**: Direccionalidad derecha-a-izquierda para árabe, hebreo, etc.
-- **Paste inteligente**: Limpieza automática de markup de Microsoft Word/Excel/Google Docs; convierte listas simuladas con viñetas a `<ul>`/`<ol>` reales; preserva bold/italic/underline inferidos de estilos inline
+- **Paste inteligente**: Limpieza automática de markup de Microsoft Word/Excel/Google Docs; convierte listas simuladas con viñetas a `<ul>`/`<ol>` reales; preserva bold/italic/underline inferidos de estilos inline. Opción `pasteAsText: true` para forzar todo paste como texto plano
+- **Seguridad XSS**: Sanitización automática contra inyección en todos los puntos de entrada (constructor, `loadFromJSON`, `loadFromMarkdown`, paste). Whitelist estricto de tags/atributos/URLs. Método `getSafeHTML()` para exportación segura
 - **Internacionalización (i18n)**: Español, inglés y traducciones personalizadas
 - **Temas**: Dark mode con auto-detección del sistema, tema compact, temas custom
 - **Content Styles**: Opción para heredar estilos CSS de la página
@@ -74,9 +82,46 @@ var editor = new meWYSE({
     console.log(data.plainText); // Texto plano
     console.log(data.json);      // JSON
     console.log(data.blocks);    // Array de bloques
+  },
+  onFocus: function(data) {
+    // Se dispara solo al entrar al editor desde fuera (no entre bloques)
+    console.log('editor enfocado, bloque actual:', data.focusedBlockId);
+  },
+  onBlur: function(data) {
+    // Se dispara solo al salir del editor (no al usar toolbar/menús/modales)
+    console.log('editor perdió foco. Contenido final:', data.html);
   }
 });
 ```
+
+### Payload de los callbacks
+
+`onChange`, `onFocus` y `onBlur` reciben un objeto con la misma estructura:
+
+```javascript
+{
+  blocks: Array,          // array de bloques internos
+  plainText: String,      // texto plano de bloques
+  html: String,           // getHTML()
+  json: String,           // getJSON()
+  markdown: String,       // getMarkdown()
+  focusedBlockId: Number, // id del bloque enfocado/que perdió foco (solo onFocus/onBlur)
+  focusedBlockType: String // tipo del bloque (paragraph/heading1/...)
+}
+```
+
+### Comportamiento de onFocus / onBlur
+
+- **`onFocus`** se dispara **solo cuando el editor gana foco desde el exterior**. No se dispara cuando el caret se mueve entre bloques del editor.
+- **`onBlur`** se dispara **solo cuando el editor pierde foco a un elemento externo**. NO se dispara cuando el foco va a:
+  - La toolbar del editor o sus botones
+  - Menús flotantes (slash, mention, emoji, format, color picker, etc.)
+  - Modales del editor (link, imagen, propiedades de tabla, etc.)
+  - Find & Replace
+  - El handle flotante de bloque
+  - Cualquier otra UI propia del editor
+
+Útil para validaciones al salir o tracking de uso.
 
 ## API
 
@@ -96,6 +141,11 @@ new meWYSE(options)
 | `fullscreen` | boolean | `true` | Mostrar botón de pantalla completa en toolbar |
 | `showBlocksToggle` | boolean | `true` | Mostrar botón de "mostrar bloques" (modo debug) en toolbar |
 | `rtl` | boolean | `false` | Activar dirección derecha-a-izquierda (árabe, hebreo) |
+| `pasteAsText` | boolean | `false` | Forzar que todo paste entre como texto plano (sin preservar formato) |
+| `imageMaxSize` | number | `0` | Tamaño máximo permitido al insertar imagen, en bytes. `0` = sin límite |
+| `imageMaxSizeError` | string | auto | Mensaje de alerta cuando la imagen excede `imageMaxSize` |
+| `onImageUpload` | Function | — | Hook para subir imágenes al servidor. Recibe `(file, callback)`. El callback espera `{ url, fileName?, width?, height? }` |
+| `styleFormats` | Array | `[]` | Estilos custom para el dropdown de tipos de bloque. Cada item: `{ title, block, className }` |
 | `theme` | string | auto | Tema: `'dark'`, `'compact'`, o cualquier nombre custom. Sin tema, auto-detecta `prefers-color-scheme` del OS |
 | `contentStyles` | boolean | `true` | Inyectar estilos de contenido. Con `false`, la página define sus propios estilos |
 | `lang` | string/object | `'es'` | Idioma (`'es'`, `'en'`) o objeto de traducciones personalizadas |
@@ -103,6 +153,8 @@ new meWYSE(options)
 | `autoFocus` | boolean | `false` | Enfocar automáticamente el primer bloque al inicializar |
 | `blocks` | Array | `[]` | Contenido inicial como array de bloques |
 | `onChange` | Function | `function(){}` | Callback cuando cambia el contenido |
+| `onFocus` | Function | `function(){}` | Callback cuando el editor gana foco (entrar al editor desde fuera). No se dispara al moverse entre bloques internamente |
+| `onBlur` | Function | `function(){}` | Callback cuando el editor pierde foco. No se dispara al hacer click en toolbar/menús/modales/pickers del editor |
 
 ### Métodos
 
@@ -110,6 +162,7 @@ new meWYSE(options)
 
 ```javascript
 editor.getHTML();       // HTML semántico
+editor.getSafeHTML();   // HTML semántico + re-sanitizado (extra seguro para inserción externa)
 editor.getMarkdown();   // Markdown
 editor.getPlainText();  // Texto plano
 editor.getJSON();       // JSON string
@@ -126,6 +179,16 @@ editor.loadFromJSON([
 
 // Desde Markdown
 editor.loadFromMarkdown('# Título\n\nTexto con **negrita** y *cursiva*.');
+
+// Desde HTML (útil para migrar contenido de TinyMCE/CKEditor)
+editor.loadFromHTML(
+  '<h1>Doc</h1>' +
+  '<p>Texto con <strong>negrita</strong>.</p>' +
+  '<ul><li>Item 1</li><li>Item 2</li></ul>' +
+  '<iframe src="https://www.youtube.com/embed/VIDEO_ID"></iframe>'
+);
+// Detecta iframes YouTube/Vimeo, <video>, <audio>, <img>, tablas y listas
+// automáticamente y los convierte al modelo de bloques.
 ```
 
 #### Manipular bloques
@@ -180,6 +243,8 @@ var editor = new meWYSE({
 | `checklist` | Lista de tareas | `/checklist` |
 | `table` | Tabla (3x3 inicial) | `/tabla` |
 | `image` | Imagen desde archivo | `/imagen` |
+| `video` | Vídeo (YouTube/Vimeo/.mp4) | `/video` |
+| `audio` | Audio (.mp3/.ogg/.wav) | `/audio` |
 | `divider` | Separador horizontal | `/separador` |
 
 ### Estructura de un bloque
@@ -217,9 +282,18 @@ Para bloques de imagen, `content` es un objeto:
 | `Ctrl/Cmd+I` | Cursiva |
 | `Ctrl/Cmd+U` | Subrayado |
 | `Ctrl/Cmd+K` | Insertar enlace |
+| `Ctrl/Cmd+Shift+K` | Limpiar formato |
+| `Ctrl/Cmd+E` | Código inline (`<code>`) |
+| `Ctrl/Cmd+Shift+X` | Tachado |
 | `Ctrl/Cmd+F` | Buscar y reemplazar |
 | `Ctrl/Cmd+Z` | Deshacer |
 | `Ctrl/Cmd+Y` o `Ctrl/Cmd+Shift+Z` | Rehacer |
+| `Ctrl/Cmd+Alt+1/2/3` | Cambiar a Heading 1/2/3 |
+| `Ctrl/Cmd+Alt+0` | Cambiar a Párrafo |
+| `Ctrl/Cmd+Shift+7` | Lista numerada |
+| `Ctrl/Cmd+Shift+8` | Lista con viñetas |
+| `Tab` (en lista) | Indentar item |
+| `Shift+Tab` (en lista) | Desindentar item |
 | `Enter` | Nuevo bloque (o nueva línea en listas) |
 | `Backspace` en bloque vacío | Eliminar bloque |
 | `↑` al inicio del bloque | Ir al bloque anterior |
@@ -622,6 +696,256 @@ meWYSE limpia automáticamente el HTML pegado desde aplicaciones Office:
 - Preserva bold/italic/underline inferidos de estilos inline antes de limpiar
 - Desenvuelve `<span>` y `<font>` sin atributos útiles
 - Elimina párrafos vacíos y zero-width chars
+
+### Propiedades de la tabla
+
+Al hacer click en el handle lateral de un bloque de tipo tabla, aparece una nueva opción **"Propiedades de la tabla"** que abre un modal con los siguientes ajustes:
+
+| Propiedad | Tipo | Descripción |
+|-----------|------|-------------|
+| **Ancho** | `number` (px) | Ancho fijo de la tabla |
+| **Alto** | `number` (px) | Alto fijo de la tabla |
+| **Espacio entre celdas** | `number` (px) | `border-spacing` (activa `border-collapse: separate`) |
+| **Relleno de celda** | `number` (px) | `padding` aplicado a cada `<td>`/`<th>` |
+| **Grosor del borde** | `number` (px) | Ancho del borde de cada celda |
+| **Estilo de borde** | `solid`, `dashed`, `dotted`, `double`, `none` | Estilo CSS del borde |
+| **Color del borde** | color picker | Color hex del borde |
+| **Alineación** | `left`, `center`, `right` | Posición de la tabla en el bloque |
+| **Color de fondo** | color picker | Fondo de la tabla (botón "Restablecer" para quitar) |
+
+El modal lee los valores actuales de la tabla al abrirse. Los cambios se guardan en una propiedad `tableStyle` del bloque (para el `<table>`) y como estilos inline en cada `<td>/<th>` para borde y padding.
+
+```javascript
+// Estructura resultante en el modelo
+{
+  id: 1,
+  type: 'table',
+  tableStyle: 'width: 500px; height: 300px; border-collapse: separate; ...',
+  content: '<tr><td style="border: 2px dashed #ff0000; padding: 10px"><p>...</p></td>...'
+}
+```
+
+### Exportación limpia de tablas
+
+El editor añade controles internos a las celdas (botones de opciones de fila/columna, handles de redimensionado, `contenteditable="true"` en los `<p>` de celdas, `position: relative` en `<td>`, etc.) que son necesarios para la UI de edición pero no deben aparecer en el export.
+
+Al llamar `editor.getHTML()` o `editor.getJSON()`, el contenido de las tablas se **limpia automáticamente** eliminando:
+
+- `<button class="mewyse-table-row-control">` / `col-control`
+- `<div class="mewyse-table-resize-handle">`
+- `<button class="mewyse-table-add-row">` / `add-col`
+- Atributo `contenteditable` y `data-placeholder` en `<p>` internos
+- `position: relative` en `<td>`/`<th>`
+- Estilos internos del editor (`padding: 8px; margin: 0; min-height: 1em`) en los `<p>` de celdas
+
+**Antes del fix**:
+```html
+<tbody><tr><td style="border: 1px solid #ddd; padding: 0; position: relative;">
+  <p contenteditable="true" data-placeholder="" style="padding: 8px; margin: 0; min-height: 1em;">Cell</p>
+  <button class="mewyse-table-row-control" tabindex="-1" contenteditable="false">
+    <svg>...</svg>
+  </button>
+</td>...
+```
+
+**Después del fix**:
+```html
+<tr><td style="border: 1px solid rgb(221, 221, 221); padding: 0px">
+  <p>Cell</p>
+</td>...
+```
+
+La limpieza se aplica automáticamente en `updateBlockContent()` (cuando el editor guarda cambios internos) y como red de seguridad en `getFilteredBlocks()` (cuando se exporta).
+
+## Estilos custom (styleFormats)
+
+Definir estilos personalizados que aparecen en el dropdown de tipos de bloque:
+
+```javascript
+var editor = new meWYSE({
+  target: '#editor',
+  toolbar: true,
+  styleFormats: [
+    { title: 'Destacado',        block: 'p',          className: 'destacado' },
+    { title: 'Aviso importante', block: 'blockquote', className: 'aviso' },
+    { title: 'Nota al margen',   block: 'p',          className: 'nota-margen' }
+  ]
+});
+```
+
+En tu CSS defines las apariencias:
+```css
+.destacado { background: yellow; padding: 8px; }
+.aviso { border-left: 4px solid red; padding-left: 12px; }
+.nota-margen { font-size: 0.9em; color: #666; }
+```
+
+Al abrir el dropdown de tipos aparecerán tras los tipos estándar con un preview del estilo aplicado.
+
+- **Validación**: los `className` deben ser identificadores CSS válidos (`^[a-zA-Z_][\w-]*$`). Inválidos se descartan.
+- **Seguridad**: solo las clases declaradas en `styleFormats` pasan el sanitizer. Si alguien intenta inyectar `customClass: "hacker"`, se elimina.
+- **Block type**: cada estilo se aplica sobre un tipo base (`paragraph`, `quote`, `heading1-3`, `bulletList`, etc.). `blockquote` es alias de `quote`.
+
+## Migración desde TinyMCE / CKEditor
+
+El método `loadFromHTML(html)` permite migrar contenido HTML generado por otros editores al modelo de bloques de meWYSE sin pérdida de datos.
+
+### Elementos soportados en la migración
+
+| Elemento HTML | Se convierte a |
+|---------------|----------------|
+| `<p>`, `<h1>-<h3>`, `<blockquote>`, `<pre>` | Bloques correspondientes |
+| `<ul>`, `<ol>`, `<li>` | bulletList / numberList |
+| `<table>` con `style` inline | Bloque `table` preservando `tableStyle` (ancho/alto/borde) |
+| `<img src="..."` | Bloque `image` |
+| `<iframe src="youtube.com/...">` | Bloque `video` (provider=youtube) |
+| `<iframe src="vimeo.com/...">` | Bloque `video` (provider=vimeo) |
+| `<video src="...">` | Bloque `video` (provider=file) |
+| `<audio src="...">` | Bloque `audio` |
+| `<hr>` | divider |
+
+### Equivalencia de configuración TinyMCE → meWYSE
+
+| Config TinyMCE | meWYSE |
+|----------------|--------|
+| `plugins: 'paste ... table textcolor visualblocks wordcount casechange'` | Incluido nativo |
+| `plugins: 'fullscreen code'` | `fullscreen` ✅ / `code` (vista HTML) no aplica — modelo block-based |
+| `plugins: 'media'` | Bloques `video` + `audio` |
+| `plugins: 'imagetools'` | ❌ (Sprint 3 — rotar/cropear no implementado) |
+| `toolbar: 'undo redo styleselect ...'` | `toolbar: true` |
+| `toolbar: '... removeformat ...'` | Botón incluido en grupo de formato |
+| `toolbar: '... outdent indent ...'` | ⚠️ Parcial (Sprint 2 — listas anidadas) |
+| `paste_as_text: true` | `pasteAsText: true` |
+| `paste_data_images: true` | Drag & drop + paste clipboard de imagen funcionan por defecto |
+| `file_picker_callback` con validación 1MB | `imageMaxSize: 1024000` + opcional `onImageUpload` |
+| `content_css: '...'` | `contentStyles: false` + CSS propio de la página |
+| `language: 'es'` | `lang: 'es'` |
+| `setup: ed.on('Change', ...)` | `onChange(data)` en constructor |
+
+### Ejemplo completo de migración
+
+```javascript
+// Antes (TinyMCE)
+tinymce.init({
+  selector: '#editor',
+  plugins: 'paste lists image link media code fullscreen table textcolor visualblocks wordcount casechange',
+  paste_as_text: true,
+  paste_data_images: true,
+  language: 'es',
+  setup: function(ed) {
+    ed.on('Change', function() { /* ... */ });
+  }
+});
+
+// Después (meWYSE)
+var editor = new meWYSE({
+  target: '#editor',
+  toolbar: true,
+  lang: 'es',
+  pasteAsText: true,
+  imageMaxSize: 1024000,
+  imageMaxSizeError: 'La imagen no puede superar 1MB de peso.',
+  onChange: function(data) { /* ... */ }
+});
+
+// Migrar contenido existente de la BD
+editor.loadFromHTML(contenidoLegacyDeTinyMCE);
+```
+
+## Seguridad (XSS Protection)
+
+meWYSE sanitiza **automáticamente** todo el contenido que entra al modelo de bloques contra inyección de código (XSS). No hace falta configurar nada — el whitelist estricto se aplica en todos los puntos de entrada.
+
+### Puntos de entrada protegidos
+
+| Entry point | Protección |
+|-------------|------------|
+| Constructor (`options.blocks`) | `_sanitizeBlocks()` |
+| `loadFromJSON(data)` | `_sanitizeBlocks()` |
+| `loadFromMarkdown(md)` | Escape previo del texto + `_sanitizeBlocks()` |
+| Paste (HTML/Word/Excel/Docs) | `sanitizeHTML()` + `cleanPastedDocument()` |
+| Tipeo en contenteditable | Escape nativo del navegador |
+
+### Whitelist de tags permitidos
+
+**Inline**: `b, strong, i, em, u, s, strike, del, code, mark, sub, sup, br, a, span, font`
+**Dentro de tablas**: `table, tbody, thead, tfoot, tr, td, th, p, h1-h3, blockquote, pre, ul, ol, li`
+**Imágenes** (solo en `getSafeHTML()`): `img` con `src` validado
+
+### Qué se bloquea automáticamente
+
+- Tags peligrosos: `<script>`, `<iframe>`, `<object>`, `<embed>`, `<form>`, `<input>`, `<button>`, `<style>`, `<link>`, `<meta>`, `<base>`, `<svg>`, `<math>`, `<video>`, `<audio>`
+- Event handlers: `onclick`, `onerror`, `onload`, `onmouseover`, etc. — **cualquier atributo `on*`**
+- URLs peligrosas en `href`/`src`: `javascript:`, `vbscript:`, `data:text/html`, `data:application`, `file:` (incluye ataques con tabs, newlines o mayúsculas)
+- CSS peligroso: `expression()`, `url(...)`, `@import`, `javascript:` en style
+- `<a target="_blank">` se fuerza a tener `rel="noopener noreferrer"`
+- Clases CSS en `<span>`: solo se permiten `mewyse-mention`, `mewyse-emoji`, `mewyse-search-highlight`
+
+### Qué se preserva
+
+- Menciones: `<span class="mewyse-mention" data-mention-id data-mention-name contenteditable="false">`
+- Emojis: `<span class="mewyse-emoji" data-name data-type="emoji" contenteditable="false">`
+- Colores inline: `<span style="color: red; background-color: yellow">`
+- Enlaces seguros: `<a href="https://..." title target rel>`
+- Formato de texto: `<b>`, `<i>`, `<u>`, `<s>`, `<code>`, `<mark>`, `<sub>`, `<sup>`
+- Tablas con `colspan`, `rowspan`, background-color por celda
+
+### Mostrar HTML como texto literal (documentación)
+
+Si necesitas mostrar `<div>`, `<script>` o cualquier etiqueta como **texto literal** (por ejemplo, en un tutorial de programación):
+
+| Caso de uso | Cómo |
+|-------------|------|
+| Snippet multilínea | **Bloque de código** (escribe `/code` o pulsa `/` y elige "Código") — escape automático |
+| Snippet inline (`<span>`) | Usa `<code>` inline escribiendo <code>`&lt;span&gt;`</code> con backticks en Markdown |
+| Texto plano con `<` y `>` | Al tipear, el navegador escapa automáticamente |
+
+### Exportación segura
+
+```javascript
+var html = editor.getHTML();        // HTML normal (ya viene sanitizado desde el modelo)
+var safeHtml = editor.getSafeHTML(); // Extra seguro: re-sanitiza antes de devolver
+```
+
+`getSafeHTML()` es útil cuando el consumidor va a insertar el HTML en otra parte de la aplicación sin otra capa de sanitización.
+
+### Defensa en profundidad
+
+Aunque meWYSE sanitiza proactivamente, para aplicaciones críticas se recomienda añadir **Content Security Policy (CSP)** en la aplicación:
+
+```
+Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'
+```
+
+Esto bloquea cualquier script inline aunque se escapara alguna vulnerabilidad.
+
+### Ejemplos
+
+```javascript
+// Estos intentos de inyección son neutralizados automáticamente:
+
+// 1. Script en bloque inicial
+new meWYSE({
+  target: '#editor',
+  blocks: [{ id: 1, type: 'paragraph',
+             content: '<script>alert(1)</script>Hola' }]
+});
+// Resultado: contenido = "Hola" (script eliminado)
+
+// 2. Event handler
+editor.loadFromJSON([{ id: 1, type: 'paragraph',
+  content: '<img src=x onerror="alert(1)">' }]);
+// Resultado: contenido = "" (img no está en whitelist)
+
+// 3. URL javascript:
+editor.loadFromMarkdown('[click](javascript:alert(1))');
+// Resultado: <a href="#">click</a>
+
+// 4. Ataques con encoding (tabs, case mixing, etc.)
+editor.loadFromJSON([{ id: 1, type: 'paragraph',
+  content: '<a href="JaVa\tScRiPt:alert(1)">x</a>' }]);
+// Resultado: <a href="#">x</a>
+```
 
 ## Personalización CSS
 

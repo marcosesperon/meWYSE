@@ -731,6 +731,118 @@ var editor = new meWYSE({
       <div id="rtlEditor"></div>
     </div>
 
+    <!-- Demo: styleFormats custom -->
+    <style>
+      /* Estilos custom usados por el demo de styleFormats */
+      .destacado-demo {
+        background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
+        padding: 12px 16px;
+        border-radius: 8px;
+        border-left: 4px solid #fbc02d;
+        font-weight: 500;
+      }
+      .aviso-demo {
+        background: #fee4e2;
+        border-left: 4px solid #dc2626;
+        padding: 12px 16px;
+        margin: 8px 0;
+        font-style: italic;
+        color: #7f1d1d;
+      }
+      .nota-margen-demo {
+        font-size: 0.9em;
+        color: #6b7280;
+        font-style: italic;
+        padding-left: 12px;
+        border-left: 2px solid #d1d5db;
+      }
+    </style>
+    <div class="demo-section">
+      <h2>Estilos custom (styleFormats)</h2>
+      <p>Define estilos personalizados que aparecen en el dropdown de tipos de bloque. La p&aacute;gina define los CSS, meWYSE solo aplica las clases. Abre el dropdown &quot;Texto&quot; en la toolbar para verlos.</p>
+      <pre class="docs-code"><code>var editor = new meWYSE({
+  target: '#styleFormatsEditor',
+  toolbar: true,
+  styleFormats: [
+    { title: 'Destacado',     block: 'p',          className: 'destacado-demo' },
+    { title: 'Aviso',         block: 'blockquote', className: 'aviso-demo' },
+    { title: 'Nota al margen', block: 'p',         className: 'nota-margen-demo' }
+  ]
+});
+
+// Y en tu CSS:
+// .destacado-demo  { background: yellow; padding: 8px; ... }
+// .aviso-demo      { border-left: 4px solid red; ... }
+// .nota-margen-demo { font-size: 0.9em; color: gray; ... }</code></pre>
+      <div id="styleFormatsEditor"></div>
+    </div>
+
+    <!-- Demo: Listas anidadas + transformaci&oacute;n de caso + atajos -->
+    <div class="demo-section">
+      <h2>Listas anidadas, dropdown de caso y atajos de teclado</h2>
+      <p>Pulsa <code>Tab</code> dentro de un &iacute;tem de lista para anidar (hasta 5 niveles), <code>Shift+Tab</code> para des-anidar. El bot&oacute;n &quot;Aa&quot; del toolbar abre un dropdown con 5 opciones de caso: MAY&Uacute;SCULAS, min&uacute;sculas, T&iacute;tulo, Oraci&oacute;n e Invertir.</p>
+      <p><strong>Atajos nuevos:</strong> <code>Ctrl+E</code> (c&oacute;digo inline), <code>Ctrl+Shift+X</code> (tachado), <code>Ctrl+Shift+K</code> (limpiar formato), <code>Ctrl+Alt+1/2/3</code> (H1/H2/H3), <code>Ctrl+Shift+7/8</code> (lista numerada/vi&ntilde;etas).</p>
+      <pre class="docs-code"><code>var editor = new meWYSE({
+  target: '#nestedEditor',
+  toolbar: true
+});
+
+// Insertar bloques con indentLevel
+editor.loadFromJSON([
+  { id: 1, type: 'bulletList', content: 'Frutas',         indentLevel: 0 },
+  { id: 2, type: 'bulletList', content: 'Manzana',        indentLevel: 1 },
+  { id: 3, type: 'bulletList', content: 'Roja',           indentLevel: 2 },
+  { id: 4, type: 'bulletList', content: 'Verde',          indentLevel: 2 },
+  { id: 5, type: 'bulletList', content: 'Pl&aacute;tano',       indentLevel: 1 },
+  { id: 6, type: 'bulletList', content: 'Verduras',       indentLevel: 0 }
+]);</code></pre>
+      <div id="nestedEditor"></div>
+    </div>
+
+    <!-- Demo: onFocus / onBlur callbacks -->
+    <div class="demo-section">
+      <h2>Callbacks onFocus / onBlur</h2>
+      <p>Los callbacks <code>onFocus</code> y <code>onBlur</code> se disparan solo al entrar/salir del editor (no al moverse entre bloques internos ni al usar la toolbar/menus/modales). &Uacute;til para validaciones al perder foco.</p>
+      <pre class="docs-code"><code>var editor = new meWYSE({
+  target: '#focusEditor',
+  toolbar: true,
+  onFocus: function(data) {
+    console.log('focus en bloque', data.focusedBlockId, data.focusedBlockType);
+  },
+  onBlur: function(data) {
+    if (!data.plainText.trim()) alert('El editor no puede estar vac&iacute;o');
+  }
+});</code></pre>
+      <div id="focusEditor"></div>
+      <div class="controls">
+        <h3>Eventos en directo</h3>
+        <p style="font-size: 13px; color: #6b7280;">Haz click dentro/fuera del editor o en la toolbar para ver los eventos:</p>
+        <div id="focusLog" class="output" style="max-height: 200px; min-height: 60px;">
+          <pre id="focusLogContent" style="margin: 0; font-size: 12px; color: #4b5563;">(esperando eventos...)</pre>
+        </div>
+        <div class="button-group" style="margin-top: 8px;">
+          <button class="btn btn-secondary" onclick="clearFocusLog()">Limpiar log</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Demo: Drag &amp; drop de im&aacute;genes -->
+    <div class="demo-section">
+      <h2>Drag &amp; drop de im&aacute;genes (entre celdas y bloques)</h2>
+      <p>Las im&aacute;genes son arrastrables: pulsa una imagen y arr&aacute;strala a otra celda de la tabla, o fuera de la tabla para convertirla en bloque independiente. Tambi&eacute;n puedes arrastrar un archivo del sistema operativo al editor o a una celda.</p>
+      <pre class="docs-code"><code>// El drag&amp;drop es autom&aacute;tico, no requiere configuraci&oacute;n.
+// Funciona con:
+// - Im&aacute;genes en celdas de tabla &harr; otras celdas
+// - Im&aacute;genes en celdas &harr; bloques independientes
+// - Archivos arrastrados desde el OS &rarr; cualquier bloque o celda
+var editor = new meWYSE({
+  target: '#dragDropEditor',
+  toolbar: true,
+  imageMaxSize: 1024000  // opcional: l&iacute;mite 1MB
+});</code></pre>
+      <div id="dragDropEditor"></div>
+    </div>
+
     <!-- Demo: Markdown -->
     <div class="demo-section">
       <h2>Soporte Markdown</h2>
@@ -1152,6 +1264,116 @@ editor.loadFromMarkdown(editor.getMarkdown());</code></pre>
       });
     }
 
+    // Inicializar editor con styleFormats custom
+    var styleFormatsEditor;
+    function initStyleFormatsEditor() {
+      styleFormatsEditor = new meWYSE({
+        target: '#styleFormatsEditor',
+        toolbar: true,
+        styleFormats: [
+          { title: 'Destacado',     block: 'p',          className: 'destacado-demo' },
+          { title: 'Aviso',         block: 'blockquote', className: 'aviso-demo' },
+          { title: 'Nota al margen', block: 'p',         className: 'nota-margen-demo' }
+        ],
+        blocks: [
+          { id: 1, type: 'heading1', content: 'Estilos personalizados' },
+          { id: 2, type: 'paragraph', content: 'Pulsa el dropdown "Texto" en la toolbar y verás 3 estilos custom al final.', customClass: 'destacado-demo' },
+          { id: 3, type: 'quote', content: 'Este blockquote tiene la clase "aviso-demo".', customClass: 'aviso-demo' },
+          { id: 4, type: 'paragraph', content: 'Y este párrafo tiene "nota-margen-demo".', customClass: 'nota-margen-demo' },
+          { id: 5, type: 'paragraph', content: 'Texto sin estilo custom.' }
+        ]
+      });
+    }
+
+    // Inicializar editor con listas anidadas y casechange
+    var nestedEditor;
+    function initNestedEditor() {
+      nestedEditor = new meWYSE({
+        target: '#nestedEditor',
+        toolbar: true,
+        blocks: [
+          { id: 1, type: 'heading2', content: 'Lista anidada de ejemplo' },
+          { id: 2, type: 'paragraph', content: 'Coloca el cursor en cualquier ítem y pulsa Tab/Shift+Tab para indentar.' },
+          { id: 3, type: 'bulletList', content: 'Frutas',          indentLevel: 0 },
+          { id: 4, type: 'bulletList', content: 'Manzana',         indentLevel: 1 },
+          { id: 5, type: 'bulletList', content: 'Roja',            indentLevel: 2 },
+          { id: 6, type: 'bulletList', content: 'Verde',           indentLevel: 2 },
+          { id: 7, type: 'bulletList', content: 'Plátano',         indentLevel: 1 },
+          { id: 8, type: 'bulletList', content: 'Verduras',        indentLevel: 0 },
+          { id: 9, type: 'bulletList', content: 'Tomate',          indentLevel: 1 },
+          { id: 10, type: 'bulletList', content: 'Cebolla',        indentLevel: 1 },
+          { id: 11, type: 'paragraph', content: 'Selecciona texto y pulsa "Aa" en el toolbar para ver el dropdown de transformación de caso.' }
+        ]
+      });
+    }
+
+    // Inicializar editor con onFocus / onBlur
+    var focusEditor;
+    function initFocusEditor() {
+      var focusLog = [];
+      var maxLogEntries = 12;
+      var renderLog = function() {
+        var content = document.getElementById('focusLogContent');
+        if (!content) return;
+        if (focusLog.length === 0) {
+          content.textContent = '(esperando eventos...)';
+        } else {
+          content.textContent = focusLog.slice().reverse().join('\n');
+        }
+      };
+      var pushLog = function(type, data) {
+        var time = new Date().toLocaleTimeString();
+        var blockInfo = data.focusedBlockId
+          ? ' (bloque #' + data.focusedBlockId + ' ' + data.focusedBlockType + ')'
+          : '';
+        focusLog.push('[' + time + '] ' + type.toUpperCase() + blockInfo);
+        if (focusLog.length > maxLogEntries) focusLog.shift();
+        renderLog();
+      };
+      window.clearFocusLog = function() {
+        focusLog = [];
+        renderLog();
+      };
+
+      focusEditor = new meWYSE({
+        target: '#focusEditor',
+        toolbar: true,
+        blocks: [
+          { id: 1, type: 'paragraph', content: 'Haz click aquí para enfocar...' },
+          { id: 2, type: 'paragraph', content: 'Y luego click fuera del editor para ver el evento blur.' }
+        ],
+        onFocus: function(data) {
+          pushLog('focus', data);
+        },
+        onBlur: function(data) {
+          pushLog('blur', data);
+        }
+      });
+    }
+
+    // Inicializar editor con drag & drop de imágenes
+    var dragDropEditor;
+    function initDragDropEditor() {
+      dragDropEditor = new meWYSE({
+        target: '#dragDropEditor',
+        toolbar: true,
+        blocks: [
+          { id: 1, type: 'heading2', content: 'Drag & drop de imágenes' },
+          { id: 2, type: 'paragraph', content: 'Inserta una imagen usando el botón de la toolbar, luego arrástrala a una celda de la tabla. También puedes arrastrar la imagen entre celdas o fuera de la tabla.' },
+          { id: 3, type: 'table', content:
+            '<tbody><tr>' +
+            '<td><p>Celda A1</p></td>' +
+            '<td><p>Celda A2</p></td>' +
+            '</tr><tr>' +
+            '<td><p>Celda B1</p></td>' +
+            '<td><p>Celda B2</p></td>' +
+            '</tr></tbody>'
+          },
+          { id: 4, type: 'paragraph', content: 'O arrastra un archivo de imagen desde tu sistema operativo a cualquier bloque del editor.' }
+        ]
+      });
+    }
+
     // Inicializar editor Markdown
     function initMarkdownEditor() {
       markdownEditor = new meWYSE({
@@ -1259,6 +1481,10 @@ editor.loadFromMarkdown(editor.getMarkdown());</code></pre>
       initNoStylesEditor();
       initToolsEditor();
       initRtlEditor();
+      initStyleFormatsEditor();
+      initNestedEditor();
+      initFocusEditor();
+      initDragDropEditor();
       initMarkdownEditor();
     };
   </script>
