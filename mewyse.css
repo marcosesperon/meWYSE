@@ -169,6 +169,141 @@
   margin: 0 4px;
 }
 
+/* Overlay invisible que aparece mientras hay un menú flotante o modal activo.
+   Bloquea clicks/teclas en el resto de la página; click en él cierra el menú
+   superior del stack. z-index 999 = encima del editor (auto/0) y debajo de cualquier
+   menú (1000+) o modal (9998+). */
+.mewyse-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: transparent;
+  z-index: 999;
+}
+
+/* ============================================
+   TOOLBAR — modo scroll (toolbarOverflow: 'scroll')
+   - Una sola fila con scroll horizontal en la zona izquierda.
+   - Zona derecha (mover bloque) anclada y sin scroll.
+   - Indicadores: gradiente de fade + flechas chevron + scrollbar nativa fina.
+   ============================================ */
+.mewyse-toolbar.mewyse-toolbar-mode-scroll {
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+.mewyse-toolbar-scroll-area {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0; /* permite que el flex item encoja por debajo de su contenido */
+  display: flex;
+  align-items: center;
+}
+
+.mewyse-toolbar-scroll-track {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  /* Ocultar scrollbar nativa: los fades en los extremos y las flechas
+     prev/next ya indican overflow. Firefox + IE/Edge legacy. */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* Webkit (Chrome, Safari, nuevos Edge): ocultar scrollbar manteniendo el scroll */
+.mewyse-toolbar-scroll-track::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* Las flechas y fades NO añaden hueco al track: van por encima en absoluto. */
+.mewyse-toolbar-fade {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 32px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  z-index: 1;
+}
+.mewyse-toolbar-fade-start {
+  inset-inline-start: 0;
+  background: linear-gradient(to right, var(--mewyse-bg-secondary) 0%, transparent 100%);
+}
+.mewyse-toolbar-fade-end {
+  inset-inline-end: 0;
+  background: linear-gradient(to left, var(--mewyse-bg-secondary) 0%, transparent 100%);
+}
+/* En RTL los gradientes deben invertir el sentido visual del degradado para que
+   el lado opaco quede pegado al borde correcto. inset-inline-start ya posiciona bien. */
+.mewyse-toolbar-scroll-area[dir="rtl"] .mewyse-toolbar-fade-start {
+  background: linear-gradient(to left, var(--mewyse-bg-secondary) 0%, transparent 100%);
+}
+.mewyse-toolbar-scroll-area[dir="rtl"] .mewyse-toolbar-fade-end {
+  background: linear-gradient(to right, var(--mewyse-bg-secondary) 0%, transparent 100%);
+}
+
+.mewyse-toolbar-scroll-area.has-overflow-start .mewyse-toolbar-fade-start { opacity: 1; }
+.mewyse-toolbar-scroll-area.has-overflow-end   .mewyse-toolbar-fade-end   { opacity: 1; }
+
+/* Flechas chevron: solo aparecen cuando hay overflow en su lado. */
+.mewyse-toolbar-scroll-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--mewyse-bg-primary);
+  color: var(--mewyse-text-primary);
+  border: 1px solid var(--mewyse-border-medium);
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  transition: background 0.15s ease;
+}
+.mewyse-toolbar-scroll-arrow svg {
+  width: 12px;
+  height: 12px;
+}
+.mewyse-toolbar-scroll-arrow:hover {
+  background: var(--mewyse-bg-active);
+}
+.mewyse-toolbar-scroll-arrow-prev { inset-inline-start: 4px; }
+.mewyse-toolbar-scroll-arrow-next { inset-inline-end: 4px; }
+.mewyse-toolbar-scroll-area.has-overflow-start .mewyse-toolbar-scroll-arrow-prev { display: flex; }
+.mewyse-toolbar-scroll-area.has-overflow-end   .mewyse-toolbar-scroll-arrow-next { display: flex; }
+
+/* Zona fija a la derecha: no scrollea, anclada. */
+.mewyse-toolbar-fixed-end {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-inline-start: 8px;
+  padding-inline-start: 8px;
+  border-inline-start: 1px solid var(--mewyse-border-light);
+}
+
+/* En modo scroll los grupos NO se encogen: queremos overflow real, no botones aplastados. */
+.mewyse-toolbar.mewyse-toolbar-mode-scroll .mewyse-toolbar-group,
+.mewyse-toolbar.mewyse-toolbar-mode-scroll .mewyse-toolbar-button,
+.mewyse-toolbar.mewyse-toolbar-mode-scroll .mewyse-toolbar-separator {
+  flex-shrink: 0;
+}
+
 /* Contenedor principal del editor - solo lo estructural para UI (floating handle, menus) */
 /* margin-left deja espacio para el floating handle; los estilos inyectados pueden sobreescribirlo */
 .mewyse-editor {
@@ -1603,6 +1738,82 @@
   color: #8da0f5;
 }
 
+/* ===========================================================================
+   Compact theme — densidad reducida (padding, fuentes, alturas).
+   Aplica con `theme: 'compact'`. Ortogonal al modo oscuro: aquí solo se
+   reescriben tamaños/espaciados, no la paleta de colores.
+   =========================================================================== */
+/* border-radius: igual specificidad que los estilos inyectados por _injectContentStyles
+   (`.mewyse-editor-wrapper:has(> .mewyse-{instanceId})` también es 0,2,0); como
+   los inyectados se añaden después de mewyse.css ganarían por orden. !important
+   asegura que la densidad compact prevalezca. */
+.mewyse-editor-compact.mewyse-editor-wrapper {
+  border-radius: 4px !important;
+}
+
+.mewyse-editor-compact.mewyse-editor-wrapper .mewyse-toolbar {
+  padding: 4px 8px;
+  gap: 4px;
+  margin: 4px;
+  border-bottom-color: transparent;
+}
+
+.mewyse-editor-compact.mewyse-editor-wrapper .mewyse-toolbar-button {
+  padding: 4px;
+  min-width: 26px;
+  height: 22px;
+  font-size: 12px;
+}
+
+.mewyse-editor-compact.mewyse-editor-wrapper .mewyse-toolbar-button svg {
+  width: 13px;
+  height: 13px;
+}
+
+/* Cubre los dos modos de uso: container con clase directa (sin toolbar) y
+   wrapper con clase + editor interno (con toolbar). */
+.mewyse-editor-compact.mewyse-editor,
+.mewyse-editor-compact.mewyse-editor-wrapper > .mewyse-editor {
+  padding: 8px 12px;
+  min-height: 100px;
+  max-height: 250px;
+  font-size: 13px;
+  border-radius: 4px;
+}
+
+.mewyse-editor-compact.mewyse-editor .mewyse-block,
+.mewyse-editor-compact.mewyse-editor-wrapper > .mewyse-editor .mewyse-block {
+  margin-bottom: 4px;
+}
+
+.mewyse-editor-compact.mewyse-editor h1.mewyse-block,
+.mewyse-editor-compact.mewyse-editor-wrapper > .mewyse-editor h1.mewyse-block {
+  font-size: 1.4em;
+}
+
+.mewyse-editor-compact.mewyse-editor h2.mewyse-block,
+.mewyse-editor-compact.mewyse-editor-wrapper > .mewyse-editor h2.mewyse-block {
+  font-size: 1.2em;
+}
+
+.mewyse-editor-compact.mewyse-editor h3.mewyse-block,
+.mewyse-editor-compact.mewyse-editor-wrapper > .mewyse-editor h3.mewyse-block {
+  font-size: 1.05em;
+}
+
+.mewyse-editor-compact.mewyse-editor blockquote.mewyse-block,
+.mewyse-editor-compact.mewyse-editor-wrapper > .mewyse-editor blockquote.mewyse-block {
+  padding: 4px 8px;
+  margin-left: 0;
+  font-size: 13px;
+}
+
+.mewyse-editor-compact.mewyse-editor pre.mewyse-block,
+.mewyse-editor-compact.mewyse-editor-wrapper > .mewyse-editor pre.mewyse-block {
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
 /* Menús flotantes en dark mode (se añaden a document.body, fuera del editor) */
 .mewyse-slash-menu.mewyse-dark,
 .mewyse-mention-menu.mewyse-dark,
@@ -1648,17 +1859,37 @@
 .mewyse-editor-wrapper.mewyse-fullscreen,
 .mewyse-editor.mewyse-fullscreen {
   position: fixed !important;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  width: 100vw;
-  height: 100vh;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  /* Sin width/height: top+right+bottom+left:0 ya redimensiona al viewport.
+     width:100vw incluye el scrollbar vertical y puede provocar scroll horizontal.
+     height:100vh en móvil cuenta el chrome del navegador y deja contenido oculto;
+     100dvh sí respeta el viewport visible. */
+  width: auto !important;
+  height: auto !important;
   z-index: 9998;
-  border-radius: 0;
+  border-radius: 0 !important;
   background: var(--mewyse-bg-primary);
-  margin: 0;
-  border: none;
+  margin: 0 !important;
+  border: none !important;
+  max-width: none !important;
+  max-height: none !important;
+}
+
+/* Override de altura específico para móvil: 100dvh respeta el chrome dinámico
+   del navegador (barra de URL que aparece/desaparece). Solo aplica si los
+   navegadores soportan dvh; en caso contrario el fallback de top:0/bottom:0
+   ya cubre el caso. */
+@supports (height: 100dvh) {
+  .mewyse-editor-wrapper.mewyse-fullscreen,
+  .mewyse-editor.mewyse-fullscreen {
+    /* Forzamos un mínimo igual al viewport dinámico — top/bottom siguen
+       fijando los límites, esto solo ayuda en navegadores donde el sizing
+       fixed con bottom:0 no respeta bien el viewport visible. */
+    min-height: 100dvh;
+  }
 }
 
 .mewyse-editor-wrapper.mewyse-fullscreen > .mewyse-editor {
@@ -1767,7 +1998,10 @@ body.mewyse-fullscreen-lock {
   text-align: right;
 }
 
-.mewyse-rtl .mewyse-toolbar {
+/* RTL en modo wrap: invertimos el orden de grupos. En modo scroll dejamos
+   que el track use dir="rtl" propio y NO invertimos el flex de la toolbar
+   porque eso descolocaría la zona fija de la derecha. */
+.mewyse-rtl .mewyse-toolbar:not(.mewyse-toolbar-mode-scroll) {
   flex-direction: row-reverse;
 }
 

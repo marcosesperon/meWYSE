@@ -360,19 +360,6 @@
       line-height: 1.6;
     }
 
-    /* ===== Compact Theme overrides ===== */
-    .mewyse-editor-compact.mewyse-editor-wrapper { border-radius: 4px; }
-    .mewyse-editor-compact.mewyse-editor-wrapper .mewyse-toolbar { padding: 4px 8px; gap: 4px; }
-    .mewyse-editor-compact.mewyse-editor-wrapper .mewyse-toolbar-button { padding: 3px 6px; min-width: 26px; height: 26px; font-size: 12px; }
-    .mewyse-editor-compact.mewyse-editor-wrapper .mewyse-toolbar-button svg { width: 13px; height: 13px; }
-    .mewyse-editor-compact.mewyse-editor { padding: 8px 12px; min-height: 100px; max-height: 250px; font-size: 13px; border-radius: 4px; }
-    .mewyse-editor-compact.mewyse-editor .mewyse-block { margin-bottom: 4px; }
-    .mewyse-editor-compact.mewyse-editor h1.mewyse-block { font-size: 1.4em; }
-    .mewyse-editor-compact.mewyse-editor h2.mewyse-block { font-size: 1.2em; }
-    .mewyse-editor-compact.mewyse-editor h3.mewyse-block { font-size: 1.05em; }
-    .mewyse-editor-compact.mewyse-editor blockquote.mewyse-block { padding: 4px 8px; margin-left: 0; font-size: 13px; }
-    .mewyse-editor-compact.mewyse-editor pre.mewyse-block { padding: 6px 10px; font-size: 12px; }
-
     /* ===== Dark theme content overrides ===== */
     .mewyse-editor-dark.mewyse-editor pre.mewyse-block { color: #c8d6e5; }
     .mewyse-editor-dark.mewyse-editor table th { background: var(--mewyse-bg-secondary); }
@@ -719,6 +706,18 @@ var editor = new meWYSE({
       <div id="toolsEditor"></div>
     </div>
 
+    <!-- Demo: Toolbar con scroll horizontal -->
+    <div class="demo-section">
+      <h2>Toolbar con scroll horizontal</h2>
+      <p>Pasa <code>toolbarOverflow: 'scroll'</code> para que la toolbar se mantenga en una sola fila con scroll horizontal cuando los botones no caben. La rueda vertical se traduce a scroll horizontal sobre la barra, las flechas/fades aparecen solo cuando hay overflow, y los botones de mover bloque (&uarr; &darr;) quedan anclados a la derecha sin moverse. Encoge la ventana para forzar el overflow.</p>
+      <pre class="docs-code"><code>var editor = new meWYSE({
+  target: '#scrollToolbarEditor',
+  toolbar: true,
+  toolbarOverflow: 'scroll'  // default 'wrap'
+});</code></pre>
+      <div style="max-width: 600px;"><div id="scrollToolbarEditor"></div></div>
+    </div>
+
     <!-- Demo: RTL support -->
     <div class="demo-section">
       <h2>Soporte RTL (derecha-a-izquierda)</h2>
@@ -900,6 +899,7 @@ editor.loadFromMarkdown(editor.getMarkdown());</code></pre>
     var markdownEditor;
     var toolsEditor;
     var rtlEditor;
+    var scrollToolbarEditor;
     var currentI18nLang = 'en';
 
     // Inicializar editor basico
@@ -1247,6 +1247,21 @@ editor.loadFromMarkdown(editor.getMarkdown());</code></pre>
       });
     }
 
+    // Inicializar editor con toolbar scrollable
+    function initScrollToolbarEditor() {
+      scrollToolbarEditor = new meWYSE({
+        target: '#scrollToolbarEditor',
+        toolbar: true,
+        theme: 'compact',
+        toolbarOverflow: 'scroll',
+        blocks: [
+          { id: 1, type: 'heading2', content: 'Toolbar con scroll horizontal' },
+          { id: 2, type: 'paragraph', content: 'El contenedor está limitado a 600px para que la toolbar siempre tenga overflow. Pasa el ratón sobre la barra y prueba a girar la rueda: el scroll horizontal sigue tu gesto. Las flechas en los extremos solo aparecen cuando hay contenido oculto en ese lado.' },
+          { id: 3, type: 'paragraph', content: 'Los botones ↑/↓ a la derecha permanecen anclados, no scrollean.' }
+        ]
+      });
+    }
+
     // Inicializar editor RTL
     function initRtlEditor() {
       rtlEditor = new meWYSE({
@@ -1480,6 +1495,7 @@ editor.loadFromMarkdown(editor.getMarkdown());</code></pre>
       initI18nEditor('en');
       initNoStylesEditor();
       initToolsEditor();
+      initScrollToolbarEditor();
       initRtlEditor();
       initStyleFormatsEditor();
       initNestedEditor();

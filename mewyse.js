@@ -70,6 +70,8 @@
         redo: 'Rehacer',
         moveBlockUp: 'Mover bloque arriba',
         moveBlockDown: 'Mover bloque abajo',
+        scrollPrev: 'Desplazar barra a la izquierda',
+        scrollNext: 'Desplazar barra a la derecha',
         findReplace: 'Buscar y reemplazar',
         fullscreen: 'Pantalla completa',
         fullscreenExit: 'Salir de pantalla completa',
@@ -276,6 +278,8 @@
         redo: 'Redo',
         moveBlockUp: 'Move block up',
         moveBlockDown: 'Move block down',
+        scrollPrev: 'Scroll toolbar left',
+        scrollNext: 'Scroll toolbar right',
         findReplace: 'Find and replace',
         fullscreen: 'Fullscreen',
         fullscreenExit: 'Exit fullscreen',
@@ -713,6 +717,11 @@
     this.enableFindReplace = this.options.findReplace !== false; // Habilitar Ctrl+F para buscar (default: true)
     this.enableShowBlocks = this.options.showBlocksToggle !== false; // Habilitar toggle de bloques (default: true)
     this.rtl = this.options.rtl === true; // Dirección derecha-a-izquierda
+    // Comportamiento de la toolbar cuando los botones no caben en una fila.
+    // 'wrap' (default) = saltan a la siguiente fila como hasta ahora.
+    // 'scroll' = todos en una sola fila con scroll horizontal, gradientes en los bordes,
+    // flechas de navegación, y los botones de mover bloque anclados a la derecha.
+    this.toolbarOverflow = (this.options.toolbarOverflow === 'scroll') ? 'scroll' : 'wrap';
     this.pasteAsText = this.options.pasteAsText === true; // Forzar paste solo como texto plano
     this.imageMaxSize = (typeof this.options.imageMaxSize === 'number' && this.options.imageMaxSize > 0)
       ? this.options.imageMaxSize : 0; // Tamaño máx. de imagen en bytes (0 = sin límite)
@@ -779,6 +788,14 @@
     this.currentSelectionTable = null; // Tabla actual donde se está seleccionando
     this.tableCellMouseDownCell = null; // Celda donde se hizo mousedown
     this.tableCellMouseDownBlockId = null; // BlockId de la celda mousedown
+
+    // Estado del backdrop / overlay invisible que se activa mientras hay un menú o
+    // modal flotante abierto. Stack LIFO: el último abierto es el primero en cerrarse
+    // al hacer click en el overlay o pulsar Escape.
+    this._activeBackdropModals = [];
+    this._backdropEl = null;
+    this._backdropEscHandler = null;
+    this._backdropMouseDownHandler = null;
 
     // Variables para selección cross-block
     this.crossBlockSelection = null;       // Estado de la selección cross-block
@@ -1574,6 +1591,58 @@
     var toolbar = document.createElement('div');
     toolbar.className = 'mewyse-toolbar';
 
+    // En modo 'scroll' montamos una zona desplazable (track) + zona fija a la derecha
+    // con los botones de mover bloque. Los grupos se añaden al `host`, que en modo
+    // 'wrap' es la propia toolbar y en modo 'scroll' es el track.
+    var scrollMode = this.toolbarOverflow === 'scroll';
+    var host = toolbar;
+    var scrollArea = null;
+    var scrollTrack = null;
+    var scrollPrev = null;
+    var scrollNext = null;
+    if (scrollMode) {
+      toolbar.classList.add('mewyse-toolbar-mode-scroll');
+
+      scrollArea = document.createElement('div');
+      scrollArea.className = 'mewyse-toolbar-scroll-area';
+      if (this.rtl) scrollArea.setAttribute('dir', 'rtl');
+
+      var fadeStart = document.createElement('div');
+      fadeStart.className = 'mewyse-toolbar-fade mewyse-toolbar-fade-start';
+      fadeStart.setAttribute('aria-hidden', 'true');
+      scrollArea.appendChild(fadeStart);
+
+      var fadeEnd = document.createElement('div');
+      fadeEnd.className = 'mewyse-toolbar-fade mewyse-toolbar-fade-end';
+      fadeEnd.setAttribute('aria-hidden', 'true');
+      scrollArea.appendChild(fadeEnd);
+
+      scrollPrev = document.createElement('button');
+      scrollPrev.type = 'button';
+      scrollPrev.className = 'mewyse-toolbar-scroll-arrow mewyse-toolbar-scroll-arrow-prev';
+      scrollPrev.innerHTML = WYSIWYG_ICONS.arrowLeft || WYSIWYG_ICONS.chevronDown;
+      scrollPrev.title = this.t('tooltips.scrollPrev');
+      scrollPrev.setAttribute('aria-label', this.t('tooltips.scrollPrev'));
+      scrollPrev.tabIndex = -1;
+      scrollArea.appendChild(scrollPrev);
+
+      scrollNext = document.createElement('button');
+      scrollNext.type = 'button';
+      scrollNext.className = 'mewyse-toolbar-scroll-arrow mewyse-toolbar-scroll-arrow-next';
+      scrollNext.innerHTML = WYSIWYG_ICONS.arrowRight || WYSIWYG_ICONS.chevronDown;
+      scrollNext.title = this.t('tooltips.scrollNext');
+      scrollNext.setAttribute('aria-label', this.t('tooltips.scrollNext'));
+      scrollNext.tabIndex = -1;
+      scrollArea.appendChild(scrollNext);
+
+      scrollTrack = document.createElement('div');
+      scrollTrack.className = 'mewyse-toolbar-scroll-track';
+      scrollArea.appendChild(scrollTrack);
+
+      toolbar.appendChild(scrollArea);
+      host = scrollTrack;
+    }
+
     // Botón desplegable para tipos de bloque
     var blockTypeButton = document.createElement('button');
     blockTypeButton.className = 'mewyse-toolbar-button mewyse-toolbar-dropdown';
@@ -1587,12 +1656,12 @@
       self.showToolbarBlockTypeMenu(blockTypeButton);
     };
 
-    toolbar.appendChild(blockTypeButton);
+    host.appendChild(blockTypeButton);
 
     // Separador
     var separator1 = document.createElement('div');
     separator1.className = 'mewyse-toolbar-separator';
-    toolbar.appendChild(separator1);
+    host.appendChild(separator1);
 
     // Grupo de undo/redo
     var undoRedoGroup = document.createElement('div');
@@ -1622,11 +1691,11 @@
     this.redoButton = redoBtn;
     undoRedoGroup.appendChild(redoBtn);
 
-    toolbar.appendChild(undoRedoGroup);
+    host.appendChild(undoRedoGroup);
 
     var separator1b = document.createElement('div');
     separator1b.className = 'mewyse-toolbar-separator';
-    toolbar.appendChild(separator1b);
+    host.appendChild(separator1b);
 
     // Grupo de formato de texto
     var formatGroup = document.createElement('div');
@@ -1662,12 +1731,12 @@
       formatGroup.appendChild(button);
     });
 
-    toolbar.appendChild(formatGroup);
+    host.appendChild(formatGroup);
 
     // Separador
     var separator2 = document.createElement('div');
     separator2.className = 'mewyse-toolbar-separator';
-    toolbar.appendChild(separator2);
+    host.appendChild(separator2);
 
     // Grupo de enlaces y colores
     var extrasGroup = document.createElement('div');
@@ -1695,12 +1764,12 @@
     };
     extrasGroup.appendChild(colorButton);
 
-    toolbar.appendChild(extrasGroup);
+    host.appendChild(extrasGroup);
 
     // Separador
     var separator3 = document.createElement('div');
     separator3.className = 'mewyse-toolbar-separator';
-    toolbar.appendChild(separator3);
+    host.appendChild(separator3);
 
     // Grupo de alineación
     var alignGroup = document.createElement('div');
@@ -1726,12 +1795,12 @@
       alignGroup.appendChild(button);
     });
 
-    toolbar.appendChild(alignGroup);
+    host.appendChild(alignGroup);
 
     // Separador
     var separator4 = document.createElement('div');
     separator4.className = 'mewyse-toolbar-separator';
-    toolbar.appendChild(separator4);
+    host.appendChild(separator4);
 
     // Grupo de inserción de elementos
     var insertGroup = document.createElement('div');
@@ -1787,12 +1856,12 @@
     };
     insertGroup.appendChild(audioButton);
 
-    toolbar.appendChild(insertGroup);
+    host.appendChild(insertGroup);
 
     // Separador antes del grupo de vistas
     var separatorView = document.createElement('div');
     separatorView.className = 'mewyse-toolbar-separator';
-    toolbar.appendChild(separatorView);
+    host.appendChild(separatorView);
 
     // Grupo de vistas/herramientas (find, showBlocks, fullscreen)
     var viewGroup = document.createElement('div');
@@ -1847,13 +1916,8 @@
     }
 
     if (viewGroup.children.length > 0) {
-      toolbar.appendChild(viewGroup);
+      host.appendChild(viewGroup);
     }
-
-    // Spacer para empujar los botones de mover a la derecha
-    var spacer = document.createElement('div');
-    spacer.style.flex = '1';
-    toolbar.appendChild(spacer);
 
     // Grupo de mover bloque arriba/abajo (alineado a la derecha)
     var moveGroup = document.createElement('div');
@@ -1885,7 +1949,28 @@
     this.moveDownButton = moveDownBtn;
     moveGroup.appendChild(moveDownBtn);
 
-    toolbar.appendChild(moveGroup);
+    if (scrollMode) {
+      // Zona fija a la derecha (no scrollea); contiene el grupo de mover bloque.
+      var fixedEnd = document.createElement('div');
+      fixedEnd.className = 'mewyse-toolbar-fixed-end';
+      fixedEnd.appendChild(moveGroup);
+      toolbar.appendChild(fixedEnd);
+
+      // Guardar referencias y cablear lógica de scroll/overflow
+      this._toolbarScroll = {
+        area: scrollArea,
+        track: scrollTrack,
+        prev: scrollPrev,
+        next: scrollNext
+      };
+      this._setupToolbarScroll();
+    } else {
+      // Modo wrap (default): spacer empuja el moveGroup al extremo derecho
+      var spacer = document.createElement('div');
+      spacer.style.flex = '1';
+      toolbar.appendChild(spacer);
+      toolbar.appendChild(moveGroup);
+    }
 
     return toolbar;
   };
@@ -3707,6 +3792,8 @@
         self.closeToolbarMenu();
       });
     }, 0);
+
+    this._showBackdrop('toolbarMenu', function() { self.closeToolbarMenu(); });
   };
 
   /**
@@ -3975,6 +4062,7 @@
     }
     // Limpiar el contexto guardado si el menú se cierra sin seleccionar
     this.toolbarMenuContext = null;
+    this._hideBackdrop('toolbarMenu');
   };
 
   /**
@@ -6274,6 +6362,12 @@
     var menu = document.createElement('div');
     menu.className = 'mewyse-cell-menu';
 
+    var closeCellMenu = function() {
+      if (menu._cancelAnchor) menu._cancelAnchor();
+      if (menu.parentNode) menu.remove();
+      self._hideBackdrop('tableCellMenu');
+    };
+
     // Opción de combinar (solo si hay múltiples celdas)
     if (this.selectedTableCells.length >= 2) {
       var mergeBtn = document.createElement('button');
@@ -6283,8 +6377,7 @@
         e.preventDefault();
         e.stopPropagation();
         self.mergeSelectedCells(blockId);
-        if (menu._cancelAnchor) menu._cancelAnchor();
-        menu.remove();
+        closeCellMenu();
       };
       menu.appendChild(mergeBtn);
     }
@@ -6298,8 +6391,7 @@
         e.preventDefault();
         e.stopPropagation();
         self.unmergeCell(mergedCell, blockId);
-        if (menu._cancelAnchor) menu._cancelAnchor();
-        menu.remove();
+        closeCellMenu();
       };
       menu.appendChild(unmergeBtn);
     }
@@ -6316,10 +6408,16 @@
       document.addEventListener('click', function closeMenu(e) {
         if (!menu.contains(e.target)) {
           self.clearTableCellSelection();
+          self._hideBackdrop('tableCellMenu');
           document.removeEventListener('click', closeMenu);
         }
       });
     }, 10);
+
+    this._showBackdrop('tableCellMenu', function() {
+      self.clearTableCellSelection();
+      closeCellMenu();
+    });
   };
 
   /**
@@ -6688,6 +6786,11 @@
     var menu = document.createElement('div');
     menu.className = 'mewyse-table-menu';
 
+    var closeRowMenu = function() {
+      if (menu.parentNode) menu.remove();
+      self._hideBackdrop('tableRowMenu');
+    };
+
     var options = [
       { labelKey: 'tableMenu.backgroundColor', icon: WYSIWYG_ICONS.palette, action: 'bgColor' },
       { labelKey: 'tableMenu.insertRowAbove', icon: WYSIWYG_ICONS.arrowUp, action: 'insertBefore' },
@@ -6706,14 +6809,14 @@
         e.stopPropagation();
 
         if (opt.action === 'bgColor') {
-          menu.remove();
+          closeRowMenu();
           // Usar setTimeout para evitar conflictos con el evento de "cerrar menú"
           setTimeout(function() {
             self.showTableColorPicker(table, rowIndex, -1, blockId, button);
           }, 50);
         } else {
           self.executeRowAction(table, rowIndex, opt.action, blockId);
-          menu.remove();
+          closeRowMenu();
         }
       };
       menu.appendChild(item);
@@ -6727,11 +6830,13 @@
     setTimeout(function() {
       document.addEventListener('click', function closeMenu(e) {
         if (menu && !menu.contains(e.target) && !button.contains(e.target)) {
-          menu.remove();
+          closeRowMenu();
           document.removeEventListener('click', closeMenu);
         }
       });
     }, 10);
+
+    this._showBackdrop('tableRowMenu', closeRowMenu);
   };
 
   /**
@@ -6753,6 +6858,11 @@
     var menu = document.createElement('div');
     menu.className = 'mewyse-table-menu';
 
+    var closeColMenu = function() {
+      if (menu.parentNode) menu.remove();
+      self._hideBackdrop('tableColMenu');
+    };
+
     var options = [
       { labelKey: 'tableMenu.backgroundColor', icon: WYSIWYG_ICONS.palette, action: 'bgColor' },
       { labelKey: 'tableMenu.insertColumnLeft', icon: WYSIWYG_ICONS.arrowLeft, action: 'insertBefore' },
@@ -6771,14 +6881,14 @@
         e.stopPropagation();
 
         if (opt.action === 'bgColor') {
-          menu.remove();
+          closeColMenu();
           // Usar setTimeout para evitar conflictos con el evento de "cerrar menú"
           setTimeout(function() {
             self.showTableColorPicker(table, -1, colIndex, blockId, button);
           }, 50);
         } else {
           self.executeColAction(table, colIndex, opt.action, blockId);
-          menu.remove();
+          closeColMenu();
         }
       };
       menu.appendChild(item);
@@ -6792,11 +6902,13 @@
     setTimeout(function() {
       document.addEventListener('click', function closeMenu(e) {
         if (menu && !menu.contains(e.target) && !button.contains(e.target)) {
-          menu.remove();
+          closeColMenu();
           document.removeEventListener('click', closeMenu);
         }
       });
     }, 10);
+
+    this._showBackdrop('tableColMenu', closeColMenu);
   };
 
   /**
@@ -6824,6 +6936,11 @@
 
     var picker = document.createElement('div');
     picker.className = 'mewyse-color-picker';
+
+    var closeTablePicker = function() {
+      if (picker.parentNode) picker.remove();
+      self._hideBackdrop('tableColorPicker');
+    };
 
     var colors = [
       '#000000', '#444444', '#666666', '#999999', '#cccccc', '#eeeeee', '#ffffff',
@@ -6864,7 +6981,7 @@
         }
 
         self.updateBlockContent(blockId, self.getCleanTableHTML(table));
-        picker.remove();
+        closeTablePicker();
       };
 
       picker.appendChild(colorBtn);
@@ -6902,7 +7019,7 @@
       }
 
       self.updateBlockContent(blockId, table.innerHTML);
-      picker.remove();
+      closeTablePicker();
     };
     picker.appendChild(removeBtn);
 
@@ -6918,7 +7035,7 @@
     setTimeout(function() {
       document.addEventListener('click', function closePicker(e) {
         if (!picker.contains(e.target) && !button.contains(e.target)) {
-          picker.remove();
+          closeTablePicker();
           document.removeEventListener('click', closePicker);
         }
       });
@@ -6928,6 +7045,8 @@
     picker.addEventListener('mousedown', function(e) {
       e.preventDefault();
     });
+
+    this._showBackdrop('tableColorPicker', closeTablePicker);
   };
 
   /**
@@ -7361,6 +7480,8 @@
         }
       });
     }, 10);
+
+    this._showBackdrop('slashMenu', function() { self.closeSlashMenu(); });
   };
 
   /**
@@ -7527,6 +7648,7 @@
     this.slashMenuElement = null;
     this.slashMenuBlockId = null;
     this.slashMenuTypes = null;
+    this._hideBackdrop('slashMenu');
   };
 
   // =========================================================================
@@ -7611,6 +7733,8 @@
 
     // Actualizar selección inicial
     this.updateMentionMenuSelection();
+
+    this._showBackdrop('mentionMenu', function() { self.closeMentionMenu(); });
   };
 
   /**
@@ -7892,6 +8016,7 @@
     this.mentionMenuBlockId = null;
     this.mentionMenuItems = [];
     this.mentionMenuRange = null;
+    this._hideBackdrop('mentionMenu');
   };
 
   // ============================================
@@ -7967,6 +8092,8 @@
 
     // Actualizar selección visual
     this.updateEmojiMenuSelection();
+
+    this._showBackdrop('emojiMenu', function() { self.closeEmojiMenu(); });
   };
 
   /**
@@ -8214,6 +8341,7 @@
     this.emojiMenuBlockId = null;
     this.emojiMenuItems = [];
     this.emojiMenuRange = null;
+    this._hideBackdrop('emojiMenu');
   };
 
   /**
@@ -8688,6 +8816,13 @@
       }
     };
 
+    var closeBlockOptionsMenu = function() {
+      if (menu._cancelAnchor) menu._cancelAnchor();
+      if (menu._cleanupSelection) menu._cleanupSelection();
+      if (menu.parentNode) menu.remove();
+      self._hideBackdrop('blockOptions');
+    };
+
     // Obtener el bloque para ver si es una tabla
     var block = this.getBlock(blockId);
     var isTable = block && block.type === 'table';
@@ -8752,40 +8887,28 @@
         e.stopPropagation();
 
         if (option.action === 'changeType') {
-          if (menu._cancelAnchor) menu._cancelAnchor();
-          if (menu._cleanupSelection) menu._cleanupSelection();
-          menu.remove();
+          closeBlockOptionsMenu();
           self.showBlockTypeMenu(blockId, button);
         } else if (option.action === 'insertAbove') {
           var index = self.getBlockIndex(blockId);
           if (index !== -1) {
             self.addBlock('paragraph', index);
           }
-          if (menu._cancelAnchor) menu._cancelAnchor();
-          if (menu._cleanupSelection) menu._cleanupSelection();
-          menu.remove();
+          closeBlockOptionsMenu();
         } else if (option.action === 'insertBelow') {
           var index = self.getBlockIndex(blockId);
           if (index !== -1) {
             self.addBlock('paragraph', index + 1);
           }
-          if (menu._cancelAnchor) menu._cancelAnchor();
-          if (menu._cleanupSelection) menu._cleanupSelection();
-          menu.remove();
+          closeBlockOptionsMenu();
         } else if (option.action === 'duplicate') {
           self.duplicateBlock(blockId);
-          if (menu._cancelAnchor) menu._cancelAnchor();
-          if (menu._cleanupSelection) menu._cleanupSelection();
-          menu.remove();
+          closeBlockOptionsMenu();
         } else if (option.action === 'resetTableWidth') {
           self.resetTableColumnWidths(blockId);
-          if (menu._cancelAnchor) menu._cancelAnchor();
-          if (menu._cleanupSelection) menu._cleanupSelection();
-          menu.remove();
+          closeBlockOptionsMenu();
         } else if (option.action === 'tableProperties') {
-          if (menu._cancelAnchor) menu._cancelAnchor();
-          if (menu._cleanupSelection) menu._cleanupSelection();
-          menu.remove();
+          closeBlockOptionsMenu();
           self.showTablePropertiesModal(blockId);
         } else if (option.action === 'delete') {
           // Si hay selección múltiple, eliminar todos los seleccionados
@@ -8794,9 +8917,7 @@
           } else {
             self.deleteBlock(blockId);
           }
-          if (menu._cancelAnchor) menu._cancelAnchor();
-          if (menu._cleanupSelection) menu._cleanupSelection();
-          menu.remove();
+          closeBlockOptionsMenu();
         }
       };
 
@@ -8813,13 +8934,13 @@
     setTimeout(function() {
       document.addEventListener('click', function closeMenu(e) {
         if (!menu.contains(e.target) && !button.contains(e.target)) {
-          if (menu._cancelAnchor) menu._cancelAnchor();
-          if (menu._cleanupSelection) menu._cleanupSelection();
-          menu.remove();
+          closeBlockOptionsMenu();
           document.removeEventListener('click', closeMenu);
         }
       });
     }, 10);
+
+    this._showBackdrop('blockOptions', closeBlockOptionsMenu);
   };
 
   /**
@@ -8852,6 +8973,13 @@
       }
     };
 
+    var closeBlockTypeMenu = function() {
+      if (menu._cancelAnchor) menu._cancelAnchor();
+      if (menu._cleanupSelection) menu._cleanupSelection();
+      if (menu.parentNode) menu.remove();
+      self._hideBackdrop('blockTypeMenu');
+    };
+
     var types = [
       { type: 'paragraph', icon: WYSIWYG_ICONS.paragraph },
       { type: 'heading1', icon: WYSIWYG_ICONS.heading1 },
@@ -8876,9 +9004,7 @@
         } else {
           self.changeBlockType(blockId, typeInfo.type);
         }
-        if (menu._cancelAnchor) menu._cancelAnchor();
-        if (menu._cleanupSelection) menu._cleanupSelection();
-        menu.remove();
+        closeBlockTypeMenu();
       };
       menu.appendChild(item);
     });
@@ -8893,13 +9019,13 @@
     setTimeout(function() {
       document.addEventListener('click', function closeMenu(e) {
         if (!menu.contains(e.target) && !button.contains(e.target)) {
-          if (menu._cancelAnchor) menu._cancelAnchor();
-          if (menu._cleanupSelection) menu._cleanupSelection();
-          menu.remove();
+          closeBlockTypeMenu();
           document.removeEventListener('click', closeMenu);
         }
       });
     }, 10);
+
+    this._showBackdrop('blockTypeMenu', closeBlockTypeMenu);
   };
 
   /**
@@ -10355,6 +10481,25 @@
     }
     this.hideSummaryTooltip();
 
+    // Retirar overlay/backdrop si quedaba activo
+    if (this._activeBackdropModals) this._activeBackdropModals.length = 0;
+    this._removeBackdrop();
+
+    // Limpiar listeners y observer del scroll horizontal de la toolbar
+    if (this._toolbarScrollListeners) {
+      for (var tsi = 0; tsi < this._toolbarScrollListeners.length; tsi++) {
+        var l = this._toolbarScrollListeners[tsi];
+        if (l && l.el && l.fn) {
+          l.el.removeEventListener(l.type, l.fn, l.opts || false);
+        }
+      }
+      this._toolbarScrollListeners = null;
+    }
+    if (this._toolbarResizeObserver) {
+      try { this._toolbarResizeObserver.disconnect(); } catch (e) {}
+      this._toolbarResizeObserver = null;
+    }
+
     // Limpiar toolbar y wrapper si existen
     if (this.toolbar && this.toolbar.parentNode) {
       // El toolbar está dentro de un wrapper, eliminar el wrapper completo
@@ -10622,6 +10767,8 @@
     menu.addEventListener('mousedown', function(e) {
       e.preventDefault();
     });
+
+    this._showBackdrop('formatMenu', function() { self.closeFormatMenu(); });
   };
 
   /**
@@ -10641,6 +10788,11 @@
     var picker = document.createElement('div');
     picker.className = 'mewyse-color-picker';
 
+    var closeLegacyPicker = function() {
+      if (picker.parentNode) picker.remove();
+      self._hideBackdrop('legacyColorPicker');
+    };
+
     var colors = [
       '#000000', '#444444', '#666666', '#999999', '#cccccc', '#eeeeee', '#ffffff',
       '#ff0000', '#ff9900', '#ffff00', '#00ff00', '#00ffff', '#0000ff', '#9900ff', '#ff00ff',
@@ -10658,7 +10810,7 @@
         e.stopPropagation();
         document.execCommand(command, false, color);
         self.triggerChange();
-        picker.remove();
+        closeLegacyPicker();
       };
 
       picker.appendChild(colorBtn);
@@ -10674,7 +10826,7 @@
       e.stopPropagation();
       document.execCommand(command, false, 'transparent');
       self.triggerChange();
-      picker.remove();
+      closeLegacyPicker();
     };
     picker.appendChild(removeBtn);
 
@@ -10690,7 +10842,7 @@
     setTimeout(function() {
       document.addEventListener('click', function closePicker(e) {
         if (!picker.contains(e.target) && !button.contains(e.target)) {
-          picker.remove();
+          closeLegacyPicker();
           document.removeEventListener('click', closePicker);
         }
       });
@@ -10700,6 +10852,8 @@
     picker.addEventListener('mousedown', function(e) {
       e.preventDefault();
     });
+
+    this._showBackdrop('legacyColorPicker', closeLegacyPicker);
   };
 
   /**
@@ -10897,7 +11051,7 @@
         e.stopPropagation();
         self.applyTextColor(color);
         self.triggerChange();
-        picker.remove();
+        closePicker();
       };
 
       textColorGrid.appendChild(colorBtn);
@@ -10913,7 +11067,7 @@
       e.stopPropagation();
       self.removeTextColor();
       self.triggerChange();
-      picker.remove();
+      closePicker();
     };
     textColorGrid.appendChild(removeTextBtn);
 
@@ -10948,7 +11102,7 @@
         e.stopPropagation();
         self.applyBackgroundColor(color);
         self.triggerChange();
-        picker.remove();
+        closePicker();
       };
 
       bgColorGrid.appendChild(colorBtn);
@@ -10964,7 +11118,7 @@
       e.stopPropagation();
       self.removeBackgroundColor();
       self.triggerChange();
-      picker.remove();
+      closePicker();
     };
     bgColorGrid.appendChild(removeBgBtn);
 
@@ -11018,10 +11172,11 @@
 
     // Función para cerrar el picker
     var closePicker = function() {
-      picker.remove();
+      if (picker.parentNode) picker.remove();
       window.removeEventListener('scroll', scrollHandler, true);
       window.removeEventListener('resize', scrollHandler);
       document.removeEventListener('click', clickHandler);
+      self._hideBackdrop('colorPicker');
     };
 
     // Cerrar al hacer clic fuera
@@ -11039,6 +11194,8 @@
     picker.addEventListener('mousedown', function(e) {
       e.preventDefault();
     });
+
+    this._showBackdrop('colorPicker', closePicker);
   };
 
   /**
@@ -11452,6 +11609,14 @@
       { mode: 'toggle',   label: this.t('tooltips.caseToggle'),   sample: 'aA' }
     ];
 
+    var closeCaseMenu = function() {
+      if (self._caseMenu && self._caseMenu.parentNode) {
+        self._caseMenu.remove();
+      }
+      self._caseMenu = null;
+      self._hideBackdrop('caseMenu');
+    };
+
     options.forEach(function(opt) {
       var item = document.createElement('div');
       item.className = 'mewyse-options-menu-item';
@@ -11462,10 +11627,7 @@
         e.stopPropagation();
         // Guardar selección antes de perder foco por el click
         self.applyCaseTransform(opt.mode);
-        if (self._caseMenu && self._caseMenu.parentNode) {
-          self._caseMenu.remove();
-          self._caseMenu = null;
-        }
+        closeCaseMenu();
       };
       menu.appendChild(item);
     });
@@ -11479,13 +11641,14 @@
     setTimeout(function() {
       var closeHandler = function(e) {
         if (!menu.contains(e.target) && !button.contains(e.target)) {
-          if (menu.parentNode) menu.remove();
-          self._caseMenu = null;
+          closeCaseMenu();
           document.removeEventListener('click', closeHandler);
         }
       };
       document.addEventListener('click', closeHandler);
     }, 0);
+
+    this._showBackdrop('caseMenu', closeCaseMenu);
   };
 
   /**
@@ -11503,6 +11666,8 @@
 
     // Limpiar el range guardado
     this.formatMenuRange = null;
+
+    this._hideBackdrop('formatMenu');
 
     // Cerrar también el color picker si está abierto
     var picker = document.querySelector('.mewyse-color-picker');
@@ -11669,6 +11834,8 @@
     tooltip.style.top = top + 'px';
     tooltip.style.left = left + 'px';
     tooltip.style.right = 'auto';
+
+    this._showBackdrop('summaryTooltip', function() { self.hideSummaryTooltip(); });
   };
 
   /**
@@ -11678,6 +11845,7 @@
     if (this.summaryTooltip) {
       this.summaryTooltip.remove();
       this.summaryTooltip = null;
+      this._hideBackdrop('summaryTooltip');
     }
   };
 
@@ -13054,6 +13222,8 @@
     dialog.querySelector('.mewyse-fr-replace-all').onclick = function() { self._replaceAll(); };
 
     setTimeout(function() { findInput.focus(); }, 10);
+
+    this._showBackdrop('findReplace', function() { self.closeFindReplace(); });
   };
 
   meWYSE.prototype._positionFindReplace = function() {
@@ -13081,6 +13251,7 @@
       this.findReplaceDialog = null;
     }
     this.findReplaceState = null;
+    this._hideBackdrop('findReplace');
   };
 
   meWYSE.prototype._clearSearchHighlights = function() {
@@ -14890,6 +15061,218 @@
     if (!borderValue) return null;
     var m = borderValue.match(/#[0-9a-fA-F]{3,6}|rgb\([^)]+\)/);
     return m ? m[0] : null;
+  };
+
+  /**
+   * Backdrop / overlay invisible para menús flotantes y modales.
+   *
+   * Cuando un menú/modal se abre, llama a `_showBackdrop(name, closeFn)`. Si era el
+   * primero del stack, se inserta un <div.mewyse-overlay> en body que intercepta
+   * clicks y la tecla Escape. Click u Escape llaman al `closeFn` del top del stack.
+   *
+   * Cuando el menú se cierra por sus propios medios, debe llamar `_hideBackdrop(name)`
+   * para sacar su entrada del stack y, si era la última, retirar el overlay.
+   *
+   * El overlay es transparente (z-index 999) — los menús viven en 1000+ y los
+   * modales en 9998+, así que el overlay queda automáticamente por debajo de
+   * cualquier UI flotante y por encima del editor.
+   */
+  meWYSE.prototype._showBackdrop = function(name, closeFn) {
+    if (!name || typeof closeFn !== 'function') return;
+    // Eliminar entrada previa con el mismo nombre (re-aperturas no apilan).
+    for (var i = this._activeBackdropModals.length - 1; i >= 0; i--) {
+      if (this._activeBackdropModals[i].name === name) {
+        this._activeBackdropModals.splice(i, 1);
+      }
+    }
+    this._activeBackdropModals.push({ name: name, closeFn: closeFn });
+    this._ensureBackdrop();
+  };
+
+  meWYSE.prototype._hideBackdrop = function(name) {
+    if (!name || !this._activeBackdropModals) return;
+    for (var i = this._activeBackdropModals.length - 1; i >= 0; i--) {
+      if (this._activeBackdropModals[i].name === name) {
+        this._activeBackdropModals.splice(i, 1);
+        break;
+      }
+    }
+    if (!this._activeBackdropModals.length) this._removeBackdrop();
+  };
+
+  meWYSE.prototype._ensureBackdrop = function() {
+    if (this._backdropEl) return;
+    var self = this;
+
+    var el = document.createElement('div');
+    el.className = 'mewyse-overlay';
+    // mousedown (no click) para ganar la carrera contra otros listeners que
+    // pudieran inspeccionar selección o foco al click. preventDefault evita que
+    // el editor pierda la selección al hacer click en el overlay.
+    this._backdropMouseDownHandler = function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      self._closeTopmostBackdropModal();
+    };
+    el.addEventListener('mousedown', this._backdropMouseDownHandler);
+    document.body.appendChild(el);
+    this._backdropEl = el;
+
+    // Capture phase: nos colamos antes que listeners de bloque/teclado del editor.
+    this._backdropEscHandler = function(e) {
+      if (e.key === 'Escape' || e.keyCode === 27) {
+        e.preventDefault();
+        e.stopPropagation();
+        self._closeTopmostBackdropModal();
+      }
+    };
+    document.addEventListener('keydown', this._backdropEscHandler, true);
+  };
+
+  meWYSE.prototype._removeBackdrop = function() {
+    if (this._backdropEl && this._backdropEl.parentNode) {
+      this._backdropEl.parentNode.removeChild(this._backdropEl);
+    }
+    this._backdropEl = null;
+    this._backdropMouseDownHandler = null;
+    if (this._backdropEscHandler) {
+      document.removeEventListener('keydown', this._backdropEscHandler, true);
+      this._backdropEscHandler = null;
+    }
+  };
+
+  meWYSE.prototype._closeTopmostBackdropModal = function() {
+    if (!this._activeBackdropModals || !this._activeBackdropModals.length) return;
+    var entry = this._activeBackdropModals[this._activeBackdropModals.length - 1];
+    // Llamar al closeFn primero. Se espera que limpie llamando _hideBackdrop;
+    // si no lo hace (defensivo), forzamos la limpieza después.
+    try { entry.closeFn(); } catch (e) {}
+    for (var i = this._activeBackdropModals.length - 1; i >= 0; i--) {
+      if (this._activeBackdropModals[i] === entry) {
+        this._activeBackdropModals.splice(i, 1);
+        break;
+      }
+    }
+    if (!this._activeBackdropModals.length) this._removeBackdrop();
+  };
+
+  /**
+   * Configura el comportamiento de scroll horizontal de la toolbar cuando se
+   * usa toolbarOverflow: 'scroll'. Cablea:
+   *  - Indicadores de overflow (clases has-overflow-start/end en .mewyse-toolbar-scroll-area)
+   *  - Wheel vertical → scroll horizontal
+   *  - focusin → scrollIntoView del botón con foco
+   *  - Click en flechas prev/next → scroll suave por ~70% del ancho visible
+   *  - ResizeObserver (con fallback a window.resize) para recalcular en cambios de tamaño
+   *
+   * Las referencias a los elementos viven en this._toolbarScroll (creado en createToolbar).
+   * Los listeners se guardan en this._toolbarScrollListeners para poder limpiarlos en destroy().
+   */
+  meWYSE.prototype._setupToolbarScroll = function() {
+    var ts = this._toolbarScroll;
+    if (!ts || !ts.track) return;
+    var self = this;
+    var track = ts.track;
+    var area = ts.area;
+
+    var listeners = [];
+    this._toolbarScrollListeners = listeners;
+
+    // Calcula si hay contenido oculto en cada extremo y togglea las clases.
+    // Las clases controlan visibilidad de fades y flechas en CSS.
+    function updateOverflow() {
+      // En RTL la lógica es la misma con scrollLeft normalizado en navegadores modernos:
+      // scrollLeft 0 = inicio (visualmente derecha en RTL); scrollWidth - clientWidth = final.
+      var max = track.scrollWidth - track.clientWidth;
+      var sl = Math.abs(track.scrollLeft); // abs por si algún navegador devuelve negativo en RTL
+      var hasStart = sl > 1;
+      var hasEnd = sl < max - 1;
+      area.classList.toggle('has-overflow-start', hasStart);
+      area.classList.toggle('has-overflow-end', hasEnd);
+    }
+    this._updateToolbarOverflow = updateOverflow;
+
+    // Wheel vertical → scroll horizontal. Si el usuario hace scroll predominantemente
+    // vertical encima del track, lo redirigimos a horizontal. Movimiento horizontal
+    // explícito (touchpads, shift+wheel) se respeta sin alterar.
+    function onWheel(e) {
+      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+        var max = track.scrollWidth - track.clientWidth;
+        if (max <= 0) return; // nada que scrollear
+        e.preventDefault();
+        track.scrollLeft += e.deltaY;
+      }
+    }
+    track.addEventListener('wheel', onWheel, { passive: false });
+    listeners.push({ el: track, type: 'wheel', fn: onWheel, opts: { passive: false } });
+
+    // Mantener el botón con foco (Tab) visible dentro del track.
+    function onFocusIn(e) {
+      var btn = e.target;
+      if (!btn || typeof btn.getBoundingClientRect !== 'function') return;
+      var trackRect = track.getBoundingClientRect();
+      var btnRect = btn.getBoundingClientRect();
+      if (btnRect.left < trackRect.left || btnRect.right > trackRect.right) {
+        // scrollIntoView con inline:nearest desplaza solo lo necesario y respeta block actual.
+        try {
+          btn.scrollIntoView({ inline: 'nearest', block: 'nearest' });
+        } catch (err) {
+          // Navegadores muy antiguos sin opciones de scrollIntoView: fallback básico.
+          btn.scrollIntoView();
+        }
+      }
+    }
+    track.addEventListener('focusin', onFocusIn);
+    listeners.push({ el: track, type: 'focusin', fn: onFocusIn });
+
+    // Listener de scroll: recalcular indicadores.
+    function onScroll() { updateOverflow(); }
+    track.addEventListener('scroll', onScroll, { passive: true });
+    listeners.push({ el: track, type: 'scroll', fn: onScroll, opts: { passive: true } });
+
+    // Flechas prev/next: scrollBy ~70% del ancho visible. behavior:smooth si está soportado.
+    function scrollByDir(dir) {
+      var step = Math.max(120, Math.floor(track.clientWidth * 0.7));
+      try {
+        track.scrollBy({ left: dir * step, behavior: 'smooth' });
+      } catch (err) {
+        track.scrollLeft += dir * step;
+      }
+    }
+    if (ts.prev) {
+      ts.prev.addEventListener('click', function(e) {
+        e.preventDefault();
+        // En RTL la flecha "prev" sigue significando "el lado de inicio", lo cual visualmente
+        // es la derecha. scrollBy con left negativo ya respeta dir=rtl en navegadores modernos.
+        scrollByDir(-1);
+      });
+    }
+    if (ts.next) {
+      ts.next.addEventListener('click', function(e) {
+        e.preventDefault();
+        scrollByDir(1);
+      });
+    }
+
+    // ResizeObserver: recalcular cuando cambia el ancho disponible (responsive, fullscreen).
+    // Fallback a window.resize si no está disponible.
+    if (typeof window.ResizeObserver === 'function') {
+      var ro = new window.ResizeObserver(function() { updateOverflow(); });
+      ro.observe(track);
+      this._toolbarResizeObserver = ro;
+    } else {
+      var onWinResize = function() { updateOverflow(); };
+      window.addEventListener('resize', onWinResize);
+      listeners.push({ el: window, type: 'resize', fn: onWinResize });
+    }
+
+    // Primer cálculo. requestAnimationFrame asegura que el layout esté listo
+    // (el toolbar puede no estar aún en el DOM cuando se llama desde createToolbar).
+    if (typeof window.requestAnimationFrame === 'function') {
+      window.requestAnimationFrame(updateOverflow);
+    } else {
+      setTimeout(updateOverflow, 0);
+    }
   };
 
   /**
