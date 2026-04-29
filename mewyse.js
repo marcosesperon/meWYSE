@@ -1598,12 +1598,23 @@
     // Compensar padding-top del bloque para alinear con la primera linea de texto
     var paddingTop = parseFloat(window.getComputedStyle(blockElement).paddingTop) || 0;
 
-    // Calcular posicion del handle
-    var top = blockRect.top - wrapperRect.top + paddingTop;
-    var left = blockRect.left - wrapperRect.left - 35; // a la izquierda del bloque
+    // Calcular posicion del handle.
+    //
+    // El handle vive como hijo absolute-positioned del wrapper (con
+    // position: relative). Lo colocamos en el padding-left ampliado del
+    // editor (32px por defecto via _injectContentStyles) — siempre DENTRO
+    // del wrapper, para que un parent con `overflow: hidden` no lo recorte.
+    //
+    // Offset = blockRect.left - wrapperRect.left - 28: el handle ocupa
+    // ~24-28px de ancho, así que con 32px de padding queda holgado a 4px
+    // del borde izquierdo del wrapper.
+    var top = blockRect.top - wrapperRect.top - 4 + paddingTop;
+    var left = blockRect.left - wrapperRect.left - 20;
 
     this.floatingHandle.style.top = top + 'px';
-    this.floatingHandle.style.left = Math.max(-5, left) + 'px';
+    // Mínimo 4px desde el borde del wrapper para evitar el clip (también
+    // útil cuando el padding inyectado está desactivado por contentStyles:false).
+    this.floatingHandle.style.left = left + 'px';;//Math.max(4, left) + 'px';
     this.floatingHandle.classList.add('visible');
   };
 
@@ -9760,15 +9771,20 @@
       return b.customClass ? ' class="' + b.customClass + '"' : '';
     };
 
-    // Transformer del contenido inline. Si la opción `escapeHtmlEntities` está
-    // activa (default), todos los nodos de texto del contenido se re-escapan
-    // con las cinco entidades HTML. Si está desactivada, identidad (legacy).
-    // No se aplica al contenido de tablas (estructura compleja con tags
-    // anidados que el parser DOM no resuelve sin un wrapper de tabla) ni a
-    // bloques de código (que ya escapan TODO el HTML para emitir como source).
-    var inline = this.escapeHtmlEntities
-      ? function(c) { return self._emitInlineHTMLWithEscape(c); }
-      : function(c) { return c; };
+    // Transformer del contenido inline. Pasos:
+    //  1. Sanear: garantiza que el contenido sea válido como HTML inline. Si
+    //     el modelo recibió `<p>`, `<div>`, etc. anidados (paste pegado,
+    //     atajos del navegador, autocorrección...), el sanitizer los unwrap
+    //     a `<br>` y NO se emiten dentro del wrapper `<p>...</p>` del bloque.
+    //     Sin este paso podía salir HTML inválido tipo `<p><p></p><p></p></p>`.
+    //  2. Si `escapeHtmlEntities` está activo (default), aplica el escape de
+    //     entidades sobre el ya sanitizado.
+    var inline = function(c) {
+      if (typeof c !== 'string' || c === '') return c;
+      var clean = self._sanitizeBlockContent(c);
+      if (self.escapeHtmlEntities) return self._emitInlineHTMLWithEscape(clean);
+      return clean;
+    };
 
     while (i < blocks.length) {
       var block = blocks[i];
@@ -12938,8 +12954,12 @@
     var css = '' +
       '/* Content styles for ' + id + ' */\n' +
       w + ' { border: 1px solid var(--mewyse-border-light); border-radius: var(--mewyse-radius-xl); background: var(--mewyse-bg-primary); color: var(--mewyse-text-primary); }\n' +
-      s + ' { padding: 16px; min-height: 200px; max-height: 500px; overflow-y: auto; margin-left: 0; }\n' +
-      s + '.mewyse-minimal { border-radius: var(--mewyse-radius-xl); padding: 16px; background: var(--mewyse-bg-primary); color: var(--mewyse-text-primary); min-height: 150px; max-height: 400px; overflow-y: auto; }\n' +
+      // padding-left ampliado a 32px para alojar el handle flotante DENTRO
+      // del área del editor (en lugar de pegado al borde-izquierdo del wrapper,
+      // donde un parent con `overflow: hidden` lo recortaría). Mismo motivo
+      // en .mewyse-minimal.
+      s + ' { padding: 16px 16px 16px 32px; min-height: 200px; max-height: 500px; overflow-y: auto; margin-left: 0; }\n' +
+      s + '.mewyse-minimal { border-radius: var(--mewyse-radius-xl); padding: 16px 16px 16px 32px; background: var(--mewyse-bg-primary); color: var(--mewyse-text-primary); min-height: 150px; max-height: 400px; overflow-y: auto; }\n' +
       s + ' .mewyse-block { display: block; position: relative; margin: 0 0 8px 0; padding: 0; outline: none; box-sizing: border-box; }\n' +
       s + ' p.mewyse-block, ' + s + ' h1.mewyse-block, ' + s + ' h2.mewyse-block, ' + s + ' h3.mewyse-block { margin: 0 0 8px 0; padding: 0; }\n' +
       s + ' blockquote.mewyse-block { margin: 0 0 8px 0; padding: 8px 16px; border-left: 3px solid #ddd; }\n' +
@@ -13343,9 +13363,10 @@
 
     var dialog = document.createElement('div');
     dialog.className = 'mewyse-find-replace';
-    if (this.options.theme) {
-      dialog.classList.add('mewyse-dark');
-    }
+    // Aplicar clase dark SOLO si el editor está en modo oscuro (no para
+    // cualquier theme — `compact` u otros no implican dark). Reusa el helper
+    // común que ya hace esa comprobación correctamente.
+    this._applyMenuTheme(dialog);
     dialog.setAttribute('role', 'dialog');
     dialog.setAttribute('aria-label', t('title'));
 
