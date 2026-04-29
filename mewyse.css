@@ -224,12 +224,13 @@
   height: 0;
 }
 
-/* Las flechas y fades NO añaden hueco al track: van por encima en absoluto. */
+/* Las flechas y fades NO añaden hueco al track: van por encima en absoluto.
+   El fade nace pegado al borde y se hace algo más ancho para integrar la flecha. */
 .mewyse-toolbar-fade {
   position: absolute;
   top: 0;
   bottom: 0;
-  width: 32px;
+  width: 48px;
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.15s ease;
@@ -237,33 +238,34 @@
 }
 .mewyse-toolbar-fade-start {
   inset-inline-start: 0;
-  background: linear-gradient(to right, var(--mewyse-bg-secondary) 0%, transparent 100%);
+  background: linear-gradient(to right, var(--mewyse-bg-secondary) 40%, transparent 100%);
 }
 .mewyse-toolbar-fade-end {
   inset-inline-end: 0;
-  background: linear-gradient(to left, var(--mewyse-bg-secondary) 0%, transparent 100%);
+  background: linear-gradient(to left, var(--mewyse-bg-secondary) 40%, transparent 100%);
 }
 /* En RTL los gradientes deben invertir el sentido visual del degradado para que
    el lado opaco quede pegado al borde correcto. inset-inline-start ya posiciona bien. */
 .mewyse-toolbar-scroll-area[dir="rtl"] .mewyse-toolbar-fade-start {
-  background: linear-gradient(to left, var(--mewyse-bg-secondary) 0%, transparent 100%);
+  background: linear-gradient(to left, var(--mewyse-bg-secondary) 40%, transparent 100%);
 }
 .mewyse-toolbar-scroll-area[dir="rtl"] .mewyse-toolbar-fade-end {
-  background: linear-gradient(to right, var(--mewyse-bg-secondary) 0%, transparent 100%);
+  background: linear-gradient(to right, var(--mewyse-bg-secondary) 40%, transparent 100%);
 }
 
 .mewyse-toolbar-scroll-area.has-overflow-start .mewyse-toolbar-fade-start { opacity: 1; }
 .mewyse-toolbar-scroll-area.has-overflow-end   .mewyse-toolbar-fade-end   { opacity: 1; }
 
-/* Flechas chevron: solo aparecen cuando hay overflow en su lado. */
+/* Flechas de scroll: integradas en el fade en lugar de ser píldoras flotantes.
+   Mismo lenguaje visual que los botones de la toolbar (ghost + hover suave). */
 .mewyse-toolbar-scroll-arrow {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: var(--mewyse-bg-primary);
-  color: var(--mewyse-text-primary);
-  border: 1px solid var(--mewyse-border-medium);
-  border-radius: 50%;
+  background: transparent;
+  color: var(--mewyse-text-secondary);
+  border: none;
+  border-radius: var(--mewyse-radius-md);
   width: 24px;
   height: 24px;
   padding: 0;
@@ -272,29 +274,70 @@
   align-items: center;
   justify-content: center;
   z-index: 2;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-  transition: background 0.15s ease;
+  box-shadow: none;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 .mewyse-toolbar-scroll-arrow svg {
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
 }
 .mewyse-toolbar-scroll-arrow:hover {
   background: var(--mewyse-bg-active);
+  color: var(--mewyse-text-primary);
 }
-.mewyse-toolbar-scroll-arrow-prev { inset-inline-start: 4px; }
-.mewyse-toolbar-scroll-arrow-next { inset-inline-end: 4px; }
+.mewyse-toolbar-scroll-arrow-prev { inset-inline-start: 2px; }
+.mewyse-toolbar-scroll-arrow-next { inset-inline-end: 2px; }
 .mewyse-toolbar-scroll-area.has-overflow-start .mewyse-toolbar-scroll-arrow-prev { display: flex; }
 .mewyse-toolbar-scroll-area.has-overflow-end   .mewyse-toolbar-scroll-arrow-next { display: flex; }
 
-/* Zona fija a la derecha: no scrollea, anclada. */
+/* Zona fija a la derecha: segunda sección visualmente independiente. */
 .mewyse-toolbar-fixed-end {
   display: flex;
   align-items: center;
   flex-shrink: 0;
+  gap: 2px;
   margin-inline-start: 8px;
-  padding-inline-start: 8px;
-  border-inline-start: 1px solid var(--mewyse-border-light);
+  padding-inline-start: 12px;
+  /* Línea divisoria más marcada — delimita las dos zonas. */
+  border-inline-start: 1px solid var(--mewyse-border-medium);
+}
+
+/* ===== Refinamientos visuales del modo scroll =====
+   Los botones se vuelven "ghost" (sin borde ni fondo) y solo
+   muestran fondo al pasar el ratón. Esto los integra entre sí en lugar
+   de verlos como botones sueltos.
+   Solo tocamos color/borde para no chocar con themes que ajusten el tamaño
+   (ej. compact con altura 22px). */
+.mewyse-toolbar.mewyse-toolbar-mode-scroll .mewyse-toolbar-button {
+  background: transparent;
+  border-color: transparent;
+  border-radius: var(--mewyse-radius-md);
+}
+.mewyse-toolbar.mewyse-toolbar-mode-scroll .mewyse-toolbar-button:hover {
+  background: var(--mewyse-bg-active);
+  border-color: transparent;
+}
+.mewyse-toolbar.mewyse-toolbar-mode-scroll .mewyse-toolbar-button:active {
+  background: var(--mewyse-border-medium);
+}
+.mewyse-toolbar.mewyse-toolbar-mode-scroll .mewyse-toolbar-button.active {
+  background: var(--mewyse-bg-active);
+  color: var(--mewyse-accent);
+}
+
+/* Reduce el tamaño de los grupos para una densidad más agradable. */
+.mewyse-toolbar.mewyse-toolbar-mode-scroll .mewyse-toolbar-scroll-track {
+  gap: 2px;
+}
+.mewyse-toolbar.mewyse-toolbar-mode-scroll .mewyse-toolbar-group {
+  gap: 0;
+}
+
+/* Separadores: más sutiles y cortos para encajar con los botones ghost. */
+.mewyse-toolbar.mewyse-toolbar-mode-scroll .mewyse-toolbar-separator {
+  height: 16px;
+  margin: 0 6px;
+  background: var(--mewyse-border-light);
 }
 
 /* En modo scroll los grupos NO se encogen: queremos overflow real, no botones aplastados. */

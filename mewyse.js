@@ -723,6 +723,19 @@
     // flechas de navegación, y los botones de mover bloque anclados a la derecha.
     this.toolbarOverflow = (this.options.toolbarOverflow === 'scroll') ? 'scroll' : 'wrap';
     this.pasteAsText = this.options.pasteAsText === true; // Forzar paste solo como texto plano
+    // Por defecto, getHTML() escapa los 5 caracteres de entidad HTML (& < > " ')
+    // en los nodos de TEXTO del contenido inline (heading, quote, paragraph,
+    // ítems de lista). Es la convención de Quill: garantiza HTML siempre
+    // válido aunque el contenido tuviera comillas o ampersands sin escapar.
+    // `escapeHtmlEntities: false` desactiva el escape y emite el contenido tal
+    // cual (comportamiento legacy).
+    this.escapeHtmlEntities = this.options.escapeHtmlEntities !== false;
+    // Cuando `escapeHtmlEntities` está activo, este flag adicional escapa
+    // también `\` (→ `&#92;`) y todo carácter no-ASCII (charCode >= 128) como
+    // referencia numérica HTML. Replica la salida de TinyMCE con
+    // `entity_encoding: 'numeric'`. Útil como capa de compat para flujos que
+    // venían de TinyMCE y esperaban HTML ASCII-safe. Default: true.
+    this.htmlNumericEntities = this.options.htmlNumericEntities !== false;
     this.imageMaxSize = (typeof this.options.imageMaxSize === 'number' && this.options.imageMaxSize > 0)
       ? this.options.imageMaxSize : 0; // Tamaño máx. de imagen en bytes (0 = sin límite)
 
@@ -796,6 +809,14 @@
     this._backdropEl = null;
     this._backdropEscHandler = null;
     this._backdropMouseDownHandler = null;
+
+    // Timestamp hasta el cual el listener de focusout NO debe disparar onBlur,
+    // aunque el activeElement quede momentáneamente fuera del editor. Lo usan
+    // las operaciones internas (Enter split, Backspace merge) durante las que
+    // el foco transiciona entre dos contenteditable y, especialmente en móvil,
+    // pasa por `body` un tick. Sin este margen, esa transición se interpreta
+    // como un blur real y dispara el callback indebidamente.
+    this._suppressBlurUntil = 0;
 
     // Variables para selección cross-block
     this.crossBlockSelection = null;       // Estado de la selección cross-block
@@ -1098,16 +1119,29 @@
       }
     });
 
-    // focusout: detectar cuando el foco sale del editor a algún elemento externo
+    // focusout: detectar cuando el foco sale del editor a algún elemento externo.
+    // Si tras el evento el nuevo activeElement está dentro del container o de
+    // cualquier UI del editor (toolbar, menús flotantes, modales), el foco solo
+    // se movió internamente y no hay que disparar onBlur.
+    //
+    // Las operaciones internas que mueven el foco entre contenteditables
+    // (Enter, Backspace merge) levantan `_suppressBlurUntil`: durante esa
+    // ventana, si activeElement quedó momentáneamente en body (típico en móvil
+    // entre un focusout y el focusin del nuevo elemento), reintentamos hasta
+    // que la ventana se cierra antes de decidir si fue un blur real.
     this.container.addEventListener('focusout', function(e) {
-      // Usar setTimeout para esperar a que el activeElement se actualice. Si tras
-      // el evento el nuevo activeElement está dentro del container o de cualquier
-      // UI del editor (toolbar, menús flotantes, modales, picker, etc.), el foco
-      // solo se movió internamente y no hay que disparar onBlur.
-      setTimeout(function() {
+      function check() {
         if (!self.container) return;
+
+        // Si seguimos dentro de la ventana de supresión, reprogramar para
+        // re-chequear cuando termine. El foco interno suele asentarse antes.
+        var now = Date.now();
+        if (now < self._suppressBlurUntil) {
+          setTimeout(check, self._suppressBlurUntil - now + 10);
+          return;
+        }
+
         var active = document.activeElement;
-        // body o null: typically el browser perdió el foco — disparar onBlur
         if (!active || active === document.body) {
           if (self._hasFocus) {
             self._hasFocus = false;
@@ -1122,7 +1156,8 @@
           self._hasFocus = false;
           self._fireBlurCallback(e.target);
         }
-      }, 0);
+      }
+      setTimeout(check, 0);
     });
 
     // Añadir listener para deseleccionar imagen al hacer clic fuera
@@ -1215,6 +1250,10 @@
    */
   meWYSE.prototype.focusNewBlock = function(blockElement) {
     if (!blockElement) return;
+    // El handler de Enter hace su propio focus síncrono (necesario para no
+    // perder el teclado virtual en móvil) y nos pide saltarnos esta versión
+    // asíncrona, que dispararía un re-focus fuera del gesto del usuario.
+    if (this._skipAutoFocus) return;
 
     // Buscar el elemento editable dentro del bloque o el bloque mismo si es editable
     var contentEditable = blockElement.querySelector('[contenteditable="true"]');
@@ -2985,13 +3024,16 @@
    * @param {Function} classAttrFn - función que devuelve ' class="..."' por bloque
    * @returns {Object} { html, consumed }
    */
-  meWYSE.prototype._buildNestedListHTML = function(blocks, startIndex, classAttrFn) {
+  meWYSE.prototype._buildNestedListHTML = function(blocks, startIndex, classAttrFn, inlineFn) {
     var startType = blocks[startIndex].type;
     var tag = startType === 'numberList' ? 'ol' : 'ul';
     var listClass = startType === 'checklist' ? ' class="checklist"' : '';
+    // inlineFn es el transformer de contenido inline (ej. escape de entities).
+    // Si no se pasa, identidad — preserva el comportamiento clásico.
+    var inline = typeof inlineFn === 'function' ? inlineFn : function(c) { return c; };
 
     var renderLi = function(block) {
-      var content = block.content || '';
+      var content = inline(block.content || '');
       var classStr = classAttrFn(block);
       if (startType === 'checklist') {
         var checked = block.checked ? ' checked' : '';
@@ -4252,8 +4294,11 @@
       this.createSummaryButton();
     }
 
-    // Restaurar el foco si había uno
-    if (focusedBlockId !== null) {
+    // Restaurar el foco si había uno.
+    // Si el caller activó `_skipAutoFocus` es porque va a colocar el foco
+    // síncronamente — saltarse este setTimeout evita un re-focus async que
+    // rompería el gesto del usuario en móvil (oculta el teclado virtual).
+    if (focusedBlockId !== null && !this._skipAutoFocus) {
       setTimeout(function() {
         var blockElement = self.container.querySelector('[data-block-id="' + focusedBlockId + '"]');
         if (blockElement) {
@@ -8628,57 +8673,142 @@
       }
     }
 
-    // Enter: crear nuevo bloque
+    // Enter: dividir el bloque o crear uno nuevo según la posición del cursor.
+    //  - Cursor al final  → comportamiento clásico: bloque nuevo vacío después.
+    //  - Cursor en medio  → split: el bloque actual se queda con la parte previa,
+    //    se crea un bloque nuevo del mismo tipo con la parte siguiente.
+    //  - Cursor al inicio → split degenerado (parte previa vacía, parte siguiente
+    //    con todo el contenido) — equivalente a "empujar" el contenido abajo.
+    //
+    // CRÍTICO MÓVIL: todo el flujo (crear bloque + foco) es síncrono dentro del
+    // gesto del usuario. iOS/Android sólo muestran el teclado virtual cuando
+    // focus() ocurre síncronamente desde un evento de usuario; cualquier
+    // setTimeout/rAF intermedio rompe la cadena y oculta el teclado.
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
 
-      // Evitar múltiples llamadas simultáneas
-      if (this._isAddingBlock) {
-        return;
-      }
+      if (this._isAddingBlock) return;
       this._isAddingBlock = true;
-
-      // CRÍTICO: Quitar el foco del elemento actual ANTES de crear el nuevo bloque
-      // Esto evita que el elemento actual robe el foco cuando se crea el nuevo
-      element.blur();
 
       var index = this.getBlockIndex(blockId);
       var self = this;
-
-      // Obtener el tipo del bloque actual para mantener el tipo en listas
       var currentBlock = this.getBlock(blockId);
-      var newBlockType = 'paragraph';
 
-      // Obtener el contenido actual del bloque
-      var currentContent = element.textContent || '';
-      var isEmpty = currentContent.trim() === '';
+      // Bloques que NO se pueden dividir como texto (image, divider, video, audio,
+      // table, code). Para estos mantenemos el comportamiento clásico (paragraph
+      // nuevo a continuación).
+      var nonSplittable = { image: 1, divider: 1, video: 1, audio: 1, table: 1, code: 1 };
+      var canSplit = currentBlock && !nonSplittable[currentBlock.type];
 
-      // Si el bloque actual es una lista
-      if (currentBlock && (currentBlock.type === 'bulletList' || currentBlock.type === 'numberList' || currentBlock.type === 'checklist')) {
-        // Si el bloque de lista está vacío, salir de la lista y crear un párrafo
-        if (isEmpty) {
-          newBlockType = 'paragraph';
-        } else {
-          // Si tiene contenido, mantener el tipo de lista
-          newBlockType = currentBlock.type;
+      // Tipo del nuevo bloque cuando NO se hace split (clásico).
+      // Listas vacías → paragraph (salir de la lista). Listas con contenido → mismo
+      // tipo. Heading/quote → paragraph (más natural tras cerrar el heading).
+      // Resto → paragraph.
+      function endTypeFor(block) {
+        if (!block) return 'paragraph';
+        var listTypes = { bulletList: 1, numberList: 1, checklist: 1 };
+        if (listTypes[block.type]) {
+          var isEmpty = (element.textContent || '').trim() === '';
+          return isEmpty ? 'paragraph' : block.type;
         }
+        return 'paragraph';
       }
 
-      // Usar setTimeout para asegurar que el blur se completa antes de añadir el bloque
-      setTimeout(function() {
-        self.addBlock(newBlockType, index + 1);
+      // Determinar si hay contenido después del cursor. compareBoundaryPoints
+      // no es fiable comparando ranges en distinto container (text node vs
+      // elemento padre), así que extraemos el "after" y miramos su texto.
+      var sel = window.getSelection();
+      var range = (sel && sel.rangeCount > 0) ? sel.getRangeAt(0) : null;
+      var beforeHTML = '';
+      var afterHTML = '';
+      var atEnd = true;
+      if (canSplit && range && range.collapsed) {
+        var beforeRange = document.createRange();
+        beforeRange.selectNodeContents(element);
+        beforeRange.setEnd(range.startContainer, range.startOffset);
+        var afterRange = document.createRange();
+        afterRange.selectNodeContents(element);
+        afterRange.setStart(range.startContainer, range.startOffset);
 
-        // Resetear el flag después de crear el bloque
-        setTimeout(function() {
-          self._isAddingBlock = false;
-        }, 100);
-      }, 0);
+        var tmp = document.createElement('div');
+        tmp.appendChild(beforeRange.cloneContents());
+        beforeHTML = tmp.innerHTML;
+        tmp.innerHTML = '';
+        tmp.appendChild(afterRange.cloneContents());
+        afterHTML = tmp.innerHTML;
 
+        // atEnd: no queda texto visible después del cursor.
+        atEnd = afterRange.toString().length === 0;
+      }
+
+      // Ventana de supresión de blur: estos handlers mueven o reescriben el
+      // foco entre contenteditables. En móvil, durante esa transición, el
+      // navegador puede pasar momentáneamente por document.body y disparar el
+      // focusout antes de que el nuevo elemento reciba focusin. Sin este
+      // margen, el callback onBlur se dispararía indebidamente.
+      this._suppressBlurUntil = Date.now() + 300;
+
+      if (!canSplit || atEnd) {
+        // Comportamiento clásico: bloque vacío después. Todo síncrono para
+        // mantener vivo el gesto del usuario (teclado virtual en móvil).
+        var newType = endTypeFor(currentBlock);
+        this._skipAutoFocus = true;
+        var newBlockId = this.addBlock(newType, index + 1);
+        this._skipAutoFocus = false;
+        this._focusBlockSync(newBlockId);
+        this._isAddingBlock = false;
+        return;
+      }
+
+      // Tipo del nuevo bloque al hacer split: SIEMPRE el mismo del actual. Esto
+      // hace que Enter funcione como un "salto de línea" que respeta el formato.
+      var splitType = currentBlock.type;
+
+      // Split SIN cambiar el foco — clave para móvil: en lugar de crear el
+      // nuevo bloque ABAJO con la mitad nueva y mover el cursor allí, creamos
+      // el nuevo bloque ARRIBA con la mitad anterior y dejamos el bloque
+      // actual con la mitad nueva. El elemento sigue enfocado (no se llama
+      // a focus() en otro nodo) y el cursor queda al inicio de su contenido
+      // — exactamente la posición lógica donde estaba el cursor tras el split.
+      // Como bonus, el teclado virtual no se mueve y no se dispara onBlur.
+      var safeBefore = this._sanitizeBlockContent(beforeHTML);
+      var safeAfter = this._sanitizeBlockContent(afterHTML);
+
+      var splitProps = {};
+      if (currentBlock.alignment) splitProps.alignment = currentBlock.alignment;
+      if (currentBlock.customClass) splitProps.customClass = currentBlock.customClass;
+      if (typeof currentBlock.indentLevel === 'number') splitProps.indentLevel = currentBlock.indentLevel;
+      // Checklist: la mitad anterior (que va al bloque nuevo arriba) hereda
+      // el estado checked del original; el bloque actual (mitad nueva, que se
+      // queda con el cursor) arranca sin marcar como suele hacer Notion.
+      if (splitType === 'checklist' && currentBlock.checked) splitProps.checked = true;
+
+      // Insertar nuevo bloque ARRIBA del actual con la mitad anterior.
+      this._skipAutoFocus = true;
+      this.addBlock(splitType, index, safeBefore, splitProps);
+      this._skipAutoFocus = false;
+
+      // El bloque actual conserva su id, su elemento DOM y el foco. Solo
+      // actualizamos su contenido a la mitad posterior.
+      currentBlock.content = safeAfter;
+      if (splitType === 'checklist') currentBlock.checked = false;
+      element.innerHTML = safeAfter;
+
+      // Cursor al inicio del elemento (donde quedaba lógicamente el cursor
+      // tras el split). El elemento no perdió focus en ningún momento.
+      this._setCursorAtTextOffset(element, 0);
+
+      this.triggerChange();
+      this._isAddingBlock = false;
       return;
     }
 
-    // Backspace en bloque vacío: eliminar bloque
-    if (e.key === 'Backspace') {
+    // Backspace:
+    //  - Bloque vacío  → eliminar el bloque y enfocar el anterior (al final).
+    //  - Cursor al inicio de un bloque CON contenido → fusionar con el anterior
+    //    (inverso del split en Enter): el contenido del actual se concatena al
+    //    final del anterior, y el cursor queda en la frontera.
+    if (e.key === 'Backspace' && !e.ctrlKey && !e.metaKey && !e.altKey && !e.shiftKey) {
       var content = element.textContent;
       if (content === '' || content === '\n') {
         e.preventDefault();
@@ -8714,6 +8844,30 @@
           }
         }
         return;
+      }
+
+      // Bloque con contenido: si el cursor está al inicio, intentar fusionar
+      // con el anterior. Sólo aplica si la selección está colapsada (no hay
+      // texto seleccionado a borrar) y el bloque anterior es de tipo texto.
+      var sel = window.getSelection();
+      var range = (sel && sel.rangeCount > 0) ? sel.getRangeAt(0) : null;
+      if (range && range.collapsed) {
+        var beforeRange = document.createRange();
+        beforeRange.selectNodeContents(element);
+        beforeRange.setEnd(range.startContainer, range.startOffset);
+        var atStart = beforeRange.toString().length === 0;
+        if (atStart) {
+          var idx = this.getBlockIndex(blockId);
+          if (idx > 0) {
+            var prevBlock = this.blocks[idx - 1];
+            var nonMergeable = { table: 1, image: 1, divider: 1, video: 1, audio: 1 };
+            if (prevBlock && !nonMergeable[prevBlock.type]) {
+              e.preventDefault();
+              this._mergeBlockIntoPrevious(blockId);
+              return;
+            }
+          }
+        }
       }
     }
 
@@ -9089,13 +9243,34 @@
    * @param {number} index - Posición donde insertar (opcional)
    * @returns {number} - ID del bloque creado
    */
-  meWYSE.prototype.addBlock = function(type, index) {
+  meWYSE.prototype.addBlock = function(type, index, content, props) {
     this.pushHistory(true);
     var block = {
       id: ++this.currentBlockId,
       type: type || 'paragraph',
       content: ''
     };
+
+    // content opcional: se usa al hacer split de un bloque (Enter en medio).
+    // Pasa por el sanitizador igual que cualquier contenido externo.
+    if (typeof content === 'string' && content.length > 0) {
+      block.content = this._sanitizeBlockContent(content);
+    }
+
+    // props opcional: propiedades a heredar antes del render (alignment,
+    // customClass, indentLevel, checked). Permite que el render inicial ya
+    // emita las clases/estilos correctos sin tener que disparar un segundo
+    // render — crítico para no romper el gesto del usuario en móvil.
+    if (props && typeof props === 'object') {
+      if (typeof props.alignment === 'string') block.alignment = props.alignment;
+      if (typeof props.customClass === 'string' && this._customClassWhitelist[props.customClass]) {
+        block.customClass = props.customClass;
+      }
+      if (typeof props.indentLevel === 'number' && props.indentLevel >= 0) {
+        block.indentLevel = Math.min(5, Math.floor(props.indentLevel));
+      }
+      if (props.checked === true || props.checked === false) block.checked = props.checked;
+    }
 
     if (typeof index === 'number') {
       this.blocks.splice(index, 0, block);
@@ -9578,11 +9753,22 @@
     var html = '';
     var blocks = this.getFilteredBlocks();
     var i = 0;
+    var self = this;
 
     // Helper: devuelve ' class="custom"' si block.customClass existe, '' si no
     var classAttr = function(b) {
       return b.customClass ? ' class="' + b.customClass + '"' : '';
     };
+
+    // Transformer del contenido inline. Si la opción `escapeHtmlEntities` está
+    // activa (default), todos los nodos de texto del contenido se re-escapan
+    // con las cinco entidades HTML. Si está desactivada, identidad (legacy).
+    // No se aplica al contenido de tablas (estructura compleja con tags
+    // anidados que el parser DOM no resuelve sin un wrapper de tabla) ni a
+    // bloques de código (que ya escapan TODO el HTML para emitir como source).
+    var inline = this.escapeHtmlEntities
+      ? function(c) { return self._emitInlineHTMLWithEscape(c); }
+      : function(c) { return c; };
 
     while (i < blocks.length) {
       var block = blocks[i];
@@ -9590,7 +9776,7 @@
 
       // Agrupar listas consecutivas del mismo tipo (con anidación por indentLevel)
       if (block.type === 'bulletList' || block.type === 'numberList' || block.type === 'checklist') {
-        var listRes = this._buildNestedListHTML(blocks, i, classAttr);
+        var listRes = this._buildNestedListHTML(blocks, i, classAttr, inline);
         html += listRes.html;
         i += listRes.consumed;
         continue;
@@ -9598,16 +9784,16 @@
         // Procesar bloques que no son listas
         switch (block.type) {
           case 'heading1':
-            html += '<h1' + classAttr(block) + '>' + content + '</h1>';
+            html += '<h1' + classAttr(block) + '>' + inline(content) + '</h1>';
             break;
           case 'heading2':
-            html += '<h2' + classAttr(block) + '>' + content + '</h2>';
+            html += '<h2' + classAttr(block) + '>' + inline(content) + '</h2>';
             break;
           case 'heading3':
-            html += '<h3' + classAttr(block) + '>' + content + '</h3>';
+            html += '<h3' + classAttr(block) + '>' + inline(content) + '</h3>';
             break;
           case 'quote':
-            html += '<blockquote' + classAttr(block) + '>' + content + '</blockquote>';
+            html += '<blockquote' + classAttr(block) + '>' + inline(content) + '</blockquote>';
             break;
           case 'code':
             // Solo escapar HTML en bloques de código
@@ -9675,7 +9861,7 @@
             html += '<hr>';
             break;
           default:
-            html += '<p' + classAttr(block) + '>' + content + '</p>';
+            html += '<p' + classAttr(block) + '>' + inline(content) + '</p>';
         }
         i++;
       }
@@ -10656,6 +10842,14 @@
   meWYSE.prototype.showFormatMenu = function(selection, range, crossBlockReference) {
     var self = this;
     var isCrossBlock = !!crossBlockReference;
+
+    // Si la toolbar está activa, las acciones de formato (B/I/U, color, etc.)
+    // ya están disponibles ahí — el menú flotante sería redundante. Evitamos
+    // mostrarlo y cerramos cualquier menú abierto por si quedaba uno previo.
+    if (this.showToolbar) {
+      this.closeFormatMenu();
+      return;
+    }
 
     // Cerrar menú existente
     this.closeFormatMenu();
@@ -14251,11 +14445,40 @@
       }
 
       if (!isAllowed) {
-        // Unwrap: mover hijos al padre y eliminar el nodo
+        // Unwrap: mover hijos al padre y eliminar el nodo.
+        //
+        // Caso especial — tags block-level (DIV, P, H*, BLOCKQUOTE, PRE, LI,
+        // UL, OL, etc.) que se desempacan en un contexto inline: si solo
+        // movemos los hijos arriba se pierde el salto de línea visual. Esto
+        // afecta especialmente a contenido pegado o a Shift+Enter en algunos
+        // navegadores que insertan <div> en lugar de <br>. Insertamos <br>
+        // antes y/o después de los hijos para preservar la separación.
+        var blockUnwrap = {
+          DIV: 1, P: 1, H1: 1, H2: 1, H3: 1, H4: 1, H5: 1, H6: 1,
+          BLOCKQUOTE: 1, PRE: 1, LI: 1, UL: 1, OL: 1, DL: 1, DT: 1, DD: 1,
+          ARTICLE: 1, SECTION: 1, ASIDE: 1, HEADER: 1, FOOTER: 1, NAV: 1
+        };
         var parent = node.parentNode;
         if (parent) {
+          var needsBr = blockUnwrap[tag] && !!node.firstChild;
+          if (needsBr) {
+            var prev = node.previousSibling;
+            var prevIsBr = prev && prev.nodeType === 1 && prev.tagName === 'BR';
+            if (prev && !prevIsBr) {
+              parent.insertBefore(doc.createElement('br'), node);
+            }
+          }
           while (node.firstChild) {
             parent.insertBefore(node.firstChild, node);
+          }
+          if (needsBr) {
+            // Tras mover los hijos, node sigue ocupando su posición original
+            // (los hijos quedaron antes). Su nextSibling es el original.
+            var next = node.nextSibling;
+            var nextIsBr = next && next.nodeType === 1 && next.tagName === 'BR';
+            if (next && !nextIsBr) {
+              parent.insertBefore(doc.createElement('br'), node);
+            }
           }
           parent.removeChild(node);
         }
@@ -15064,6 +15287,149 @@
   };
 
   /**
+   * Coloca el cursor en un offset de TEXTO dentro de un elemento contenteditable.
+   * Camina los nodos de texto descendientes hasta consumir `offset` caracteres y
+   * coloca el cursor allí. Si el offset excede el texto disponible, queda al final.
+   *
+   * Lo usa `_mergeBlockIntoPrevious` para situar el cursor en la frontera entre
+   * el contenido previo y el contenido recién concatenado.
+   */
+  meWYSE.prototype._setCursorAtTextOffset = function(element, offset) {
+    if (!element) return;
+    try {
+      element.focus();
+      var range = document.createRange();
+      var sel = window.getSelection();
+      var walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null, false);
+      var charsLeft = Math.max(0, offset);
+      var targetNode = null;
+      var targetOffset = 0;
+      var node;
+      while ((node = walker.nextNode())) {
+        var len = node.textContent.length;
+        if (charsLeft <= len) {
+          targetNode = node;
+          targetOffset = charsLeft;
+          break;
+        }
+        charsLeft -= len;
+      }
+      if (targetNode) {
+        range.setStart(targetNode, targetOffset);
+      } else {
+        // No hay text nodes (o offset > total): cursor al final del elemento.
+        range.selectNodeContents(element);
+        range.collapse(false);
+      }
+      range.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    } catch (e) {}
+  };
+
+  /**
+   * Fusiona el bloque indicado con el bloque anterior. Inverso del split:
+   * el contenido del bloque se concatena al final del anterior, el bloque
+   * actual se elimina del modelo, y el cursor queda en la frontera (donde
+   * empezaba el contenido absorbido).
+   *
+   * El TIPO del bloque resultante es el del anterior — coherente con el
+   * comportamiento clásico de editores: backspace al inicio de un párrafo
+   * tras un heading lo fusiona en el heading.
+   *
+   * Síncrono dentro del gesto del usuario para no perder el teclado virtual
+   * en móvil (mismo motivo que en `_focusBlockSync`).
+   */
+  meWYSE.prototype._mergeBlockIntoPrevious = function(blockId) {
+    var index = this.getBlockIndex(blockId);
+    if (index <= 0) return;
+    var currentBlock = this.getBlock(blockId);
+    var prevBlock = this.blocks[index - 1];
+    if (!currentBlock || !prevBlock) return;
+
+    // El render() destruye el contenteditable actual y enfocamos el del bloque
+    // previo. En móvil esa transición pasa un instante por document.body —
+    // suprimimos onBlur durante 300ms para que esa transición no se reporte
+    // como un blur real.
+    this._suppressBlurUntil = Date.now() + 300;
+
+    this.pushHistory(true);
+
+    // Longitud de TEXTO del contenido previo: futura posición del cursor
+    // (carácter justo después del último char del bloque anterior original).
+    var probe = document.createElement('div');
+    probe.innerHTML = prevBlock.content || '';
+    var prevTextLen = probe.textContent.length;
+
+    // Concatenar HTML crudo y pasarlo por el sanitizador (también unifica
+    // `<div>` accidentales en `<br>` gracias al fix reciente del unwrap).
+    var mergedRaw = (prevBlock.content || '') + (currentBlock.content || '');
+    prevBlock.content = this._sanitizeBlockContent(mergedRaw);
+
+    // Quitar el bloque actual del modelo
+    this.blocks.splice(index, 1);
+
+    // Re-renderizar todo (manera más simple de manejar correctamente la
+    // re-agrupación de listas: si bloques de lista del mismo tipo quedan
+    // ahora consecutivos, deben unirse en el mismo `<ul>/<ol>`).
+    // Saltamos el focus async del render para no romper el gesto.
+    this._skipAutoFocus = true;
+    this.render();
+    this._skipAutoFocus = false;
+
+    // Cursor síncrono en la frontera (dentro del bloque previo).
+    var prevElement = this.container.querySelector('[data-block-id="' + prevBlock.id + '"]');
+    if (prevElement) {
+      var ce = prevElement.querySelector('[contenteditable="true"]');
+      if (!ce && prevElement.getAttribute('contenteditable') === 'true') ce = prevElement;
+      if (ce) this._setCursorAtTextOffset(ce, prevTextLen);
+    }
+
+    // Si era una lista numerada, refrescar la numeración consecutiva.
+    if (prevBlock.type === 'numberList' || currentBlock.type === 'numberList') {
+      this.updateConsecutiveNumberLists(Math.max(0, index - 1));
+    }
+
+    this.triggerChange();
+  };
+
+  /**
+   * Foco SÍNCRONO sobre el contenteditable de un bloque, con cursor al inicio.
+   *
+   * Existe como complemento a `focusNewBlock` (que es asíncrono — usa
+   * setTimeout + 3×rAF). Este es síncrono porque el handler de Enter lo
+   * invoca dentro del propio gesto del usuario: si focus() ocurre fuera del
+   * gesto, iOS y Android ocultan el teclado virtual al crear un bloque nuevo.
+   *
+   * No reemplaza a `focusNewBlock` para el resto de callers; sólo lo usa el
+   * Enter handler, en combinación con el flag `_skipAutoFocus` que evita el
+   * focus asíncrono de fondo cuando ya hicimos el síncrono.
+   */
+  meWYSE.prototype._focusBlockSync = function(blockId) {
+    if (!blockId || !this.container) return;
+    var blockElement = this.container.querySelector('[data-block-id="' + blockId + '"]');
+    if (!blockElement) return;
+    var ce = blockElement.querySelector('[contenteditable="true"]');
+    if (!ce && blockElement.getAttribute('contenteditable') === 'true') {
+      ce = blockElement;
+    }
+    if (!ce) return;
+    ce.focus();
+    try {
+      var range = document.createRange();
+      var sel = window.getSelection();
+      if (ce.firstChild && ce.firstChild.nodeType === 3) {
+        range.setStart(ce.firstChild, 0);
+      } else {
+        range.setStart(ce, 0);
+      }
+      range.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    } catch (e) {}
+  };
+
+  /**
    * Backdrop / overlay invisible para menús flotantes y modales.
    *
    * Cuando un menú/modal se abre, llama a `_showBackdrop(name, closeFn)`. Si era el
@@ -15273,6 +15639,122 @@
     } else {
       setTimeout(updateOverflow, 0);
     }
+  };
+
+  /**
+   * Reescribe un fragmento de HTML aplicando escape estricto de los 5 caracteres
+   * de entidad HTML (`&` `<` `>` `"` `'`) sobre los nodos de TEXTO. Los
+   * elementos y sus atributos se preservan; sólo cambia el texto humano.
+   *
+   * Convención al estilo Quill: el HTML resultante es siempre válido y robusto
+   * incluso si el contenido del bloque contenía caracteres especiales sin
+   * escapar (típico al cargar contenido vía `loadFromJSON` con texto crudo).
+   *
+   * El round-trip por `DOMParser` ya normaliza muchos casos, pero el browser
+   * NO escapa `"` ni `'` en text nodes (sólo en atributos), así que este
+   * serializador escribe el HTML manualmente para forzar las cinco entidades.
+   */
+  meWYSE.prototype._emitInlineHTMLWithEscape = function(html) {
+    if (typeof html !== 'string' || html === '') return html || '';
+    var doc;
+    try {
+      doc = new DOMParser().parseFromString(
+        '<!DOCTYPE html><html><body><div id="__mewyse_root__">' + html + '</div></body></html>',
+        'text/html'
+      );
+    } catch (e) {
+      return html;
+    }
+    var root = doc.querySelector('#__mewyse_root__');
+    if (!root) return html;
+    var out = '';
+    var c = root.firstChild;
+    while (c) {
+      out += this._serializeNodeWithEntityEscape(c);
+      c = c.nextSibling;
+    }
+    return out;
+  };
+
+  // void elements de HTML5 (no llevan </tag>)
+  var VOID_ELEMENTS = {
+    AREA: 1, BASE: 1, BR: 1, COL: 1, EMBED: 1, HR: 1, IMG: 1,
+    INPUT: 1, LINK: 1, META: 1, PARAM: 1, SOURCE: 1, TRACK: 1, WBR: 1
+  };
+
+  meWYSE.prototype._serializeNodeWithEntityEscape = function(node) {
+    if (!node) return '';
+    if (node.nodeType === 3) {
+      // text node — escape los 5 entities
+      return this._escapeTextEntities(node.nodeValue);
+    }
+    if (node.nodeType === 8) return ''; // comments: drop
+    if (node.nodeType !== 1) return '';
+
+    var tag = node.tagName;
+    var tagLower = tag.toLowerCase();
+    var attrs = '';
+    for (var i = 0; i < node.attributes.length; i++) {
+      var a = node.attributes[i];
+      // Atributos: aplicar el mismo encoder que para text nodes (5 entities y,
+      // si htmlNumericEntities está activo, también `\` y non-ASCII numérico).
+      // Sobre-escapar `<`/`>`/`'` en atributos delimitados por `"` es legal
+      // y mantiene un único criterio en todo el output.
+      var val = this._escapeTextEntities(a.value);
+      attrs += ' ' + a.name + '="' + val + '"';
+    }
+    if (VOID_ELEMENTS[tag]) return '<' + tagLower + attrs + '>';
+
+    var inner = '';
+    var c = node.firstChild;
+    while (c) {
+      inner += this._serializeNodeWithEntityEscape(c);
+      c = c.nextSibling;
+    }
+    return '<' + tagLower + attrs + '>' + inner + '</' + tagLower + '>';
+  };
+
+  meWYSE.prototype._escapeTextEntities = function(text) {
+    if (text == null) return '';
+    var s = String(text);
+
+    // Modo extendido (TinyMCE-compat): además de las 5 entities, escapar `\`
+    // como `&#92;` y todo char no-ASCII (incluidos pares de subrogados Unicode
+    // > U+FFFF) como referencia numérica.
+    if (this.htmlNumericEntities) {
+      var out = '';
+      for (var i = 0; i < s.length; i++) {
+        var c = s.charAt(i);
+        var code = s.charCodeAt(i);
+        // Detectar pair de subrogados → recombinar al codepoint real
+        if (code >= 0xD800 && code <= 0xDBFF && i + 1 < s.length) {
+          var low = s.charCodeAt(i + 1);
+          if (low >= 0xDC00 && low <= 0xDFFF) {
+            var cp = ((code - 0xD800) * 0x400) + (low - 0xDC00) + 0x10000;
+            out += '&#' + cp + ';';
+            i++; // saltar el low surrogate
+            continue;
+          }
+        }
+        if (c === '&') out += '&amp;';
+        else if (c === '<') out += '&lt;';
+        else if (c === '>') out += '&gt;';
+        else if (c === '"') out += '&quot;';
+        else if (c === "'") out += '&#39;';
+        else if (c === '\\') out += '&#92;';
+        else if (code >= 128) out += '&#' + code + ';';
+        else out += c;
+      }
+      return out;
+    }
+
+    // Modo Quill: solo las 5 entities HTML.
+    return s
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   };
 
   /**
