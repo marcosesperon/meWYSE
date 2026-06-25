@@ -1639,19 +1639,26 @@
       e.stopPropagation();
       self.container.classList.remove('mewyse-image-drop-target');
 
-      // Calcular insertIndex: después del bloque sobre el que se soltó, o al final
+      // Calcular insertIndex: después del bloque sobre el que se soltó, o al final.
+      // Si ese bloque está vacío, la imagen lo reemplaza en su sitio.
       var insertIndex = self.blocks.length;
+      var v_replaceId = null;
       var targetBlock = e.target && e.target.closest ? e.target.closest('[data-block-id]') : null;
       if (targetBlock) {
         var blockId = parseInt(targetBlock.getAttribute('data-block-id'), 10);
         if (!isNaN(blockId)) {
           insertIndex = self.getBlockIndex(blockId) + 1;
+          var v_tb = self.getBlock(blockId);
+          if (v_tb && typeof v_tb.content === 'string' &&
+              v_tb.content.trim() === '' && v_tb.type !== 'divider') {
+            v_replaceId = blockId;
+          }
         }
       }
 
       self._processImageFile(imageFile, function(imgData) {
         if (!imgData) return;
-        self.createImageBlock(imageFile, imgData.blob, imgData.width, imgData.height, insertIndex);
+        self.createImageBlock(imageFile, imgData.blob, imgData.width, imgData.height, insertIndex, null, v_replaceId);
       });
     };
 
@@ -5507,9 +5514,13 @@
           var insertIndex = this.getBlockIndex(blockId);
           if (insertIndex < 0) insertIndex = this.blocks.length - 1;
           insertIndex++;
+          // Si el bloque actual está vacío, la imagen lo reemplaza en su sitio
+          var v_curBlock = this.getBlock(blockId);
+          var v_replaceId = (v_curBlock && typeof v_curBlock.content === 'string' &&
+                             v_curBlock.content.trim() === '' && v_curBlock.type !== 'divider') ? blockId : null;
           self._processImageFile(file, function(imgData) {
             if (!imgData) return;
-            self.createImageBlock(file, imgData.blob, imgData.width, imgData.height, insertIndex);
+            self.createImageBlock(file, imgData.blob, imgData.width, imgData.height, insertIndex, null, v_replaceId);
           });
           return;
         }
