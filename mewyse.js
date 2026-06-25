@@ -62,8 +62,6 @@
         justify: 'Justificar',
         editDimensions: 'Editar dimensiones',
         dragToResize: 'Arrastrar para redimensionar',
-        addRow: 'Añadir fila',
-        addColumn: 'Añadir columna',
         summary: 'Resumen',
         link: 'Enlace',
         undo: 'Deshacer',
@@ -92,13 +90,9 @@
         delete: 'Eliminar bloque',
         deleteMultiple: 'Eliminar {count} bloques',
         changeType: 'Cambiar tipo de bloque',
-        changeTypeMultiple: 'Cambiar tipo de {count} bloques',
-        resetTableWidth: 'Ajustar tabla al 100%',
-        tableProperties: 'Propiedades de la tabla'
+        changeTypeMultiple: 'Cambiar tipo de {count} bloques'
       },
       tableMenu: {
-        rowOptions: 'Opciones de fila',
-        columnOptions: 'Opciones de columna',
         backgroundColor: 'Color de fondo',
         insertRowAbove: 'Insertar fila arriba',
         insertRowBelow: 'Insertar fila abajo',
@@ -111,7 +105,11 @@
         clearColumnContent: 'Limpiar contenido',
         deleteColumn: 'Eliminar columna',
         mergeCells: 'Combinar celdas',
-        unmergeCells: 'Descombinar celda'
+        unmergeCells: 'Descombinar celda',
+        deleteTable: 'Eliminar tabla',
+        tableProperties: 'Propiedades de la tabla',
+        resetTableWidth: 'Restablecer anchos de columna',
+        toolbarLabel: 'Herramientas de tabla'
       },
       modals: {
         configureImageDimensions: 'Configurar dimensiones de imagen',
@@ -270,8 +268,6 @@
         justify: 'Justify',
         editDimensions: 'Edit dimensions',
         dragToResize: 'Drag to resize',
-        addRow: 'Add row',
-        addColumn: 'Add column',
         summary: 'Summary',
         link: 'Link',
         undo: 'Undo',
@@ -300,13 +296,9 @@
         delete: 'Delete block',
         deleteMultiple: 'Delete {count} blocks',
         changeType: 'Change block type',
-        changeTypeMultiple: 'Change type of {count} blocks',
-        resetTableWidth: 'Fit table to 100%',
-        tableProperties: 'Table properties'
+        changeTypeMultiple: 'Change type of {count} blocks'
       },
       tableMenu: {
-        rowOptions: 'Row options',
-        columnOptions: 'Column options',
         backgroundColor: 'Background color',
         insertRowAbove: 'Insert row above',
         insertRowBelow: 'Insert row below',
@@ -319,7 +311,11 @@
         clearColumnContent: 'Clear content',
         deleteColumn: 'Delete column',
         mergeCells: 'Merge cells',
-        unmergeCells: 'Unmerge cell'
+        unmergeCells: 'Unmerge cell',
+        deleteTable: 'Delete table',
+        tableProperties: 'Table properties',
+        resetTableWidth: 'Reset column widths',
+        toolbarLabel: 'Table tools'
       },
       modals: {
         configureImageDimensions: 'Configure image dimensions',
@@ -689,6 +685,20 @@
     unmergeCells: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="12" height="12" rx="1"/><line x1="8" y1="2" x2="8" y2="14"/><polyline points="5,6 8,3 11,6"/><polyline points="5,10 8,13 11,10"/></svg>',
     plus: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" xmlns="http://www.w3.org/2000/svg"><line x1="8" y1="3" x2="8" y2="13"/><line x1="3" y1="8" x2="13" y2="8"/></svg>',
     resetWidth: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><line x1="3" y1="8" x2="13" y2="8"/><polyline points="5,5.5 2,8 5,10.5"/><polyline points="11,5.5 14,8 11,10.5"/></svg>',
+    eraser: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M4 13h8"/><path d="M9.5 3.5l3 3a1.2 1.2 0 0 1 0 1.7l-4 4h-3l-2-2a1.2 1.2 0 0 1 0-1.7l5-5a1.2 1.2 0 0 1 1.7 0z"/><line x1="6" y1="6.5" x2="9.5" y2="10"/></svg>',
+    // Iconos específicos de tabla. Convención: píldora horizontal = FILA,
+    // píldora vertical = COLUMNA; modificador = + (insertar), x (borrar),
+    // doble píldora (duplicar), trazo discontinuo (vaciar contenido).
+    tableRowAbove: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="13" width="16" height="6" rx="1.5"/><line x1="12" y1="3" x2="12" y2="9"/><line x1="9" y1="6" x2="15" y2="6"/></svg>',
+    tableRowBelow: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="5" width="16" height="6" rx="1.5"/><line x1="12" y1="15" x2="12" y2="21"/><line x1="9" y1="18" x2="15" y2="18"/></svg>',
+    tableRowDuplicate: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="16" height="6" rx="1.5"/><rect x="4" y="14" width="16" height="6" rx="1.5"/></svg>',
+    tableRowClear: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="9" width="16" height="6" rx="1.5" stroke-dasharray="3 2.5"/></svg>',
+    tableRowDelete: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="9" width="11" height="6" rx="1.5"/><line x1="16.5" y1="9.5" x2="21" y2="14"/><line x1="21" y1="9.5" x2="16.5" y2="14"/></svg>',
+    tableColLeft: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="13" y="4" width="6" height="16" rx="1.5"/><line x1="6" y1="9" x2="6" y2="15"/><line x1="3" y1="12" x2="9" y2="12"/></svg>',
+    tableColRight: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="4" width="6" height="16" rx="1.5"/><line x1="18" y1="9" x2="18" y2="15"/><line x1="15" y1="12" x2="21" y2="12"/></svg>',
+    tableColDuplicate: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="6" height="16" rx="1.5"/><rect x="14" y="4" width="6" height="16" rx="1.5"/></svg>',
+    tableColClear: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="9" y="4" width="6" height="16" rx="1.5" stroke-dasharray="3 2.5"/></svg>',
+    tableColDelete: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="9" y="3" width="6" height="11" rx="1.5"/><line x1="9.5" y1="16.5" x2="14" y2="21"/><line x1="14" y1="16.5" x2="9.5" y2="21"/></svg>',
     undo: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><polyline points="4,7 2,5 4,3"/><path d="M2,5 H10 A4,4 0 0 1 10,13 H6"/></svg>',
     redo: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><polyline points="12,7 14,5 12,3"/><path d="M14,5 H6 A4,4 0 0 0 6,13 H10"/></svg>',
     search: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><circle cx="7" cy="7" r="5"/><line x1="10.5" y1="10.5" x2="14" y2="14"/></svg>',
@@ -717,6 +727,11 @@
     this.enableFindReplace = this.options.findReplace !== false; // Habilitar Ctrl+F para buscar (default: true)
     this.enableShowBlocks = this.options.showBlocksToggle !== false; // Habilitar toggle de bloques (default: true)
     this.rtl = this.options.rtl === true; // Dirección derecha-a-izquierda
+    // readOnly: el editor se monta para visualización. Ningún bloque es
+    // editable, no se generan toolbar, floating handle, drag&drop de imágenes
+    // ni format menu. Selección nativa funciona — el usuario puede copiar
+    // texto al portapapeles igual que en cualquier elemento estático.
+    this.readOnly = this.options.readOnly === true;
     // Comportamiento de la toolbar cuando los botones no caben en una fila.
     // 'wrap' (default) = saltan a la siguiente fila como hasta ahora.
     // 'scroll' = todos en una sola fila con scroll horizontal, gradientes en los bordes,
@@ -781,12 +796,13 @@
     this.container = null;
     // NOTA: this.blocks se asigna más abajo tras sanitizar (necesita this.currentBlockId inicializado)
 
-    // ID único de instancia para scoping de estilos de contenido
+    // ID único de instancia (útil para identificar elementos del editor en el DOM)
     this.instanceId = 'mewyse-' + Math.random().toString(36).substr(2, 9);
-    this._contentStyleElement = null;
     this.toolbar = null;
     this.draggedBlockId = null; // ID del bloque siendo arrastrado (reorder)
     this._draggedImage = null;  // estado del drag de imagen interna
+    this._destroyed = false;   // marca de ciclo de vida (idempotencia de destroy)
+    this._doc_click_handlers = null; // registro de listeners click en document
     this.slashMenu = null;
     this.formatMenu = null;
     this.formatMenuTimeout = null;
@@ -832,6 +848,17 @@
     this.mentionMenuSelectedIndex = 0; // Indice seleccionado en el menu
     this.mentionMenuItems = []; // Items filtrados del menu
     this.mentionMenuRange = null; // Rango guardado para insercion con click
+
+    // Variables para el sistema de etiquetas (#tags)
+    // Cada tag: { id, name, color }. `color` es opcional — si se omite se
+    // aplica el color genérico del tema (ver CSS de .mewyse-tag).
+    this.tags = this.options.tags || [];
+    this.tagMenu = null;
+    this.tagMenuElement = null;
+    this.tagMenuBlockId = null;
+    this.tagMenuSelectedIndex = 0;
+    this.tagMenuItems = [];
+    this.tagMenuRange = null;
 
     // Variables para el sistema de emoji picker
     this.emojiMenu = null; // Elemento del menu de emojis
@@ -895,7 +922,12 @@
     }
 
     this.init();
-    this.initFormatMenu();
+    // En readOnly no necesitamos el listener de selectionchange que abre el
+    // format menu — el menú no se mostraría igualmente, pero ahorramos coste
+    // y evitamos efectos colaterales.
+    if (!this.readOnly) {
+      this.initFormatMenu();
+    }
   }
 
   /**
@@ -909,6 +941,7 @@
     var offsetY = options.offsetY || 5;
     var offsetX = options.offsetX || 0;
     var centerX = options.centerX || false;
+    var placeAbove = options.placement === 'above'; // preferir colocar encima
 
     var animationFrameId = null;
     var isActive = true;
@@ -929,14 +962,23 @@
       menu.style.position = 'fixed';
 
       // Calcular posición vertical inicial
-      var top = rect.bottom + offsetY;
-
-      // Si el menú se sale por abajo del viewport, mostrarlo arriba del elemento
-      if (top + menuRect.height > viewportHeight) {
+      var top;
+      if (placeAbove) {
+        // Preferir colocar el menú ENCIMA del elemento de referencia
         top = rect.top - menuRect.height - offsetY;
-        // Si tampoco cabe arriba, posicionarlo lo más cerca posible del borde superior
+        // Si no cabe arriba, colocarlo debajo
         if (top < 0) {
-          top = 10; // Margen de 10px desde arriba
+          top = rect.bottom + offsetY;
+        }
+      } else {
+        top = rect.bottom + offsetY;
+        // Si el menú se sale por abajo del viewport, mostrarlo arriba del elemento
+        if (top + menuRect.height > viewportHeight) {
+          top = rect.top - menuRect.height - offsetY;
+          // Si tampoco cabe arriba, posicionarlo lo más cerca posible del borde superior
+          if (top < 0) {
+            top = 10; // Margen de 10px desde arriba
+          }
         }
       }
 
@@ -1067,10 +1109,17 @@
    * Inicializa el editor según el modo
    */
   meWYSE.prototype.init = function() {
+    // Idempotencia: no reinicializar (duplicaría listeners globales)
+    if (this._initialized) return;
+    this._initialized = true;
+
     this.initDomEditor();
 
-    // Crear el handle flotante
-    this.createFloatingHandle();
+    // Crear el handle flotante (no aplica en readOnly — la UI de drag/menú
+    // del bloque no tiene sentido en modo solo-visualización).
+    if (!this.readOnly) {
+      this.createFloatingHandle();
+    }
 
     // Si no hay bloques, crear uno vacío
     if (this.blocks.length === 0) {
@@ -1096,6 +1145,7 @@
     var self = this;
     if (this.options.autoFocus) {
       setTimeout(function() {
+        if (self._destroyed) return;  // no enfocar si ya se destruyó
         self.focusFirstBlock();
       }, 100);
     }
@@ -1116,6 +1166,23 @@
       if (!self._hasFocus) {
         self._hasFocus = true;
         self._fireFocusCallback(target);
+      }
+
+      // Reevaluar la toolbar de tabla (aparece si el foco entró en una celda)
+      self._updateTableToolbar();
+
+      // Mostrar el handle flotante para el bloque que recibe el foco. Se hace
+      // aquí (focusin burbujea) en vez de con un listener por bloque, para que
+      // funcione en todas las rutas de render y tipos de bloque enfocables.
+      if (!self.readOnly && self.floatingHandle && target.closest) {
+        var v_blkEl = target.closest('.mewyse-block');
+        if (v_blkEl) {
+          // Cancelar cualquier ocultado diferido pendiente: el foco se asentó
+          // en un bloque, así que el handle debe permanecer visible.
+          if (self._handleHideTimer) { clearTimeout(self._handleHideTimer); self._handleHideTimer = null; }
+          var v_bid = parseInt(v_blkEl.getAttribute('data-block-id'), 10);
+          if (!isNaN(v_bid)) self.positionFloatingHandle(v_blkEl, v_bid);
+        }
       }
     });
 
@@ -1147,18 +1214,37 @@
             self._hasFocus = false;
             self._fireBlurCallback(e.target);
           }
+          self.hideTableToolbar();  // el foco salió de la tabla
+          // Ocultar el handle de forma diferida (evita parpadeo por blur
+          // transitorio al reposicionar el caret / cambiar de bloque)
+          self._scheduleHandleHideCheck();
           return;
         }
 
+        // Si el foco se movió a la propia UI del editor (toolbar de tabla,
+        // picker, menús, handle), no tocar toolbar ni handle: se sigue
+        // interactuando con ellos.
         if (self._isPartOfEditorUI(active)) return;
 
         if (self._hasFocus) {
           self._hasFocus = false;
           self._fireBlurCallback(e.target);
         }
+        self.hideTableToolbar();  // el foco salió a un elemento externo
+        self._scheduleHandleHideCheck();
       }
       setTimeout(check, 0);
     });
+
+    // Reposicionar el handle flotante al hacer scroll interno del editor, para
+    // que siga alineado con el bloque enfocado/seleccionado.
+    this._handleScrollReposition = function() {
+      if (self.floatingHandle && self.currentFloatingBlockId != null) {
+        var el = self.getBlockElementById(self.currentFloatingBlockId);
+        if (el) self.positionFloatingHandle(el, self.currentFloatingBlockId);
+      }
+    };
+    this.container.addEventListener('scroll', this._handleScrollReposition);
 
     // Añadir listener para deseleccionar imagen al hacer clic fuera
     this.container.addEventListener('click', function(e) {
@@ -1184,8 +1270,9 @@
     this._handleDocMouseDown = function(e) {
       if (self.selectedTableCells.length > 0) {
         var clickedCell = e.target.closest('td, th');
-        var clickedMenu = e.target.closest('.mewyse-cell-menu');
-        if (!clickedCell && !clickedMenu) {
+        // No limpiar si el clic fue en la toolbar de tabla (p.ej. botón combinar)
+        var clickedToolbar = e.target.closest('.mewyse-table-toolbar');
+        if (!clickedCell && !clickedToolbar) {
           self.clearTableCellSelection();
         }
       }
@@ -1298,16 +1385,29 @@
    * Inicializa el DOM para el editor
    */
   meWYSE.prototype.initDomEditor = function() {
+    // Idempotencia: evita duplicar los listeners globales de document
+    if (this._dom_initialized) return;
+    this._dom_initialized = true;
+
     // Si el target no es un textarea, crear uno interno
     if (this.target.tagName !== 'TEXTAREA') {
       this.originalTarget = this.target;
+
+      // Conservar el HTML original COMPLETO. Antes leíamos solo textContent,
+      // lo cual aplastaba múltiples <p>/<h*>/<ul> a un único string de texto
+      // y el `loadFromText` posterior creaba un único bloque. Guardando el
+      // innerHTML, podemos parsearlo con `loadFromHTML` y respetar la
+      // estructura original (párrafos, listas, tags/menciones, etc.).
+      this._initialHTML = (this.originalTarget.innerHTML || '').trim();
 
       // Crear textarea interno oculto
       var internalTextarea = document.createElement('textarea');
       internalTextarea.style.display = 'none';
 
-      // Copiar contenido del elemento original
-      internalTextarea.value = this.originalTarget.textContent || this.originalTarget.innerText || '';
+      // El textarea interno se mantiene vacío en este punto. La fuente de
+      // verdad es `_initialHTML` (parseado más abajo) o `target.value` si el
+      // target ORIGINAL ya era un textarea (en cuyo caso esta rama no entra).
+      internalTextarea.value = '';
 
       // Insertar el textarea justo después del elemento original
       this.originalTarget.parentNode.insertBefore(internalTextarea, this.originalTarget.nextSibling);
@@ -1322,8 +1422,10 @@
     // Ocultar textarea (original o interno)
     this.target.style.display = 'none';
 
-    // Si se solicita toolbar, crear un wrapper
-    if (this.showToolbar) {
+    // Si se solicita toolbar, crear un wrapper.
+    // En modo readOnly el toolbar no aplica (sus acciones no harían nada);
+    // se omite aunque se haya pasado `toolbar: true`.
+    if (this.showToolbar && !this.readOnly) {
       var editorWrapper = document.createElement('div');
       editorWrapper.className = 'mewyse-editor-wrapper';
       if (this.options.theme) {
@@ -1383,18 +1485,81 @@
       }
     }
 
-    // Inyectar estilos de contenido si la opción lo permite (por defecto: true)
-    if (this.options.contentStyles !== false) {
-      this._injectContentStyles();
+    // En modo readOnly añadir hook CSS y aria-readonly. Se aplica tanto al
+    // container como al wrapper (si lo hay) para permitir reglas separadas
+    // (ej. ocultar placeholders, atenuar cursor, etc.).
+    if (this.readOnly) {
+      if (this.container) {
+        this.container.classList.add('mewyse-readonly');
+        this.container.setAttribute('aria-readonly', 'true');
+      }
+      if (this.editorWrapper) {
+        this.editorWrapper.classList.add('mewyse-readonly');
+      }
     }
 
-    // Cargar contenido del textarea si existe
-    if (this.target.value) {
+    // Activar los estilos de contenido por defecto (mewyse.css los define
+    // bajo el marker `.mewyse-editor-styled`). Cuando `contentStyles: false`
+    // no se aplica el marker — la página consumidora controla los estilos.
+    if (this.options.contentStyles !== false) {
+      if (this.container) this.container.classList.add('mewyse-editor-styled');
+      if (this.editorWrapper) this.editorWrapper.classList.add('mewyse-editor-styled');
+    }
+
+    // Cargar contenido inicial.
+    //  - Prioridad 1: HTML original del target (cuando NO era textarea) →
+    //    parsear con `loadFromHTML` para conservar estructura.
+    //  - Prioridad 2: texto plano del textarea → `loadFromText`.
+    if (this._initialHTML) {
+      this.loadFromHTML(this._initialHTML);
+      this._initialHTML = null; // libera referencia
+    } else if (this.target.value) {
       this.loadFromText(this.target.value);
     }
 
-    // Habilitar drag & drop de imágenes sobre el editor
-    this._attachImageDropHandlers();
+    // Habilitar drag & drop de imágenes sobre el editor.
+    // No aplica en readOnly: no se puede insertar nada nuevo.
+    if (!this.readOnly) {
+      this._attachImageDropHandlers();
+    }
+
+    // Interceptar copy para limpiar styles no-nativos (mismo criterio que getHTML).
+    this._attachCopyHandler();
+  };
+
+  /**
+   * Listener de `copy` sobre el container: extrae el HTML de la selección,
+   * pasa por `_stripNonNativeStyles` y reescribe el clipboard. El texto plano
+   * (selection.toString()) se mantiene tal cual.
+   */
+  meWYSE.prototype._attachCopyHandler = function() {
+    var self = this;
+    if (!this.container) return;
+    this.container.addEventListener('copy', function(e) {
+      try {
+        var sel = window.getSelection();
+        if (!sel || sel.rangeCount === 0 || sel.isCollapsed) return;
+        // Solo intervenimos si la selección está realmente dentro del editor.
+        var range = sel.getRangeAt(0);
+        var anchor = range.commonAncestorContainer;
+        if (anchor.nodeType === 3) anchor = anchor.parentNode;
+        if (!anchor || !self.container.contains(anchor)) return;
+
+        var fragment = range.cloneContents();
+        var div = document.createElement('div');
+        div.appendChild(fragment);
+        var cleaned = self._stripNonNativeStyles(div.innerHTML);
+
+        var data = e.clipboardData || window.clipboardData;
+        if (data && data.setData) {
+          data.setData('text/html', cleaned);
+          data.setData('text/plain', sel.toString());
+          e.preventDefault();
+        }
+      } catch (err) {
+        // En caso de error, dejar que el browser maneje el copy de forma nativa.
+      }
+    });
   };
 
   /**
@@ -1549,24 +1714,30 @@
 
     this.floatingHandle.appendChild(handle);
 
-    // Eventos del handle flotante para mantenerlo visible mientras se interactúa
+    // Mantener el handle visible al pasar el ratón por encima (cancela el
+    // ocultado pendiente del hover de separador).
     this.floatingHandle.addEventListener('mouseenter', function() {
-      // Cancelar cualquier timeout de ocultación pendiente
       if (self.floatingHandleHideTimeout) {
         clearTimeout(self.floatingHandleHideTimeout);
         self.floatingHandleHideTimeout = null;
       }
     });
 
+    // Al salir del handle solo se oculta si el handle se mostró por HOVER (caso
+    // separador). Con el modelo por foco/selección, la visibilidad la gobiernan
+    // el foco y la selección, no el ratón, así que no se oculta aquí.
     this.floatingHandle.addEventListener('mouseleave', function(e) {
-      // Al salir del handle, verificar si vamos a un bloque
+      var v_block = self.currentFloatingBlockId ? self.getBlock(self.currentFloatingBlockId) : null;
+      if (!v_block || v_block.type !== 'divider') return;
       var relatedTarget = e.relatedTarget;
       var goingToBlock = relatedTarget && (
         relatedTarget.classList.contains('mewyse-block') ||
-        relatedTarget.closest('.mewyse-block')
+        (relatedTarget.closest && relatedTarget.closest('.mewyse-block'))
       );
       if (!goingToBlock) {
-        self.hideFloatingHandle();
+        self.floatingHandleHideTimeout = setTimeout(function() {
+          self.hideFloatingHandle();
+        }, 100);
       }
     });
 
@@ -1602,7 +1773,7 @@
     //
     // El handle vive como hijo absolute-positioned del wrapper (con
     // position: relative). Lo colocamos en el padding-left ampliado del
-    // editor (32px por defecto via _injectContentStyles) — siempre DENTRO
+    // editor (var --mewyse-padding-handle desde mewyse.css) — siempre DENTRO
     // del wrapper, para que un parent con `overflow: hidden` no lo recorte.
     //
     // Offset = blockRect.left - wrapperRect.left - 28: el handle ocupa
@@ -1621,6 +1792,29 @@
   /**
    * Oculta el handle flotante
    */
+  /**
+   * Programa un ocultado diferido del handle: solo oculta si, tras un breve
+   * retardo, el foco realmente quedó FUERA del editor (no en un bloque ni en la
+   * UI del editor). Evita el parpadeo cuando el foco pasa fugazmente por `body`
+   * al reposicionar el caret o cambiar de bloque con el ratón.
+   */
+  meWYSE.prototype._scheduleHandleHideCheck = function() {
+    var self = this;
+    if (this._handleHideTimer) clearTimeout(this._handleHideTimer);
+    this._handleHideTimer = setTimeout(function() {
+      self._handleHideTimer = null;
+      if (self._destroyed) return;
+      if (self.selectedImage) return; // su handle se gestiona por selección
+      var active = document.activeElement;
+      // Si el foco volvió al editor o a su UI flotante, no ocultar
+      if (active && (
+        (self.container && self.container.contains(active)) ||
+        self._isPartOfEditorUI(active)
+      )) return;
+      self.hideFloatingHandle();
+    }, 120);
+  };
+
   meWYSE.prototype.hideFloatingHandle = function() {
     // Limpiar timeout pendiente
     if (this.floatingHandleHideTimeout) {
@@ -2895,6 +3089,13 @@
       tableCell: tableCell
     };
 
+    // Mostrar el handle del bloque para imágenes sueltas (las de dentro de una
+    // tabla no tienen handle de bloque propio).
+    if (!isInTable && blockId != null && this.floatingHandle) {
+      var v_imgBlockEl = this.getBlockElementById(blockId);
+      if (v_imgBlockEl) this.positionFloatingHandle(v_imgBlockEl, blockId);
+    }
+
     // Añadir event listener para tecla Delete/Backspace/Enter si no existe
     if (!this.imageKeydownHandler) {
       this.imageKeydownHandler = function(e) {
@@ -2926,7 +3127,10 @@
     if (this.selectedImage) {
       this.selectedImage.element.classList.remove('selected');
       this.selectedImage.element.style.border = '2px solid transparent';
+      var wasStandalone = (!this.selectedImage.isInTable && this.selectedImage.blockId != null);
       this.selectedImage = null;
+      // Ocultar el handle si se mostró por la imagen suelta y no hay foco activo
+      if (wasStandalone) this.hideFloatingHandle();
     }
   };
 
@@ -3550,10 +3754,16 @@
     };
 
     if (typeof this.options.onImageUpload === 'function') {
-      this.options.onImageUpload(file, function(result) {
-        if (!result || !result.url) return; // hook rechazó → abortar
-        doCreate(result.url, result.width, result.height);
-      });
+      // Protegido: si el hook del consumidor lanza, caer al comportamiento
+      // por defecto (insertar la imagen inline) en vez de abortar.
+      try {
+        this.options.onImageUpload(file, function(result) {
+          if (!result || !result.url) return; // hook rechazó → abortar
+          doCreate(result.url, result.width, result.height);
+        });
+      } catch (e) {
+        doCreate(dataUrl);
+      }
     } else {
       doCreate(dataUrl);
     }
@@ -4125,6 +4335,10 @@
   meWYSE.prototype.render = function(focusBlockId) {
     var self = this;
 
+    // Ocultar la toolbar de tabla: tras un render las referencias DOM (tabla)
+    // pueden quedar obsoletas; reaparecerá con el siguiente foco/selección.
+    this.hideTableToolbar();
+
     // Si estamos añadiendo un nuevo bloque (focusBlockId existe), verificar si ya existe en el DOM
     // Solo añadir el nuevo bloque si NO existe en el DOM aún
     if (focusBlockId) {
@@ -4303,6 +4517,18 @@
     // Recrear botón de resumen si está habilitado
     if (this.showSummary) {
       this.createSummaryButton();
+    }
+
+    // Modo readOnly: desactivar la edición de cualquier descendiente que
+    // haya sido marcado contenteditable=true (bloques, celdas de tabla,
+    // inner spans de checklist, etc.) en una sola pasada. Los listeners
+    // de mutación ya se omiten en `attachBlockEvents`; este paso garantiza
+    // además que el navegador no permita edición nativa.
+    if (this.readOnly && this.container) {
+      var editables = this.container.querySelectorAll('[contenteditable="true"]');
+      for (var ri = 0; ri < editables.length; ri++) {
+        editables[ri].setAttribute('contenteditable', 'false');
+      }
     }
 
     // Restaurar el foco si había uno.
@@ -4576,29 +4802,35 @@
   meWYSE.prototype.attachFloatingHandleEvents = function(element, blockId) {
     var self = this;
 
-    element.addEventListener('mouseenter', function() {
-      // Cancelar cualquier timeout de ocultación pendiente
-      if (self.floatingHandleHideTimeout) {
-        clearTimeout(self.floatingHandleHideTimeout);
-        self.floatingHandleHideTimeout = null;
-      }
-      self.positionFloatingHandle(element, blockId);
-    });
+    // En modo readOnly el floating handle no se crea (ver `init`). Sin handle
+    // no tiene sentido enganchar mouseenter/mouseleave/focus que lo posicionan
+    // u oculten — además `self.floatingHandle` sería null y los handlers
+    // explotarían al referenciarlo.
+    if (this.readOnly) return;
 
-    element.addEventListener('mouseleave', function(e) {
-      // Solo ocultar si no estamos entrando en el handle flotante
-      var relatedTarget = e.relatedTarget;
-      if (!relatedTarget || !self.floatingHandle.contains(relatedTarget)) {
-        // Usar un pequeño delay para dar tiempo a llegar al handle
-        self.floatingHandleHideTimeout = setTimeout(function() {
-          self.hideFloatingHandle();
-        }, 100);
-      }
-    });
-
-    element.addEventListener('focus', function() {
-      self.positionFloatingHandle(element, blockId);
-    }, true);
+    // El handle se muestra cuando el bloque RECIBE EL FOCO. Eso se gestiona de
+    // forma centralizada en el listener `focusin` del container (focusin
+    // burbujea y cubre todas las rutas de render). Aquí solo queda el caso
+    // especial de los separadores, que no reciben foco ni selección y siguen
+    // usando hover como única vía de acceso al handle.
+    var block = this.getBlock(blockId);
+    if (block && block.type === 'divider') {
+      element.addEventListener('mouseenter', function() {
+        if (self.floatingHandleHideTimeout) {
+          clearTimeout(self.floatingHandleHideTimeout);
+          self.floatingHandleHideTimeout = null;
+        }
+        self.positionFloatingHandle(element, blockId);
+      });
+      element.addEventListener('mouseleave', function(e) {
+        var relatedTarget = e.relatedTarget;
+        if (!relatedTarget || !self.floatingHandle.contains(relatedTarget)) {
+          self.floatingHandleHideTimeout = setTimeout(function() {
+            self.hideFloatingHandle();
+          }, 100);
+        }
+      });
+    }
   };
 
   /**
@@ -4716,29 +4948,8 @@
 
     tableWrapper.appendChild(table);
 
-    // Botón para añadir fila
-    var addRowBtn = document.createElement('button');
-    addRowBtn.className = 'mewyse-table-add-row';
-    addRowBtn.innerHTML = WYSIWYG_ICONS.plus;
-    addRowBtn.title = self.t('tooltips.addRow');
-    addRowBtn.onclick = function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      self.addTableRow(table, block.id);
-    };
-    tableWrapper.appendChild(addRowBtn);
-
-    // Botón para añadir columna
-    var addColBtn = document.createElement('button');
-    addColBtn.className = 'mewyse-table-add-col';
-    addColBtn.innerHTML = WYSIWYG_ICONS.plus;
-    addColBtn.title = self.t('tooltips.addColumn');
-    addColBtn.onclick = function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      self.addTableColumn(table, block.id);
-    };
-    tableWrapper.appendChild(addColBtn);
+    // Los botones +fila/+columna se eliminaron: ahora se insertan filas y
+    // columnas desde la toolbar contextual de tabla.
 
     return tableWrapper;
   };
@@ -5017,29 +5228,8 @@
 
         tableWrapper.appendChild(element);
 
-        // Botón para añadir fila
-        var addRowBtn = document.createElement('button');
-        addRowBtn.className = 'mewyse-table-add-row';
-        addRowBtn.innerHTML = WYSIWYG_ICONS.plus;
-        addRowBtn.title = self.t('tooltips.addRow');
-        addRowBtn.onclick = function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          self.addTableRow(element, block.id);
-        };
-        tableWrapper.appendChild(addRowBtn);
-
-        // Botón para añadir columna
-        var addColBtn = document.createElement('button');
-        addColBtn.className = 'mewyse-table-add-col';
-        addColBtn.innerHTML = WYSIWYG_ICONS.plus;
-        addColBtn.title = self.t('tooltips.addColumn');
-        addColBtn.onclick = function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          self.addTableColumn(element, block.id);
-        };
-        tableWrapper.appendChild(addColBtn);
+        // Los botones +fila/+columna se eliminaron: las inserciones se hacen
+        // desde la toolbar contextual de tabla.
 
         return tableWrapper;
       case 'image':
@@ -5190,6 +5380,12 @@
   meWYSE.prototype.attachBlockEvents = function(element, blockId) {
     var self = this;
 
+    // En modo readOnly, el editor solo visualiza: no registramos listeners
+    // de input/keydown/keyup/paste/click ni hacemos editable el bloque.
+    // La selección nativa del navegador para copiar/pegar fuera sigue
+    // funcionando porque solo depende del contenido del DOM.
+    if (this.readOnly) return;
+
     // Event listener para input
     element.addEventListener('input', function(e) {
       self.updateBlockContent(blockId, element.innerHTML);
@@ -5250,8 +5446,11 @@
       }
     }
 
-    var htmlData = clipboardData.getData('text/html');
-    var plainText = clipboardData.getData('text/plain');
+    // getData puede lanzar en navegadores antiguos/IE: proteger con fallback
+    var htmlData = '';
+    var plainText = '';
+    try { htmlData = clipboardData.getData('text/html'); } catch (e) {}
+    try { plainText = clipboardData.getData('text/plain'); } catch (e) {}
 
     // Si pasteAsText está habilitado, forzar siempre plaintext
     if (this.pasteAsText) {
@@ -5299,6 +5498,8 @@
    * @returns {string}
    */
   meWYSE.prototype.sanitizeHTML = function(element) {
+    var self = this;
+
     // Lista de etiquetas permitidas para formato inline
     var allowedInlineTags = ['B', 'STRONG', 'I', 'EM', 'U', 'S', 'STRIKE', 'DEL', 'A', 'CODE', 'SUB', 'SUP', 'MARK', 'BR'];
 
@@ -5306,6 +5507,17 @@
     var allowedAttributes = {
       'A': ['href', 'title', 'target', 'rel']
     };
+
+    // Atributos data-* específicos de cada átomo meWYSE
+    var ATOMIC_DATA_ATTRS = {
+      'mewyse-tag':     ['data-tag-id', 'data-tag-name', 'data-tag-color'],
+      'mewyse-mention': ['data-mention-id', 'data-mention-name'],
+      'mewyse-emoji':   ['data-emoji']
+    };
+
+    function escAttr(v) {
+      return String(v).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+    }
 
     function cleanNode(node) {
       if (node.nodeType === Node.TEXT_NODE) {
@@ -5323,6 +5535,39 @@
         // BR se convierte en <br>
         if (tagName === 'BR') {
           return '<br>';
+        }
+
+        // SPAN atómico de meWYSE (mewyse-tag / mewyse-mention / mewyse-emoji):
+        // se preserva con su clase, sus data-* y se re-aplican los atributos
+        // estructurales (contenteditable=false, style del color del tag).
+        if (tagName === 'SPAN' && node.classList) {
+          var atomicClass = null;
+          if (node.classList.contains('mewyse-tag')) atomicClass = 'mewyse-tag';
+          else if (node.classList.contains('mewyse-mention')) atomicClass = 'mewyse-mention';
+          else if (node.classList.contains('mewyse-emoji')) atomicClass = 'mewyse-emoji';
+          if (atomicClass) {
+            var atomAttrs = ' class="' + atomicClass + '"';
+            var keepData = ATOMIC_DATA_ATTRS[atomicClass] || [];
+            for (var ad = 0; ad < keepData.length; ad++) {
+              var aVal = node.getAttribute(keepData[ad]);
+              if (aVal) atomAttrs += ' ' + keepData[ad] + '="' + escAttr(aVal) + '"';
+            }
+            // Los átomos siempre son contenteditable=false en el editor
+            atomAttrs += ' contenteditable="false"';
+            // Para tag, derivar el style inline del color (con contraste)
+            if (atomicClass === 'mewyse-tag') {
+              var tagColor = node.getAttribute('data-tag-color');
+              if (tagColor && self._pickContrastColor) {
+                var fg = self._pickContrastColor(tagColor);
+                atomAttrs += ' style="background-color: ' + escAttr(tagColor) + '; color: ' + fg + '"';
+              }
+            }
+            var inner = '';
+            for (var ai = 0; ai < node.childNodes.length; ai++) {
+              inner += cleanNode(node.childNodes[ai]);
+            }
+            return '<span' + atomAttrs + '>' + inner + '</span>';
+          }
         }
 
         // Si no es una etiqueta permitida, extraer el contenido de sus hijos
@@ -5423,9 +5668,11 @@
       if (node.nodeType === Node.TEXT_NODE) {
         var text = node.textContent.trim();
         if (text) {
+          // El contenido del bloque es HTML (render vía innerHTML); el texto
+          // plano del nodo se escapa para no reinterpretarse como markup.
           blocksToInsert.push({
             type: 'paragraph',
-            content: text
+            content: escapeHtml(text)
           });
         }
         return;
@@ -5732,6 +5979,17 @@
     for (var j = 0; j < allElements.length; j++) {
       var el = allElements[j];
 
+      // Si es un átomo meWYSE (mewyse-tag / mewyse-mention / mewyse-emoji),
+      // saltarse el cleanup completo. Estos spans son contenido legítimo del
+      // editor — quitarles la class o el style los rompería visualmente y
+      // perderían su semántica.
+      if (el.classList && (
+          el.classList.contains('mewyse-tag') ||
+          el.classList.contains('mewyse-mention') ||
+          el.classList.contains('mewyse-emoji'))) {
+        continue;
+      }
+
       // Detectar si tenía ciertos estilos útiles antes de limpiar (bold/italic implícitos de Word)
       var styleStr = el.getAttribute('style') || '';
       var inheritedBold = /font-weight\s*:\s*(bold|[6-9]00)/i.test(styleStr);
@@ -5746,12 +6004,19 @@
       el.removeAttribute('width');
       el.removeAttribute('height');
 
-      // Eliminar atributos MS Office (mso-*), datos internos, xmlns, namespaces
+      // Eliminar atributos MS Office (mso-*), datos internos, xmlns, namespaces.
+      // Preservar atributos meWYSE: data-mention-*, data-tag-*, data-block-*.
       var attrs = el.attributes;
       var attrsToRemove = [];
       for (var k = 0; k < attrs.length; k++) {
         var attrName = attrs[k].name;
-        if (attrName.indexOf('mso-') === 0 || attrName.indexOf('data-') === 0 ||
+        var isMewyseDataAttr = attrName.indexOf('data-mention-') === 0 ||
+                               attrName.indexOf('data-tag-') === 0 ||
+                               attrName.indexOf('data-block-') === 0 ||
+                               attrName === 'data-name' ||
+                               attrName === 'data-type';
+        if (attrName.indexOf('mso-') === 0 ||
+            (attrName.indexOf('data-') === 0 && !isMewyseDataAttr) ||
             attrName.indexOf('xmlns') === 0 || attrName.indexOf('o:') === 0 ||
             attrName.indexOf('v:') === 0 || attrName.indexOf('w:') === 0 ||
             attrName.indexOf('m:') === 0 || attrName === 'bgcolor' ||
@@ -5798,12 +6063,20 @@
         .replace(/[\u200B-\u200D\uFEFF]/g, ''); // zero-width chars
     }
 
-    // 6. Desenvolver SPANs/FONTs vacíos o que solo contienen formato (no aportan nada)
+    // 6. Desenvolver SPANs/FONTs vacíos o que solo contienen formato (no aportan nada).
+    // Excepción: spans atómicos de meWYSE (mewyse-tag / mewyse-mention /
+    // mewyse-emoji) son contenido semántico — NO desenvolverlos.
     var unwrapTags = ['SPAN', 'FONT'];
     for (var ut = 0; ut < unwrapTags.length; ut++) {
       var toUnwrap = doc.querySelectorAll(unwrapTags[ut].toLowerCase());
       for (var m = toUnwrap.length - 1; m >= 0; m--) {
         var elUnwrap = toUnwrap[m];
+        if (elUnwrap.classList && (
+            elUnwrap.classList.contains('mewyse-tag') ||
+            elUnwrap.classList.contains('mewyse-mention') ||
+            elUnwrap.classList.contains('mewyse-emoji'))) {
+          continue;
+        }
         if (!elUnwrap.getAttribute('href')) {
           while (elUnwrap.firstChild) {
             elUnwrap.parentNode.insertBefore(elUnwrap.firstChild, elUnwrap);
@@ -5979,24 +6252,26 @@
         range.insertNode(document.createTextNode(lines[0]));
         this.updateBlockContent(currentBlockId, element.innerHTML);
       } else {
+        // El modelo almacena HTML (se renderiza vía innerHTML), así que la
+        // línea de texto plano debe escaparse para no inyectar markup.
         element.textContent = lines[0];
-        this.updateBlockContent(currentBlockId, lines[0]);
+        this.updateBlockContent(currentBlockId, escapeHtml(lines[0]));
       }
     } else {
       // Múltiples líneas
       if (currentContent.trim() === '') {
         // Si el bloque actual está vacío, reemplazarlo con la primera línea
         element.textContent = lines[0];
-        this.updateBlockContent(currentBlockId, lines[0]);
+        this.updateBlockContent(currentBlockId, escapeHtml(lines[0]));
 
-        // Insertar las líneas restantes como nuevos bloques
+        // Insertar las líneas restantes como nuevos bloques (escapadas)
         for (var i = 1; i < lines.length; i++) {
-          this.insertBlockAt(currentIndex + i, 'paragraph', lines[i]);
+          this.insertBlockAt(currentIndex + i, 'paragraph', escapeHtml(lines[i]));
         }
       } else {
-        // Si tiene contenido, insertar todas las líneas después
+        // Si tiene contenido, insertar todas las líneas después (escapadas)
         for (var j = 0; j < lines.length; j++) {
-          this.insertBlockAt(currentIndex + 1 + j, 'paragraph', lines[j]);
+          this.insertBlockAt(currentIndex + 1 + j, 'paragraph', escapeHtml(lines[j]));
         }
       }
 
@@ -6011,6 +6286,10 @@
    * @param {string} content
    */
   meWYSE.prototype.insertBlockAt = function(index, type, content) {
+    // Normalizar el índice a un rango válido [0, length] para que un índice
+    // negativo o fuera de rango no inserte en una posición inesperada.
+    index = Math.max(0, Math.min(index, this.blocks.length));
+
     var block = {
       id: ++this.currentBlockId,
       type: type || 'paragraph',
@@ -6242,19 +6521,9 @@
       this.currentSelectionTable.classList.remove('mewyse-table-selecting');
     }
 
-    // Mostrar menú si hay más de una celda seleccionada
-    if (this.selectedTableCells.length > 1) {
-      this.showTableCellSelectionMenu(blockId);
-    }
-    // O si hay una única celda combinada seleccionada
-    else if (this.selectedTableCells.length === 1) {
-      var cell = this.selectedTableCells[0];
-      var colspan = parseInt(cell.getAttribute('colspan')) || 1;
-      var rowspan = parseInt(cell.getAttribute('rowspan')) || 1;
-      if (colspan > 1 || rowspan > 1) {
-        this.showTableCellSelectionMenu(blockId);
-      }
-    }
+    // La selección de rango de celdas ya no abre un popup: se refleja en la
+    // toolbar contextual (habilita "combinar" / "descombinar" según el estado).
+    this._updateTableToolbar();
   };
 
   /**
@@ -6361,6 +6630,221 @@
   };
 
   /**
+   * Devuelve el número de columnas LÓGICAS de una matriz (máx. ancho de fila).
+   * @param {Array} matrix
+   * @returns {number}
+   */
+  meWYSE.prototype._logicalColCount = function(matrix) {
+    var v_cols = 0;
+    for (var r = 0; r < matrix.length; r++) {
+      if (matrix[r] && matrix[r].length > v_cols) v_cols = matrix[r].length;
+    }
+    return v_cols;
+  };
+
+  /**
+   * Crea una celda vacía con la estructura canónica (td/th > p[contenteditable])
+   * y eventos enganchados. Clona border/padding de una celda plantilla para
+   * mantener coherencia visual (incluido modo oscuro); si no hay plantilla usa
+   * los valores por defecto.
+   * @param {number} blockId
+   * @param {string} tagName - 'td' o 'th'
+   * @param {HTMLElement} templateCell - celda de referencia (opcional)
+   * @returns {HTMLElement}
+   */
+  meWYSE.prototype._createEmptyTableCell = function(blockId, tagName, templateCell) {
+    var v_cell = document.createElement(tagName || 'td');
+    v_cell.style.border = (templateCell && templateCell.style.border) ? templateCell.style.border : '1px solid #ddd';
+    v_cell.style.padding = '0';
+
+    var v_content = document.createElement('p');
+    v_content.contentEditable = true;
+    v_content.style.padding = (templateCell && templateCell.querySelector('p') && templateCell.querySelector('p').style.padding) ? templateCell.querySelector('p').style.padding : '8px';
+    v_content.style.margin = '0';
+    v_content.style.minHeight = '1em';
+
+    v_cell.appendChild(v_content);
+    this.attachTableCellEvents(v_content, blockId);
+    return v_cell;
+  };
+
+  /**
+   * Inserta una columna lógica en la posición P (todo lo que esté en columna
+   * >= P se desplaza a la derecha). Respeta colspan/rowspan: si una celda cruza
+   * la frontera P-1|P se expande su colspan; en el resto de filas se inserta
+   * una celda nueva en la posición DOM correcta.
+   * @param {HTMLElement} table
+   * @param {number} insertCol - posición lógica de inserción
+   * @param {number} blockId
+   */
+  meWYSE.prototype._insertTableColumnAt = function(table, insertCol, blockId) {
+    var matrix = this.buildTableMatrix(table);
+    var rows = table.querySelectorAll('tr');
+    var v_expanded = []; // celdas ya expandidas (evita doble incremento en rowspans)
+
+    for (var r = 0; r < rows.length; r++) {
+      var v_occ = matrix[r] ? matrix[r][insertCol] : null;
+      var v_left = (insertCol > 0 && matrix[r]) ? matrix[r][insertCol - 1] : null;
+
+      // La frontera cae DENTRO de una celda con colspan -> expandir esa celda
+      if (v_occ && v_occ === v_left) {
+        if (v_expanded.indexOf(v_occ) === -1) {
+          var v_cs = parseInt(v_occ.getAttribute('colspan')) || 1;
+          v_occ.setAttribute('colspan', v_cs + 1);
+          v_expanded.push(v_occ);
+        }
+        continue;
+      }
+
+      // La frontera está entre celdas -> insertar una celda nueva en columna P.
+      // findInsertPosition devuelve la celda DOM ante la que insertar (o null=fin).
+      var v_template = v_occ || v_left || null;
+      var v_new = this._createEmptyTableCell(blockId, 'td', v_template);
+      var v_ref = this.findInsertPosition(rows[r], insertCol);
+      if (v_ref) {
+        rows[r].insertBefore(v_new, v_ref);
+      } else {
+        rows[r].appendChild(v_new);
+      }
+    }
+  };
+
+  /**
+   * Elimina la columna lógica C. Si una celda tiene colspan>1 se reduce su
+   * colspan; si ocupa solo esa columna se elimina. Las celdas con rowspan se
+   * procesan una sola vez.
+   * @param {HTMLElement} table
+   * @param {number} delCol
+   * @param {number} blockId
+   */
+  meWYSE.prototype._deleteTableColumnAt = function(table, delCol, blockId) {
+    var matrix = this.buildTableMatrix(table);
+    var v_processed = [];
+
+    for (var r = 0; r < matrix.length; r++) {
+      var v_cell = matrix[r] ? matrix[r][delCol] : null;
+      if (!v_cell || v_processed.indexOf(v_cell) !== -1) continue;
+      v_processed.push(v_cell);
+
+      var v_cs = parseInt(v_cell.getAttribute('colspan')) || 1;
+      if (v_cs > 1) {
+        // La celda cubre más columnas: reducir el colspan
+        if (v_cs - 1 === 1) {
+          v_cell.removeAttribute('colspan');
+        } else {
+          v_cell.setAttribute('colspan', v_cs - 1);
+        }
+      } else {
+        // Ocupa solo esta columna: eliminar el elemento (afecta a todas sus
+        // filas si tenía rowspan, al ser un único nodo DOM)
+        v_cell.remove();
+      }
+    }
+  };
+
+  /**
+   * Inserta una fila lógica en la posición P. Si una celda con rowspan cruza la
+   * frontera P-1|P se expande su rowspan; el resto de columnas reciben una celda
+   * nueva. Devuelve la fila creada (o null si todo quedó cubierto por rowspans).
+   * @param {HTMLElement} table
+   * @param {number} insertRow
+   * @param {number} blockId
+   * @returns {HTMLElement|null}
+   */
+  meWYSE.prototype._insertTableRowAt = function(table, insertRow, blockId) {
+    var matrix = this.buildTableMatrix(table);
+    var rows = table.querySelectorAll('tr');
+    var v_colCount = this._logicalColCount(matrix);
+    var v_expanded = [];
+    var v_newRow = document.createElement('tr');
+
+    for (var c = 0; c < v_colCount; c++) {
+      var v_above = (insertRow > 0 && matrix[insertRow - 1]) ? matrix[insertRow - 1][c] : null;
+      var v_at = (matrix[insertRow]) ? matrix[insertRow][c] : null;
+
+      // Una celda con rowspan cruza la frontera de filas -> expandir su rowspan
+      if (v_above && v_above === v_at) {
+        if (v_expanded.indexOf(v_above) === -1) {
+          var v_rs = parseInt(v_above.getAttribute('rowspan')) || 1;
+          v_above.setAttribute('rowspan', v_rs + 1);
+          v_expanded.push(v_above);
+        }
+        continue;
+      }
+
+      // Columna no cubierta por un rowspan: añadir celda nueva a la fila
+      var v_template = v_at || v_above || null;
+      v_newRow.appendChild(this._createEmptyTableCell(blockId, 'td', v_template));
+    }
+
+    // Insertar la fila en el DOM en la posición P
+    if (insertRow >= rows.length) {
+      // Al final: usar el tbody si existe
+      var v_tbody = table.querySelector('tbody') || table;
+      v_tbody.appendChild(v_newRow);
+    } else {
+      var v_ref = rows[insertRow];
+      v_ref.parentNode.insertBefore(v_newRow, v_ref);
+    }
+
+    return v_newRow.children.length ? v_newRow : (v_newRow.parentNode && v_newRow.parentNode.removeChild(v_newRow), null);
+  };
+
+  /**
+   * Elimina la fila lógica R ajustando rowspans: las celdas que vienen de
+   * filas superiores y cruzan R reducen su rowspan; las que se originan en R con
+   * rowspan>1 se desplazan a la fila siguiente reduciendo su rowspan.
+   * @param {HTMLElement} table
+   * @param {number} delRow
+   * @param {number} blockId
+   */
+  meWYSE.prototype._deleteTableRowAt = function(table, delRow, blockId) {
+    var matrix = this.buildTableMatrix(table);
+    var rows = table.querySelectorAll('tr');
+    var row = rows[delRow];
+    if (!row) return;
+
+    var v_colCount = this._logicalColCount(matrix);
+    var v_processed = [];
+    var v_nextRow = rows[delRow + 1] || null;
+
+    for (var c = 0; c < v_colCount; c++) {
+      var v_cell = matrix[delRow] ? matrix[delRow][c] : null;
+      if (!v_cell || v_processed.indexOf(v_cell) !== -1) continue;
+      v_processed.push(v_cell);
+
+      var v_above = (delRow > 0 && matrix[delRow - 1]) ? matrix[delRow - 1][c] : null;
+      var v_rs = parseInt(v_cell.getAttribute('rowspan')) || 1;
+
+      if (v_above === v_cell) {
+        // La celda viene de arriba y cruza esta fila -> reducir rowspan
+        if (v_rs - 1 === 1) {
+          v_cell.removeAttribute('rowspan');
+        } else {
+          v_cell.setAttribute('rowspan', v_rs - 1);
+        }
+      } else if (v_rs > 1 && v_nextRow) {
+        // Se origina en esta fila y abarca hacia abajo -> moverla a la fila
+        // siguiente reduciendo su rowspan, para no perder su contenido
+        if (v_rs - 1 === 1) {
+          v_cell.removeAttribute('rowspan');
+        } else {
+          v_cell.setAttribute('rowspan', v_rs - 1);
+        }
+        var v_ref = this.findInsertPosition(v_nextRow, c);
+        if (v_ref) {
+          v_nextRow.insertBefore(v_cell, v_ref);
+        } else {
+          v_nextRow.appendChild(v_cell);
+        }
+      }
+      // else: se origina aquí con rowspan 1 -> se elimina con la fila
+    }
+
+    row.remove();
+  };
+
+  /**
    * Limpia la selección de celdas de tabla
    */
   meWYSE.prototype.clearTableCellSelection = function() {
@@ -6377,103 +6861,9 @@
     this.isSelectingTableCells = false;
     this.currentSelectionTable = null;
 
-    // Cerrar menú de celdas si existe
-    var menu = document.querySelector('.mewyse-cell-menu');
-    if (menu) {
-      if (menu._cancelAnchor) menu._cancelAnchor();
-      menu.remove();
-    }
-  };
-
-  /**
-   * Muestra el menú de opciones para celdas seleccionadas
-   * @param {number} blockId
-   */
-  meWYSE.prototype.showTableCellSelectionMenu = function(blockId) {
-    var self = this;
-
-    // Cerrar menú existente
-    var existingMenu = document.querySelector('.mewyse-cell-menu');
-    if (existingMenu) {
-      if (existingMenu._cancelAnchor) existingMenu._cancelAnchor();
-      existingMenu.remove();
-    }
-
-    // Verificar si hay una celda combinada seleccionada (para opción de descombinar)
-    var hasMergedCell = false;
-    var mergedCell = null;
-    if (this.selectedTableCells.length === 1) {
-      var cell = this.selectedTableCells[0];
-      var colspan = parseInt(cell.getAttribute('colspan')) || 1;
-      var rowspan = parseInt(cell.getAttribute('rowspan')) || 1;
-      if (colspan > 1 || rowspan > 1) {
-        hasMergedCell = true;
-        mergedCell = cell;
-      }
-    }
-
-    // Si no hay múltiples celdas ni celda combinada, salir
-    if (this.selectedTableCells.length < 2 && !hasMergedCell) return;
-
-    var menu = document.createElement('div');
-    menu.className = 'mewyse-cell-menu';
-
-    var closeCellMenu = function() {
-      if (menu._cancelAnchor) menu._cancelAnchor();
-      if (menu.parentNode) menu.remove();
-      self._hideBackdrop('tableCellMenu');
-    };
-
-    // Opción de combinar (solo si hay múltiples celdas)
-    if (this.selectedTableCells.length >= 2) {
-      var mergeBtn = document.createElement('button');
-      mergeBtn.className = 'mewyse-cell-menu-btn';
-      mergeBtn.innerHTML = '<span class="icon">' + WYSIWYG_ICONS.mergeCells + '</span> ' + this.t('tableMenu.mergeCells');
-      mergeBtn.onclick = function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        self.mergeSelectedCells(blockId);
-        closeCellMenu();
-      };
-      menu.appendChild(mergeBtn);
-    }
-
-    // Opción de descombinar (solo si hay una celda combinada)
-    if (hasMergedCell) {
-      var unmergeBtn = document.createElement('button');
-      unmergeBtn.className = 'mewyse-cell-menu-btn';
-      unmergeBtn.innerHTML = '<span class="icon">' + WYSIWYG_ICONS.unmergeCells + '</span> ' + this.t('tableMenu.unmergeCells');
-      unmergeBtn.onclick = function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        self.unmergeCell(mergedCell, blockId);
-        closeCellMenu();
-      };
-      menu.appendChild(unmergeBtn);
-    }
-
-    self._applyMenuTheme(menu);
-    document.body.appendChild(menu);
-
-    // Posicionar el menú cerca de las celdas seleccionadas
-    var lastCell = this.selectedTableCells[this.selectedTableCells.length - 1];
-    this.anchorMenu(menu, lastCell, { offsetY: 5, centerX: true });
-
-    // Cerrar al hacer clic fuera
-    setTimeout(function() {
-      document.addEventListener('click', function closeMenu(e) {
-        if (!menu.contains(e.target)) {
-          self.clearTableCellSelection();
-          self._hideBackdrop('tableCellMenu');
-          document.removeEventListener('click', closeMenu);
-        }
-      });
-    }, 10);
-
-    this._showBackdrop('tableCellMenu', function() {
-      self.clearTableCellSelection();
-      closeCellMenu();
-    });
+    // Refrescar el estado de la toolbar (deshabilita "combinar" al perder la
+    // selección de rango). _updateTableToolbar es seguro y se autogestiona.
+    if (this._updateTableToolbar) this._updateTableToolbar();
   };
 
   /**
@@ -6681,58 +7071,9 @@
    * @param {number} blockId
    */
   meWYSE.prototype.addTableControls = function(table, blockId) {
-    var self = this;
-    var rows = table.querySelectorAll('tr');
-
-    rows.forEach(function(row, rowIndex) {
-      var cells = row.querySelectorAll('td, th');
-
-      // Añadir control de fila (solo a la primera celda)
-      if (cells.length > 0) {
-        var firstCell = cells[0];
-        firstCell.style.position = 'relative';
-
-        var rowControl = document.createElement('button');
-        rowControl.className = 'mewyse-table-row-control';
-        rowControl.innerHTML = WYSIWYG_ICONS.hamburger;
-        rowControl.title = self.t('tableMenu.rowOptions');
-        rowControl.tabIndex = -1;
-        rowControl.contentEditable = false; // Evitar que sea editable
-
-        // Usar mousedown en lugar de click para capturar antes que focus
-        rowControl.onmousedown = function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          self.showTableRowMenu(table, rowIndex, blockId, rowControl);
-          return false;
-        };
-
-        firstCell.appendChild(rowControl);
-      }
-
-      // Añadir control de columna (solo en la primera fila)
-      if (rowIndex === 0) {
-        cells.forEach(function(cell, colIndex) {
-          cell.style.position = 'relative';
-
-          var colControl = document.createElement('button');
-          colControl.className = 'mewyse-table-col-control';
-          colControl.innerHTML = WYSIWYG_ICONS.hamburger;
-          colControl.title = self.t('tableMenu.columnOptions');
-          colControl.tabIndex = -1;
-          colControl.contentEditable = false;
-
-          colControl.onmousedown = function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            self.showTableColMenu(table, colIndex, blockId, colControl);
-            return false;
-          };
-
-          cell.appendChild(colControl);
-        });
-      }
-    });
+    // No-op: los controles hamburguesa de fila/columna se sustituyeron por la
+    // toolbar contextual flotante (showTableToolbar). Se conserva el método para
+    // compatibilidad con las llamadas existentes.
   };
 
   /**
@@ -6741,29 +7082,10 @@
    * @param {number} blockId
    */
   meWYSE.prototype.addTableRow = function(table, blockId) {
-    var tbody = table.querySelector('tbody');
-    var firstRow = table.querySelector('tr');
-    var colCount = firstRow ? firstRow.querySelectorAll('td, th').length : 3;
-
-    var newRow = document.createElement('tr');
-    for (var i = 0; i < colCount; i++) {
-      var cell = document.createElement('td');
-      cell.style.border = '1px solid #ddd';
-      cell.style.padding = '0';
-
-      // Crear párrafo interno editable
-      var cellContent = document.createElement('p');
-      cellContent.contentEditable = true;
-      cellContent.style.padding = '8px';
-      cellContent.style.margin = '0';
-      cellContent.style.minHeight = '1em';
-
-      cell.appendChild(cellContent);
-      this.attachTableCellEvents(cellContent, blockId);
-      newRow.appendChild(cell);
-    }
-
-    tbody.appendChild(newRow);
+    // Insertar una fila al final usando el número de columnas LÓGICO (la última
+    // fila no puede tener rowspans entrantes, así que recibe celdas frescas).
+    var v_rows = table.querySelectorAll('tr');
+    this._insertTableRowAt(table, v_rows.length, blockId);
 
     // Actualizar controles
     this.refreshTableControls(table, blockId);
@@ -6778,24 +7100,9 @@
    * @param {number} blockId
    */
   meWYSE.prototype.addTableColumn = function(table, blockId) {
-    var rows = table.querySelectorAll('tr');
-
-    rows.forEach(function(row) {
-      var cell = document.createElement('td');
-      cell.style.border = '1px solid #ddd';
-      cell.style.padding = '0';
-
-      // Crear párrafo interno editable
-      var cellContent = document.createElement('p');
-      cellContent.contentEditable = true;
-      cellContent.style.padding = '8px';
-      cellContent.style.margin = '0';
-      cellContent.style.minHeight = '1em';
-
-      cell.appendChild(cellContent);
-      this.attachTableCellEvents(cellContent, blockId);
-      row.appendChild(cell);
-    }, this);
+    // Insertar una columna al final (posición lógica = nº de columnas)
+    var v_colCount = this._logicalColCount(this.buildTableMatrix(table));
+    this._insertTableColumnAt(table, v_colCount, blockId);
 
     // Actualizar controles
     this.refreshTableControls(table, blockId);
@@ -6810,192 +7117,276 @@
    * @param {number} blockId
    */
   meWYSE.prototype.refreshTableControls = function(table, blockId) {
-    // Eliminar controles existentes
+    // Limpiar restos de controles hamburguesa antiguos (por si vinieran de
+    // contenido guardado previo a la migración a la toolbar)
     var existingControls = table.querySelectorAll('.mewyse-table-row-control, .mewyse-table-col-control');
     for (var i = 0; i < existingControls.length; i++) {
       existingControls[i].remove();
     }
 
-    // Añadir controles nuevamente
-    this.addTableControls(table, blockId);
-
-    // Asegurar eventos de selección
+    // Asegurar eventos de selección de celdas
     this.addTableSelectionEvents(table, blockId);
+
+    // Reposicionar/refrescar la toolbar contextual tras cambios estructurales
+    this._updateTableToolbar();
   };
 
-  /**
-   * Muestra el menú contextual de fila
-   * @param {HTMLElement} table
-   * @param {number} rowIndex
-   * @param {number} blockId
-   * @param {HTMLElement} button
-   */
-  meWYSE.prototype.showTableRowMenu = function(table, rowIndex, blockId, button) {
-    var self = this;
+  // =========================================================================
+  // TOOLBAR CONTEXTUAL DE TABLA (estilo TinyMCE)
+  // Aparece encima de la tabla cuando el caret está dentro de una celda y no
+  // hay texto/imagen seleccionada. Centraliza todas las operaciones de tabla.
+  // =========================================================================
 
-    // Cerrar menú existente
-    var existingMenu = document.querySelector('.mewyse-table-menu');
-    if (existingMenu) {
-      existingMenu.remove();
+  /**
+   * Resuelve la celda de tabla "activa" (la del foco/caret, o la primera de una
+   * selección de rango de celdas) junto con su tabla y blockId.
+   * @returns {Object|null} { cell, table, blockId }
+   */
+  meWYSE.prototype._getActiveTableCell = function() {
+    var cell = null;
+
+    // 1. Selección de rango de celdas (drag): usar la primera
+    if (this.selectedTableCells && this.selectedTableCells.length > 0) {
+      cell = this.selectedTableCells[0];
+    } else {
+      // 2. Desde el elemento con foco
+      var active = document.activeElement;
+      if (active && this.container.contains(active) && active.closest) {
+        cell = active.closest('td, th');
+      }
+      // 3. Desde la selección/caret actual
+      if (!cell) {
+        var sel = window.getSelection();
+        if (sel && sel.rangeCount > 0) {
+          var node = sel.getRangeAt(0).startContainer;
+          node = (node.nodeType === 3) ? node.parentNode : node;
+          if (node && this.container.contains(node) && node.closest) {
+            cell = node.closest('td, th');
+          }
+        }
+      }
     }
 
-    var menu = document.createElement('div');
-    menu.className = 'mewyse-table-menu';
-
-    var closeRowMenu = function() {
-      if (menu.parentNode) menu.remove();
-      self._hideBackdrop('tableRowMenu');
-    };
-
-    var options = [
-      { labelKey: 'tableMenu.backgroundColor', icon: WYSIWYG_ICONS.palette, action: 'bgColor' },
-      { labelKey: 'tableMenu.insertRowAbove', icon: WYSIWYG_ICONS.arrowUp, action: 'insertBefore' },
-      { labelKey: 'tableMenu.insertRowBelow', icon: WYSIWYG_ICONS.arrowDown, action: 'insertAfter' },
-      { labelKey: 'tableMenu.duplicateRow', icon: WYSIWYG_ICONS.duplicate, action: 'duplicate' },
-      { labelKey: 'tableMenu.clearRowContent', icon: WYSIWYG_ICONS.trash, action: 'clear' },
-      { labelKey: 'tableMenu.deleteRow', icon: WYSIWYG_ICONS.close, action: 'delete', danger: true }
-    ];
-
-    options.forEach(function(opt) {
-      var item = document.createElement('div');
-      item.className = 'mewyse-table-menu-item' + (opt.danger ? ' danger' : '');
-      item.innerHTML = '<span class="icon">' + opt.icon + '</span>' + self.t(opt.labelKey);
-      item.onclick = function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        if (opt.action === 'bgColor') {
-          closeRowMenu();
-          // Usar setTimeout para evitar conflictos con el evento de "cerrar menú"
-          setTimeout(function() {
-            self.showTableColorPicker(table, rowIndex, -1, blockId, button);
-          }, 50);
-        } else {
-          self.executeRowAction(table, rowIndex, opt.action, blockId);
-          closeRowMenu();
-        }
-      };
-      menu.appendChild(item);
-    });
-
-    self._applyMenuTheme(menu);
-    document.body.appendChild(menu);
-    this.anchorMenu(menu, button, { offsetY: 5 });
-
-    // Cerrar al hacer clic fuera
-    setTimeout(function() {
-      document.addEventListener('click', function closeMenu(e) {
-        if (menu && !menu.contains(e.target) && !button.contains(e.target)) {
-          closeRowMenu();
-          document.removeEventListener('click', closeMenu);
-        }
-      });
-    }, 10);
-
-    this._showBackdrop('tableRowMenu', closeRowMenu);
+    if (!cell || !this.container.contains(cell)) return null;
+    var table = cell.closest('table');
+    var blockEl = cell.closest('.mewyse-block');
+    if (!table || !blockEl) return null;
+    var blockId = parseInt(blockEl.getAttribute('data-block-id'), 10);
+    if (isNaN(blockId)) return null;
+    return { cell: cell, table: table, blockId: blockId };
   };
 
   /**
-   * Muestra el menú contextual de columna
-   * @param {HTMLElement} table
-   * @param {number} colIndex
-   * @param {number} blockId
-   * @param {HTMLElement} button
+   * Decide si mostrar/ocultar la toolbar de tabla según el foco y la selección.
+   * Se llama desde selectionchange, focusin/focusout y tras acciones de tabla.
    */
-  meWYSE.prototype.showTableColMenu = function(table, colIndex, blockId, button) {
-    var self = this;
+  meWYSE.prototype._updateTableToolbar = function() {
+    if (this._destroyed || this.readOnly) { this.hideTableToolbar(); return; }
+    // No competir con la selección de imagen
+    if (this.selectedImage) { this.hideTableToolbar(); return; }
 
-    // Cerrar menú existente
-    var existingMenu = document.querySelector('.mewyse-table-menu');
-    if (existingMenu) {
-      existingMenu.remove();
-    }
+    var info = this._getActiveTableCell();
+    if (!info) { this.hideTableToolbar(); return; }
 
-    var menu = document.createElement('div');
-    menu.className = 'mewyse-table-menu';
-
-    var closeColMenu = function() {
-      if (menu.parentNode) menu.remove();
-      self._hideBackdrop('tableColMenu');
-    };
-
-    var options = [
-      { labelKey: 'tableMenu.backgroundColor', icon: WYSIWYG_ICONS.palette, action: 'bgColor' },
-      { labelKey: 'tableMenu.insertColumnLeft', icon: WYSIWYG_ICONS.arrowLeft, action: 'insertBefore' },
-      { labelKey: 'tableMenu.insertColumnRight', icon: WYSIWYG_ICONS.arrowRight, action: 'insertAfter' },
-      { labelKey: 'tableMenu.duplicateColumn', icon: WYSIWYG_ICONS.duplicate, action: 'duplicate' },
-      { labelKey: 'tableMenu.clearColumnContent', icon: WYSIWYG_ICONS.trash, action: 'clear' },
-      { labelKey: 'tableMenu.deleteColumn', icon: WYSIWYG_ICONS.close, action: 'delete', danger: true }
-    ];
-
-    options.forEach(function(opt) {
-      var item = document.createElement('div');
-      item.className = 'mewyse-table-menu-item' + (opt.danger ? ' danger' : '');
-      item.innerHTML = '<span class="icon">' + opt.icon + '</span>' + self.t(opt.labelKey);
-      item.onclick = function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        if (opt.action === 'bgColor') {
-          closeColMenu();
-          // Usar setTimeout para evitar conflictos con el evento de "cerrar menú"
-          setTimeout(function() {
-            self.showTableColorPicker(table, -1, colIndex, blockId, button);
-          }, 50);
-        } else {
-          self.executeColAction(table, colIndex, opt.action, blockId);
-          closeColMenu();
-        }
-      };
-      menu.appendChild(item);
-    });
-
-    self._applyMenuTheme(menu);
-    document.body.appendChild(menu);
-    this.anchorMenu(menu, button, { offsetY: 5 });
-
-    // Cerrar al hacer clic fuera
-    setTimeout(function() {
-      document.addEventListener('click', function closeMenu(e) {
-        if (menu && !menu.contains(e.target) && !button.contains(e.target)) {
-          closeColMenu();
-          document.removeEventListener('click', closeMenu);
-        }
-      });
-    }, 10);
-
-    this._showBackdrop('tableColMenu', closeColMenu);
-  };
-
-  /**
-   * Muestra el selector de color para tabla
-   * @param {HTMLElement} table
-   * @param {number} rowIndex - Índice de fila (-1 si es columna)
-   * @param {number} colIndex - Índice de columna (-1 si es fila)
-   * @param {number} blockId
-   * @param {HTMLElement} button
-   */
-  meWYSE.prototype.showTableColorPicker = function(table, rowIndex, colIndex, blockId, button) {
-    var self = this;
-
-    // Verificar que button existe
-    if (!button || !button.getBoundingClientRect) {
-      console.error('Button no válido para showTableColorPicker', button);
+    // Si hay selección de TEXTO (rango no colapsado) deja paso al format menu,
+    // salvo que sea una selección de rango de CELDAS (para combinar).
+    var sel = window.getSelection();
+    var hasTextSelection = sel && sel.rangeCount > 0 && !sel.isCollapsed && sel.toString().trim() !== '';
+    if (hasTextSelection && (!this.selectedTableCells || this.selectedTableCells.length === 0)) {
+      this.hideTableToolbar();
       return;
     }
 
-    // Cerrar picker existente
-    var existingPicker = document.querySelector('.mewyse-color-picker');
-    if (existingPicker) {
-      existingPicker.remove();
+    this.showTableToolbar(info);
+  };
+
+  /**
+   * Muestra (creando si hace falta) la toolbar y la reconstruye según el estado.
+   * @param {Object} info - { cell, table, blockId }
+   */
+  meWYSE.prototype.showTableToolbar = function(info) {
+    var needNew = !this._tableToolbar;
+    if (needNew) {
+      this._tableToolbar = document.createElement('div');
+      this._tableToolbar.className = 'mewyse-table-toolbar';
+      this._tableToolbar.setAttribute('role', 'toolbar');
+      this._tableToolbar.setAttribute('aria-label', this.t('tableMenu.toolbarLabel'));
+      document.body.appendChild(this._tableToolbar);
+      this._applyMenuTheme(this._tableToolbar);
     }
+
+    this._buildTableToolbar(info);
+
+    // (Re)anclar encima de la tabla, centrado. Solo reinicia el seguimiento si
+    // es nueva o cambió la tabla de referencia (evita reiniciar el rAF en cada
+    // pulsación de tecla).
+    if (needNew || this._toolbarAnchoredTable !== info.table) {
+      if (this._tableToolbar._cancelAnchor) this._tableToolbar._cancelAnchor();
+      this.anchorMenu(this._tableToolbar, info.table, { offsetY: 8, centerX: true, placement: 'above' });
+      this._toolbarAnchoredTable = info.table;
+    }
+    this._activeTableBlockId = info.blockId;
+  };
+
+  /**
+   * Oculta y destruye la toolbar de tabla.
+   */
+  meWYSE.prototype.hideTableToolbar = function() {
+    if (this._tableToolbar) {
+      if (this._tableToolbar._cancelAnchor) this._tableToolbar._cancelAnchor();
+      if (this._tableToolbar.parentNode) this._tableToolbar.parentNode.removeChild(this._tableToolbar);
+      this._tableToolbar = null;
+    }
+    this._toolbarAnchoredTable = null;
+    this._activeTableBlockId = null;
+  };
+
+  /**
+   * Vuelve a poner el foco en una celda de la tabla (tras una acción) para que
+   * la toolbar permanezca anclada y resoluble.
+   * @param {HTMLElement} table
+   */
+  meWYSE.prototype._refocusTable = function(table) {
+    if (!table) return;
+    var ed = table.querySelector('[contenteditable="true"]');
+    if (ed) { try { ed.focus(); } catch (e) {} }
+  };
+
+  /**
+   * (Re)construye los botones de la toolbar según la celda activa y el estado de
+   * combinación. rowIndex/colIndex son LÓGICOS (respetan colspan/rowspan).
+   * @param {Object} info - { cell, table, blockId }
+   */
+  meWYSE.prototype._buildTableToolbar = function(info) {
+    var self = this;
+    var table = info.table;
+    var blockId = info.blockId;
+    var coords = this.getTableCellCoords(info.cell) || { row: 0, col: 0 };
+    var rowIndex = coords.row;
+    var colIndex = coords.col;
+
+    // Estado combinar/descombinar
+    var mergeEnabled = this.selectedTableCells && this.selectedTableCells.length >= 2;
+    var unmergeTarget = null;
+    var checkCell = (this.selectedTableCells && this.selectedTableCells.length === 1)
+      ? this.selectedTableCells[0] : info.cell;
+    if (checkCell) {
+      var cs = parseInt(checkCell.getAttribute('colspan')) || 1;
+      var rs = parseInt(checkCell.getAttribute('rowspan')) || 1;
+      if (cs > 1 || rs > 1) unmergeTarget = checkCell;
+    }
+
+    // Limpiar contenido previo
+    this._tableToolbar.innerHTML = '';
+
+    var makeBtn = function(icon, titleKey, handler, opts) {
+      opts = opts || {};
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'mewyse-table-toolbar-btn' + (opts.danger ? ' danger' : '');
+      b.innerHTML = icon;
+      var label = self.t(titleKey);
+      b.title = label;
+      b.setAttribute('aria-label', label);
+      if (opts.disabled) { b.disabled = true; b.classList.add('disabled'); }
+      // mousedown con preventDefault: NO perder el foco/caret de la celda
+      b.onmousedown = function(e) { e.preventDefault(); e.stopPropagation(); };
+      b.onclick = function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (b.disabled) return;
+        handler(b);
+      };
+      return b;
+    };
+    var sep = function() {
+      var s = document.createElement('span');
+      s.className = 'mewyse-table-toolbar-sep';
+      return s;
+    };
+    // Ejecuta una acción y vuelve a enfocar la tabla para mantener la toolbar
+    var run = function(fn) {
+      fn();
+      self._refocusTable(table);
+      self._updateTableToolbar();
+    };
+
+    var tb = this._tableToolbar;
+    var I = WYSIWYG_ICONS;
+
+    // --- Grupo FILA ---
+    tb.appendChild(makeBtn(I.tableRowAbove, 'tableMenu.insertRowAbove', function(){ run(function(){ self.executeRowAction(table, rowIndex, 'insertBefore', blockId); }); }));
+    tb.appendChild(makeBtn(I.tableRowBelow, 'tableMenu.insertRowBelow', function(){ run(function(){ self.executeRowAction(table, rowIndex, 'insertAfter', blockId); }); }));
+    tb.appendChild(makeBtn(I.tableRowDuplicate, 'tableMenu.duplicateRow', function(){ run(function(){ self.executeRowAction(table, rowIndex, 'duplicate', blockId); }); }));
+    tb.appendChild(makeBtn(I.tableRowClear, 'tableMenu.clearRowContent', function(){ run(function(){ self.executeRowAction(table, rowIndex, 'clear', blockId); }); }));
+    tb.appendChild(makeBtn(I.tableRowDelete, 'tableMenu.deleteRow', function(){ run(function(){ self.executeRowAction(table, rowIndex, 'delete', blockId); }); }, { danger: true }));
+
+    tb.appendChild(sep());
+
+    // --- Grupo COLUMNA ---
+    tb.appendChild(makeBtn(I.tableColLeft, 'tableMenu.insertColumnLeft', function(){ run(function(){ self.executeColAction(table, colIndex, 'insertBefore', blockId); }); }));
+    tb.appendChild(makeBtn(I.tableColRight, 'tableMenu.insertColumnRight', function(){ run(function(){ self.executeColAction(table, colIndex, 'insertAfter', blockId); }); }));
+    tb.appendChild(makeBtn(I.tableColDuplicate, 'tableMenu.duplicateColumn', function(){ run(function(){ self.executeColAction(table, colIndex, 'duplicate', blockId); }); }));
+    tb.appendChild(makeBtn(I.tableColClear, 'tableMenu.clearColumnContent', function(){ run(function(){ self.executeColAction(table, colIndex, 'clear', blockId); }); }));
+    tb.appendChild(makeBtn(I.tableColDelete, 'tableMenu.deleteColumn', function(){ run(function(){ self.executeColAction(table, colIndex, 'delete', blockId); }); }, { danger: true }));
+
+    tb.appendChild(sep());
+
+    // --- Grupo CELDA (combinar / descombinar) ---
+    tb.appendChild(makeBtn(I.mergeCells, 'tableMenu.mergeCells', function(){
+      run(function(){ self.mergeSelectedCells(blockId); });
+    }, { disabled: !mergeEnabled }));
+    tb.appendChild(makeBtn(I.unmergeCells, 'tableMenu.unmergeCells', function(){
+      run(function(){ if (unmergeTarget) self.unmergeCell(unmergeTarget, blockId); });
+    }, { disabled: !unmergeTarget }));
+
+    tb.appendChild(sep());
+
+    // --- Grupo ESTILO (color de fondo de celdas) ---
+    tb.appendChild(makeBtn(I.palette, 'tableMenu.backgroundColor', function(btn){
+      var cells = (self.selectedTableCells && self.selectedTableCells.length > 0)
+        ? self.selectedTableCells.slice() : [info.cell];
+      self.showCellColorPicker(cells, blockId, btn);
+    }));
+
+    tb.appendChild(sep());
+
+    // --- Grupo TABLA ---
+    tb.appendChild(makeBtn(I.gear, 'tableMenu.tableProperties', function(){
+      self.showTablePropertiesModal(blockId);
+    }));
+    tb.appendChild(makeBtn(I.resetWidth, 'tableMenu.resetTableWidth', function(){
+      run(function(){ self.resetTableColumnWidths(blockId); });
+    }));
+    tb.appendChild(makeBtn(I.trash, 'tableMenu.deleteTable', function(){
+      self.hideTableToolbar();
+      self.deleteBlock(blockId);
+    }, { danger: true }));
+  };
+
+  /**
+   * Muestra un selector de color que aplica el fondo a un conjunto de celdas.
+   * Reemplaza al antiguo color por fila/columna (que usaba índice DOM).
+   * @param {Array} cells - celdas destino
+   * @param {number} blockId
+   * @param {HTMLElement} anchorEl - botón de anclaje
+   */
+  meWYSE.prototype.showCellColorPicker = function(cells, blockId, anchorEl) {
+    var self = this;
+    if (!cells || !cells.length) return;
+    var table = cells[0].closest('table');
+    if (!table) return;
+
+    // Cerrar picker existente
+    var existing = document.querySelector('.mewyse-color-picker');
+    if (existing) { if (existing._cancelAnchor) existing._cancelAnchor(); existing.remove(); }
 
     var picker = document.createElement('div');
     picker.className = 'mewyse-color-picker';
 
-    var closeTablePicker = function() {
+    var closePicker = function() {
+      if (picker._cancelAnchor) picker._cancelAnchor();
       if (picker.parentNode) picker.remove();
-      self._hideBackdrop('tableColorPicker');
     };
 
     var colors = [
@@ -7004,105 +7395,51 @@
       '#f4cccc', '#fce5cd', '#fff2cc', '#d9ead3', '#d0e0e3', '#cfe2f3', '#d9d2e9', '#ead1dc'
     ];
 
+    var apply = function(color) {
+      for (var i = 0; i < cells.length; i++) {
+        cells[i].style.backgroundColor = color;
+      }
+      self.updateBlockContent(blockId, table.innerHTML);
+      self.triggerChange();
+      closePicker();
+      self._refocusTable(table);
+      self._updateTableToolbar();
+    };
+
     colors.forEach(function(color) {
-      var colorBtn = document.createElement('button');
-      colorBtn.className = 'mewyse-color-button';
-      colorBtn.style.backgroundColor = color;
-      colorBtn.title = color;
-
-      colorBtn.onclick = function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        // Aplicar color a fila o columna
-        if (rowIndex >= 0) {
-          // Es una fila
-          var rows = table.querySelectorAll('tr');
-          var row = rows[rowIndex];
-          if (row) {
-            var cells = row.querySelectorAll('td, th');
-            for (var i = 0; i < cells.length; i++) {
-              cells[i].style.backgroundColor = color;
-            }
-          }
-        } else if (colIndex >= 0) {
-          // Es una columna
-          var rows = table.querySelectorAll('tr');
-          rows.forEach(function(row) {
-            var cells = row.querySelectorAll('td, th');
-            if (cells[colIndex]) {
-              cells[colIndex].style.backgroundColor = color;
-            }
-          });
-        }
-
-        self.updateBlockContent(blockId, self.getCleanTableHTML(table));
-        closeTablePicker();
-      };
-
-      picker.appendChild(colorBtn);
+      var cb = document.createElement('button');
+      cb.type = 'button';
+      cb.className = 'mewyse-color-button';
+      cb.style.backgroundColor = color;
+      cb.title = color;
+      cb.onmousedown = function(e) { e.preventDefault(); e.stopPropagation(); };
+      cb.onclick = function(e) { e.preventDefault(); e.stopPropagation(); apply(color); };
+      picker.appendChild(cb);
     });
 
-    // Botón para remover color
+    // Botón para quitar color
     var removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
     removeBtn.className = 'mewyse-color-button mewyse-color-remove';
     removeBtn.innerHTML = WYSIWYG_ICONS.close;
     removeBtn.title = self.t('colors.removeColor');
-    removeBtn.onclick = function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-
-      // Remover color de fila o columna
-      if (rowIndex >= 0) {
-        // Es una fila
-        var rows = table.querySelectorAll('tr');
-        var row = rows[rowIndex];
-        if (row) {
-          var cells = row.querySelectorAll('td, th');
-          for (var i = 0; i < cells.length; i++) {
-            cells[i].style.backgroundColor = '';
-          }
-        }
-      } else if (colIndex >= 0) {
-        // Es una columna
-        var rows = table.querySelectorAll('tr');
-        rows.forEach(function(row) {
-          var cells = row.querySelectorAll('td, th');
-          if (cells[colIndex]) {
-            cells[colIndex].style.backgroundColor = '';
-          }
-        });
-      }
-
-      self.updateBlockContent(blockId, table.innerHTML);
-      closeTablePicker();
-    };
+    removeBtn.onmousedown = function(e) { e.preventDefault(); e.stopPropagation(); };
+    removeBtn.onclick = function(e) { e.preventDefault(); e.stopPropagation(); apply(''); };
     picker.appendChild(removeBtn);
 
-    // Posicionar el picker
-    var rect = button.getBoundingClientRect();
-    picker.style.position = 'fixed';
-    picker.style.top = (rect.bottom + 5) + 'px';
-    picker.style.left = rect.left + 'px';
-
+    self._applyMenuTheme(picker);
     document.body.appendChild(picker);
+    this.anchorMenu(picker, anchorEl, { offsetY: 5, centerX: true });
 
-    // Cerrar al hacer clic fuera
+    // Cerrar al hacer clic fuera (registrado para limpieza en destroy)
     setTimeout(function() {
-      document.addEventListener('click', function closePicker(e) {
-        if (!picker.contains(e.target) && !button.contains(e.target)) {
-          closeTablePicker();
-          document.removeEventListener('click', closePicker);
+      self._add_doc_click(function closeColorMenu(e) {
+        if (!picker.contains(e.target) && e.target !== anchorEl) {
+          closePicker();
+          self._remove_doc_click(closeColorMenu);
         }
       });
     }, 10);
-
-    // Evitar que se cierre al hacer clic en el picker
-    picker.addEventListener('mousedown', function(e) {
-      e.preventDefault();
-    });
-
-    this._showBackdrop('tableColorPicker', closeTablePicker);
   };
 
   /**
@@ -7114,60 +7451,40 @@
    */
   meWYSE.prototype.executeRowAction = function(table, rowIndex, action, blockId) {
     var rows = table.querySelectorAll('tr');
-    var row = rows[rowIndex];
-
-    if (!row) return;
+    if (!rows[rowIndex]) return;
 
     switch (action) {
       case 'insertBefore':
-        var newRow = row.cloneNode(true);
-        var cells = newRow.querySelectorAll('td, th');
-        for (var i = 0; i < cells.length; i++) {
-          cells[i].innerHTML = '';
-          cells[i].style.backgroundColor = '';
-          this.attachTableCellEvents(cells[i], blockId);
-        }
-        row.parentNode.insertBefore(newRow, row);
+        this._insertTableRowAt(table, rowIndex, blockId);
         break;
 
       case 'insertAfter':
-        var newRow = row.cloneNode(true);
-        var cells = newRow.querySelectorAll('td, th');
-        for (var i = 0; i < cells.length; i++) {
-          cells[i].innerHTML = '';
-          cells[i].style.backgroundColor = '';
-          this.attachTableCellEvents(cells[i], blockId);
-        }
-        if (row.nextSibling) {
-          row.parentNode.insertBefore(newRow, row.nextSibling);
-        } else {
-          row.parentNode.appendChild(newRow);
-        }
+        this._insertTableRowAt(table, rowIndex + 1, blockId);
         break;
 
       case 'duplicate':
-        var newRow = row.cloneNode(true);
-        var cells = newRow.querySelectorAll('td, th');
-        for (var i = 0; i < cells.length; i++) {
-          this.attachTableCellEvents(cells[i], blockId);
-        }
-        if (row.nextSibling) {
-          row.parentNode.insertBefore(newRow, row.nextSibling);
-        } else {
-          row.parentNode.appendChild(newRow);
-        }
+        // Insertar una fila vacía debajo y copiar el contenido de las celdas
+        // originales en las celdas nuevas que correspondan (por columna lógica).
+        this._duplicateTableRow(table, rowIndex, blockId);
         break;
 
       case 'clear':
-        var cells = row.querySelectorAll('td, th');
-        for (var i = 0; i < cells.length; i++) {
-          cells[i].innerHTML = '';
+        // Limpiar el contenido de las celdas únicas de la fila (respeta spans)
+        var v_matrix = this.buildTableMatrix(table);
+        var v_cols = this._logicalColCount(v_matrix);
+        var v_seen = [];
+        for (var c = 0; c < v_cols; c++) {
+          var v_cell = v_matrix[rowIndex] ? v_matrix[rowIndex][c] : null;
+          if (!v_cell || v_seen.indexOf(v_cell) !== -1) continue;
+          v_seen.push(v_cell);
+          var v_inner = v_cell.querySelector('p, h1, h2, h3, blockquote, pre');
+          if (v_inner) { v_inner.innerHTML = ''; } else { v_cell.innerHTML = ''; }
         }
         break;
 
       case 'delete':
         if (rows.length > 1) {
-          row.remove();
+          this._deleteTableRowAt(table, rowIndex, blockId);
         } else {
           alert(this.t('alerts.cannotDeleteLastRow'));
           return;
@@ -7181,6 +7498,48 @@
   };
 
   /**
+   * Duplica una fila lógica: inserta una fila vacía debajo y copia el contenido
+   * de las celdas originales en las celdas nuevas según su columna lógica.
+   * @param {HTMLElement} table
+   * @param {number} rowIndex
+   * @param {number} blockId
+   */
+  meWYSE.prototype._duplicateTableRow = function(table, rowIndex, blockId) {
+    // Capturar el contenido de la fila original por columna lógica ANTES de
+    // modificar la tabla
+    var v_srcMatrix = this.buildTableMatrix(table);
+    var v_cols = this._logicalColCount(v_srcMatrix);
+    var v_srcHtml = {};
+    for (var c = 0; c < v_cols; c++) {
+      var v_src = v_srcMatrix[rowIndex] ? v_srcMatrix[rowIndex][c] : null;
+      if (v_src) {
+        var v_inner = v_src.querySelector('p, h1, h2, h3, blockquote, pre');
+        v_srcHtml[c] = v_inner ? v_inner.innerHTML : '';
+      }
+    }
+
+    // Insertar fila vacía debajo
+    this._insertTableRowAt(table, rowIndex + 1, blockId);
+
+    // Volcar el contenido en las celdas nuevas que se originan en la fila nueva
+    var v_newMatrix = this.buildTableMatrix(table);
+    var v_newRowIdx = rowIndex + 1;
+    var v_done = [];
+    for (var c2 = 0; c2 < v_cols; c2++) {
+      var v_cell = v_newMatrix[v_newRowIdx] ? v_newMatrix[v_newRowIdx][c2] : null;
+      if (!v_cell || v_done.indexOf(v_cell) !== -1) continue;
+      // Solo las celdas que se ORIGINAN en la fila nueva (no rowspans de arriba)
+      var v_aboveNew = v_newMatrix[v_newRowIdx - 1] ? v_newMatrix[v_newRowIdx - 1][c2] : null;
+      if (v_aboveNew === v_cell) continue;
+      v_done.push(v_cell);
+      if (typeof v_srcHtml[c2] === 'string') {
+        var v_innerNew = v_cell.querySelector('p, h1, h2, h3, blockquote, pre');
+        if (v_innerNew) v_innerNew.innerHTML = v_srcHtml[c2];
+      }
+    }
+  };
+
+  /**
    * Ejecuta una acción sobre una columna
    * @param {HTMLElement} table
    * @param {number} colIndex
@@ -7188,76 +7547,37 @@
    * @param {number} blockId
    */
   meWYSE.prototype.executeColAction = function(table, colIndex, action, blockId) {
-    var rows = table.querySelectorAll('tr');
-
     switch (action) {
       case 'insertBefore':
-        rows.forEach(function(row) {
-          var cells = row.querySelectorAll('td, th');
-          if (cells[colIndex]) {
-            var newCell = document.createElement('td');
-            newCell.contentEditable = true;
-            newCell.style.border = '1px solid #ddd';
-            newCell.style.padding = '8px';
-            this.attachTableCellEvents(newCell, blockId);
-            row.insertBefore(newCell, cells[colIndex]);
-          }
-        }, this);
+        this._insertTableColumnAt(table, colIndex, blockId);
         break;
 
       case 'insertAfter':
-        rows.forEach(function(row) {
-          var cells = row.querySelectorAll('td, th');
-          if (cells[colIndex]) {
-            var newCell = document.createElement('td');
-            newCell.contentEditable = true;
-            newCell.style.border = '1px solid #ddd';
-            newCell.style.padding = '8px';
-            this.attachTableCellEvents(newCell, blockId);
-            if (cells[colIndex].nextSibling) {
-              row.insertBefore(newCell, cells[colIndex].nextSibling);
-            } else {
-              row.appendChild(newCell);
-            }
-          }
-        }, this);
+        this._insertTableColumnAt(table, colIndex + 1, blockId);
         break;
 
       case 'duplicate':
-        rows.forEach(function(row) {
-          var cells = row.querySelectorAll('td, th');
-          if (cells[colIndex]) {
-            var newCell = cells[colIndex].cloneNode(true);
-            this.attachTableCellEvents(newCell, blockId);
-            if (cells[colIndex].nextSibling) {
-              row.insertBefore(newCell, cells[colIndex].nextSibling);
-            } else {
-              row.appendChild(newCell);
-            }
-          }
-        }, this);
+        // Insertar columna a la derecha y copiar el contenido de la original
+        this._duplicateTableColumn(table, colIndex, blockId);
         break;
 
       case 'clear':
-        rows.forEach(function(row) {
-          var cells = row.querySelectorAll('td, th');
-          if (cells[colIndex]) {
-            cells[colIndex].innerHTML = '';
-          }
-        });
+        // Limpiar el contenido de las celdas únicas de la columna (respeta spans)
+        var v_matrix = this.buildTableMatrix(table);
+        var v_seen = [];
+        for (var r = 0; r < v_matrix.length; r++) {
+          var v_cell = v_matrix[r] ? v_matrix[r][colIndex] : null;
+          if (!v_cell || v_seen.indexOf(v_cell) !== -1) continue;
+          v_seen.push(v_cell);
+          var v_inner = v_cell.querySelector('p, h1, h2, h3, blockquote, pre');
+          if (v_inner) { v_inner.innerHTML = ''; } else { v_cell.innerHTML = ''; }
+        }
         break;
 
       case 'delete':
-        var firstRow = rows[0];
-        var cellCount = firstRow ? firstRow.querySelectorAll('td, th').length : 0;
-
-        if (cellCount > 1) {
-          rows.forEach(function(row) {
-            var cells = row.querySelectorAll('td, th');
-            if (cells[colIndex]) {
-              cells[colIndex].remove();
-            }
-          });
+        var v_colCount = this._logicalColCount(this.buildTableMatrix(table));
+        if (v_colCount > 1) {
+          this._deleteTableColumnAt(table, colIndex, blockId);
         } else {
           alert(this.t('alerts.cannotDeleteLastColumn'));
           return;
@@ -7268,6 +7588,46 @@
     // Actualizar controles y guardar
     this.refreshTableControls(table, blockId);
     this.updateBlockContent(blockId, table.innerHTML);
+  };
+
+  /**
+   * Duplica una columna lógica: inserta una columna a la derecha y copia el
+   * contenido de las celdas originales en las nuevas según su fila lógica.
+   * @param {HTMLElement} table
+   * @param {number} colIndex
+   * @param {number} blockId
+   */
+  meWYSE.prototype._duplicateTableColumn = function(table, colIndex, blockId) {
+    // Capturar contenido de la columna original por fila ANTES de modificar
+    var v_srcMatrix = this.buildTableMatrix(table);
+    var v_srcHtml = {};
+    for (var r = 0; r < v_srcMatrix.length; r++) {
+      var v_src = v_srcMatrix[r] ? v_srcMatrix[r][colIndex] : null;
+      if (v_src) {
+        var v_inner = v_src.querySelector('p, h1, h2, h3, blockquote, pre');
+        v_srcHtml[r] = v_inner ? v_inner.innerHTML : '';
+      }
+    }
+
+    // Insertar columna a la derecha
+    var v_newCol = colIndex + 1;
+    this._insertTableColumnAt(table, v_newCol, blockId);
+
+    // Volcar contenido en las celdas que se originan en la columna nueva
+    var v_newMatrix = this.buildTableMatrix(table);
+    var v_done = [];
+    for (var r2 = 0; r2 < v_newMatrix.length; r2++) {
+      var v_cell = v_newMatrix[r2] ? v_newMatrix[r2][v_newCol] : null;
+      if (!v_cell || v_done.indexOf(v_cell) !== -1) continue;
+      // Solo celdas que se originan en la columna nueva (no colspans desde la izquierda)
+      var v_leftNew = v_newMatrix[r2] ? v_newMatrix[r2][v_newCol - 1] : null;
+      if (v_leftNew === v_cell) continue;
+      v_done.push(v_cell);
+      if (typeof v_srcHtml[r2] === 'string') {
+        var v_innerNew = v_cell.querySelector('p, h1, h2, h3, blockquote, pre');
+        if (v_innerNew) v_innerNew.innerHTML = v_srcHtml[r2];
+      }
+    }
   };
 
   /**
@@ -7395,7 +7755,13 @@
       return;
     }
 
-    var text = element.textContent;
+    // El texto sobre el que detectamos triggers (`/` `@` `#` `:`) IGNORA el
+    // contenido de spans atómicos contenteditable=false (mewyse-mention,
+    // mewyse-tag, mewyse-emoji). Sin esto, al borrar el espacio que sigue a
+    // un tag con texto `#xxx` el matcher dispararía el menú falsamente —
+    // creyendo que el usuario tecleó `#xxx`. El texto del tag no es texto
+    // editable por el usuario y debe excluirse del matcher.
+    var text = this._editableTextContent(element);
 
     // ===== MENÚ SLASH =====
     // Buscar "/" al inicio o después de espacio
@@ -7440,6 +7806,27 @@
       } else if (this.mentionMenu) {
         // Cerrar menú si el "@" ya no está
         this.closeMentionMenu();
+      }
+    }
+
+    // ===== MENÚ DE ETIQUETAS (#) =====
+    // Mismo patrón que @mentions: trigger al inicio o tras espacio.
+    if (this.tags.length > 0) {
+      var tagMatch = text.match(/(^|\s)#([\w-]*)$/);
+
+      if (tagMatch) {
+        var tagSearchText = tagMatch[2];
+
+        if (!this.tagMenu) {
+          this.showTagMenu(blockId, element);
+        }
+
+        if (this.tagMenu) {
+          this.filterTagMenu(tagSearchText);
+        }
+        return;
+      } else if (this.tagMenu) {
+        this.closeTagMenu();
       }
     }
 
@@ -7529,10 +7916,10 @@
 
     // Cerrar al hacer clic fuera
     setTimeout(function() {
-      document.addEventListener('click', function closeMenu(e) {
+      self._add_doc_click(function closeMenu(e) {
         if (self.slashMenu && !self.slashMenu.contains(e.target) && e.target !== element) {
           self.closeSlashMenu();
-          document.removeEventListener('click', closeMenu);
+          self._remove_doc_click(closeMenu);
         }
       });
     }, 10);
@@ -7794,14 +8181,18 @@
   };
 
   /**
-   * Posiciona el menú de menciones cerca del cursor/caret
+   * Posiciona un menú flotante (menciones, tags, etc.) cerca del cursor/caret.
+   * Se usa para todos los autocompletes anclados al cursor — la única condición
+   * para seguir reposicionando es que el menú siga en el DOM (mientras esté
+   * `parentNode` no es null), independientemente de qué propiedad del editor
+   * lo referencie.
    * @param {HTMLElement} menu
    */
   meWYSE.prototype.positionMentionMenuAtCaret = function(menu) {
     var self = this;
 
     function updatePosition() {
-      if (!menu.parentNode || !self.mentionMenu) {
+      if (!menu.parentNode) {
         return;
       }
 
@@ -7862,8 +8253,10 @@
       menu.style.left = left + 'px';
       menu.style.top = top + 'px';
 
-      // Continuar actualizando mientras el menú esté abierto
-      if (self.mentionMenu) {
+      // Continuar actualizando mientras el menú siga en el DOM. El cleanup
+      // por `_cancelAnchor` (llamado desde _closeMenu) cancela este rAF al
+      // cerrar, así que no hace falta acoplar a una propiedad concreta.
+      if (menu.parentNode) {
         menu._animationFrameId = requestAnimationFrame(updatePosition);
       }
     }
@@ -8400,6 +8793,283 @@
     this._hideBackdrop('emojiMenu');
   };
 
+  // =========================================================================
+  // SISTEMA DE ETIQUETAS (#tags)
+  // =========================================================================
+
+  /**
+   * Construye el HTML inline de un tag (cápsula). Reusable desde insertTag y
+   * desde la preview en el menú. El color es opcional — si no se proporciona,
+   * la cápsula hereda el color genérico definido por CSS (.mewyse-tag).
+   */
+  /**
+   * Devuelve el textContent del elemento EXCLUYENDO el texto que vive dentro
+   * de spans atómicos contenteditable=false (mention/tag/emoji). Lo usa el
+   * detector de triggers (`/`, `@`, `#`, `:`) en `handleKeyUp` para que el
+   * matcher no vea el texto de los átomos como si fuera texto del usuario.
+   */
+  meWYSE.prototype._editableTextContent = function(element) {
+    var ATOMIC_CLASSES = { 'mewyse-mention': 1, 'mewyse-tag': 1, 'mewyse-emoji': 1 };
+    var out = '';
+    function walk(node) {
+      if (!node) return;
+      if (node.nodeType === 3) {
+        out += node.textContent;
+        return;
+      }
+      if (node.nodeType !== 1) return;
+      // Skip atomic span subtree — su texto no es del usuario
+      if (node.classList) {
+        for (var i = 0; i < node.classList.length; i++) {
+          if (ATOMIC_CLASSES[node.classList[i]]) return;
+        }
+      }
+      var c = node.firstChild;
+      while (c) {
+        walk(c);
+        c = c.nextSibling;
+      }
+    }
+    walk(element);
+    return out;
+  };
+
+  meWYSE.prototype._renderTagCapsule = function(tag) {
+    var span = document.createElement('span');
+    span.className = 'mewyse-tag';
+    span.setAttribute('data-tag-id', String(tag.id));
+    span.setAttribute('data-tag-name', tag.name);
+    span.setAttribute('contenteditable', 'false');
+    if (typeof tag.color === 'string' && tag.color) {
+      span.setAttribute('data-tag-color', tag.color);
+      // El sanitizer permite background-color y color en el style. Aplicamos
+      // texto blanco/negro según el brillo del fondo para legibilidad.
+      var fg = this._pickContrastColor(tag.color);
+      span.setAttribute('style', 'background-color: ' + tag.color + '; color: ' + fg);
+    }
+    span.textContent = '#' + tag.name;
+    return span;
+  };
+
+  /**
+   * Devuelve un color de texto legible (blanco u oscuro) sobre un fondo dado.
+   * Soporta hex (#rgb, #rrggbb), rgb(...) y nombres CSS comunes. Para colores
+   * que no parsea cae en blanco como default seguro.
+   */
+  meWYSE.prototype._pickContrastColor = function(bg) {
+    var rgb = this._parseColorToRGB(bg);
+    if (!rgb) return '#fff';
+    // Luminancia relativa simplificada (W3C — versión rápida).
+    var lum = (rgb[0] * 0.2126 + rgb[1] * 0.7152 + rgb[2] * 0.0722) / 255;
+    return lum > 0.6 ? '#1a1a1a' : '#fff';
+  };
+
+  meWYSE.prototype._parseColorToRGB = function(s) {
+    if (typeof s !== 'string') return null;
+    s = s.trim().toLowerCase();
+    // Hex #rgb, #rrggbb
+    var m = s.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/);
+    if (m) {
+      var hex = m[1];
+      if (hex.length === 3) hex = hex.charAt(0) + hex.charAt(0) + hex.charAt(1) + hex.charAt(1) + hex.charAt(2) + hex.charAt(2);
+      return [parseInt(hex.substr(0, 2), 16), parseInt(hex.substr(2, 2), 16), parseInt(hex.substr(4, 2), 16)];
+    }
+    // rgb(r,g,b) / rgba(r,g,b,a)
+    m = s.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+    if (m) return [parseInt(m[1], 10), parseInt(m[2], 10), parseInt(m[3], 10)];
+    return null;
+  };
+
+  meWYSE.prototype.showTagMenu = function(blockId, element) {
+    var self = this;
+
+    this.closeTagMenu();
+
+    var menu = document.createElement('div');
+    menu.className = 'mewyse-tag-menu';
+    menu.setAttribute('role', 'listbox');
+    menu.setAttribute('aria-label', 'Tags');
+    this.tagMenu = menu;
+    this.tagMenuSelectedIndex = 0;
+    this.tagMenuElement = element;
+    this.tagMenuBlockId = blockId;
+    this.tagMenuItems = this.tags.slice();
+
+    var selection = window.getSelection();
+    if (selection.rangeCount > 0) {
+      this.tagMenuRange = selection.getRangeAt(0).cloneRange();
+    }
+
+    this.tags.forEach(function(tag, index) {
+      var item = document.createElement('div');
+      item.className = 'mewyse-tag-menu-item';
+      item.setAttribute('role', 'option');
+      item.setAttribute('data-index', index);
+
+      // Swatch visual del color
+      var swatch = document.createElement('span');
+      swatch.className = 'mewyse-tag-menu-swatch';
+      if (typeof tag.color === 'string' && tag.color) {
+        swatch.style.backgroundColor = tag.color;
+      }
+      item.appendChild(swatch);
+
+      var nameSpan = document.createElement('span');
+      nameSpan.className = 'mewyse-tag-menu-name';
+      nameSpan.textContent = tag.name;
+      item.appendChild(nameSpan);
+
+      item.addEventListener('mousedown', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (self.tagMenuRange) {
+          var sel = window.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(self.tagMenuRange);
+        }
+        self.selectTagItem(index);
+      });
+
+      menu.appendChild(item);
+    });
+
+    self._applyMenuTheme(menu);
+    document.body.appendChild(menu);
+
+    // Reusamos exactamente el posicionamiento del menú de menciones.
+    this.positionMentionMenuAtCaret(menu);
+
+    this.updateTagMenuSelection();
+
+    this._showBackdrop('tagMenu', function() { self.closeTagMenu(); });
+  };
+
+  meWYSE.prototype.filterTagMenu = function(searchText) {
+    if (!this.tagMenu) return;
+
+    var self = this;
+    var searchLower = searchText.toLowerCase();
+    var items = this.tagMenu.querySelectorAll('.mewyse-tag-menu-item');
+    var visibleCount = 0;
+
+    this.tagMenuItems = [];
+
+    this.tags.forEach(function(tag, index) {
+      var item = items[index];
+      var matches = tag.name.toLowerCase().indexOf(searchLower) !== -1;
+      if (matches) {
+        item.style.display = '';
+        self.tagMenuItems.push(tag);
+        visibleCount++;
+      } else {
+        item.style.display = 'none';
+      }
+    });
+
+    if (this.tagMenuSelectedIndex >= visibleCount) {
+      this.tagMenuSelectedIndex = 0;
+    }
+    this.updateTagMenuSelection();
+
+    if (visibleCount === 0) {
+      this.closeTagMenu();
+    }
+  };
+
+  meWYSE.prototype.updateTagMenuSelection = function() {
+    if (!this.tagMenu) return;
+    var items = this.tagMenu.querySelectorAll('.mewyse-tag-menu-item');
+    var visibleItems = this.tagMenu.querySelectorAll('.mewyse-tag-menu-item:not([style*="display: none"])');
+    items.forEach(function(item) {
+      item.classList.remove('selected');
+      item.setAttribute('aria-selected', 'false');
+    });
+    if (visibleItems[this.tagMenuSelectedIndex]) {
+      visibleItems[this.tagMenuSelectedIndex].classList.add('selected');
+      visibleItems[this.tagMenuSelectedIndex].setAttribute('aria-selected', 'true');
+    }
+  };
+
+  meWYSE.prototype.tagMenuNavigateUp = function() {
+    this._navigateMenu('tagMenu', '.mewyse-tag-menu-item', 'tagMenuSelectedIndex', 'updateTagMenuSelection', 'up');
+  };
+  meWYSE.prototype.tagMenuNavigateDown = function() {
+    this._navigateMenu('tagMenu', '.mewyse-tag-menu-item', 'tagMenuSelectedIndex', 'updateTagMenuSelection', 'down');
+  };
+
+  meWYSE.prototype.selectTagItem = function(index) {
+    if (!this.tagMenu || !this.tagMenuElement) return;
+    var visibleItems = this.tagMenu.querySelectorAll('.mewyse-tag-menu-item:not([style*="display: none"])');
+    if (!visibleItems[index]) {
+      var tag = this.tags[index];
+      if (!tag) return;
+      this.insertTag(tag);
+      return;
+    }
+    var tag = this.tagMenuItems[index];
+    if (!tag) return;
+    this.insertTag(tag);
+  };
+
+  meWYSE.prototype.insertTag = function(tag) {
+    var element = this.tagMenuElement;
+    var tagSpan = this._renderTagCapsule(tag);
+
+    var selection = window.getSelection();
+    if (!selection.rangeCount) {
+      this.closeTagMenu();
+      return;
+    }
+
+    // Buscar y eliminar el "#..." que activó el menú
+    var textContent = element.textContent;
+    var hashMatch = textContent.match(/(^|\s)#([\w-]*)$/);
+    if (hashMatch) {
+      var hashPosition = textContent.lastIndexOf('#');
+      var walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null, false);
+      var currentPos = 0;
+      var targetNode = null;
+      var nodeOffset = 0;
+      while (walker.nextNode()) {
+        var node = walker.currentNode;
+        var nodeLength = node.textContent.length;
+        if (currentPos + nodeLength > hashPosition) {
+          targetNode = node;
+          nodeOffset = hashPosition - currentPos;
+          break;
+        }
+        currentPos += nodeLength;
+      }
+      if (targetNode) {
+        var deleteRange = document.createRange();
+        deleteRange.setStart(targetNode, nodeOffset);
+        deleteRange.setEndAfter(element.lastChild || element);
+        deleteRange.deleteContents();
+        deleteRange.insertNode(tagSpan);
+        var spaceNode = document.createTextNode(' ');
+        tagSpan.parentNode.insertBefore(spaceNode, tagSpan.nextSibling);
+        var newRange = document.createRange();
+        newRange.setStartAfter(spaceNode);
+        newRange.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(newRange);
+      }
+    }
+
+    this.updateBlockContent(this.tagMenuBlockId, element.innerHTML);
+    this.closeTagMenu();
+  };
+
+  meWYSE.prototype.closeTagMenu = function() {
+    this._closeMenu('tagMenu');
+    this.tagMenuSelectedIndex = 0;
+    this.tagMenuElement = null;
+    this.tagMenuBlockId = null;
+    this.tagMenuItems = [];
+    this.tagMenuRange = null;
+    this._hideBackdrop('tagMenu');
+  };
+
   /**
    * Maneja los eventos de teclado en los bloques
    * @param {KeyboardEvent} e
@@ -8440,6 +9110,47 @@
         e.preventDefault();
         this.clearSelection();
         return;
+      }
+    }
+
+    // Espacio dentro/al final de una cápsula `.mewyse-tag`: redirigir el espacio
+    // a DESPUÉS del tag y llevar el cursor allí. Sin este guard, el cursor a
+    // veces queda atrapado en la frontera del span contenteditable=false
+    // (especialmente tras navegar con flechas o clicar al borde derecho del
+    // tag) y el siguiente texto que escribes podría asociarse visualmente al
+    // tag o no aparecer.
+    if ((e.key === ' ' || e.code === 'Space') && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      var spaceSel = window.getSelection();
+      if (spaceSel && spaceSel.rangeCount > 0) {
+        var spaceRange = spaceSel.getRangeAt(0);
+        if (spaceRange.collapsed) {
+          var probe = spaceRange.startContainer;
+          if (probe && probe.nodeType === 3) probe = probe.parentNode;
+          var tagAncestor = null;
+          while (probe && probe !== element) {
+            if (probe.classList && probe.classList.contains('mewyse-tag')) {
+              tagAncestor = probe;
+              break;
+            }
+            probe = probe.parentNode;
+          }
+          if (tagAncestor) {
+            e.preventDefault();
+            var spaceNode = document.createTextNode(' ');
+            if (tagAncestor.nextSibling) {
+              tagAncestor.parentNode.insertBefore(spaceNode, tagAncestor.nextSibling);
+            } else {
+              tagAncestor.parentNode.appendChild(spaceNode);
+            }
+            var newRange = document.createRange();
+            newRange.setStartAfter(spaceNode);
+            newRange.collapse(true);
+            spaceSel.removeAllRanges();
+            spaceSel.addRange(newRange);
+            this.updateBlockContent(blockId, element.innerHTML);
+            return;
+          }
+        }
       }
     }
 
@@ -8521,6 +9232,30 @@
       if (e.key === 'Escape') {
         e.preventDefault();
         this.closeMentionMenu();
+        return;
+      }
+    }
+
+    // Si el menú de etiquetas está abierto, manejar navegación
+    if (this.tagMenu) {
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        this.tagMenuNavigateUp();
+        return;
+      }
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        this.tagMenuNavigateDown();
+        return;
+      }
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        this.selectTagItem(this.tagMenuSelectedIndex);
+        return;
+      }
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        this.closeTagMenu();
         return;
       }
     }
@@ -8734,6 +9469,33 @@
       var afterHTML = '';
       var atEnd = true;
       if (canSplit && range && range.collapsed) {
+        // Si el cursor cayó DENTRO de un átomo inline (mention/tag/emoji,
+        // todos `contenteditable="false"`), re-anclamos a DESPUÉS del átomo
+        // antes de partir el contenido. Sin esto, el split chopearía el
+        // átomo en dos mitades — la primera con el texto parcial y la
+        // segunda como cápsula vacía visible (el "círculo gris" reportado).
+        var ATOMIC = { 'mewyse-mention': 1, 'mewyse-tag': 1, 'mewyse-emoji': 1 };
+        var probeNode = range.startContainer;
+        if (probeNode && probeNode.nodeType === 3) probeNode = probeNode.parentNode;
+        var atomicAncestor = null;
+        while (probeNode && probeNode !== element) {
+          if (probeNode.classList) {
+            var cls = probeNode.classList;
+            if (ATOMIC['mewyse-mention'] && cls.contains('mewyse-mention')) { atomicAncestor = probeNode; break; }
+            if (ATOMIC['mewyse-tag'] && cls.contains('mewyse-tag')) { atomicAncestor = probeNode; break; }
+            if (ATOMIC['mewyse-emoji'] && cls.contains('mewyse-emoji')) { atomicAncestor = probeNode; break; }
+          }
+          probeNode = probeNode.parentNode;
+        }
+        if (atomicAncestor) {
+          var snapped = document.createRange();
+          snapped.setStartAfter(atomicAncestor);
+          snapped.collapse(true);
+          sel.removeAllRanges();
+          sel.addRange(snapped);
+          range = snapped;
+        }
+
         var beforeRange = document.createRange();
         beforeRange.selectNodeContents(element);
         beforeRange.setEnd(range.startContainer, range.startOffset);
@@ -8988,10 +9750,6 @@
       self._hideBackdrop('blockOptions');
     };
 
-    // Obtener el bloque para ver si es una tabla
-    var block = this.getBlock(blockId);
-    var isTable = block && block.type === 'table';
-
     // Verificar si hay múltiples bloques seleccionados
     var hasMultipleSelection = this.selectedBlocks.length > 1;
     var selectionCount = this.selectedBlocks.length;
@@ -9030,18 +9788,8 @@
       }
     ];
 
-    // Si es una tabla, añadir opciones específicas de tabla
-    if (isTable && !hasMultipleSelection) {
-      options.splice(2, 0, {
-        action: 'tableProperties',
-        label: this.t('blockMenu.tableProperties'),
-        icon: WYSIWYG_ICONS.gear
-      }, {
-        action: 'resetTableWidth',
-        label: this.t('blockMenu.resetTableWidth'),
-        icon: WYSIWYG_ICONS.resetWidth
-      });
-    }
+    // Las acciones específicas de tabla (propiedades, restablecer anchos) viven
+    // ahora en la toolbar contextual de tabla, no en el handle lateral.
 
     options.forEach(function(option) {
       var item = document.createElement('div');
@@ -9069,12 +9817,6 @@
         } else if (option.action === 'duplicate') {
           self.duplicateBlock(blockId);
           closeBlockOptionsMenu();
-        } else if (option.action === 'resetTableWidth') {
-          self.resetTableColumnWidths(blockId);
-          closeBlockOptionsMenu();
-        } else if (option.action === 'tableProperties') {
-          closeBlockOptionsMenu();
-          self.showTablePropertiesModal(blockId);
         } else if (option.action === 'delete') {
           // Si hay selección múltiple, eliminar todos los seleccionados
           if (self.selectedBlocks.length > 1) {
@@ -9097,10 +9839,10 @@
 
     // Cerrar al hacer clic fuera
     setTimeout(function() {
-      document.addEventListener('click', function closeMenu(e) {
+      self._add_doc_click(function closeMenu(e) {
         if (!menu.contains(e.target) && !button.contains(e.target)) {
           closeBlockOptionsMenu();
-          document.removeEventListener('click', closeMenu);
+          self._remove_doc_click(closeMenu);
         }
       });
     }, 10);
@@ -9182,10 +9924,10 @@
 
     // Cerrar al hacer clic fuera
     setTimeout(function() {
-      document.addEventListener('click', function closeMenu(e) {
+      self._add_doc_click(function closeMenu(e) {
         if (!menu.contains(e.target) && !button.contains(e.target)) {
           closeBlockTypeMenu();
-          document.removeEventListener('click', closeMenu);
+          self._remove_doc_click(closeMenu);
         }
       });
     }, 10);
@@ -9284,6 +10026,8 @@
     }
 
     if (typeof index === 'number') {
+      // Normalizar a rango válido [0, length] (evita splice con índice negativo)
+      index = Math.max(0, Math.min(index, this.blocks.length));
       this.blocks.splice(index, 0, block);
     } else {
       this.blocks.push(block);
@@ -9323,10 +10067,13 @@
         type: block.type,
         content: block.content
       };
-      // Preservar propiedades opcionales (tableStyle, checked, alignment)
+      // Preservar propiedades opcionales (tableStyle, checked, alignment,
+      // indentLevel para listas anidadas, customClass de styleFormats)
       if (typeof block.tableStyle === 'string') duplicatedBlock.tableStyle = block.tableStyle;
       if (block.checked === true) duplicatedBlock.checked = true;
       if (typeof block.alignment === 'string') duplicatedBlock.alignment = block.alignment;
+      if (typeof block.indentLevel === 'number') duplicatedBlock.indentLevel = block.indentLevel;
+      if (typeof block.customClass === 'string') duplicatedBlock.customClass = block.customClass;
 
       this.blocks.splice(index + 1, 0, duplicatedBlock);
       this.render();
@@ -9701,13 +10448,18 @@
       if (blocks[i].type === 'table' && typeof blocks[i].content === 'string') {
         var cleaned = this._cleanTableContent(blocks[i].content);
         if (cleaned !== blocks[i].content) {
-          // No mutar el bloque original, devolver una copia
+          // No mutar el bloque original, devolver una copia preservando TODAS
+          // las propiedades opcionales (tableStyle/indentLevel/customClass se
+          // omitían antes, perdiéndose en el export de tablas limpiadas).
           blocks[i] = {
             id: blocks[i].id,
             type: blocks[i].type,
             content: cleaned,
             checked: blocks[i].checked,
-            alignment: blocks[i].alignment
+            alignment: blocks[i].alignment,
+            tableStyle: blocks[i].tableStyle,
+            indentLevel: blocks[i].indentLevel,
+            customClass: blocks[i].customClass
           };
         }
       }
@@ -9772,16 +10524,17 @@
     };
 
     // Transformer del contenido inline. Pasos:
-    //  1. Sanear: garantiza que el contenido sea válido como HTML inline. Si
-    //     el modelo recibió `<p>`, `<div>`, etc. anidados (paste pegado,
-    //     atajos del navegador, autocorrección...), el sanitizer los unwrap
-    //     a `<br>` y NO se emiten dentro del wrapper `<p>...</p>` del bloque.
-    //     Sin este paso podía salir HTML inválido tipo `<p><p></p><p></p></p>`.
-    //  2. Si `escapeHtmlEntities` está activo (default), aplica el escape de
-    //     entidades sobre el ya sanitizado.
+    //  1. Sanear: garantiza HTML válido inline (unwrap de bloques anidados
+    //     a <br>, etc.).
+    //  2. Strip de `style` en elementos NO nativos del editor — limpia spans
+    //     de color picker, párrafos pegados con estilos heredados, etc. Solo
+    //     conserva style en table/td/th/img/iframe/video/audio y span.mewyse-tag.
+    //  3. Si `escapeHtmlEntities` está activo (default), aplica el escape de
+    //     entidades sobre el resultado.
     var inline = function(c) {
       if (typeof c !== 'string' || c === '') return c;
       var clean = self._sanitizeBlockContent(c);
+      clean = self._stripNonNativeStyles(clean);
       if (self.escapeHtmlEntities) return self._emitInlineHTMLWithEscape(clean);
       return clean;
     };
@@ -9816,13 +10569,18 @@
             html += '<pre><code>' + escapeHtml(content) + '</code></pre>';
             break;
           case 'table':
-            // Solo incluir style si el usuario configuró propiedades de tabla
-            if (typeof block.tableStyle === 'string' && block.tableStyle) {
-              html += '<table style="' + block.tableStyle + '">';
+            // Solo incluir style si el usuario configuró propiedades de tabla;
+            // el style se sanea (whitelist CSS) y se escapa como atributo
+            var v_table_style = self._sanitizeStyle(block.tableStyle || '');
+            if (v_table_style) {
+              html += '<table style="' + escape_attr(v_table_style) + '">';
             } else {
               html += '<table>';
             }
-            html += content;
+            // Strip de styles no-nativos también dentro de las celdas (td/th
+            // conservan su style por estar en la whitelist; spans/p internos
+            // quedan limpios).
+            html += self._stripNonNativeStyles(content, { allowTable: true });
             html += '</table>';
             break;
           case 'image':
@@ -9851,7 +10609,11 @@
                 }
                 if (parts.length) imgStyle = ' style="' + parts.join('; ') + '"';
               }
-              html += '<img src="' + block.content.blob + '" alt="' + escapeHtml(block.content.fileName || 'Imagen') + '" width="' + block.content.width + '" height="' + block.content.height + '"' + imgStyle + ' />';
+              // El blob solo se emite si pasa la validación de URL de imagen;
+              // tanto src como alt se escapan como atributo (anti break-out).
+              if (self._isSafeImageUrl(block.content.blob)) {
+                html += '<img src="' + escape_attr(block.content.blob) + '" alt="' + escape_attr(block.content.fileName || 'Imagen') + '" width="' + block.content.width + '" height="' + block.content.height + '"' + imgStyle + ' />';
+              }
             }
             break;
           case 'video':
@@ -9864,13 +10626,13 @@
                 html += '<iframe src="https://player.vimeo.com/video/' + encodeURIComponent(vc.videoId) +
                         '" frameborder="0" allowfullscreen width="' + (vc.width || 640) + '" height="' + (vc.height || 360) + '"></iframe>';
               } else if (vc.provider === 'file' && vc.url) {
-                html += '<video controls src="' + escapeHtml(vc.url) + '" width="' + (vc.width || 640) + '" height="' + (vc.height || 360) + '"></video>';
+                html += '<video controls src="' + escape_attr(vc.url) + '" width="' + (vc.width || 640) + '" height="' + (vc.height || 360) + '"></video>';
               }
             }
             break;
           case 'audio':
             if (typeof block.content === 'object' && block.content.url) {
-              html += '<audio controls src="' + escapeHtml(block.content.url) + '"></audio>';
+              html += '<audio controls src="' + escape_attr(block.content.url) + '"></audio>';
             }
             break;
           case 'divider':
@@ -9892,23 +10654,32 @@
    */
   meWYSE.prototype.getHTMLSource = function() {
     var html = '';
+    var self = this;
     var blocks = this.getFilteredBlocks();
     var i = 0;
     var classAttr = function(b) { return b.customClass ? ' class="' + b.customClass + '"' : ''; };
+
+    // Transformer del contenido inline para la vista "fuente": sanea el HTML
+    // (whitelist de tags) y limpia styles no nativos, pero NO escapa las
+    // entidades (a diferencia de getHTML) para mostrar el HTML como código.
+    var inline_source = function(c) {
+      if (typeof c !== 'string' || c === '') return c;
+      var v_clean = self._sanitizeBlockContent(c);
+      return self._stripNonNativeStyles(v_clean);
+    };
 
     while (i < blocks.length) {
       var block = blocks[i];
 
       // Agrupar listas consecutivas del mismo tipo (con anidación por indentLevel)
       if (block.type === 'bulletList' || block.type === 'numberList' || block.type === 'checklist') {
-        var listRes = this._buildNestedListHTML(blocks, i, classAttr);
+        var listRes = this._buildNestedListHTML(blocks, i, classAttr, inline_source);
         html += listRes.html;
         i += listRes.consumed;
         continue;
       } else {
-        // Para el código fuente HTML, usamos el contenido directo sin escapar
-        // ya que el contenido puede contener etiquetas HTML de formato
-        var content = block.content || '';
+        // Contenido saneado (whitelist de tags), preservando el formato inline
+        var content = inline_source(block.content || '');
 
         // Procesar bloques que no son listas
         switch (block.type) {
@@ -9925,16 +10696,18 @@
             html += '<blockquote' + classAttr(block) + '>' + content + '</blockquote>';
             break;
           case 'code':
-            html += '<pre><code>' + escapeHtml(content) + '</code></pre>';
+            html += '<pre><code>' + escapeHtml(block.content || '') + '</code></pre>';
             break;
           case 'table':
-            // Solo incluir style si el usuario configuró propiedades de tabla
-            if (typeof block.tableStyle === 'string' && block.tableStyle) {
-              html += '<table style="' + block.tableStyle + '">';
+            // Solo incluir style si el usuario configuró propiedades de tabla;
+            // el style se sanea (whitelist CSS) y se escapa como atributo
+            var v_table_style = self._sanitizeStyle(block.tableStyle || '');
+            if (v_table_style) {
+              html += '<table style="' + escape_attr(v_table_style) + '">';
             } else {
               html += '<table>';
             }
-            html += content;
+            html += self._stripNonNativeStyles(block.content || '', { allowTable: true });
             html += '</table>';
             break;
           case 'image':
@@ -9963,7 +10736,11 @@
                 }
                 if (parts.length) imgStyle = ' style="' + parts.join('; ') + '"';
               }
-              html += '<img src="' + block.content.blob + '" alt="' + escapeHtml(block.content.fileName || 'Imagen') + '" width="' + block.content.width + '" height="' + block.content.height + '"' + imgStyle + ' />';
+              // El blob solo se emite si pasa la validación de URL de imagen;
+              // src y alt se escapan como atributo (anti break-out).
+              if (self._isSafeImageUrl(block.content.blob)) {
+                html += '<img src="' + escape_attr(block.content.blob) + '" alt="' + escape_attr(block.content.fileName || 'Imagen') + '" width="' + block.content.width + '" height="' + block.content.height + '"' + imgStyle + ' />';
+              }
             }
             break;
           case 'video':
@@ -9976,13 +10753,13 @@
                 html += '<iframe src="https://player.vimeo.com/video/' + encodeURIComponent(vc.videoId) +
                         '" frameborder="0" allowfullscreen width="' + (vc.width || 640) + '" height="' + (vc.height || 360) + '"></iframe>';
               } else if (vc.provider === 'file' && vc.url) {
-                html += '<video controls src="' + escapeHtml(vc.url) + '" width="' + (vc.width || 640) + '" height="' + (vc.height || 360) + '"></video>';
+                html += '<video controls src="' + escape_attr(vc.url) + '" width="' + (vc.width || 640) + '" height="' + (vc.height || 360) + '"></video>';
               }
             }
             break;
           case 'audio':
             if (typeof block.content === 'object' && block.content.url) {
-              html += '<audio controls src="' + escapeHtml(block.content.url) + '"></audio>';
+              html += '<audio controls src="' + escape_attr(block.content.url) + '"></audio>';
             }
             break;
           case 'divider':
@@ -10527,13 +11304,29 @@
       this.updateCharCounter();
     }
 
-    this.onChange({
+    // En modo readOnly no notificamos cambios — el contenido no muta y los
+    // callbacks (onChange/onFocus/onBlur) deben ser inertes.
+    if (this.readOnly) return;
+
+    this._fireChangeCallback({
       blocks: this.blocks,
       plainText: this.getPlainText(),
       html: this.getHTML(),
       json: this.getJSON(),
       markdown: this.getMarkdown()
     });
+  };
+
+  /**
+   * Dispara onChange protegido: un error del consumidor no debe romper la
+   * operación de edición en curso (mismo patrón que onFocus/onBlur).
+   * @param {Object} payload
+   */
+  meWYSE.prototype._fireChangeCallback = function(payload) {
+    if (typeof this.onChange !== 'function') return;
+    try {
+      this.onChange(payload);
+    } catch (e) {}
   };
 
   /**
@@ -10567,7 +11360,7 @@
     var floatingSelector =
       '.mewyse-slash-menu, .mewyse-mention-menu, .mewyse-emoji-menu, ' +
       '.mewyse-format-menu, .mewyse-options-menu, .mewyse-type-menu, ' +
-      '.mewyse-toolbar-menu, .mewyse-table-menu, .mewyse-cell-menu, ' +
+      '.mewyse-toolbar-menu, .mewyse-table-toolbar, ' +
       '.mewyse-color-picker, .mewyse-unified-color-picker, ' +
       '.mewyse-modal-overlay, .mewyse-find-replace, ' +
       '.mewyse-summary-tooltip, .mewyse-floating-handle, ' +
@@ -10611,6 +11404,7 @@
    * Dispara onFocus con el payload estándar.
    */
   meWYSE.prototype._fireFocusCallback = function(focusedElement) {
+    if (this.readOnly) return; // sin eventos en modo solo-visualización
     if (typeof this.onFocus !== 'function') return;
     try {
       this.onFocus(this._buildEventPayload(focusedElement));
@@ -10621,6 +11415,7 @@
    * Dispara onBlur con el payload estándar.
    */
   meWYSE.prototype._fireBlurCallback = function(blurredElement) {
+    if (this.readOnly) return; // sin eventos en modo solo-visualización
     if (typeof this.onBlur !== 'function') return;
     try {
       this.onBlur(this._buildEventPayload(blurredElement));
@@ -10631,12 +11426,16 @@
    * Destruye el editor
    */
   meWYSE.prototype.destroy = function() {
+    // Idempotencia: no destruir dos veces
+    if (this._destroyed) return;
+
     // Cerrar menús abiertos
     this.closeSlashMenu();
     this.closeFormatMenu();
     this.closeToolbarMenu();
     this.closeMentionMenu();
     this.closeEmojiMenu();
+    this.hideTableToolbar();
 
     // Cerrar find/replace si estaba abierto
     this.closeFindReplace();
@@ -10651,9 +11450,6 @@
       this.charCounterBar.remove();
       this.charCounterBar = null;
     }
-
-    // Limpiar estilos de contenido inyectados
-    this._removeContentStyles();
 
     // Limpiar listener de dark mode del sistema
     if (this._darkModeMediaQuery && this._handleDarkModeChange) {
@@ -10734,6 +11530,7 @@
 
     // Remove image drop handlers
     if (this.container) {
+      if (this._handleScrollReposition) this.container.removeEventListener('scroll', this._handleScrollReposition);
       if (this._imageDragEnterHandler) this.container.removeEventListener('dragenter', this._imageDragEnterHandler);
       if (this._imageDragOverHandler) this.container.removeEventListener('dragover', this._imageDragOverHandler);
       if (this._imageDragLeaveHandler) this.container.removeEventListener('dragleave', this._imageDragLeaveHandler);
@@ -10755,6 +11552,25 @@
       this.target.style.display = '';
     }
 
+    // Cancelar todos los timers / animaciones pendientes para que ningún
+    // callback se ejecute sobre una instancia ya desmontada
+    if (this.formatMenuTimeout) { clearTimeout(this.formatMenuTimeout); this.formatMenuTimeout = null; }
+    if (this.historyDebounceTimer) { clearTimeout(this.historyDebounceTimer); this.historyDebounceTimer = null; }
+    if (this.summaryTooltipTimeout) { clearTimeout(this.summaryTooltipTimeout); this.summaryTooltipTimeout = null; }
+    if (this.floatingHandleHideTimeout) { clearTimeout(this.floatingHandleHideTimeout); this.floatingHandleHideTimeout = null; }
+    if (this._handleHideTimer) { clearTimeout(this._handleHideTimer); this._handleHideTimer = null; }
+    if (this._crossBlockRafId) { cancelAnimationFrame(this._crossBlockRafId); this._crossBlockRafId = null; }
+
+    // Red de seguridad: retirar cualquier listener de click en document que
+    // quedara registrado por menús cerrados por selección/Escape
+    if (this._doc_click_handlers) {
+      for (var dch = 0; dch < this._doc_click_handlers.length; dch++) {
+        document.removeEventListener('click', this._doc_click_handlers[dch]);
+      }
+      this._doc_click_handlers = null;
+    }
+
+    this._destroyed = true;
   };
 
   /**
@@ -10789,10 +11605,13 @@
 
     // Esperar un momento para asegurar que la selección está completa
     this.formatMenuTimeout = setTimeout(function() {
+      // Reevaluar la toolbar de tabla en cada cambio de selección/caret
+      self._updateTableToolbar();
+
       var selection = window.getSelection();
 
-      // Verificar si hay texto seleccionado
-      if (!selection || selection.isCollapsed || selection.toString().trim() === '') {
+      // Verificar si hay texto seleccionado (y un rango disponible)
+      if (!selection || !selection.rangeCount || selection.isCollapsed || selection.toString().trim() === '') {
         self.closeFormatMenu();
         return;
       }
@@ -10817,30 +11636,33 @@
         return;
       }
 
-      // Verificar si la selección está dentro de una mención/emoji o contiene menciones/emojis
+      // Verificar si la selección está dentro de una mención/emoji/tag o los contiene
       var selectionContainsSpecial = false;
 
-      // Verificar si el contenedor común es o está dentro de una mención o emoji
+      // Verificar si el contenedor común es o está dentro de una mención, emoji o tag
       var checkNode = container.nodeType === 3 ? container.parentNode : container;
       while (checkNode && checkNode !== self.container) {
-        if (checkNode.classList && (checkNode.classList.contains('mewyse-mention') || checkNode.classList.contains('mewyse-emoji'))) {
+        if (checkNode.classList && (
+            checkNode.classList.contains('mewyse-mention') ||
+            checkNode.classList.contains('mewyse-emoji') ||
+            checkNode.classList.contains('mewyse-tag'))) {
           selectionContainsSpecial = true;
           break;
         }
         checkNode = checkNode.parentNode;
       }
 
-      // Verificar si hay menciones o emojis dentro del rango seleccionado
+      // Verificar si hay menciones, emojis o tags dentro del rango seleccionado
       if (!selectionContainsSpecial) {
         var fragment = range.cloneContents();
-        var mentionsInRange = fragment.querySelectorAll('.mewyse-mention');
-        var emojisInRange = fragment.querySelectorAll('.mewyse-emoji');
-        if (mentionsInRange.length > 0 || emojisInRange.length > 0) {
+        if (fragment.querySelectorAll('.mewyse-mention').length > 0 ||
+            fragment.querySelectorAll('.mewyse-emoji').length > 0 ||
+            fragment.querySelectorAll('.mewyse-tag').length > 0) {
           selectionContainsSpecial = true;
         }
       }
 
-      // No mostrar menú de formato si hay menciones o emojis involucrados
+      // No mostrar menú de formato si hay elementos especiales involucrados
       if (selectionContainsSpecial) {
         self.closeFormatMenu();
         return;
@@ -12632,6 +13454,28 @@
     var textContent = textParts.join('\n');
     var htmlContent = htmlParts.join('<br>');
 
+    // Fallback compatible ES5: textarea temporal + execCommand. Se ejecuta solo
+    // una vez (guard) tanto si falla la parte síncrona como si la promesa de
+    // clipboard.write se rechaza.
+    var v_fallback_done = false;
+    var fallback_copy = function() {
+      if (v_fallback_done) return;
+      v_fallback_done = true;
+      var ta = document.createElement('textarea');
+      ta.value = textContent;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      ta.style.top = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+      } catch (ex) {
+        // Silenciar error
+      }
+      document.body.removeChild(ta);
+    };
+
     // Intentar usar Clipboard API primero
     if (navigator.clipboard && navigator.clipboard.write) {
       try {
@@ -12641,27 +13485,18 @@
           'text/html': blob,
           'text/plain': textBlob
         });
-        navigator.clipboard.write([item]);
+        var v_p = navigator.clipboard.write([item]);
+        // Si la promesa se rechaza (permiso denegado, sin foco), usar el fallback
+        if (v_p && typeof v_p.then === 'function') {
+          v_p.then(null, function() { fallback_copy(); });
+        }
         return;
       } catch (ex) {
-        // Fallback abajo
+        // Error síncrono al construir Blob/ClipboardItem → fallback
       }
     }
 
-    // Fallback compatible ES5: textarea temporal + execCommand
-    var ta = document.createElement('textarea');
-    ta.value = textContent;
-    ta.style.position = 'fixed';
-    ta.style.left = '-9999px';
-    ta.style.top = '-9999px';
-    document.body.appendChild(ta);
-    ta.select();
-    try {
-      document.execCommand('copy');
-    } catch (ex) {
-      // Silenciar error
-    }
-    document.body.removeChild(ta);
+    fallback_copy();
   };
 
   /**
@@ -12748,16 +13583,19 @@
         if (isFirst && isLast) {
           // Solo un bloque: vaciar contenido
           range.deleteContents();
+          this.updateBlockContent(blockId, editableEl.innerHTML);
         } else if (isFirst) {
           // Primer bloque completamente seleccionado: vaciar
           range.deleteContents();
+          this.updateBlockContent(blockId, editableEl.innerHTML);
         } else {
           // Último bloque completamente seleccionado: eliminar
           blocksToRemove.push(blockId);
         }
       } else {
-        // Parcialmente seleccionado
+        // Parcialmente seleccionado: reconciliar el modelo con el DOM editado
         range.deleteContents();
+        this.updateBlockContent(blockId, editableEl.innerHTML);
       }
     }
 
@@ -12886,14 +13724,15 @@
     this.isUndoRedo = true;
     this.blocks = JSON.parse(JSON.stringify(this.history[this.historyIndex]));
 
-    // Recalcular currentBlockId
+    // Recalcular currentBlockId de forma MONÓTONA: nunca decrece, para no
+    // reciclar ids ya emitidos (evita colisiones tras undo/redo + inserción).
     var maxId = 0;
     for (var i = 0; i < this.blocks.length; i++) {
       if (this.blocks[i].id > maxId) {
         maxId = this.blocks[i].id;
       }
     }
-    this.currentBlockId = maxId;
+    this.currentBlockId = Math.max(this.currentBlockId, maxId);
 
     this.render();
     this.triggerChange();
@@ -12911,14 +13750,15 @@
     this.isUndoRedo = true;
     this.blocks = JSON.parse(JSON.stringify(this.history[this.historyIndex]));
 
-    // Recalcular currentBlockId
+    // Recalcular currentBlockId de forma MONÓTONA: nunca decrece, para no
+    // reciclar ids ya emitidos (evita colisiones tras undo/redo + inserción).
     var maxId = 0;
     for (var i = 0; i < this.blocks.length; i++) {
       if (this.blocks[i].id > maxId) {
         maxId = this.blocks[i].id;
       }
     }
-    this.currentBlockId = maxId;
+    this.currentBlockId = Math.max(this.currentBlockId, maxId);
 
     this.render();
     this.triggerChange();
@@ -12941,90 +13781,6 @@
   // =========================================================================
   // INYECCIÓN DE ESTILOS DE CONTENIDO
   // =========================================================================
-
-  /**
-   * Inyecta los estilos de contenido en el documento, scopeados al instanceId
-   */
-  meWYSE.prototype._injectContentStyles = function() {
-    var id = this.instanceId;
-    var s = '.' + id; // scope selector
-
-    var w = '.mewyse-editor-wrapper:has(> ' + s + ')'; // wrapper scope via instanceId child
-
-    var css = '' +
-      '/* Content styles for ' + id + ' */\n' +
-      w + ' { border: 1px solid var(--mewyse-border-light); border-radius: var(--mewyse-radius-xl); background: var(--mewyse-bg-primary); color: var(--mewyse-text-primary); }\n' +
-      // padding-left ampliado a 32px para alojar el handle flotante DENTRO
-      // del área del editor (en lugar de pegado al borde-izquierdo del wrapper,
-      // donde un parent con `overflow: hidden` lo recortaría). Mismo motivo
-      // en .mewyse-minimal.
-      s + ' { padding: 16px 16px 16px 32px; min-height: 200px; max-height: 500px; overflow-y: auto; margin-left: 0; }\n' +
-      s + '.mewyse-minimal { border-radius: var(--mewyse-radius-xl); padding: 16px 16px 16px 32px; background: var(--mewyse-bg-primary); color: var(--mewyse-text-primary); min-height: 150px; max-height: 400px; overflow-y: auto; }\n' +
-      s + ' .mewyse-block { display: block; position: relative; margin: 0 0 8px 0; padding: 0; outline: none; box-sizing: border-box; }\n' +
-      s + ' p.mewyse-block, ' + s + ' h1.mewyse-block, ' + s + ' h2.mewyse-block, ' + s + ' h3.mewyse-block { margin: 0 0 8px 0; padding: 0; }\n' +
-      s + ' blockquote.mewyse-block { margin: 0 0 8px 0; padding: 8px 16px; border-left: 3px solid #ddd; }\n' +
-      s + ' hr.mewyse-block { margin: 0 0 8px 0; padding: 0; }\n' +
-      s + ' .mewyse-block-selected { background-color: rgba(59, 130, 246, 0.1); border-radius: 4px; }\n' +
-      s + ' .mewyse-block:empty:before, ' + s + ' .mewyse-block[data-placeholder]:empty:before { content: attr(data-placeholder); color: #aaa; pointer-events: none; }\n' +
-      s + ' pre.mewyse-block { margin: 0 0 8px 0; padding: 8px 12px; overflow-x: auto; }\n' +
-      s + ' pre.mewyse-block code { display: block; outline: none; }\n' +
-      s + ' div.mewyse-block.mewyse-table-wrapper, ' + s + ' div.mewyse-block.mewyse-image-wrapper { display: block; }\n' +
-      s + ' .mewyse-table-wrapper { position: relative; display: inline-block; width: 100%; }\n' +
-      // Defaults visuales para tabla durante edición (los estilos inline del usuario ganan por especificidad)
-      s + ' .mewyse-table-wrapper table { width: 100%; border-collapse: collapse; margin: 4px 0; position: relative; }\n' +
-      s + ' .mewyse-table-wrapper table td, ' + s + ' .mewyse-table-wrapper table th { border: 1px solid var(--mewyse-border-medium); padding: 8px; min-width: 50px; outline: none; position: relative; vertical-align: top; }\n' +
-      s + ' .mewyse-table-wrapper table td:focus, ' + s + ' .mewyse-table-wrapper table th:focus { background-color: var(--mewyse-bg-hover); }\n' +
-      s + ' .mewyse-table-wrapper table td:empty:before, ' + s + ' .mewyse-table-wrapper table th:empty:before { content: ""; color: var(--mewyse-text-muted); }\n' +
-      s + ' .mewyse-table-wrapper table td > p, ' + s + ' .mewyse-table-wrapper table td > h1, ' + s + ' .mewyse-table-wrapper table td > h2, ' + s + ' .mewyse-table-wrapper table td > h3, ' +
-        s + ' .mewyse-table-wrapper table td > blockquote, ' + s + ' .mewyse-table-wrapper table td > pre, ' + s + ' .mewyse-table-wrapper table td > ul, ' + s + ' .mewyse-table-wrapper table td > ol, ' +
-        s + ' .mewyse-table-wrapper table th > p, ' + s + ' .mewyse-table-wrapper table th > h1, ' + s + ' .mewyse-table-wrapper table th > h2, ' + s + ' .mewyse-table-wrapper table th > h3, ' +
-        s + ' .mewyse-table-wrapper table th > blockquote, ' + s + ' .mewyse-table-wrapper table th > pre, ' + s + ' .mewyse-table-wrapper table th > ul, ' + s + ' .mewyse-table-wrapper table th > ol ' +
-        '{ outline: none; width: 100%; min-height: 1em; margin: 0; }\n' +
-      s + ' .mewyse-table-wrapper table td > p:focus, ' + s + ' .mewyse-table-wrapper table th > p:focus { background-color: transparent; }\n' +
-      s + ' .mewyse-table-wrapper table td > p:empty:before, ' + s + ' .mewyse-table-wrapper table th > p:empty:before { content: attr(data-placeholder); color: var(--mewyse-text-muted); pointer-events: none; }\n' +
-      s + ' .mewyse-mention { background-color: #e8f0fe; color: #1a73e8; padding: 2px 6px; border-radius: 4px; font-weight: 500; cursor: default; user-select: all; display: inline; white-space: nowrap; }\n' +
-      s + ' .mewyse-mention:hover { background-color: #d2e3fc; }\n' +
-      s + ' .mewyse-emoji { display: inline; cursor: default; user-select: all; }\n' +
-      s + ' .mewyse-list-group { margin: 0; padding-left: 24px; }\n' +
-      s + ' .mewyse-list-group .mewyse-list-group { padding-left: 24px; margin-top: 4px; }\n' +
-      s + ' .mewyse-list-group > li.mewyse-block { display: list-item; margin-bottom: 4px; }\n' +
-      s + ' .mewyse-list-group > li.mewyse-block:focus { outline: none; }\n' +
-      s + ' ul.mewyse-checklist-group { list-style: none; padding-left: 0; }\n' +
-      s + ' ul.mewyse-checklist-group > li.mewyse-block { display: flex; align-items: flex-start; gap: 8px; }\n' +
-      s + ' ul.mewyse-checklist-group > li.mewyse-block input[type="checkbox"] { margin-top: 4px; flex-shrink: 0; }\n' +
-      s + ' ul.mewyse-checklist-group > li.mewyse-block .mewyse-checklist-content { flex: 1; outline: none; }\n' +
-      s + ' ul.mewyse-checklist-group > li.mewyse-block.checked .mewyse-checklist-content { text-decoration: line-through; color: #999; }\n' +
-      s + ' .mewyse-image-wrapper { display: inline-block; max-width: 100%; margin: 12px 0; }\n' +
-      s + ' .mewyse-image-container { position: relative; display: inline-block; }\n' +
-      s + ' .mewyse-image { display: block; max-width: 100%; height: auto; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border: 2px solid transparent; transition: border-color 0.2s ease; }\n' +
-      s + ' .mewyse-image-container:hover .mewyse-image { border-color: #4a9eff; }\n' +
-      s + ' .mewyse-image.selected { border-color: #4a9eff !important; box-shadow: 0 4px 16px rgba(74,158,255,0.3); cursor: pointer; }\n' +
-      s + ' .mewyse-image-edit-btn { position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.95); border: 1px solid #ddd; border-radius: 4px; padding: 6px 10px; cursor: pointer; opacity: 0; transition: all 0.2s ease; box-shadow: 0 2px 6px rgba(0,0,0,0.15); z-index: 2; display: flex; align-items: center; justify-content: center; color: #555; }\n' +
-      s + ' .mewyse-image-edit-btn svg { width: 16px; height: 16px; }\n' +
-      s + ' .mewyse-image-container:hover .mewyse-image-edit-btn { opacity: 1; }\n' +
-      s + ' .mewyse-image-edit-btn:hover { background: #fff; color: #333; border-color: #999; transform: scale(1.05); }\n' +
-      s + ' .mewyse-image-resize-handle { position: absolute; bottom: 0; right: 0; width: 16px; height: 16px; background: #4a9eff; border: 2px solid #fff; border-radius: 2px; cursor: nwse-resize; opacity: 0; transition: all 0.2s ease; box-shadow: 0 2px 6px rgba(0,0,0,0.2); z-index: 2; }\n' +
-      s + ' .mewyse-image-container:hover .mewyse-image-resize-handle { opacity: 1; }\n' +
-      s + ' .mewyse-image-resize-handle:hover { background: #3a8eef; transform: scale(1.1); }\n' +
-      s + ' .mewyse-image-resizing { user-select: none; }\n' +
-      s + ' .mewyse-image-resizing .mewyse-image { pointer-events: none; }\n';
-
-    var style = document.createElement('style');
-    style.setAttribute('data-mewyse-instance', id);
-    style.textContent = css;
-    document.head.appendChild(style);
-    this._contentStyleElement = style;
-  };
-
-  /**
-   * Elimina los estilos de contenido inyectados
-   */
-  meWYSE.prototype._removeContentStyles = function() {
-    if (this._contentStyleElement && this._contentStyleElement.parentNode) {
-      this._contentStyleElement.parentNode.removeChild(this._contentStyleElement);
-      this._contentStyleElement = null;
-    }
-  };
 
   // =========================================================================
   // MOVER BLOQUE ARRIBA/ABAJO
@@ -13173,6 +13929,30 @@
       }
       menu.remove();
       this[menuProp] = null;
+    }
+  };
+
+  /**
+   * Registra un listener de click en document llevando la cuenta para poder
+   * limpiarlo en destroy() aunque el menú se cierre por una vía distinta al
+   * clic-fuera (selección de item, Escape, etc.).
+   * @param {Function} fn
+   */
+  meWYSE.prototype._add_doc_click = function(fn) {
+    if (!this._doc_click_handlers) this._doc_click_handlers = [];
+    this._doc_click_handlers.push(fn);
+    document.addEventListener('click', fn);
+  };
+
+  /**
+   * Elimina un listener registrado con _add_doc_click y lo saca del registro.
+   * @param {Function} fn
+   */
+  meWYSE.prototype._remove_doc_click = function(fn) {
+    document.removeEventListener('click', fn);
+    if (this._doc_click_handlers) {
+      var v_idx = this._doc_click_handlers.indexOf(fn);
+      if (v_idx >= 0) this._doc_click_handlers.splice(v_idx, 1);
     }
   };
 
@@ -13710,6 +14490,7 @@
     'A': { 'href': 1, 'title': 1, 'target': 1, 'rel': 1 },
     'SPAN': { 'class': 1, 'style': 1, 'contenteditable': 1,
               'data-mention-id': 1, 'data-mention-name': 1,
+              'data-tag-id': 1, 'data-tag-name': 1, 'data-tag-color': 1,
               'data-name': 1, 'data-type': 1 },
     'FONT': { 'color': 1, 'face': 1, 'size': 1 },
     'TD': { 'colspan': 1, 'rowspan': 1, 'style': 1 },
@@ -13727,6 +14508,7 @@
   var ALLOWED_SPAN_CLASSES = {
     'mewyse-mention': 1,
     'mewyse-emoji': 1,
+    'mewyse-tag': 1,
     'mewyse-search-highlight': 1
   };
 
@@ -13782,7 +14564,10 @@
     var normalized = url.trim().toLowerCase().replace(/[\x00-\x20]/g, '');
     if (normalized.indexOf('http://') === 0) return true;
     if (normalized.indexOf('https://') === 0) return true;
-    if (normalized.indexOf('data:image/') === 0) return true;
+    // data:image/* permitido salvo SVG (puede contener scripts/handlers)
+    if (normalized.indexOf('data:image/') === 0) {
+      return normalized.indexOf('data:image/svg') !== 0;
+    }
     // Rutas relativas
     if (normalized.indexOf('/') === 0 || normalized.indexOf('./') === 0 ||
         normalized.indexOf('../') === 0) return true;
@@ -13811,6 +14596,9 @@
       if (valueLower.indexOf('javascript:') >= 0) continue;
       if (valueLower.indexOf('vbscript:') >= 0) continue;
       if (value.indexOf('<') >= 0 || value.indexOf('>') >= 0) continue;
+      // Bloquear comillas (romperían el atributo style al emitir) y comentarios CSS
+      if (value.indexOf('"') >= 0 || value.indexOf("'") >= 0) continue;
+      if (value.indexOf('/*') >= 0 || value.indexOf('*/') >= 0) continue;
       // value razonablemente corto (anti-DoS)
       if (value.length > 200) continue;
       clean.push(prop + ': ' + value);
@@ -13878,15 +14666,20 @@
     };
 
     if (typeof this.options.onImageUpload === 'function') {
-      // Hook externo: el consumidor sube al servidor y devuelve la URL
-      this.options.onImageUpload(file, function(result) {
-        if (!result || !result.url) { callback(null); return; }
-        resolveWithDimensions(
-          result.url,
-          result.fileName || file.name,
-          result.width, result.height
-        );
-      });
+      // Hook externo: el consumidor sube al servidor y devuelve la URL.
+      // Protegido: si lanza de forma síncrona, abortar con callback(null).
+      try {
+        this.options.onImageUpload(file, function(result) {
+          if (!result || !result.url) { callback(null); return; }
+          resolveWithDimensions(
+            result.url,
+            result.fileName || file.name,
+            result.width, result.height
+          );
+        });
+      } catch (e) {
+        callback(null);
+      }
     } else {
       // Comportamiento por defecto: base64 inline
       var reader = new FileReader();
@@ -14585,6 +15378,17 @@
       c = n;
     }
 
+    // Limpieza defensiva: spans atómicos (mention/tag/emoji) sin contenido
+    // textual son residuos típicos de operaciones donde un cursor cayó dentro
+    // del span y un split/borrado partió el contenido. Sin texto, la cápsula
+    // se ve como un círculo de color suelto. Los eliminamos del output.
+    var emptyAtomic = root.querySelectorAll('span.mewyse-tag, span.mewyse-mention');
+    for (var ea = 0; ea < emptyAtomic.length; ea++) {
+      if (!emptyAtomic[ea].textContent) {
+        emptyAtomic[ea].parentNode.removeChild(emptyAtomic[ea]);
+      }
+    }
+
     return root.innerHTML;
   };
 
@@ -14747,10 +15551,20 @@
         this.currentBlockId = b.id;
       }
     }
-    // Segunda pasada: sanitizar
+    // Segunda pasada: sanitizar y deduplicar ids. Dos bloques con el mismo id
+    // dejarían el segundo inalcanzable para getBlock/getBlockIndex, así que al
+    // detectar colisión se reasigna un id fresco (currentBlockId ya está en el
+    // máximo tras la primera pasada).
+    var v_seen = {};
     for (var j = 0; j < blocks.length; j++) {
       var clean = this._sanitizeBlock(blocks[j], ++this.currentBlockId);
-      if (clean) result.push(clean);
+      if (clean) {
+        if (v_seen[clean.id]) {
+          clean.id = ++this.currentBlockId;
+        }
+        v_seen[clean.id] = true;
+        result.push(clean);
+      }
     }
     return result;
   };
@@ -14911,11 +15725,18 @@
     var buttons = document.createElement('div');
     buttons.className = 'mewyse-modal-buttons';
 
+    // Cierre unificado: quita el overlay del DOM y desregistra el listener de
+    // Escape, sea cual sea la vía de cierre (Cancelar/Aplicar/overlay/Escape).
+    var cerrar_modal = function() {
+      if (overlay.parentNode) document.body.removeChild(overlay);
+      document.removeEventListener('keydown', escHandler);
+    };
+
     var cancelBtn = document.createElement('button');
     cancelBtn.type = 'button';
     cancelBtn.className = 'mewyse-modal-button mewyse-modal-button-cancel';
     cancelBtn.textContent = t('cancel');
-    cancelBtn.onclick = function() { document.body.removeChild(overlay); };
+    cancelBtn.onclick = function() { cerrar_modal(); };
 
     var applyBtn = document.createElement('button');
     applyBtn.type = 'button';
@@ -14936,7 +15757,7 @@
         backgroundColor: bgColorInput.value,
         backgroundColorUserSet: bgColorInput.dataset.userSet === 'true'
       });
-      document.body.removeChild(overlay);
+      cerrar_modal();
     };
 
     buttons.appendChild(cancelBtn);
@@ -14946,13 +15767,12 @@
     overlay.appendChild(modal);
     // Cerrar al click fuera
     overlay.onclick = function(e) {
-      if (e.target === overlay) document.body.removeChild(overlay);
+      if (e.target === overlay) cerrar_modal();
     };
     // Escape para cerrar
     var escHandler = function(e) {
       if (e.key === 'Escape') {
-        if (overlay.parentNode) document.body.removeChild(overlay);
-        document.removeEventListener('keydown', escHandler);
+        cerrar_modal();
       }
     };
     document.addEventListener('keydown', escHandler);
@@ -15779,6 +16599,60 @@
   };
 
   /**
+   * Whitelist de elementos donde el atributo `style` es inherente al editor.
+   * Sobre el resto de elementos `style` se elimina al hacer getHTML/copy
+   * (típicamente spans con colores aplicados ad-hoc, párrafos pegados con
+   * estilos heredados, etc.).
+   */
+  var STYLE_NATIVE_TAGS = {
+    TABLE: 1, TD: 1, TH: 1, COL: 1, IMG: 1, IFRAME: 1, VIDEO: 1, AUDIO: 1
+  };
+
+  meWYSE.prototype._isStyleNativeElement = function(el) {
+    if (!el || el.nodeType !== 1) return false;
+    if (STYLE_NATIVE_TAGS[el.tagName]) return true;
+    // Spans atómicos del editor: la cápsula del tag lleva su color en style.
+    if (el.tagName === 'SPAN' && el.classList && el.classList.contains('mewyse-tag')) {
+      return true;
+    }
+    return false;
+  };
+
+  /**
+   * Recorre `html` y elimina `style` de cualquier elemento que no sea nativo
+   * del editor (ver `_isStyleNativeElement`). Usado por `getHTML` y por el
+   * handler de `copy` para que el output que sale del editor venga limpio
+   * de estilos inline arrastrados (paste de Word, color picker, etc.).
+   *
+   * @param {string} html
+   * @param {Object} opts - opcional. opts.allowTable=true parsea el contenido
+   *   envuelto en <table> para que tr/td/th no sean descartados por DOMParser.
+   * @returns {string}
+   */
+  meWYSE.prototype._stripNonNativeStyles = function(html, opts) {
+    if (typeof html !== 'string' || !html) return html || '';
+    var allowTable = !!(opts && opts.allowTable);
+    var open = allowTable ? '<table id="__root__">' : '<div id="__root__">';
+    var close = allowTable ? '</table>' : '</div>';
+    var doc;
+    try {
+      doc = new DOMParser().parseFromString(
+        '<!DOCTYPE html><html><body>' + open + html + close + '</body></html>',
+        'text/html'
+      );
+    } catch (e) { return html; }
+    var root = doc.querySelector(allowTable ? 'table#__root__' : '#__root__');
+    if (!root) return html;
+    var styled = root.querySelectorAll('[style]');
+    for (var i = 0; i < styled.length; i++) {
+      if (!this._isStyleNativeElement(styled[i])) {
+        styled[i].removeAttribute('style');
+      }
+    }
+    return root.innerHTML;
+  };
+
+  /**
    * Función auxiliar para escapar HTML
    * @param {string} text
    * @returns {string}
@@ -15787,6 +16661,23 @@
     var div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+  }
+
+  /**
+   * Escapa un valor para usarlo de forma segura DENTRO de un atributo HTML
+   * (alt, src, style, etc.). A diferencia de escapeHtml, también escapa las
+   * comillas dobles y simples, evitando el "break-out" de atributos que
+   * permitiría inyectar handlers como onerror=.
+   * @param {*} v_text
+   * @returns {string}
+   */
+  function escape_attr(v_text) {
+    return String(v_text)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   // Exportar el constructor

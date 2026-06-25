@@ -63,8 +63,7 @@
 .mewyse-options-menu svg,
 .mewyse-type-menu svg,
 .mewyse-slash-menu svg,
-.mewyse-table-menu svg,
-.mewyse-cell-menu svg,
+.mewyse-table-toolbar svg,
 .mewyse-summary-button svg,
 .mewyse-summary-close svg,
 .mewyse-floating-handle svg {
@@ -106,7 +105,6 @@
   border-radius: var(--mewyse-radius-md);
   padding: 6px 10px;
   cursor: pointer;
-  font-size: 14px;
   color: var(--mewyse-text-primary);
   transition: all 0.15s ease;
   min-width: 32px;
@@ -143,7 +141,6 @@
 
 .mewyse-toolbar-button .icon {
   font-weight: 600;
-  font-size: 12px;
 }
 
 .mewyse-toolbar-dropdown {
@@ -183,6 +180,31 @@
   bottom: 0;
   background: transparent;
   z-index: 999;
+}
+
+/* ============================================
+   readOnly — visualización sin edición
+   El JS pone `mewyse-readonly` en container (y wrapper si hay) y deja todos
+   los descendientes con contenteditable="false". CSS oculta placeholders de
+   bloques vacíos (sin sentido en read-only) y restablece el cursor a default.
+   ============================================ */
+.mewyse-editor.mewyse-readonly {
+  padding: 8px;
+  min-height: auto;
+}
+.mewyse-readonly [data-placeholder]:empty:before,
+.mewyse-readonly .mewyse-block:empty:before {
+  content: none !important;
+}
+.mewyse-readonly,
+.mewyse-readonly .mewyse-block {
+  cursor: default;
+}
+/* Permitir selección nativa para copiar texto */
+.mewyse-readonly,
+.mewyse-readonly .mewyse-block {
+  user-select: text;
+  -webkit-user-select: text;
 }
 
 /* ============================================
@@ -356,15 +378,304 @@
    el texto del primer bloque ni quede recortado por un parent con `overflow: hidden`. */
 .mewyse-editor {
   position: relative;
+  width: 100%;
   padding-left: var(--mewyse-padding-handle);
 }
-
-/* Estilos visuales del contenedor: inyectados dinámicamente por JS (ver _injectContentStyles) */
-/* Cuando contentStyles: false, el contenedor hereda los estilos de la página */
 
 /* Modo completo */
 .mewyse-full {
   /* Sin estilos visuales - hereda del contenedor padre */
+}
+
+/* ============================================================================
+   ESTILOS DE CONTENIDO (default).
+   Aplican cuando JS añade `mewyse-editor-styled` al wrapper y al container —
+   es decir, cuando NO se pasó `contentStyles: false`. Si la opción está
+   desactivada, la página consumidora controla todos los estilos del editor.
+   ============================================================================ */
+.mewyse-editor-wrapper.mewyse-editor-styled {
+  border: 1px solid var(--mewyse-border-light);
+  border-radius: var(--mewyse-radius-xl);
+  background: var(--mewyse-bg-primary);
+  color: var(--mewyse-text-primary);
+}
+
+.mewyse-editor.mewyse-editor-styled {
+  padding: 16px 16px 16px var(--mewyse-padding-handle);
+  min-height: 200px;
+  max-height: 500px;
+  overflow-y: auto;
+  margin-left: 0;
+}
+.mewyse-editor.mewyse-editor-styled.mewyse-minimal {
+  border-radius: var(--mewyse-radius-xl);
+  padding: 16px 16px 16px var(--mewyse-padding-handle);
+  background: var(--mewyse-bg-primary);
+  color: var(--mewyse-text-primary);
+  min-height: 150px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+.mewyse-editor.mewyse-editor-styled.mewyse-minimal.mewyse-readonly {
+  padding: 8px;
+  min-height: auto;
+}
+
+/* Bloques */
+.mewyse-editor-styled .mewyse-block {
+  display: block;
+  position: relative;
+  margin: 0 0 8px 0;
+  padding: 0;
+  outline: none;
+  box-sizing: border-box;
+}
+.mewyse-editor-styled p.mewyse-block,
+.mewyse-editor-styled h1.mewyse-block,
+.mewyse-editor-styled h2.mewyse-block,
+.mewyse-editor-styled h3.mewyse-block {
+  margin: 0 0 8px 0;
+  padding: 0;
+}
+.mewyse-editor-styled blockquote.mewyse-block {
+  margin: 0 0 8px 0;
+  padding: 8px 16px;
+  border-left: 3px solid #ddd;
+}
+.mewyse-editor-styled hr.mewyse-block {
+  margin: 0 0 8px 0;
+  padding: 0;
+}
+.mewyse-editor-styled .mewyse-block-selected {
+  background-color: rgba(59, 130, 246, 0.1);
+  border-radius: 4px;
+}
+.mewyse-editor-styled .mewyse-block:empty:before,
+.mewyse-editor-styled .mewyse-block[data-placeholder]:empty:before {
+  content: attr(data-placeholder);
+  color: #aaa;
+  pointer-events: none;
+}
+.mewyse-editor-styled pre.mewyse-block {
+  margin: 0 0 8px 0;
+  padding: 8px 12px;
+  overflow-x: auto;
+}
+.mewyse-editor-styled pre.mewyse-block code {
+  display: block;
+  outline: none;
+}
+.mewyse-editor-styled div.mewyse-block.mewyse-table-wrapper,
+.mewyse-editor-styled div.mewyse-block.mewyse-image-wrapper {
+  display: block;
+}
+
+/* Tablas */
+.mewyse-editor-styled .mewyse-table-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+.mewyse-editor-styled .mewyse-table-wrapper table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 4px 0;
+  position: relative;
+}
+.mewyse-editor-styled .mewyse-table-wrapper table td,
+.mewyse-editor-styled .mewyse-table-wrapper table th {
+  border: 1px solid var(--mewyse-border-medium);
+  padding: 8px;
+  min-width: 50px;
+  outline: none;
+  position: relative;
+  vertical-align: top;
+}
+.mewyse-editor-styled .mewyse-table-wrapper table td:focus,
+.mewyse-editor-styled .mewyse-table-wrapper table th:focus {
+  background-color: var(--mewyse-bg-hover);
+}
+.mewyse-editor-styled .mewyse-table-wrapper table td:empty:before,
+.mewyse-editor-styled .mewyse-table-wrapper table th:empty:before {
+  content: "";
+  color: var(--mewyse-text-muted);
+}
+.mewyse-editor-styled .mewyse-table-wrapper table td > p,
+.mewyse-editor-styled .mewyse-table-wrapper table td > h1,
+.mewyse-editor-styled .mewyse-table-wrapper table td > h2,
+.mewyse-editor-styled .mewyse-table-wrapper table td > h3,
+.mewyse-editor-styled .mewyse-table-wrapper table td > blockquote,
+.mewyse-editor-styled .mewyse-table-wrapper table td > pre,
+.mewyse-editor-styled .mewyse-table-wrapper table td > ul,
+.mewyse-editor-styled .mewyse-table-wrapper table td > ol,
+.mewyse-editor-styled .mewyse-table-wrapper table th > p,
+.mewyse-editor-styled .mewyse-table-wrapper table th > h1,
+.mewyse-editor-styled .mewyse-table-wrapper table th > h2,
+.mewyse-editor-styled .mewyse-table-wrapper table th > h3,
+.mewyse-editor-styled .mewyse-table-wrapper table th > blockquote,
+.mewyse-editor-styled .mewyse-table-wrapper table th > pre,
+.mewyse-editor-styled .mewyse-table-wrapper table th > ul,
+.mewyse-editor-styled .mewyse-table-wrapper table th > ol {
+  outline: none;
+  width: 100%;
+  min-height: 1em;
+  margin: 0;
+}
+.mewyse-editor-styled .mewyse-table-wrapper table td > p:focus,
+.mewyse-editor-styled .mewyse-table-wrapper table th > p:focus {
+  background-color: transparent;
+}
+.mewyse-editor-styled .mewyse-table-wrapper table td > p:empty:before,
+.mewyse-editor-styled .mewyse-table-wrapper table th > p:empty:before {
+  content: attr(data-placeholder);
+  color: var(--mewyse-text-muted);
+  pointer-events: none;
+}
+
+/* Mention y emoji (la cápsula del tag se estila ya en su sección dedicada arriba) */
+.mewyse-editor-styled .mewyse-mention {
+  background-color: #e8f0fe;
+  color: #1a73e8;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: default;
+  user-select: all;
+  display: inline;
+  white-space: nowrap;
+}
+.mewyse-editor-styled .mewyse-mention:hover {
+  background-color: #d2e3fc;
+}
+.mewyse-editor-styled .mewyse-emoji {
+  display: inline;
+  cursor: default;
+  user-select: all;
+}
+
+/* Listas (anidadas) y checklist */
+.mewyse-editor-styled .mewyse-list-group {
+  margin: 0;
+  padding-left: 24px;
+}
+.mewyse-editor-styled .mewyse-list-group .mewyse-list-group {
+  padding-left: 24px;
+  margin-top: 4px;
+}
+.mewyse-editor-styled .mewyse-list-group > li.mewyse-block {
+  display: list-item;
+  margin-bottom: 4px;
+}
+.mewyse-editor-styled .mewyse-list-group > li.mewyse-block:focus {
+  outline: none;
+}
+.mewyse-editor-styled ul.mewyse-checklist-group {
+  list-style: none;
+  padding-left: 0;
+}
+.mewyse-editor-styled ul.mewyse-checklist-group > li.mewyse-block {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.mewyse-editor-styled ul.mewyse-checklist-group > li.mewyse-block input[type="checkbox"] {
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+.mewyse-editor-styled ul.mewyse-checklist-group > li.mewyse-block .mewyse-checklist-content {
+  flex: 1;
+  outline: none;
+}
+.mewyse-editor-styled ul.mewyse-checklist-group > li.mewyse-block.checked .mewyse-checklist-content {
+  text-decoration: line-through;
+  color: #999;
+}
+
+/* Imagen */
+.mewyse-editor-styled .mewyse-image-wrapper {
+  display: inline-block;
+  max-width: 100%;
+  margin: 12px 0;
+}
+.mewyse-editor-styled .mewyse-image-container {
+  position: relative;
+  display: inline-block;
+}
+.mewyse-editor-styled .mewyse-image {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border: 2px solid transparent;
+  transition: border-color 0.2s ease;
+}
+.mewyse-editor-styled .mewyse-image-container:hover .mewyse-image {
+  border-color: #4a9eff;
+}
+.mewyse-editor-styled .mewyse-image.selected {
+  border-color: #4a9eff !important;
+  box-shadow: 0 4px 16px rgba(74,158,255,0.3);
+  cursor: pointer;
+}
+.mewyse-editor-styled .mewyse-image-edit-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(255,255,255,0.95);
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 6px 10px;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #555;
+}
+.mewyse-editor-styled .mewyse-image-edit-btn svg {
+  width: 16px;
+  height: 16px;
+}
+.mewyse-editor-styled .mewyse-image-container:hover .mewyse-image-edit-btn {
+  opacity: 1;
+}
+.mewyse-editor-styled .mewyse-image-edit-btn:hover {
+  background: #fff;
+  color: #333;
+  border-color: #999;
+  transform: scale(1.05);
+}
+.mewyse-editor-styled .mewyse-image-resize-handle {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 16px;
+  height: 16px;
+  background: #4a9eff;
+  border: 2px solid #fff;
+  border-radius: 2px;
+  cursor: nwse-resize;
+  opacity: 0;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  z-index: 2;
+}
+.mewyse-editor-styled .mewyse-image-container:hover .mewyse-image-resize-handle {
+  opacity: 1;
+}
+.mewyse-editor-styled .mewyse-image-resize-handle:hover {
+  background: #3a8eef;
+  transform: scale(1.1);
+}
+.mewyse-editor-styled .mewyse-image-resizing {
+  user-select: none;
+}
+.mewyse-editor-styled .mewyse-image-resizing .mewyse-image {
+  pointer-events: none;
 }
 
 /* Estilos de contenido de bloques: inyectados dinámicamente por JS (ver _injectContentStyles) */
@@ -403,58 +714,6 @@
 
 
 
-/* Botones para añadir filas/columnas */
-.mewyse-table-add-row,
-.mewyse-table-add-col {
-  position: absolute;
-  background: var(--mewyse-accent);
-  color: white;
-  border: none;
-  border-radius: var(--mewyse-radius-md);
-  cursor: pointer;
-  opacity: 0;
-  transition: opacity 0.2s ease, background 0.15s ease;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.mewyse-table-add-row svg,
-.mewyse-table-add-col svg {
-  width: 16px;
-  height: 16px;
-}
-
-.mewyse-table-wrapper:hover .mewyse-table-add-row,
-.mewyse-table-wrapper:hover .mewyse-table-add-col {
-  opacity: 0.7;
-}
-
-.mewyse-table-add-row:hover,
-.mewyse-table-add-col:hover {
-  opacity: 1 !important;
-  background: #5568d3;
-}
-
-.mewyse-table-add-row {
-  left: 0;
-  right: 0;
-  height: 30px;
-  bottom: -35px;
-  width: calc(100% - 2px);
-  margin: 0 1px;
-}
-
-.mewyse-table-add-col {
-  top: 0;
-  bottom: 0;
-  width: 30px;
-  right: -35px;
-  height: calc(100% - 2px);
-  margin: 1px 0;
-}
-
 /* Handle de redimensionamiento de columnas */
 .mewyse-table-resize-handle {
   position: absolute;
@@ -485,109 +744,70 @@
   cursor: col-resize !important;
 }
 
-/* Botones de control de fila/columna */
-.mewyse-table-row-control,
-.mewyse-table-col-control {
-  position: absolute;
-  background: var(--mewyse-bg-hover);
-  border: 1px solid var(--mewyse-border-medium);
-  border-radius: var(--mewyse-radius-sm);
-  cursor: pointer;
-  opacity: 0;
-  transition: all 0.15s ease;
-  z-index: 10;
+/* Toolbar contextual de tabla (estilo TinyMCE): flota encima de la tabla */
+.mewyse-table-toolbar {
+  position: fixed;
   display: flex;
   align-items: center;
-  justify-content: center;
-  color: var(--mewyse-text-secondary);
-  pointer-events: none; /* Permitir clics a través del botón cuando no es visible */
-}
-
-.mewyse-table-row-control svg,
-.mewyse-table-col-control svg {
-  width: 12px;
-  height: 12px;
-}
-
-.mewyse-table-row-control:hover,
-.mewyse-table-col-control:hover {
-  background: var(--mewyse-accent);
-  color: white;
-  border-color: var(--mewyse-accent);
-  pointer-events: auto; /* Reactivar eventos cuando el botón es visible */
-}
-
-.mewyse-table-wrapper table tr:hover .mewyse-table-row-control {
-  opacity: 1;
-  pointer-events: auto; /* Reactivar eventos cuando el botón es visible */
-}
-
-.mewyse-table-wrapper table td:hover .mewyse-table-col-control,
-.mewyse-table-wrapper table th:hover .mewyse-table-col-control {
-  opacity: 1;
-  pointer-events: auto; /* Reactivar eventos cuando el botón es visible */
-}
-
-.mewyse-table-row-control {
-  left: -15px;
-  width: 24px;
-  height: 24px;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-.mewyse-table-col-control {
-  top: -15px;
-  width: 24px;
-  height: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-/* Menú contextual de tabla */
-.mewyse-table-menu {
-  position: fixed;
+  gap: 2px;
+  flex-wrap: wrap;
+  max-width: 95vw;
   background: var(--mewyse-bg-primary);
   color: var(--mewyse-text-primary);
   border: 1px solid var(--mewyse-border-light);
   border-radius: var(--mewyse-radius-lg);
   box-shadow: var(--mewyse-shadow-md);
-  padding: 6px;
-  min-width: 220px;
-  z-index: 1000;
-  animation: fadeIn 0.2s ease;
+  padding: 4px 6px;
+  z-index: 1001;
+  animation: fadeIn 0.15s ease;
 }
 
-.mewyse-table-menu-item {
-  padding: 10px 12px;
-  cursor: pointer;
-  border-radius: var(--mewyse-radius-md);
-  display: flex;
+.mewyse-table-toolbar-btn {
+  display: inline-flex;
   align-items: center;
-  gap: 10px;
-  font-size: 14px;
-  transition: background-color 0.15s ease;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--mewyse-text-primary);
+  border-radius: var(--mewyse-radius-md);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-.mewyse-table-menu-item:hover {
+.mewyse-table-toolbar-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.mewyse-table-toolbar-btn:hover {
   background-color: var(--mewyse-bg-hover);
 }
 
-.mewyse-table-menu-item.danger:hover {
-  background-color: #fee;
-  color: #d33;
+.mewyse-table-toolbar-btn:focus-visible {
+  outline: 2px solid var(--mewyse-accent);
+  outline-offset: -1px;
 }
 
-.mewyse-table-menu-item .icon {
-  min-width: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.mewyse-table-toolbar-btn.danger:hover {
+  background-color: rgba(211, 51, 51, 0.12);
+  color: var(--mewyse-danger, #d33);
 }
 
-.mewyse-table-menu-item .icon svg {
-  width: 16px;
-  height: 16px;
+.mewyse-table-toolbar-btn.disabled,
+.mewyse-table-toolbar-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+  pointer-events: none;
+}
+
+.mewyse-table-toolbar-sep {
+  width: 1px;
+  align-self: stretch;
+  margin: 2px 4px;
+  background: var(--mewyse-border-light);
 }
 
 /* Celdas de tabla seleccionadas */
@@ -611,47 +831,6 @@
   cursor: cell;
 }
 
-/* Menú de celdas seleccionadas */
-.mewyse-cell-menu {
-  position: fixed;
-  background: var(--mewyse-bg-primary);
-  color: var(--mewyse-text-primary);
-  border: 1px solid var(--mewyse-border-light);
-  border-radius: var(--mewyse-radius-lg);
-  box-shadow: var(--mewyse-shadow-md);
-  padding: 4px;
-  z-index: 1001;
-}
-
-.mewyse-cell-menu-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 12px;
-  background: none;
-  border: none;
-  border-radius: var(--mewyse-radius-md);
-  cursor: pointer;
-  font-size: 14px;
-  color: var(--mewyse-text-primary);
-  white-space: nowrap;
-  transition: background-color 0.15s ease;
-}
-
-.mewyse-cell-menu-btn .icon {
-  display: flex;
-  align-items: center;
-}
-
-.mewyse-cell-menu-btn .icon svg {
-  width: 16px;
-  height: 16px;
-}
-
-.mewyse-cell-menu-btn:hover {
-  background-color: var(--mewyse-bg-hover);
-}
-
 /* Menú de opciones del bloque */
 .mewyse-options-menu {
   position: fixed;
@@ -672,7 +851,6 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 14px;
   transition: background-color 0.15s ease;
 }
 
@@ -719,7 +897,6 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 14px;
   transition: background-color 0.15s ease;
 }
 
@@ -770,7 +947,6 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  font-size: 14px;
   transition: background-color 0.15s ease;
 }
 
@@ -813,11 +989,9 @@
 .mewyse-slash-menu-item .label {
   font-weight: 600;
   color: var(--mewyse-text-primary);
-  font-size: 14px;
 }
 
 .mewyse-slash-menu-item .description {
-  font-size: 12px;
   color: var(--mewyse-text-muted);
 }
 
@@ -844,7 +1018,6 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 14px;
   transition: background-color 0.15s ease;
 }
 
@@ -875,7 +1048,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
   font-weight: 600;
   flex-shrink: 0;
 }
@@ -889,6 +1061,86 @@
 }
 
 /* Mención insertada en el contenido */
+/* ============================================ */
+/* MENÚ DE ETIQUETAS (#tags) */
+/* ============================================ */
+.mewyse-tag-menu {
+  position: fixed;
+  background: var(--mewyse-bg-primary);
+  color: var(--mewyse-text-primary);
+  border: 1px solid var(--mewyse-border-light);
+  border-radius: var(--mewyse-radius-xl);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  padding: 8px;
+  min-width: 200px;
+  max-width: 280px;
+  z-index: 1000;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.mewyse-tag-menu-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: var(--mewyse-radius-lg);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: background-color 0.15s ease;
+}
+
+.mewyse-tag-menu-item:hover,
+.mewyse-tag-menu-item.selected {
+  background-color: var(--mewyse-bg-active);
+}
+
+.mewyse-tag-menu-item:focus-visible {
+  outline: 2px solid var(--mewyse-accent);
+  outline-offset: -2px;
+}
+
+/* Swatch del color del tag dentro del menú. Si el tag no trae color, hereda
+   el color genérico (mismo que la cápsula sin color). */
+.mewyse-tag-menu-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  background-color: var(--mewyse-tag-default-bg, #6b7280);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.mewyse-tag-menu-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--mewyse-text-primary);
+}
+
+/* Cápsula del tag insertado en el contenido. Si el tag no llevaba color,
+   se aplica el color genérico --mewyse-tag-default-bg / -fg. Si lo llevaba,
+   el JS pone background-color y color inline (con contraste calculado). */
+.mewyse-tag {
+  display: inline;
+  white-space: nowrap;
+  background-color: var(--mewyse-tag-default-bg, #6b7280);
+  color: var(--mewyse-tag-default-fg, #fff);
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 0.92em;
+  font-weight: 500;
+  cursor: default;
+  user-select: all;
+  line-height: 1.4;
+}
+
+.mewyse-editor-dark .mewyse-tag {
+  /* En dark mode el genérico cambia ligeramente para mejor contraste */
+  --mewyse-tag-default-bg: #4b5563;
+  --mewyse-tag-default-fg: #f3f4f6;
+}
+
 /* ============================================ */
 /* MENÚ DE EMOJI PICKER */
 /* ============================================ */
@@ -915,7 +1167,6 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 14px;
   transition: background-color 0.15s ease;
 }
 
@@ -930,7 +1181,7 @@
 }
 
 .mewyse-emoji-menu-item .emoji {
-  font-size: 20px;
+  font-size: 2em;
   width: 28px;
   text-align: center;
   flex-shrink: 0;
@@ -956,7 +1207,6 @@
   border-radius: var(--mewyse-radius-lg);
   color: var(--mewyse-text-secondary);
   cursor: pointer;
-  font-size: 14px;
   font-weight: 500;
   transition: all 0.15s ease;
 }
@@ -1098,7 +1348,6 @@
   padding: 8px 10px;
   cursor: pointer;
   border-radius: var(--mewyse-radius-md);
-  font-size: 14px;
   color: var(--mewyse-text-primary);
   transition: background-color 0.15s ease;
   min-width: 32px;
@@ -1197,7 +1446,7 @@
 }
 
 .mewyse-color-section-label {
-  font-size: 12px;
+  font-size: .9em;
   font-weight: 600;
   color: var(--mewyse-text-secondary);
   margin-bottom: 8px;
@@ -1290,7 +1539,7 @@
 
 .mewyse-modal-title {
   margin: 0 0 16px 0;
-  font-size: 20px;
+  font-size: 2em;
   font-weight: 600;
   color: var(--mewyse-text-primary);
 }
@@ -1315,7 +1564,6 @@
 .mewyse-modal-info {
   margin: 0 0 16px 0;
   color: var(--mewyse-text-secondary);
-  font-size: 14px;
 }
 
 .mewyse-modal-inputs {
@@ -1332,7 +1580,6 @@
 }
 
 .mewyse-modal-input-group label {
-  font-size: 14px;
   font-weight: 500;
   color: var(--mewyse-text-primary);
 }
@@ -1341,7 +1588,6 @@
   padding: 8px 12px;
   border: 1px solid var(--mewyse-border-medium);
   border-radius: var(--mewyse-radius-md);
-  font-size: 14px;
   transition: all 0.15s ease;
 }
 
@@ -1365,7 +1611,6 @@
 }
 
 .mewyse-modal-checkbox-group label {
-  font-size: 14px;
   cursor: pointer;
   user-select: none;
   color: var(--mewyse-text-primary);
@@ -1381,7 +1626,6 @@
   padding: 10px 20px;
   border: 1px solid var(--mewyse-border-medium);
   border-radius: var(--mewyse-radius-md);
-  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -1468,7 +1712,6 @@
 .mewyse-summary-tooltip-item {
   padding: 8px 16px;
   cursor: pointer;
-  font-size: 14px;
   color: var(--mewyse-text-primary);
   transition: background 0.15s ease;
   white-space: nowrap;
@@ -1482,19 +1725,19 @@
 
 .mewyse-summary-heading1 {
   font-weight: 600;
-  font-size: 15px;
+  font-size: 2em;
   padding-left: 16px;
 }
 
 .mewyse-summary-heading2 {
   font-weight: 500;
-  font-size: 14px;
+  font-size: 1.75em;
   padding-left: 28px;
 }
 
 .mewyse-summary-heading3 {
   font-weight: 400;
-  font-size: 13px;
+  font-size: 1.5em;
   padding-left: 40px;
 }
 
@@ -1559,7 +1802,7 @@
 
 .mewyse-summary-modal-header h3 {
   margin: 0;
-  font-size: 20px;
+  font-size: 2em;
   font-weight: 600;
   color: var(--mewyse-text-primary);
 }
@@ -1617,13 +1860,13 @@
 }
 
 .mewyse-summary-stat-label {
-  font-size: 13px;
+  font-size: 1.25em;
   color: var(--mewyse-text-secondary);
   font-weight: 500;
 }
 
 .mewyse-summary-stat-value {
-  font-size: 24px;
+  font-size: 2.2em;
   font-weight: 600;
   color: var(--mewyse-text-primary);
 }
@@ -1631,7 +1874,7 @@
 /* Sección de índice */
 .mewyse-summary-index h4 {
   margin: 0 0 16px 0;
-  font-size: 16px;
+  font-size: 1.5em;
   font-weight: 600;
   color: var(--mewyse-text-primary);
 }
@@ -1647,7 +1890,6 @@
   cursor: pointer;
   border-radius: var(--mewyse-radius-lg);
   transition: all 0.15s ease;
-  font-size: 14px;
   color: var(--mewyse-text-primary);
 }
 
@@ -1657,19 +1899,19 @@
 
 .mewyse-summary-index-item.mewyse-summary-heading1 {
   font-weight: 600;
-  font-size: 15px;
+  font-size: 1.5em;
   padding-left: 16px;
 }
 
 .mewyse-summary-index-item.mewyse-summary-heading2 {
   font-weight: 500;
-  font-size: 14px;
+  font-size: 1.25em;
   padding-left: 32px;
 }
 
 .mewyse-summary-index-item.mewyse-summary-heading3 {
   font-weight: 400;
-  font-size: 13px;
+  font-size: 1.1em;
   padding-left: 48px;
 }
 
@@ -1678,7 +1920,6 @@
   text-align: center;
   color: var(--mewyse-text-muted);
   padding: 32px 0;
-  font-size: 14px;
 }
 
 /* Responsive */
@@ -1810,7 +2051,6 @@
   padding: 4px;
   min-width: 26px;
   height: 22px;
-  font-size: 12px;
 }
 
 .mewyse-editor-compact.mewyse-editor-wrapper .mewyse-toolbar-button svg {
@@ -1828,7 +2068,6 @@
   padding: 8px 12px 8px var(--mewyse-padding-handle);
   min-height: 100px;
   max-height: 250px;
-  font-size: 13px;
   border-radius: 4px;
 }
 
@@ -1856,24 +2095,22 @@
 .mewyse-editor-compact.mewyse-editor-wrapper > .mewyse-editor blockquote.mewyse-block {
   padding: 4px 8px;
   margin-left: 0;
-  font-size: 13px;
 }
 
 .mewyse-editor-compact.mewyse-editor pre.mewyse-block,
 .mewyse-editor-compact.mewyse-editor-wrapper > .mewyse-editor pre.mewyse-block {
   padding: 6px 10px;
-  font-size: 12px;
 }
 
 /* Menús flotantes en dark mode (se añaden a document.body, fuera del editor) */
 .mewyse-slash-menu.mewyse-dark,
 .mewyse-mention-menu.mewyse-dark,
+.mewyse-tag-menu.mewyse-dark,
 .mewyse-emoji-menu.mewyse-dark,
 .mewyse-format-menu.mewyse-dark,
 .mewyse-options-menu.mewyse-dark,
 .mewyse-type-menu.mewyse-dark,
-.mewyse-cell-menu.mewyse-dark,
-.mewyse-table-menu.mewyse-dark,
+.mewyse-table-toolbar.mewyse-dark,
 .mewyse-color-picker.mewyse-dark,
 .mewyse-unified-color-picker.mewyse-dark {
   --mewyse-text-primary: #ddd;
@@ -1979,7 +2216,7 @@ body.mewyse-fullscreen-lock {
   position: absolute;
   top: -18px;
   left: 0;
-  font-size: 10px;
+  font-size: .9em;
   font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
   background: var(--mewyse-accent);
   color: #fff;
@@ -2013,7 +2250,7 @@ body.mewyse-fullscreen-lock {
   align-items: center;
   gap: 16px;
   padding: 6px 14px;
-  font-size: 12px;
+  font-size: .9em;
   color: var(--mewyse-text-secondary);
   background: var(--mewyse-bg-secondary);
   border-top: 1px solid var(--mewyse-border-light);
@@ -2111,7 +2348,7 @@ body.mewyse-fullscreen-lock {
 
 .mewyse-fr-title {
   font-weight: 600;
-  font-size: 13px;
+  font-size: 1.05em;
   color: var(--mewyse-text-primary);
 }
 
@@ -2144,7 +2381,7 @@ body.mewyse-fullscreen-lock {
   padding: 6px 10px;
   border: 1px solid var(--mewyse-border-medium);
   border-radius: var(--mewyse-radius-md);
-  font-size: 13px;
+  font-size: 1.05em;
   font-family: inherit;
   background: var(--mewyse-bg-primary);
   color: var(--mewyse-text-primary);
@@ -2158,7 +2395,7 @@ body.mewyse-fullscreen-lock {
 }
 
 .mewyse-fr-counter {
-  font-size: 11px;
+  font-size: .8em;
   color: var(--mewyse-text-muted);
   min-width: 70px;
   text-align: right;
@@ -2168,7 +2405,7 @@ body.mewyse-fullscreen-lock {
 .mewyse-fr-options {
   display: flex;
   gap: 14px;
-  font-size: 12px;
+  font-size: .9em;
   color: var(--mewyse-text-secondary);
 }
 
@@ -2197,7 +2434,6 @@ body.mewyse-fullscreen-lock {
   color: var(--mewyse-text-primary);
   border-radius: var(--mewyse-radius-md);
   cursor: pointer;
-  font-size: 12px;
   font-family: inherit;
   display: inline-flex;
   align-items: center;
@@ -2314,7 +2550,6 @@ th.mewyse-image-drop-target-cell {
   border-radius: var(--mewyse-radius-md);
   color: var(--mewyse-text-secondary);
   font-family: inherit;
-  font-size: 13px;
   font-weight: 500;
   text-align: left;
   cursor: pointer;
@@ -2351,7 +2586,6 @@ th.mewyse-image-drop-target-cell {
 
 .mewyse-modal-advanced-row label {
   flex: 0 0 100px;
-  font-size: 12px;
   color: var(--mewyse-text-secondary);
   font-weight: 500;
 }
@@ -2448,14 +2682,12 @@ th.mewyse-image-drop-target-cell {
 }
 
 .mewyse-table-properties-modal .mewyse-modal-input-group label {
-  font-size: 12px;
   color: var(--mewyse-text-secondary);
   font-weight: 500;
 }
 
 .mewyse-table-properties-modal .mewyse-modal-input {
   padding: 6px 10px;
-  font-size: 13px;
   font-family: inherit;
   border: 1px solid var(--mewyse-border-medium);
   border-radius: var(--mewyse-radius-md);
@@ -2503,7 +2735,7 @@ th.mewyse-image-drop-target-cell {
 
 .mewyse-modal-btn-small {
   padding: 4px 10px;
-  font-size: 11px;
+  font-size: .85em;
   font-family: inherit;
   border: 1px solid var(--mewyse-border-medium);
   background: var(--mewyse-bg-secondary);

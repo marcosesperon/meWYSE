@@ -569,6 +569,49 @@ editor.focus(blockId); // bloque especifico
       </div>
     </div>
 
+    <!-- Demo: ReadOnly -->
+    <div class="demo-section">
+      <h2>Modo ReadOnly (visualizaci&oacute;n)</h2>
+      <p>Pasa <code>readOnly: true</code> para que el editor solo muestre el contenido sin permitir edici&oacute;n. No se monta toolbar, ni floating handle, ni autocompletes; los bloques quedan con <code>contenteditable=&quot;false&quot;</code>. La selecci&oacute;n nativa y el copy/paste hacia fuera siguen funcionando.</p>
+      <pre class="docs-code"><code>var editor = new meWYSE({
+  target: '#readOnlyEditor',
+  readOnly: true,
+  blocks: [
+    { id: 1, type: 'heading2', content: 'T&iacute;tulo no editable' },
+    { id: 2, type: 'paragraph', content: 'Texto que se ve pero no se puede editar.' }
+  ]
+});</code></pre>
+      <div id="readOnlyEditor"></div>
+    </div>
+
+    <!-- Demo: Etiquetas -->
+    <div class="demo-section">
+      <h2>Sistema de Etiquetas</h2>
+      <p>Escribe <code>#</code> para insertar etiquetas con autocompletado. Cada etiqueta puede llevar un <code>color</code> opcional — se renderiza como una c&aacute;psula con ese color de fondo y contraste autom&aacute;tico. Sin color, usa un gen&eacute;rico del tema.</p>
+      <pre class="docs-code"><code>var editor = new meWYSE({
+  target: '#tagsEditor',
+  toolbar: true,
+  tags: [
+    { id: 1, name: 'urgente',  color: '#dc2626' },
+    { id: 2, name: 'pendiente', color: '#f59e0b' },
+    { id: 3, name: 'completado', color: '#16a34a' },
+    { id: 4, name: 'review',   color: '#3b82f6' },
+    { id: 5, name: 'sin-color' }
+  ]
+});</code></pre>
+      <div id="tagsEditor"></div>
+      <div class="controls">
+        <h3>Controles</h3>
+        <div class="button-group">
+          <button class="btn" onclick="getTagsHTML()">Ver HTML</button>
+          <button class="btn btn-secondary" onclick="clearTagsEditor()">Limpiar</button>
+        </div>
+        <div id="tagsOutput" class="output" style="display:none;">
+          <pre id="tagsOutputContent"></pre>
+        </div>
+      </div>
+    </div>
+
     <!-- Demo: Editor con Div -->
     <div class="demo-section">
       <h2>Editor con Div</h2>
@@ -891,6 +934,8 @@ editor.loadFromMarkdown(editor.getMarkdown());</code></pre>
     var toolbarEditor;
     var summaryEditor;
     var mentionsEditor;
+    var tagsEditor;
+    var readOnlyEditor;
     var divEditor;
     var darkEditor;
     var compactEditor;
@@ -957,6 +1002,52 @@ editor.loadFromMarkdown(editor.getMarkdown());</code></pre>
         ],
         onChange: function(data) {
           console.log('Editor con menciones - Contenido:', data.html);
+        }
+      });
+    }
+
+    // Inicializar editor en modo readOnly (visualización)
+    function initReadOnlyEditor() {
+      readOnlyEditor = new meWYSE({
+        target: '#readOnlyEditor',
+        readOnly: true,
+        // Mentions y tags se incluyen para que el editor reconozca las clases
+        // y los estilos se apliquen igual que en un editor normal.
+        mentions: [{ id: 'JG', name: 'Juan García' }],
+        tags: [{ id: 1, name: 'urgente', color: '#dc2626' }],
+        // onFocus/onBlur/onChange se ignoran en readOnly (probarlos no hace nada)
+        onFocus: function(){ console.log('[readOnly] onFocus — NO debería verse esto'); },
+        onBlur:  function(){ console.log('[readOnly] onBlur — NO debería verse esto'); },
+        onChange:function(){ console.log('[readOnly] onChange — NO debería verse esto'); },
+        blocks: [
+          { id: 1, type: 'heading2', content: 'Documento solo de lectura' },
+          { id: 2, type: 'paragraph', content: 'Este editor está montado con <b>readOnly: true</b>. No hay toolbar ni floating handle. Los bloques no admiten edición pero sí selección nativa para <i>copiar al portapapeles</i>.' },
+          { id: 3, type: 'paragraph', content: 'Asignado a <span class="mewyse-mention" data-mention-id="JG" data-mention-name="Juan García" contenteditable="false">@Juan García</span> con prioridad <span class="mewyse-tag" data-tag-id="1" data-tag-name="urgente" data-tag-color="#dc2626" contenteditable="false" style="background-color: #dc2626; color: #fff">#urgente</span>.' },
+          { id: 4, type: 'bulletList', content: 'Ítem uno' },
+          { id: 5, type: 'bulletList', content: 'Ítem dos' },
+          { id: 6, type: 'quote', content: 'Las citas también se renderizan correctamente.' }
+        ]
+      });
+    }
+
+    // Inicializar editor con etiquetas
+    function initTagsEditor() {
+      tagsEditor = new meWYSE({
+        target: '#tagsEditor',
+        toolbar: true,
+        tags: [
+          { id: 1, name: 'urgente',    color: '#dc2626' },
+          { id: 2, name: 'pendiente',  color: '#f59e0b' },
+          { id: 3, name: 'completado', color: '#16a34a' },
+          { id: 4, name: 'review',     color: '#3b82f6' },
+          { id: 5, name: 'idea',       color: '#a855f7' },
+          { id: 6, name: 'sin-color' }
+        ],
+        blocks: [
+          { id: 1, type: 'paragraph', content: 'Escribe # para insertar etiquetas con autocompletado.' }
+        ],
+        onChange: function(data) {
+          console.log('Editor con tags - Contenido:', data.html);
         }
       });
     }
@@ -1127,6 +1218,18 @@ editor.loadFromMarkdown(editor.getMarkdown());</code></pre>
       if (confirm('Limpiar editor?')) {
         mentionsEditor.loadFromJSON([]);
         mentionsEditor.addBlock('paragraph');
+      }
+    }
+
+    // Funciones de control para editor con etiquetas
+    function getTagsHTML() {
+      var html = tagsEditor.getHTML();
+      showOutput('tagsOutput', 'tagsOutputContent', html);
+    }
+    function clearTagsEditor() {
+      if (confirm('Limpiar editor?')) {
+        tagsEditor.loadFromJSON([]);
+        tagsEditor.addBlock('paragraph');
       }
     }
 
@@ -1489,6 +1592,8 @@ editor.loadFromMarkdown(editor.getMarkdown());</code></pre>
       initToolbarEditor();
       initSummaryEditor();
       initMentionsEditor();
+      initReadOnlyEditor();
+      initTagsEditor();
       initDivEditor();
       initDarkEditor();
       initCompactEditor();
