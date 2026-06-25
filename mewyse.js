@@ -2307,11 +2307,17 @@
       }
     }
 
-    // Calcular insertIndex para el caso fuera de tabla
+    // Calcular insertIndex para el caso fuera de tabla. Si el bloque enfocado
+    // está VACÍO, marcarlo para que la imagen lo reemplace (no dejar el vacío).
     var insertIndex;
+    var replaceBlockId = null;
     if (lastFocusedBlock) {
       var blockId = parseInt(lastFocusedBlock.getAttribute('data-block-id'));
       insertIndex = this.getBlockIndex(blockId) + 1;
+      var v_fb = this.getBlock(blockId);
+      if (v_fb && typeof v_fb.content === 'string' && v_fb.content.trim() === '' && v_fb.type !== 'divider') {
+        replaceBlockId = blockId;
+      }
     } else {
       insertIndex = this.blocks.length;
     }
@@ -2332,7 +2338,7 @@
       if (tableCellElement) {
         self.insertImageInTableCell(file, tableCellElement);
       } else {
-        self.showImageDimensionsModal(file, insertIndex);
+        self.showImageDimensionsModal(file, insertIndex, replaceBlockId);
       }
     };
 
@@ -2587,6 +2593,8 @@
             }
 
             self.triggerChange();
+            // Tras redimensionar, dejar la imagen de la celda seleccionada/enfocada
+            self.selectImage(imgElement, null, true, tableCell);
           };
 
           document.addEventListener('mousemove', mouseMoveHandler);
@@ -3142,6 +3150,10 @@
 
     var self = this;
 
+    // Suprimir el onBlur transitorio: al quitar la imagen (que tenía el foco)
+    // el DOM se reconstruye y el foco se reasienta en el bloque vacío.
+    this._suppressBlurUntil = Date.now() + 300;
+
     if (this.selectedImage.isInTable) {
       // Imagen en tabla: eliminar imagen y crear párrafo vacío en la celda
       var tableCell = this.selectedImage.tableCell;
@@ -3177,9 +3189,22 @@
       // Enfocar el nuevo párrafo
       paragraph.focus();
     } else {
-      // Imagen en bloque: eliminar el bloque completo
-      var blockId = this.selectedImage.blockId;
-      this.deleteBlock(blockId);
+      // Imagen en bloque suelto: convertir el bloque en un párrafo vacío en su
+      // sitio y dejar el foco dentro (en vez de eliminar el bloque), para que el
+      // usuario pueda seguir escribiendo y no salte un onBlur.
+      var v_blockId = this.selectedImage.blockId;
+      var v_block = this.getBlock(v_blockId);
+      if (v_block) {
+        this.pushHistory(true);
+        v_block.type = 'paragraph';
+        v_block.content = '';
+        if (v_block.checked != null) delete v_block.checked;
+        if (v_block.alignment != null) delete v_block.alignment;
+        this.render(v_blockId);
+        var v_el = this.getBlockElementById(v_blockId);
+        var v_editable = this.getEditableElement(v_el);
+        if (v_editable) v_editable.focus();
+      }
     }
 
     // Limpiar selección
@@ -3570,7 +3595,7 @@
   /**
    * Muestra el modal para editar las dimensiones de la imagen
    */
-  meWYSE.prototype.showImageDimensionsModal = function(file, insertIndex) {
+  meWYSE.prototype.showImageDimensionsModal = function(file, insertIndex, replaceBlockId) {
     var self = this;
 
     // Crear el overlay del modal
@@ -3697,7 +3722,7 @@
           var height = parseInt(heightInput.value);
 
           // Crear el bloque de imagen con el blob + opciones avanzadas
-          self.createImageBlock(file, e.target.result, width, height, insertIndex, advanced.getValues());
+          self.createImageBlock(file, e.target.result, width, height, insertIndex, advanced.getValues(), replaceBlockId);
 
           document.body.removeChild(modalOverlay);
         };
@@ -3728,7 +3753,7 @@
    *
    * @param {Object} advanced - Opciones avanzadas opcionales: { border, margin, alignment }
    */
-  meWYSE.prototype.createImageBlock = function(file, dataUrl, width, height, insertIndex, advanced) {
+  meWYSE.prototype.createImageBlock = function(file, dataUrl, width, height, insertIndex, advanced, replaceBlockId) {
     var self = this;
 
     var doCreate = function(finalBlob, finalWidth, finalHeight) {
@@ -3743,14 +3768,44 @@
       if (advanced && (advanced.border || advanced.margin || advanced.alignment)) {
         content.advanced = advanced;
       }
-      var newBlock = {
-        id: ++self.currentBlockId,
-        type: 'image',
-        content: content
-      };
-      self.blocks.splice(insertIndex, 0, newBlock);
+
+      // Si el bloque donde estaba el foco está VACÍO, convertirlo en la imagen
+      // (reutiliza id y posición) en vez de insertar debajo dejando el vacío.
+      var v_replaceBlock = (replaceBlockId != null) ? self.getBlock(replaceBlockId) : null;
+      var v_canReplace = v_replaceBlock &&
+        typeof v_replaceBlock.content === 'string' &&
+        v_replaceBlock.content.trim() === '' &&
+        v_replaceBlock.type !== 'divider';
+
+      var v_targetId;
+      if (v_canReplace) {
+        v_replaceBlock.type = 'image';
+        v_replaceBlock.content = content;
+        if (v_replaceBlock.checked != null) delete v_replaceBlock.checked;
+        if (v_replaceBlock.alignment != null) delete v_replaceBlock.alignment;
+        if (v_replaceBlock.customClass != null) delete v_replaceBlock.customClass;
+        if (v_replaceBlock.indentLevel != null) delete v_replaceBlock.indentLevel;
+        v_targetId = v_replaceBlock.id;
+      } else {
+        var newBlock = {
+          id: ++self.currentBlockId,
+          type: 'image',
+          content: content
+        };
+        self.blocks.splice(insertIndex, 0, newBlock);
+        v_targetId = newBlock.id;
+      }
+
+      // El render recrea el DOM (blur transitorio del bloque que tenía el foco):
+      // suprimir onBlur durante la transición.
+      self._suppressBlurUntil = Date.now() + 300;
       self.render();
       self.triggerChange();
+      // Mantener el foco DENTRO del editor: seleccionar la imagen recién
+      // insertada (la selección la enfoca y muestra el handle).
+      var v_newEl = self.getBlockElementById(v_targetId);
+      var v_newImg = v_newEl ? v_newEl.querySelector('img.mewyse-image') : null;
+      if (v_newImg) self.selectImage(v_newImg, v_targetId, false);
     };
 
     if (typeof this.options.onImageUpload === 'function') {
@@ -3871,11 +3926,20 @@
     var buttonsContainer = document.createElement('div');
     buttonsContainer.className = 'mewyse-modal-buttons';
 
+    // Al cerrar el modal, devolver el foco a la imagen dejándola seleccionada
+    // (para que el estado de foco sea coherente y el onBlur salte cuando toque).
+    var v_cell = imgElement.closest ? imgElement.closest('td, th') : null;
+    var closeAndReselect = function() {
+      if (modalOverlay.parentNode) document.body.removeChild(modalOverlay);
+      self._suppressBlurUntil = Date.now() + 300;
+      self.selectImage(imgElement, v_cell ? null : blockId, !!v_cell, v_cell || null);
+    };
+
     var cancelButton = document.createElement('button');
     cancelButton.textContent = self.t('modals.cancel');
     cancelButton.className = 'mewyse-modal-button mewyse-modal-button-cancel';
     cancelButton.onclick = function() {
-      document.body.removeChild(modalOverlay);
+      closeAndReselect();
     };
 
     var saveButton = document.createElement('button');
@@ -3894,7 +3958,7 @@
       imgElement.style.height = height + 'px';
 
       self.triggerChange();
-      document.body.removeChild(modalOverlay);
+      closeAndReselect();
     };
 
     buttonsContainer.appendChild(cancelButton);
@@ -3907,7 +3971,7 @@
     // Cerrar al hacer click fuera del modal
     modalOverlay.onclick = function(e) {
       if (e.target === modalOverlay) {
-        document.body.removeChild(modalOverlay);
+        closeAndReselect();
       }
     };
   };
@@ -4064,6 +4128,10 @@
    */
   meWYSE.prototype.changeBlockTypeFromToolbar = function(type, customClass) {
     var self = this;
+
+    // El cambio de tipo re-renderiza el bloque (blur transitorio del editable):
+    // suprimir onBlur durante la transición.
+    this._suppressBlurUntil = Date.now() + 300;
 
     // Si hay contexto guardado, usarlo
     if (this.toolbarMenuContext && this.toolbarMenuContext.blockId) {
@@ -5053,6 +5121,8 @@
         block.content.height = finalHeight;
       }
       self.triggerChange();
+      // Tras redimensionar, dejar la imagen seleccionada/enfocada
+      self.selectImage(img, block.id, false);
     };
 
     document.addEventListener('mousemove', mousemoveHandler);
@@ -6001,8 +6071,13 @@
       el.removeAttribute('id');
       el.removeAttribute('lang');
       el.removeAttribute('align');
-      el.removeAttribute('width');
-      el.removeAttribute('height');
+      // width/height: conservar si el editor los permite para este tag
+      // (IMG/IFRAME/VIDEO), para no perder las dimensiones de una imagen al
+      // cargar contenido externo. Para el resto de tags (p.ej. TD/P de Word)
+      // se siguen eliminando.
+      var v_tagAllowed = ATTR_WHITELIST[el.tagName] || {};
+      if (!v_tagAllowed['width']) el.removeAttribute('width');
+      if (!v_tagAllowed['height']) el.removeAttribute('height');
 
       // Eliminar atributos MS Office (mso-*), datos internos, xmlns, namespaces.
       // Preservar atributos meWYSE: data-mention-*, data-tag-*, data-block-*.
@@ -6180,9 +6255,25 @@
           cleanCell.setAttribute('rowspan', cell.getAttribute('rowspan'));
         }
 
-        // Limpiar el contenido de la celda
-        var cellContent = this.sanitizeHTML(cell).trim() || '';
-        cleanCell.innerHTML = '<p style="padding: 8px; margin: 0; min-height: 1em;">' + cellContent + '</p>';
+        // Limpiar el contenido de la celda. Si contiene una imagen con src
+        // seguro, preservarla (createTableElement la envolverá y enganchará);
+        // sanitizeHTML descartaría el <img>, perdiéndolo al cargar HTML.
+        var imgInCell = cell.querySelector('img');
+        if (imgInCell && this._isSafeImageUrl(imgInCell.getAttribute('src'))) {
+          var v_src = imgInCell.getAttribute('src');
+          var v_alt = imgInCell.getAttribute('alt') || '';
+          var v_w = parseInt(imgInCell.getAttribute('width'), 10);
+          var v_h = parseInt(imgInCell.getAttribute('height'), 10);
+          var v_img = '<img class="mewyse-image" src="' + escape_attr(v_src) + '"';
+          if (v_alt) v_img += ' alt="' + escape_attr(v_alt) + '"';
+          if (!isNaN(v_w) && v_w > 0) v_img += ' width="' + v_w + '"';
+          if (!isNaN(v_h) && v_h > 0) v_img += ' height="' + v_h + '"';
+          v_img += '>';
+          cleanCell.innerHTML = v_img;
+        } else {
+          var cellContent = this.sanitizeHTML(cell).trim() || '';
+          cleanCell.innerHTML = '<p style="padding: 8px; margin: 0; min-height: 1em;">' + cellContent + '</p>';
+        }
 
         cleanRow.appendChild(cleanCell);
       }
@@ -7867,6 +7958,10 @@
     menu.className = 'mewyse-slash-menu';
     menu.setAttribute('role', 'listbox');
     menu.setAttribute('aria-label', this.t('blockMenu.changeType'));
+    // Evitar que clicar el menú quite el foco del bloque (que dispararía un
+    // onBlur espurio): preventDefault en mousedown mantiene el caret; el click
+    // de los items sigue funcionando.
+    menu.addEventListener('mousedown', function(e) { e.preventDefault(); });
     this.slashMenu = menu;
     this.slashMenuSelectedIndex = 0;
     this.slashMenuElement = element;
@@ -8113,6 +8208,8 @@
     menu.className = 'mewyse-mention-menu';
     menu.setAttribute('role', 'listbox');
     menu.setAttribute('aria-label', 'Mentions');
+    // Mantener el foco del bloque al clicar el menú (evita onBlur espurio)
+    menu.addEventListener('mousedown', function(e) { e.preventDefault(); });
     this.mentionMenu = menu;
     this.mentionMenuSelectedIndex = 0;
     this.mentionMenuElement = element;
@@ -8487,6 +8584,8 @@
     menu.className = 'mewyse-emoji-menu';
     menu.setAttribute('role', 'listbox');
     menu.setAttribute('aria-label', 'Emoji');
+    // Mantener el foco del bloque al clicar el menú (evita onBlur espurio)
+    menu.addEventListener('mousedown', function(e) { e.preventDefault(); });
 
     // Guardar la selección actual antes de crear el menú
     var selection = window.getSelection();
@@ -9946,6 +10045,11 @@
     if (block) {
       var oldType = block.type;
       block.type = newType;
+      // El render recrea el bloque enfocado: el contenteditable viejo se destruye
+      // (focusout) y el nuevo recibe foco (focusin). Sin esta ventana, ese blur
+      // transitorio dispararía onBlur indebidamente. Cubre el cambio de tipo
+      // desde el menú slash y otras rutas que pasan por aquí.
+      this._suppressBlurUntil = Date.now() + 300;
       this.render(blockId);
 
       // Si el cambio involucra listas numeradas, actualizar la numeración
