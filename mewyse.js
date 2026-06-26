@@ -9860,50 +9860,160 @@
       }
     }
 
-    // Flecha arriba: ir al bloque anterior
-    if (e.key === 'ArrowUp') {
-      var sel = window.getSelection();
-      if (sel.rangeCount > 0) {
-        var range = sel.getRangeAt(0);
-        // Solo si estamos al inicio del bloque
-        if (range.startOffset === 0) {
-          e.preventDefault();
-          var index = this.getBlockIndex(blockId);
-          if (index > 0) {
-            var prevBlock = this.blocks[index - 1];
-            var prevBlockElement = this.container.querySelector('[data-block-id="' + prevBlock.id + '"]');
-            if (prevBlockElement) {
-              var contentEditable = prevBlockElement.querySelector('[contenteditable="true"]');
-              if (contentEditable) {
-                contentEditable.focus();
-              }
-            }
+    // Flechas arriba/abajo: navegar entre bloques preservando la columna (x)
+    // del caret, como en un editor de texto. Solo se intercepta si el caret
+    // está en la primera (ArrowUp) / última (ArrowDown) línea visual del bloque;
+    // en líneas intermedias se deja el movimiento nativo dentro del bloque.
+    if ((e.key === 'ArrowUp' || e.key === 'ArrowDown') &&
+        !e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      var navSel = window.getSelection();
+      if (navSel && navSel.rangeCount > 0 && navSel.isCollapsed) {
+        var caretRect = this._getCaretClientRect();
+        var editableEl = this.getEditableElement(this.getBlockElementById(blockId)) || element;
+        if (caretRect && editableEl) {
+          var edgeInfo = this._caretLineEdge(editableEl, caretRect);
+          var idxNav = this.getBlockIndex(blockId);
+
+          if (e.key === 'ArrowUp' && edgeInfo.first && idxNav > 0) {
+            e.preventDefault();
+            this._moveCaretToAdjacentBlock(this.blocks[idxNav - 1].id, caretRect.left, 'bottom');
+            return;
+          }
+          if (e.key === 'ArrowDown' && edgeInfo.last && idxNav < this.blocks.length - 1) {
+            e.preventDefault();
+            this._moveCaretToAdjacentBlock(this.blocks[idxNav + 1].id, caretRect.left, 'top');
+            return;
           }
         }
       }
     }
+  };
 
-    // Flecha abajo: ir al bloque siguiente
-    if (e.key === 'ArrowDown') {
-      var sel = window.getSelection();
-      if (sel.rangeCount > 0) {
-        var range = sel.getRangeAt(0);
-        // Solo si estamos al final del bloque
-        if (range.startOffset === element.textContent.length) {
-          e.preventDefault();
-          var index = this.getBlockIndex(blockId);
-          if (index < this.blocks.length - 1) {
-            var nextBlock = this.blocks[index + 1];
-            var nextBlockElement = this.container.querySelector('[data-block-id="' + nextBlock.id + '"]');
-            if (nextBlockElement) {
-              var contentEditable = nextBlockElement.querySelector('[contenteditable="true"]');
-              if (contentEditable) {
-                contentEditable.focus();
-              }
-            }
-          }
-        }
+  /**
+   * Devuelve el rect del caret (rango colapsado actual), o null.
+   */
+  meWYSE.prototype._getCaretClientRect = function() {
+    var sel = window.getSelection();
+    if (!sel || !sel.rangeCount) return null;
+    var range = sel.getRangeAt(0).cloneRange();
+    range.collapse(true);
+    var rects = range.getClientRects();
+    if (rects && rects.length) return rects[0];
+
+    // Un rango colapsado al final de un nodo de texto suele no tener rects:
+    // sondear el carácter adyacente y derivar la posición del caret.
+    var node = range.startContainer;
+    var off = range.startOffset;
+    if (node && node.nodeType === 3 && node.length > 0) {
+      var probe = document.createRange();
+      if (off > 0) { probe.setStart(node, off - 1); probe.setEnd(node, off); }
+      else { probe.setStart(node, 0); probe.setEnd(node, Math.min(1, node.length)); }
+      var pr = probe.getClientRects();
+      if (pr && pr.length) {
+        var last = pr[pr.length - 1];
+        var edgeX = (off > 0) ? last.right : last.left;
+        return { top: last.top, bottom: last.bottom, left: edgeX, right: edgeX, height: last.height, width: 0 };
       }
+    }
+
+    var r = range.getBoundingClientRect();
+    if (r && (r.height || r.top || r.left)) return r;
+    // Fallback final: rect del elemento contenedor
+    var host = (node && node.nodeType === 3) ? node.parentNode : node;
+    if (host && host.getBoundingClientRect) {
+      var hr = host.getBoundingClientRect();
+      if (hr && (hr.height || hr.top)) return hr;
+    }
+    return null;
+  };
+
+  /**
+   * Indica si el caret está en la primera/última línea visual de un editable,
+   * usando line-height y padding como tolerancia.
+   * @returns {{first:boolean, last:boolean}}
+   */
+  meWYSE.prototype._caretLineEdge = function(editableEl, caretRect) {
+    var elRect = editableEl.getBoundingClientRect();
+    var cs = window.getComputedStyle(editableEl);
+    var padT = parseFloat(cs.paddingTop) || 0;
+    var padB = parseFloat(cs.paddingBottom) || 0;
+    var lineH = parseFloat(cs.lineHeight);
+    if (isNaN(lineH)) lineH = (parseFloat(cs.fontSize) || 16) * 1.3;
+    var tol = lineH * 0.6;
+    return {
+      first: (caretRect.top - (elRect.top + padT)) < tol,
+      last: ((elRect.bottom - padB) - caretRect.bottom) < tol
+    };
+  };
+
+  /**
+   * Coloca el caret en el bloque adyacente, en su borde superior/inferior y a
+   * la x indicada (preserva la columna). Maneja texto/tabla por coordenada e
+   * imágenes por selección.
+   * @param {number} targetBlockId
+   * @param {number} x - coordenada horizontal a preservar
+   * @param {string} edge - 'top' (primera línea) | 'bottom' (última línea)
+   */
+  meWYSE.prototype._moveCaretToAdjacentBlock = function(targetBlockId, x, edge) {
+    var targetEl = this.getBlockElementById(targetBlockId);
+    if (!targetEl) return;
+    var block = this.getBlock(targetBlockId);
+
+    // Imagen suelta: seleccionarla
+    if (block && block.type === 'image') {
+      var img = targetEl.querySelector('img.mewyse-image') || targetEl.querySelector('img');
+      if (img) { this.selectImage(img, targetBlockId, false); return; }
+    }
+
+    var editableEl = this.getEditableElement(targetEl) || targetEl;
+    var rect = editableEl.getBoundingClientRect();
+    var cs = window.getComputedStyle(editableEl);
+    var padT = parseFloat(cs.paddingTop) || 0;
+    var padB = parseFloat(cs.paddingBottom) || 0;
+    var lineH = parseFloat(cs.lineHeight);
+    if (isNaN(lineH)) lineH = (parseFloat(cs.fontSize) || 16) * 1.3;
+
+    // y de la primera/última línea del destino; x clamped al rect del destino
+    var y = (edge === 'top')
+      ? (rect.top + padT + lineH * 0.5)
+      : (rect.bottom - padB - lineH * 0.5);
+    y = Math.max(rect.top + 1, Math.min(y, rect.bottom - 1));
+    var cx = Math.max(rect.left + 1, Math.min(x, rect.right - 1));
+
+    // Colocar el caret por coordenada (preserva la columna). Si el rango cae
+    // fuera del bloque destino o el navegador no lo soporta, foco + inicio/fin.
+    var range = null;
+    if (document.caretRangeFromPoint) {
+      range = document.caretRangeFromPoint(cx, y);
+    } else if (document.caretPositionFromPoint) {
+      var pos = document.caretPositionFromPoint(cx, y);
+      if (pos) { range = document.createRange(); range.setStart(pos.offsetNode, pos.offset); range.collapse(true); }
+    }
+
+    var placed = false;
+    if (range) {
+      var node = range.startContainer;
+      var host = (node.nodeType === 3) ? node.parentNode : node;
+      if (host && targetEl.contains(host)) {
+        var s = window.getSelection();
+        s.removeAllRanges();
+        s.addRange(range);
+        // Asegurar foco del editable que contiene el caret
+        var ce = host.closest ? host.closest('[contenteditable="true"]') : null;
+        if (ce) { try { ce.focus(); } catch (e) {} }
+        placed = true;
+      }
+    }
+
+    if (!placed) {
+      // Fallback: foco y cursor al inicio (top) o final (bottom) del editable
+      try { editableEl.focus(); } catch (e2) {}
+      var fb = document.createRange();
+      fb.selectNodeContents(editableEl);
+      fb.collapse(edge === 'top');
+      var s2 = window.getSelection();
+      s2.removeAllRanges();
+      s2.addRange(fb);
     }
   };
 
