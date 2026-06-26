@@ -1248,9 +1248,9 @@
 }
 
 .mewyse-editor-dark .mewyse-tag {
-  /* En dark mode el genérico cambia ligeramente para mejor contraste */
-  --mewyse-tag-default-bg: #4b5563;
-  --mewyse-tag-default-fg: #f3f4f6;
+  /* En dark mode el genérico cambia ligeramente para mejor contraste (gris neutro) */
+  --mewyse-tag-default-bg: #404040;
+  --mewyse-tag-default-fg: #e6e6e6;
 }
 
 /* ============================================ */
@@ -2169,39 +2169,40 @@
 .mewyse-editor-dark.mewyse-editor,
 .mewyse-editor-dark.mewyse-editor-wrapper,
 .mewyse-editor-wrapper.mewyse-editor-dark .mewyse-editor {
+  /* Paleta neutra (negro/gris) — sin tinte de color */
   /* Text colors */
-  --mewyse-text-primary: #ddd;
-  --mewyse-text-secondary: #aaa;
-  --mewyse-text-muted: #777;
-  --mewyse-text-light: #666;
-  --mewyse-text-inverse: #1e1e2e;
+  --mewyse-text-primary: #e6e6e6;
+  --mewyse-text-secondary: #a0a0a0;
+  --mewyse-text-muted: #707070;
+  --mewyse-text-light: #5a5a5a;
+  --mewyse-text-inverse: #1a1a1a;
 
   /* Background colors */
-  --mewyse-bg-primary: #1e1e2e;
-  --mewyse-bg-secondary: #2a2a3d;
-  --mewyse-bg-hover: #383850;
-  --mewyse-bg-active: #44445a;
-  --mewyse-bg-code: #12121e;
+  --mewyse-bg-primary: #1a1a1a;
+  --mewyse-bg-secondary: #242424;
+  --mewyse-bg-hover: #2e2e2e;
+  --mewyse-bg-active: #3a3a3a;
+  --mewyse-bg-code: #0d0d0d;
   --mewyse-bg-overlay: rgba(0, 0, 0, 0.7);
 
   /* Border colors */
-  --mewyse-border-light: #383850;
-  --mewyse-border-medium: #44445a;
-  --mewyse-border-dark: #555;
+  --mewyse-border-light: #333333;
+  --mewyse-border-medium: #444444;
+  --mewyse-border-dark: #565656;
 
-  /* Accent / brand */
-  --mewyse-accent: #7b8ff0;
-  --mewyse-accent-hover: #8da0f5;
-  --mewyse-accent-text: #1e1e2e;
+  /* Accent / brand — gris claro neutro */
+  --mewyse-accent: #c9c9c9;
+  --mewyse-accent-hover: #e0e0e0;
+  --mewyse-accent-text: #1a1a1a;
 
-  /* Status colors */
+  /* Status colors — danger se mantiene rojo (semántica de acción destructiva) */
   --mewyse-danger: #ff6b6b;
   --mewyse-danger-hover: #ff5252;
   --mewyse-danger-bg: #3a2020;
 
-  /* Selection */
-  --mewyse-selection-bg: rgba(123, 143, 240, 0.35);
-  --mewyse-selection-cell: rgba(123, 143, 240, 0.2);
+  /* Selection — blanco translúcido (neutro) */
+  --mewyse-selection-bg: rgba(255, 255, 255, 0.18);
+  --mewyse-selection-cell: rgba(255, 255, 255, 0.10);
 
   /* Shadows */
   --mewyse-shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.4);
@@ -2211,13 +2212,13 @@
 
 /* Estilos adicionales para dark mode que no se resuelven solo con variables */
 .mewyse-editor-dark .mewyse-block blockquote {
-  background: rgba(102, 126, 234, 0.08);
-  border-left-color: rgba(102, 126, 234, 0.4);
+  background: rgba(255, 255, 255, 0.04);
+  border-left-color: rgba(255, 255, 255, 0.2);
 }
 
 .mewyse-editor-dark .mewyse-mention {
-  background: rgba(102, 126, 234, 0.2);
-  color: #8da0f5;
+  background: rgba(255, 255, 255, 0.12);
+  color: #d0d0d0;
 }
 
 /* ===========================================================================
@@ -2301,20 +2302,21 @@
 .mewyse-table-toolbar.mewyse-dark,
 .mewyse-color-picker.mewyse-dark,
 .mewyse-unified-color-picker.mewyse-dark {
-  --mewyse-text-primary: #ddd;
-  --mewyse-text-secondary: #aaa;
-  --mewyse-text-muted: #777;
-  --mewyse-text-light: #666;
-  --mewyse-bg-primary: #1e1e2e;
-  --mewyse-bg-secondary: #2a2a3d;
-  --mewyse-bg-hover: #383850;
-  --mewyse-bg-active: #44445a;
-  --mewyse-bg-code: #12121e;
-  --mewyse-border-light: #383850;
-  --mewyse-border-medium: #44445a;
-  --mewyse-border-dark: #555;
-  --mewyse-accent: #7b8ff0;
-  --mewyse-accent-hover: #8da0f5;
+  /* Paleta neutra (negro/gris) — coherente con el editor en dark */
+  --mewyse-text-primary: #e6e6e6;
+  --mewyse-text-secondary: #a0a0a0;
+  --mewyse-text-muted: #707070;
+  --mewyse-text-light: #5a5a5a;
+  --mewyse-bg-primary: #1a1a1a;
+  --mewyse-bg-secondary: #242424;
+  --mewyse-bg-hover: #2e2e2e;
+  --mewyse-bg-active: #3a3a3a;
+  --mewyse-bg-code: #0d0d0d;
+  --mewyse-border-light: #333333;
+  --mewyse-border-medium: #444444;
+  --mewyse-border-dark: #565656;
+  --mewyse-accent: #c9c9c9;
+  --mewyse-accent-hover: #e0e0e0;
   --mewyse-danger: #ff6b6b;
   --mewyse-danger-hover: #ff5252;
   --mewyse-danger-bg: #3a2020;
