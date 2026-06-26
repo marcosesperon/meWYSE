@@ -9698,30 +9698,48 @@
 
         if (this.blocks.length > 1) {
           var index = this.getBlockIndex(blockId);
+          // Suprimir el onBlur transitorio entre borrar el bloque y reposicionar
+          // el foco en el anterior.
+          this._suppressBlurUntil = Date.now() + 300;
           this.deleteBlock(blockId);
 
-          // Enfocar el bloque anterior
+          // Posicionar el foco en el bloque anterior para poder seguir borrando
+          // (como en un editor de texto): texto → cursor al final; imagen → la
+          // selecciona; otros → el editable interno si lo hay.
           if (index > 0) {
             var self = this;
             setTimeout(function() {
               var prevBlock = self.blocks[index - 1];
-              if (prevBlock) {
-                var prevBlockElement = self.container.querySelector('[data-block-id="' + prevBlock.id + '"]');
-                if (prevBlockElement) {
-                  var contentEditable = prevBlockElement.querySelector('[contenteditable="true"]');
-                  if (contentEditable) {
-                    contentEditable.focus();
-                    // Mover cursor al final
-                    var range = document.createRange();
-                    var sel = window.getSelection();
-                    if (contentEditable.firstChild) {
-                      range.setStart(contentEditable.firstChild, contentEditable.textContent.length);
-                      range.collapse(true);
-                      sel.removeAllRanges();
-                      sel.addRange(range);
-                    }
-                  }
-                }
+              if (!prevBlock) return;
+              var prevBlockElement = self.container.querySelector('[data-block-id="' + prevBlock.id + '"]');
+              if (!prevBlockElement) return;
+
+              // Imagen: seleccionarla (permite borrarla con Backspace/Delete)
+              if (prevBlock.type === 'image') {
+                var img = prevBlockElement.querySelector('img.mewyse-image') ||
+                          prevBlockElement.querySelector('img');
+                if (img) { self.selectImage(img, prevBlock.id, false); return; }
+              }
+
+              // Texto (o celda de tabla): enfocar el contenteditable y poner el
+              // cursor al final. getEditableElement devuelve el propio bloque si
+              // este es editable (párrafos/títulos) o el editable interno.
+              var contentEditable = self.getEditableElement(prevBlockElement);
+              if (contentEditable) {
+                contentEditable.focus();
+                var range = document.createRange();
+                var sel = window.getSelection();
+                range.selectNodeContents(contentEditable);
+                range.collapse(false); // colapsar al final
+                sel.removeAllRanges();
+                sel.addRange(range);
+                return;
+              }
+
+              // Bloques sin editable ni imagen (divider/video/audio): enfocar el
+              // propio elemento si es enfocable
+              if (typeof prevBlockElement.focus === 'function') {
+                try { prevBlockElement.focus(); } catch (err) {}
               }
             }, 10);
           }
