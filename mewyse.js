@@ -2002,8 +2002,15 @@
         } else if (tool.type === 'removeFormat') {
           self.removeFormat();
         } else {
-          document.execCommand(tool.command, false, null);
-          self.triggerChange();
+          var v_command = tool.command;
+          // Si hay varios bloques seleccionados, aplicar a todos; si no, normal.
+          var v_applied = self._applyInlineAcrossSelection(function() {
+            document.execCommand(v_command, false, null);
+          });
+          if (!v_applied) {
+            document.execCommand(v_command, false, null);
+            self.triggerChange();
+          }
         }
       };
       formatGroup.appendChild(button);
@@ -2054,10 +2061,10 @@
     alignGroup.className = 'mewyse-toolbar-group';
 
     var alignTools = [
-      { action: 'alignLeft', labelKey: 'tooltips.alignLeft', icon: WYSIWYG_ICONS.alignLeft, command: 'justifyLeft' },
-      { action: 'alignCenter', labelKey: 'tooltips.alignCenter', icon: WYSIWYG_ICONS.alignCenter, command: 'justifyCenter' },
-      { action: 'alignRight', labelKey: 'tooltips.alignRight', icon: WYSIWYG_ICONS.alignRight, command: 'justifyRight' },
-      { action: 'alignJustify', labelKey: 'tooltips.justify', icon: WYSIWYG_ICONS.alignJustify, command: 'justifyFull' }
+      { action: 'alignLeft', labelKey: 'tooltips.alignLeft', icon: WYSIWYG_ICONS.alignLeft, command: 'justifyLeft', align: 'left' },
+      { action: 'alignCenter', labelKey: 'tooltips.alignCenter', icon: WYSIWYG_ICONS.alignCenter, command: 'justifyCenter', align: 'center' },
+      { action: 'alignRight', labelKey: 'tooltips.alignRight', icon: WYSIWYG_ICONS.alignRight, command: 'justifyRight', align: 'right' },
+      { action: 'alignJustify', labelKey: 'tooltips.justify', icon: WYSIWYG_ICONS.alignJustify, command: 'justifyFull', align: 'justify' }
     ];
 
     alignTools.forEach(function(tool) {
@@ -2067,6 +2074,9 @@
       button.title = self.t(tool.labelKey);
       button.onclick = function(e) {
         e.preventDefault();
+        // Multi-selección: alineación por modelo a todos los bloques. Si no hay
+        // multi-selección, comportamiento actual (execCommand sobre el bloque).
+        if (self.applyAlignmentToSelection(tool.align)) return;
         document.execCommand(tool.command, false, null);
         self.triggerChange();
       };
@@ -4220,6 +4230,9 @@
     // suprimir onBlur durante la transición.
     this._suppressBlurUntil = Date.now() + 300;
 
+    // Si hay varios bloques seleccionados, aplicar el tipo a todos.
+    if (this.applyBlockTypeToSelection(type, customClass)) return;
+
     // Si hay contexto guardado, usarlo
     if (this.toolbarMenuContext && this.toolbarMenuContext.blockId) {
       var blockId = this.toolbarMenuContext.blockId;
@@ -4882,6 +4895,12 @@
     // Aplicar customClass (styleFormats) si existe
     if (block.customClass && typeof block.customClass === 'string') {
       element.classList.add(block.customClass);
+    }
+
+    // Alineación a nivel de bloque (texto). Las imágenes/tablas usan su propio
+    // mecanismo (advanced.alignment / tableStyle), por eso se excluyen aquí.
+    if (block.alignment && TEXT_ALIGN_BLOCK_TYPES[block.type]) {
+      element.style.textAlign = block.alignment;
     }
 
     // Eventos para drag & drop
@@ -12254,6 +12273,9 @@
    * @param {string} color - Color en formato hexadecimal
    */
   meWYSE.prototype.applyTextColor = function(color) {
+    var self = this;
+    // Si hay varios bloques seleccionados, aplicar a todos; si no, comportamiento normal.
+    if (this._applyInlineAcrossSelection(function() { self.applyInlineStyle('color', color); })) return;
     this.applyInlineStyle('color', color);
   };
 
@@ -12262,6 +12284,8 @@
    * @param {string} color - Color en formato hexadecimal
    */
   meWYSE.prototype.applyBackgroundColor = function(color) {
+    var self = this;
+    if (this._applyInlineAcrossSelection(function() { self.applyInlineStyle('backgroundColor', color); })) return;
     this.applyInlineStyle('backgroundColor', color);
   };
 
@@ -12859,6 +12883,13 @@
    * Helpers puros de transformación de texto por modo.
    * Usados por applyCaseTransform para normal y cross-block selection.
    */
+  // Tipos de bloque a los que aplica la alineación a nivel de bloque (texto).
+  // Imágenes/tablas/media usan su propio mecanismo (advanced.alignment / tableStyle).
+  var TEXT_ALIGN_BLOCK_TYPES = {
+    paragraph: 1, heading1: 1, heading2: 1, heading3: 1, quote: 1,
+    code: 1, bulletList: 1, numberList: 1, checklist: 1
+  };
+
   var CASE_TRANSFORMERS = {
     'upper': function(s) { return s.toUpperCase(); },
     'lower': function(s) { return s.toLowerCase(); },
@@ -12899,6 +12930,21 @@
   meWYSE.prototype.applyCaseTransform = function(mode) {
     var transformer = CASE_TRANSFORMERS[mode];
     if (!transformer) return;
+
+    // Selección por bloques enteros (Ctrl/Shift+clic): transformar todo el texto
+    // de cada bloque preservando su HTML interno (solo los nodos de texto).
+    if (this.selectedBlocks && this.selectedBlocks.length > 0) {
+      this.pushHistory(true);
+      for (var k = 0; k < this.selectedBlocks.length; k++) {
+        var v_blk = this.getBlock(this.selectedBlocks[k]);
+        if (!v_blk || typeof v_blk.content !== 'string') continue;
+        v_blk.content = this._transformTextNodesHtml(v_blk.content, transformer);
+      }
+      this.render();
+      this._reapplyBlockSelectionVisuals();
+      this.triggerChange();
+      return;
+    }
 
     // Cross-block selection: aplicar bloque por bloque
     if (this.crossBlockSelection) {
@@ -15545,6 +15591,25 @@
   meWYSE.prototype.removeFormat = function() {
     var self = this;
 
+    // Caso 0: selección por bloques enteros → quitar formato del contenido completo
+    if (this.selectedBlocks && this.selectedBlocks.length > 0) {
+      this.pushHistory(true);
+      for (var bi = 0; bi < this.selectedBlocks.length; bi++) {
+        var blk = this.getBlock(this.selectedBlocks[bi]);
+        if (!blk || typeof blk.content !== 'string') continue;
+        var tmpEl = document.createElement('div');
+        tmpEl.innerHTML = blk.content;
+        var brList = tmpEl.querySelectorAll('br');
+        for (var bj = 0; bj < brList.length; bj++) brList[bj].replaceWith('\n');
+        var plain = tmpEl.textContent || '';
+        blk.content = escapeHtml(plain).replace(/\n/g, '<br>');
+      }
+      this.render();
+      this._reapplyBlockSelectionVisuals();
+      this.triggerChange();
+      return;
+    }
+
     // Caso 1: selección cross-block → limpiar cada bloque seleccionado
     if (this.crossBlockSelection && this.crossBlockSelection.blockIds && this.crossBlockSelection.blockIds.length > 0) {
       this.pushHistory(true);
@@ -17217,6 +17282,176 @@
       }
     }
     return root.innerHTML;
+  };
+
+  // ============================================
+  // Acciones de toolbar sobre selección de varios bloques
+  // ============================================
+
+  /**
+   * Devuelve la selección múltiple activa: bloques enteros (Ctrl/Shift+clic)
+   * tienen prioridad sobre la selección cross-block (arrastre de texto).
+   * @returns {{mode: 'blocks'|'cross'|'none', ids: number[]}}
+   */
+  meWYSE.prototype._getActiveBlockSelection = function() {
+    var self = this;
+    if (this.selectedBlocks && this.selectedBlocks.length > 0) {
+      // Ordenar por posición en el documento para un recorrido coherente
+      var v_ids = this.selectedBlocks.slice().sort(function(a, b) {
+        return self.getBlockIndex(a) - self.getBlockIndex(b);
+      });
+      return { mode: 'blocks', ids: v_ids };
+    }
+    if (this.crossBlockSelection && this.crossBlockSelection.blockIds &&
+        this.crossBlockSelection.blockIds.length > 0) {
+      return { mode: 'cross', ids: this.crossBlockSelection.blockIds.slice() };
+    }
+    return { mode: 'none', ids: [] };
+  };
+
+  /**
+   * Re-aplica la clase visual de selección a los bloques seleccionados.
+   * Necesario tras un render(), que no la conserva.
+   */
+  meWYSE.prototype._reapplyBlockSelectionVisuals = function() {
+    if (!this.selectedBlocks) return;
+    for (var i = 0; i < this.selectedBlocks.length; i++) {
+      this.updateBlockSelectionVisual(this.selectedBlocks[i], true);
+    }
+  };
+
+  /**
+   * Transforma solo los nodos de texto de un string HTML con la función dada,
+   * preservando las etiquetas (negrita, enlaces, menciones...). Usado por
+   * mayúsculas/minúsculas sobre bloques enteros.
+   * @param {string} html
+   * @param {Function} transformer - (text) => text
+   * @returns {string}
+   */
+  meWYSE.prototype._transformTextNodesHtml = function(html, transformer) {
+    var tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    var walker = document.createTreeWalker(tmp, NodeFilter.SHOW_TEXT, null, false);
+    var nodes = [];
+    var node;
+    while ((node = walker.nextNode())) nodes.push(node);
+    for (var i = 0; i < nodes.length; i++) {
+      nodes[i].nodeValue = transformer(nodes[i].nodeValue);
+    }
+    return tmp.innerHTML;
+  };
+
+  /**
+   * Aplica un formato inline (negrita, cursiva, color...) a la selección
+   * múltiple activa. La función applyFn opera sobre la selección NATIVA, que
+   * este método fija bloque a bloque:
+   *  - 'cross': la porción parcial de cada bloque (getRangeForBlock).
+   *  - 'blocks': el contenido completo de cada bloque.
+   * @param {Function} applyFn - p.ej. function(){ document.execCommand('bold'); }
+   * @returns {boolean} true si actuó (había multi-selección); false si no.
+   */
+  meWYSE.prototype._applyInlineAcrossSelection = function(applyFn) {
+    var info = this._getActiveBlockSelection();
+    if (info.mode === 'none') return false;
+
+    this.pushHistory(true);
+    var nativeSel = window.getSelection();
+    var v_cross = this.crossBlockSelection;
+
+    for (var i = 0; i < info.ids.length; i++) {
+      var v_id = info.ids[i];
+      var blockEl = this.getBlockElementById(v_id);
+      if (!blockEl) continue;
+      var editableEl = this.getEditableElement(blockEl);
+      if (!editableEl) continue;
+
+      var range;
+      if (info.mode === 'cross') {
+        range = this.getRangeForBlock(v_id, v_cross);
+      } else {
+        range = document.createRange();
+        range.selectNodeContents(editableEl);
+      }
+      if (!range) continue;
+
+      editableEl.focus();
+      nativeSel.removeAllRanges();
+      nativeSel.addRange(range);
+
+      applyFn(); // opera sobre la selección nativa recién fijada
+
+      // execCommand/applyInlineStyle mutan el editable directamente: persistir.
+      var v_block = this.getBlock(v_id);
+      if (v_block) v_block.content = editableEl.innerHTML;
+    }
+
+    nativeSel.removeAllRanges();
+
+    if (info.mode === 'cross') {
+      this.clearCrossBlockSelection();
+      this.closeFormatMenu();
+    }
+
+    this.render();
+    if (info.mode === 'blocks') this._reapplyBlockSelectionVisuals();
+    this.triggerChange();
+    return true;
+  };
+
+  /**
+   * Cambia el tipo de bloque de todos los bloques de la selección múltiple.
+   * Omite bloques no convertibles (tabla/imagen/divider/media).
+   * @returns {boolean} true si actuó; false si no había multi-selección.
+   */
+  meWYSE.prototype.applyBlockTypeToSelection = function(type, customClass) {
+    var info = this._getActiveBlockSelection();
+    if (info.mode === 'none') return false;
+
+    if (type === 'blockquote') type = 'quote'; // alias
+
+    this.pushHistory(true);
+    var v_validClass = (customClass && this._customClassWhitelist &&
+                        this._customClassWhitelist[customClass]) ? customClass : null;
+    var v_nonConvertible = { table: 1, image: 1, divider: 1, video: 1, audio: 1 };
+
+    for (var i = 0; i < info.ids.length; i++) {
+      var v_block = this.getBlock(info.ids[i]);
+      if (!v_block || v_nonConvertible[v_block.type]) continue;
+      v_block.type = type;
+      if (v_validClass) v_block.customClass = v_validClass;
+      else delete v_block.customClass;
+    }
+
+    if (info.mode === 'cross') { this.clearCrossBlockSelection(); this.closeFormatMenu(); }
+    this.render();
+    if (info.mode === 'blocks') this._reapplyBlockSelectionVisuals();
+    this.triggerChange();
+    return true;
+  };
+
+  /**
+   * Aplica alineación (text-align) a todos los bloques de texto de la selección
+   * múltiple, vía el modelo (block.alignment) para que persista en el render.
+   * @returns {boolean} true si actuó; false si no había multi-selección.
+   */
+  meWYSE.prototype.applyAlignmentToSelection = function(alignment) {
+    var info = this._getActiveBlockSelection();
+    if (info.mode === 'none') return false;
+
+    this.pushHistory(true);
+    for (var i = 0; i < info.ids.length; i++) {
+      var v_block = this.getBlock(info.ids[i]);
+      if (!v_block || !TEXT_ALIGN_BLOCK_TYPES[v_block.type]) continue;
+      // 'left' es el valor por defecto: no ensuciar el modelo con él.
+      if (alignment === 'left') delete v_block.alignment;
+      else v_block.alignment = alignment;
+    }
+
+    if (info.mode === 'cross') { this.clearCrossBlockSelection(); this.closeFormatMenu(); }
+    this.render();
+    if (info.mode === 'blocks') this._reapplyBlockSelectionVisuals();
+    this.triggerChange();
+    return true;
   };
 
   /**
