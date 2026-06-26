@@ -4630,6 +4630,11 @@
     }
 
     this.container.innerHTML = '';
+    // El innerHTML='' acaba de desconectar el overlay de selección cross-block
+    // del DOM; soltar la referencia para que createSelectionOverlay() lo recree
+    // dentro del nuevo container (si no, los rects se pintan en un nodo huérfano
+    // y la selección deja de verse tras el primer render).
+    this.crossBlockOverlay = null;
 
     // Renderizar bloques con agrupacion de listas (incluyendo anidación por indentLevel)
     var i = 0;
