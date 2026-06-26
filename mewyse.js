@@ -1919,29 +1919,7 @@
       host = scrollTrack;
     }
 
-    // Botón desplegable para tipos de bloque
-    var blockTypeButton = document.createElement('button');
-    blockTypeButton.className = 'mewyse-toolbar-button mewyse-toolbar-dropdown';
-    blockTypeButton.innerHTML = this.t('misc.text') + ' <span class="dropdown-arrow">' + WYSIWYG_ICONS.chevronDown + '</span>';
-    blockTypeButton.title = this.t('tooltips.changeBlockType');
-    blockTypeButton.setAttribute('aria-expanded', 'false');
-    blockTypeButton.setAttribute('aria-haspopup', 'listbox');
-    blockTypeButton.onclick = function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      self.showToolbarBlockTypeMenu(blockTypeButton);
-    };
-    // Referencia para actualizar su etiqueta según el bloque enfocado
-    this._blockTypeButton = blockTypeButton;
-
-    host.appendChild(blockTypeButton);
-
-    // Separador
-    var separator1 = document.createElement('div');
-    separator1.className = 'mewyse-toolbar-separator';
-    host.appendChild(separator1);
-
-    // Grupo de undo/redo
+    // Grupo de undo/redo (al principio de la toolbar)
     var undoRedoGroup = document.createElement('div');
     undoRedoGroup.className = 'mewyse-toolbar-group';
 
@@ -1971,6 +1949,29 @@
 
     host.appendChild(undoRedoGroup);
 
+    // Separador
+    var separator1 = document.createElement('div');
+    separator1.className = 'mewyse-toolbar-separator';
+    host.appendChild(separator1);
+
+    // Botón desplegable para tipos de bloque
+    var blockTypeButton = document.createElement('button');
+    blockTypeButton.className = 'mewyse-toolbar-button mewyse-toolbar-dropdown';
+    blockTypeButton.innerHTML = this.t('misc.text') + ' <span class="dropdown-arrow">' + WYSIWYG_ICONS.chevronDown + '</span>';
+    blockTypeButton.title = this.t('tooltips.changeBlockType');
+    blockTypeButton.setAttribute('aria-expanded', 'false');
+    blockTypeButton.setAttribute('aria-haspopup', 'listbox');
+    blockTypeButton.onclick = function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      self.showToolbarBlockTypeMenu(blockTypeButton);
+    };
+    // Referencia para actualizar su etiqueta según el bloque enfocado
+    this._blockTypeButton = blockTypeButton;
+
+    host.appendChild(blockTypeButton);
+
+    // Separador
     var separator1b = document.createElement('div');
     separator1b.className = 'mewyse-toolbar-separator';
     host.appendChild(separator1b);
