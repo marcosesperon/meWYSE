@@ -5189,18 +5189,6 @@
       ? block.content.width / block.content.height
       : 1;
 
-    resizeHandle.onmousedown = function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      isResizing = true;
-      startX = e.clientX;
-      startY = e.clientY;
-      startWidth = parseInt(img.style.width) || 200;
-      document.body.style.cursor = 'nwse-resize';
-      imageContainer.classList.add('mewyse-image-resizing');
-      document.body.style.userSelect = 'none';
-    };
-
     var mousemoveHandler = function(e) {
       if (!isResizing) return;
       var deltaX = e.clientX - startX;
@@ -5223,7 +5211,7 @@
       imageContainer.classList.remove('mewyse-image-resizing');
       document.body.style.userSelect = '';
 
-      // Remover event listeners
+      // Remover los listeners de este arrastre (se re-añaden en el próximo mousedown)
       document.removeEventListener('mousemove', mousemoveHandler);
       document.removeEventListener('mouseup', mouseupHandler);
 
@@ -5238,8 +5226,21 @@
       self.selectImage(img, block.id, false);
     };
 
-    document.addEventListener('mousemove', mousemoveHandler);
-    document.addEventListener('mouseup', mouseupHandler);
+    resizeHandle.onmousedown = function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      isResizing = true;
+      startX = e.clientX;
+      startY = e.clientY;
+      startWidth = parseInt(img.style.width) || 200;
+      document.body.style.cursor = 'nwse-resize';
+      imageContainer.classList.add('mewyse-image-resizing');
+      document.body.style.userSelect = 'none';
+      // Registrar los listeners SOLO durante el arrastre: así funciona en cada
+      // uso (no solo el primero) y no quedan listeners colgando en document.
+      document.addEventListener('mousemove', mousemoveHandler);
+      document.addEventListener('mouseup', mouseupHandler);
+    };
 
     imageContainer.appendChild(resizeHandle);
     imageWrapper.appendChild(imageContainer);
