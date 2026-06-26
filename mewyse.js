@@ -1184,6 +1184,16 @@
           if (!isNaN(v_bid)) self.positionFloatingHandle(v_blkEl, v_bid);
         }
       }
+
+      // Reflejar el tipo del bloque enfocado en el dropdown de la toolbar
+      if (self._blockTypeButton && target.closest) {
+        var v_typeBlkEl = target.closest('.mewyse-block');
+        if (v_typeBlkEl) {
+          var v_typeId = parseInt(v_typeBlkEl.getAttribute('data-block-id'), 10);
+          var v_typeBlock = !isNaN(v_typeId) ? self.getBlock(v_typeId) : null;
+          if (v_typeBlock) self._updateBlockTypeDropdown(v_typeBlock.type);
+        }
+      }
     });
 
     // focusout: detectar cuando el foco sale del editor a algún elemento externo.
@@ -1906,6 +1916,8 @@
       e.stopPropagation();
       self.showToolbarBlockTypeMenu(blockTypeButton);
     };
+    // Referencia para actualizar su etiqueta según el bloque enfocado
+    this._blockTypeButton = blockTypeButton;
 
     host.appendChild(blockTypeButton);
 
@@ -3986,6 +3998,22 @@
   /**
    * Muestra el menú desplegable de tipos de bloque en la toolbar
    */
+  /**
+   * Actualiza la etiqueta del dropdown "Cambiar tipo de bloque" de la toolbar
+   * para reflejar el tipo del bloque enfocado. No hace nada si no hay toolbar.
+   * @param {string} blockType - tipo del bloque (paragraph/heading1/...)
+   */
+  meWYSE.prototype._updateBlockTypeDropdown = function(blockType) {
+    if (!this._blockTypeButton) return;
+    // Para 'paragraph' se usa la etiqueta genérica "Texto" (coherente con el
+    // estado inicial del dropdown); el resto usan su nombre de tipo.
+    var label = (blockType && blockType !== 'paragraph')
+      ? this.t('blockTypes.' + blockType)
+      : this.t('misc.text');
+    this._blockTypeButton.innerHTML = escape_attr(label) +
+      ' <span class="dropdown-arrow">' + WYSIWYG_ICONS.chevronDown + '</span>';
+  };
+
   meWYSE.prototype.showToolbarBlockTypeMenu = function(buttonElement) {
     var self = this;
 
