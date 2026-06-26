@@ -11590,6 +11590,9 @@
     this.blocks = this._sanitizeBlocks(data);
 
     this.render();
+    // Igual que loadFromHTML/loadFromMarkdown: refresca el panel de esquema si
+    // está abierto, sincroniza el textarea y el contador, y dispara onChange.
+    this.triggerChange();
   };
 
   /**
