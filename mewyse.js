@@ -9223,6 +9223,16 @@
       }
     }
 
+    // Ctrl/Cmd+A: seleccionar TODO el contenido del editor (todos los bloques).
+    // Con un solo bloque se deja el comportamiento nativo (selecciona su texto).
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'a' || e.key === 'A') && !e.shiftKey && !e.altKey) {
+      if (this.blocks.length > 1) {
+        e.preventDefault();
+        this.selectAllBlocks();
+      }
+      return;
+    }
+
     // Espacio dentro/al final de una cápsula `.mewyse-tag`: redirigir el espacio
     // a DESPUÉS del tag y llevar el cursor allí. Sin este guard, el cursor a
     // veces queda atrapado en la frontera del span contenteditable=false
@@ -13350,6 +13360,48 @@
     };
 
     this.renderCrossBlockHighlight();
+  };
+
+  /**
+   * Selecciona todo el contenido del editor (todos los bloques) usando el
+   * sistema de selección cross-block. Útil para Ctrl/Cmd+A. Devuelve true si
+   * estableció una selección.
+   * @returns {boolean}
+   */
+  meWYSE.prototype.selectAllBlocks = function() {
+    if (!this.blocks || this.blocks.length === 0) return false;
+
+    var firstBlock = this.blocks[0];
+    var lastBlock = this.blocks[this.blocks.length - 1];
+    var firstEditable = this.getEditableElement(this.getBlockElementById(firstBlock.id));
+
+    // Limpiar otras selecciones que pudieran competir
+    if (this.selectedBlocks && this.selectedBlocks.length > 0 && this.clearSelection) {
+      this.clearSelection();
+    }
+    this.closeFormatMenu();
+
+    // Abarcar de blocks[0] a blocks[último] para que copiar/borrar cubran TODO.
+    // endNode = null hace que getRangeForBlock seleccione el contenido completo
+    // del último bloque; los bloques intermedios se seleccionan enteros.
+    this.crossBlockSelectOrigin = null;
+    this.crossBlockSelection = {
+      blockIds: this.blocks.map(function(b) { return b.id; }),
+      forward: true,
+      originBlockId: firstBlock.id,
+      originNode: firstEditable || null,
+      originOffset: 0,
+      endBlockId: lastBlock.id,
+      endNode: null,
+      endOffset: 0
+    };
+
+    // Quitar la selección nativa para que no compita con el overlay
+    var nsel = window.getSelection();
+    if (nsel) { try { nsel.removeAllRanges(); } catch (e) {} }
+
+    this.renderCrossBlockHighlight();
+    return true;
   };
 
   /**
