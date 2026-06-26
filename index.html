@@ -448,7 +448,8 @@
         <li><strong>Menciones (@):</strong> Escribe @ para mencionar usuarios con autocompletado</li>
         <li><strong>Resumen y estadisticas:</strong> Indice de navegacion, conteo de palabras y tiempo de lectura</li>
         <li><strong>Menu slash (/):</strong> Menu contextual al estilo Notion para cambiar tipos de bloque</li>
-        <li><strong>Atajos de teclado:</strong> Ctrl+B/I/U/Z/Y/K para formato rapido y undo/redo</li>
+        <li><strong>Atajos de teclado:</strong> Ctrl+B/I/U/Z/Y/K para formato rapido y undo/redo; Ctrl+A selecciona todo el contenido</li>
+        <li><strong>Ajuste de texto:</strong> opcion wordWrap (y boton en la toolbar) para que el contenido largo salte de linea dentro del bloque</li>
         <li><strong>Exportacion multiple:</strong> JSON, HTML, Markdown y texto plano</li>
         <li><strong>Soporte Markdown:</strong> Importar y exportar contenido Markdown</li>
         <li><strong>Internacionalizacion:</strong> Espanol, ingles y traducciones personalizadas</li>
@@ -517,7 +518,7 @@ editor.focus(blockId); // bloque especifico
     <!-- Demo: Editor con Summary -->
     <div class="demo-section">
       <h2>Editor con Summary</h2>
-      <p>Editor con boton de resumen, estadisticas e indice de navegacion.</p>
+      <p>Editor con boton de resumen, estadisticas e indice de navegacion. Al pulsar el boton de resumen se ancla un <strong>panel de esquema</strong> a la derecha (vista tipo Word): el contenido se encoge y el indice de titulos queda siempre visible y navegable, actualizandose en vivo. El boton de cerrar del panel vuelve a ver solo el editor. (Sin toolbar, el boton abre el modal de resumen clasico.)</p>
       <pre class="docs-code"><code>var editor = new meWYSE({
   target: '#summaryEditor',
   toolbar: true,
@@ -737,7 +738,7 @@ var editor = new meWYSE({
     <!-- Demo: Nuevas features (SunEditor inspired) -->
     <div class="demo-section">
       <h2>Buscar y Reemplazar &middot; Fullscreen &middot; Show Blocks &middot; Contador</h2>
-      <p>Atajo <code>Ctrl+F</code> / <code>Cmd+F</code> para abrir el panel de busqueda. El boton &quot;pantalla completa&quot; expande el editor sobre toda la ventana. &quot;Mostrar bloques&quot; muestra los limites de cada bloque y su tipo para debugging. La barra inferior muestra el contador de palabras, caracteres y tiempo de lectura en tiempo real.</p>
+      <p>Atajo <code>Ctrl+F</code> / <code>Cmd+F</code> para abrir el panel de busqueda. El boton &quot;pantalla completa&quot; expande el editor sobre toda la ventana. El boton &quot;ajuste de texto&quot; activa/desactiva el salto de linea automatico del contenido dentro del bloque (opcion <code>wordWrap</code>, activa por defecto; desactivable con <code>wordWrap: false</code> o el boton <code>wordWrapToggle: false</code>). &quot;Mostrar bloques&quot; muestra los limites de cada bloque y su tipo para debugging. La barra inferior muestra el contador de palabras, caracteres y tiempo de lectura en tiempo real.</p>
       <pre class="docs-code"><code>var editor = new meWYSE({
   target: '#toolsEditor',
   toolbar: true,
