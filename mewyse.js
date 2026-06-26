@@ -726,7 +726,7 @@
   function meWYSE(options) {
     this.options = options || {};
     this.showToolbar = this.options.toolbar === true; // Nueva opción para toolbar en modo minimal
-    this.showSummary = this.options.summary === true; // Nueva opción para mostrar resumen
+    this.showSummary = this.options.summary !== false; // Resumen/esquema activo por defecto (desactivar con summary:false)
     this.showCharCounter = this.options.charCounter === true; // Barra inferior con contador de palabras/caracteres
     this.enableFullscreen = this.options.fullscreen !== false; // Habilitar botón fullscreen (default: true)
     this.enableFindReplace = this.options.findReplace !== false; // Habilitar Ctrl+F para buscar (default: true)
@@ -816,6 +816,7 @@
     this.scrollHandlers = [];
     this.lastFocusedElement = null;
     this.summaryButton = null;
+    this.toolbarSummaryButton = null; // Botón de resumen en la toolbar (modo con toolbar)
     this.selectedBlocks = []; // Array de IDs de bloques seleccionados
     this.lastClickedBlockId = null; // Último bloque clickeado (para Shift+Click)
     this.selectedTableCells = []; // Array de celdas de tabla seleccionadas
@@ -1138,8 +1139,9 @@
       this.render();
     }
 
-    // Crear botón de resumen si está habilitado
-    if (this.showSummary) {
+    // Crear botón de resumen flotante solo si está habilitado y NO hay toolbar
+    // (con toolbar se usa this.toolbarSummaryButton en su lugar).
+    if (this.showSummary && !this.showToolbar) {
       this.createSummaryButton();
     }
 
@@ -2174,6 +2176,24 @@
       };
       this.wordWrapButton = wordWrapBtn;
       viewGroup.appendChild(wordWrapBtn);
+    }
+
+    // Botón de Resumen / esquema (abre el panel lateral). En modo con toolbar
+    // se usa este botón en lugar del flotante (mewyse-summary-button).
+    if (this.showSummary) {
+      var summaryBtn = document.createElement('button');
+      summaryBtn.className = 'mewyse-toolbar-button';
+      summaryBtn.innerHTML = WYSIWYG_ICONS.hamburger;
+      summaryBtn.title = this.t('tooltips.summary');
+      summaryBtn.setAttribute('aria-label', this.t('tooltips.summary'));
+      summaryBtn.setAttribute('aria-pressed', this.outlinePanel ? 'true' : 'false');
+      if (this.outlinePanel) summaryBtn.classList.add('active');
+      summaryBtn.onclick = function(e) {
+        e.preventDefault();
+        self.toggleOutlinePanel();
+      };
+      this.toolbarSummaryButton = summaryBtn;
+      viewGroup.appendChild(summaryBtn);
     }
 
     // Botón de Mostrar bloques (show blocks)
@@ -4654,8 +4674,9 @@
       }
     }
 
-    // Recrear botón de resumen si está habilitado
-    if (this.showSummary) {
+    // Recrear botón de resumen flotante solo si está habilitado y NO hay toolbar
+    // (con toolbar se usa this.toolbarSummaryButton en su lugar).
+    if (this.showSummary && !this.showToolbar) {
       this.createSummaryButton();
     }
 
@@ -13087,6 +13108,8 @@
     this.summaryButton.addEventListener('click', function(e) {
       e.preventDefault();
       e.stopPropagation();
+      // Ocultar el tooltip de preview para que no quede flotando al abrir/cerrar el panel.
+      self.hideSummaryTooltip();
       self.toggleOutlinePanel();
     });
 
@@ -13208,7 +13231,10 @@
     tooltip.style.left = left + 'px';
     tooltip.style.right = 'auto';
 
-    this._showBackdrop('summaryTooltip', function() { self.hideSummaryTooltip(); });
+    // Nota: NO se usa backdrop aquí. El tooltip es hover-driven (se cierra con
+    // mouseleave de botón/tooltip). Un backdrop a pantalla completa (z-index 999)
+    // taparía el propio botón (z-index 100) e interceptaría su clic, impidiendo
+    // abrir el panel de esquema.
   };
 
   /**
@@ -13318,12 +13344,24 @@
     this.editorWrapper.classList.add('mewyse-has-outline');
     this.outlinePanel = panel;
 
-    if (this.summaryButton) {
-      this.summaryButton.classList.add('active');
-      this.summaryButton.setAttribute('aria-pressed', 'true');
-    }
+    this._setSummaryButtonsActive(true);
 
     this._buildOutlineContent();
+  };
+
+  /**
+   * Sincroniza el estado activo (clase + aria-pressed) de los botones de resumen
+   * que existan: el flotante (this.summaryButton) y el de la toolbar
+   * (this.toolbarSummaryButton).
+   */
+  meWYSE.prototype._setSummaryButtonsActive = function(v_active) {
+    var v_buttons = [this.summaryButton, this.toolbarSummaryButton];
+    for (var i = 0; i < v_buttons.length; i++) {
+      var v_btn = v_buttons[i];
+      if (!v_btn) continue;
+      v_btn.classList.toggle('active', v_active);
+      v_btn.setAttribute('aria-pressed', v_active ? 'true' : 'false');
+    }
   };
 
   /**
@@ -13337,10 +13375,7 @@
     if (this.editorWrapper) {
       this.editorWrapper.classList.remove('mewyse-has-outline');
     }
-    if (this.summaryButton) {
-      this.summaryButton.classList.remove('active');
-      this.summaryButton.setAttribute('aria-pressed', 'false');
-    }
+    this._setSummaryButtonsActive(false);
   };
 
   /**
