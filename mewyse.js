@@ -74,6 +74,7 @@
         fullscreen: 'Pantalla completa',
         fullscreenExit: 'Salir de pantalla completa',
         showBlocks: 'Mostrar bloques',
+        wordWrap: 'Ajuste de texto',
         removeFormat: 'Limpiar formato',
         insertVideo: 'Insertar vídeo',
         insertAudio: 'Insertar audio',
@@ -143,7 +144,8 @@
         paragraphs: 'Párrafos:',
         readingTime: 'Tiempo de lectura:',
         index: 'Índice',
-        noHeadings: 'No hay encabezados en el documento'
+        noHeadings: 'No hay encabezados en el documento',
+        close: 'Cerrar'
       },
       colors: {
         textColor: 'Color de texto',
@@ -280,6 +282,7 @@
         fullscreen: 'Fullscreen',
         fullscreenExit: 'Exit fullscreen',
         showBlocks: 'Show blocks',
+        wordWrap: 'Word wrap',
         removeFormat: 'Clear formatting',
         insertVideo: 'Insert video',
         insertAudio: 'Insert audio',
@@ -349,7 +352,8 @@
         paragraphs: 'Paragraphs:',
         readingTime: 'Reading time:',
         index: 'Index',
-        noHeadings: 'No headings in the document'
+        noHeadings: 'No headings in the document',
+        close: 'Close'
       },
       colors: {
         textColor: 'Text color',
@@ -705,6 +709,7 @@
     fullscreen: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><polyline points="3,6 3,3 6,3"/><polyline points="10,3 13,3 13,6"/><polyline points="13,10 13,13 10,13"/><polyline points="6,13 3,13 3,10"/></svg>',
     fullscreenExit: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><polyline points="6,3 6,6 3,6"/><polyline points="13,6 10,6 10,3"/><polyline points="10,13 10,10 13,10"/><polyline points="3,10 6,10 6,13"/></svg>',
     showBlocks: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="12" height="3" rx="0.5"/><rect x="2" y="6.5" width="12" height="3" rx="0.5"/><rect x="2" y="11" width="12" height="3" rx="0.5"/></svg>',
+    wordWrap: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><line x1="2" y1="3.5" x2="14" y2="3.5"/><path d="M2 8h9a2.5 2.5 0 0 1 0 5h-3"/><polyline points="9.5,11 7.5,13 9.5,15"/><line x1="2" y1="12.5" x2="5" y2="12.5"/></svg>',
     removeFormat: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M3 3h9M6 3v10M5 13h4"/><line x1="11" y1="10" x2="15" y2="14"/><line x1="15" y1="10" x2="11" y2="14"/></svg>',
     video: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="3" width="12" height="10" rx="1.5"/><polygon points="6.5,6 6.5,10 10,8" fill="currentColor"/></svg>',
     audio: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M9 3 L9 11 a2 2 0 1 1 -2 -1.7 L7 5 L12 3.5 z"/></svg>'
@@ -726,7 +731,9 @@
     this.enableFullscreen = this.options.fullscreen !== false; // Habilitar botón fullscreen (default: true)
     this.enableFindReplace = this.options.findReplace !== false; // Habilitar Ctrl+F para buscar (default: true)
     this.enableShowBlocks = this.options.showBlocksToggle !== false; // Habilitar toggle de bloques (default: true)
+    this.enableWordWrapToggle = this.options.wordWrapToggle !== false; // Botón de ajuste de texto en toolbar (default: true)
     this.rtl = this.options.rtl === true; // Dirección derecha-a-izquierda
+    this.wordWrap = this.options.wordWrap !== false; // Ajuste de texto: envolver dentro del bloque (default: true)
     // readOnly: el editor se monta para visualización. Ningún bloque es
     // editable, no se generan toolbar, floating handle, drag&drop de imágenes
     // ni format menu. Selección nativa funciona — el usuario puede copiar
@@ -1516,6 +1523,12 @@
       if (this.editorWrapper) this.editorWrapper.classList.add('mewyse-editor-styled');
     }
 
+    // Ajuste de texto: envolver contenido largo dentro del mismo bloque
+    // (comportamiento, independiente de contentStyles). Activo salvo wordWrap:false.
+    if (this.wordWrap && this.container) {
+      this.container.classList.add('mewyse-word-wrap');
+    }
+
     // Cargar contenido inicial.
     //  - Prioridad 1: HTML original del target (cuando NO era textarea) →
     //    parsear con `loadFromHTML` para conservar estructura.
@@ -2142,6 +2155,25 @@
         self.showFindReplace();
       };
       viewGroup.appendChild(findBtn);
+    }
+
+    // Botón de Ajuste de texto (word wrap)
+    if (this.enableWordWrapToggle) {
+      var wordWrapBtn = document.createElement('button');
+      wordWrapBtn.className = 'mewyse-toolbar-button';
+      wordWrapBtn.innerHTML = WYSIWYG_ICONS.wordWrap;
+      wordWrapBtn.title = this.t('tooltips.wordWrap');
+      wordWrapBtn.setAttribute('aria-label', this.t('tooltips.wordWrap'));
+      wordWrapBtn.setAttribute('aria-pressed', this.wordWrap ? 'true' : 'false');
+      if (this.wordWrap) wordWrapBtn.classList.add('active');
+      wordWrapBtn.onclick = function(e) {
+        e.preventDefault();
+        self.toggleWordWrap();
+        wordWrapBtn.setAttribute('aria-pressed', self.wordWrap ? 'true' : 'false');
+        wordWrapBtn.classList.toggle('active', self.wordWrap);
+      };
+      this.wordWrapButton = wordWrapBtn;
+      viewGroup.appendChild(wordWrapBtn);
     }
 
     // Botón de Mostrar bloques (show blocks)
@@ -5964,16 +5996,16 @@
             processNode(children[k]);
           }
         } else {
-          // Es un bloque sin hijos de bloque, extraer contenido
+          // Es un bloque sin hijos de bloque, extraer contenido.
+          // Se inserta AUNQUE el contenido esté vacío: un <p></p> en medio del
+          // documento es separación intencionada y debe conservarse. El recorte
+          // de vacíos al inicio/final se aplica después sobre la lista.
           var blockType = tagToBlockType[tagName] || 'paragraph';
           var content = self.sanitizeHTML(node).trim();
-
-          if (content) {
-            blocksToInsert.push({
-              type: blockType,
-              content: content
-            });
-          }
+          blocksToInsert.push({
+            type: blockType,
+            content: content
+          });
         }
       } else {
         // Elemento inline o desconocido - procesar hijos
@@ -5990,13 +6022,23 @@
       processNode(bodyChildren[i]);
     }
 
-    // Filtrar bloques vacíos pero preservar dividers, imágenes, videos, audios
-    blocksToInsert = blocksToInsert.filter(function(block) {
+    // Recortar bloques de texto vacíos SOLO al inicio y al final. Los vacíos
+    // intermedios se conservan (separación visual intencionada del usuario).
+    // Imágenes/tablas/divisores/medios nunca se consideran "vacíos".
+    var isEmptyTextBlock = function(block) {
       if (block.type === 'divider' || block.type === 'image' ||
-          block.type === 'video' || block.type === 'audio') return true;
-      if (typeof block.content === 'string') return block.content.trim() !== '';
-      return !!block.content;
-    });
+          block.type === 'video' || block.type === 'audio' || block.type === 'table') {
+        return false;
+      }
+      if (typeof block.content === 'string') return block.content.trim() === '';
+      return !block.content;
+    };
+    while (blocksToInsert.length && isEmptyTextBlock(blocksToInsert[0])) {
+      blocksToInsert.shift();
+    }
+    while (blocksToInsert.length && isEmptyTextBlock(blocksToInsert[blocksToInsert.length - 1])) {
+      blocksToInsert.pop();
+    }
 
     return blocksToInsert;
   };
@@ -6200,13 +6242,16 @@
       }
     }
 
-    // 7. Eliminar párrafos/divs completamente vacíos (resultado típico de Word)
-    // Preservar los que contienen medios (img, iframe, video, audio, table, hr, br)
-    var emptyCandidates = doc.querySelectorAll('p, div');
+    // 7. Eliminar solo DIVs vacíos (envoltorios estructurales típicos de Word/HTML).
+    // Los <p> vacíos se CONSERVAN: representan separación visual intencionada del
+    // usuario y deben mantenerse como bloques (el recorte de vacíos al inicio/final
+    // se hace luego sobre la lista de bloques en _htmlToBlocks).
+    // Preservar los que contienen medios (img, iframe, video, audio, table, hr, br).
+    var emptyCandidates = doc.querySelectorAll('div');
     for (var ec = emptyCandidates.length - 1; ec >= 0; ec--) {
       var candidate = emptyCandidates[ec];
       var txt = (candidate.textContent || '').replace(/\s/g, '');
-      if (txt === '' && candidate.querySelectorAll('img, br, hr, table, iframe, video, audio').length === 0) {
+      if (txt === '' && candidate.querySelectorAll('img, br, hr, table, iframe, video, audio, p').length === 0) {
         candidate.remove();
       }
     }
@@ -11475,6 +11520,11 @@
       this.updateCharCounter();
     }
 
+    // Refrescar el panel de esquema si está abierto (índice en vivo)
+    if (this.outlinePanel) {
+      this._buildOutlineContent();
+    }
+
     // En modo readOnly no notificamos cambios — el contenido no muta y los
     // callbacks (onChange/onFocus/onBlur) deben ser inertes.
     if (this.readOnly) return;
@@ -11648,6 +11698,7 @@
     if (this.summaryButton && this.summaryButton.parentNode) {
       this.summaryButton.remove();
     }
+    this.closeOutlinePanel();
     this.hideSummaryTooltip();
 
     // Retirar overlay/backdrop si quedaba activo
@@ -12913,11 +12964,12 @@
       }, 300);
     });
 
-    // Evento click para mostrar modal completo
+    // Evento click: alternar el panel de esquema anclado (vista tipo Word).
+    // Si no hay wrapper (summary sin toolbar), cae al modal anterior.
     this.summaryButton.addEventListener('click', function(e) {
       e.preventDefault();
       e.stopPropagation();
-      self.showSummaryModal();
+      self.toggleOutlinePanel();
     });
 
     // Añadir el botón como primer elemento del contenedor
@@ -13049,6 +13101,127 @@
       this.summaryTooltip.remove();
       this.summaryTooltip = null;
       this._hideBackdrop('summaryTooltip');
+    }
+  };
+
+  /**
+   * Alterna el panel de esquema lateral. Sin wrapper (toolbar), cae al modal.
+   */
+  meWYSE.prototype.toggleOutlinePanel = function() {
+    if (!this.editorWrapper) {
+      // Sin wrapper no se puede empujar el contenido: usar el modal de antes.
+      this.showSummaryModal();
+      return;
+    }
+    if (this.outlinePanel) {
+      this.closeOutlinePanel();
+    } else {
+      this.openOutlinePanel();
+    }
+  };
+
+  /**
+   * Construye el contenido del panel de esquema (stats compactas + índice).
+   */
+  meWYSE.prototype._buildOutlineContent = function() {
+    var self = this;
+    var panel = this.outlinePanel;
+    if (!panel) return;
+    var body = panel.querySelector('.mewyse-outline-body');
+    if (!body) return;
+    body.innerHTML = '';
+
+    // Stats compactas
+    var stats = document.createElement('div');
+    stats.className = 'mewyse-summary-stats';
+    stats.innerHTML = '<div class="mewyse-summary-stats-grid">' +
+      '<div class="mewyse-summary-stat"><span class="mewyse-summary-stat-label">' + this.t('summary.words') + '</span> <span class="mewyse-summary-stat-value">' + this.getWordCount() + '</span></div>' +
+      '<div class="mewyse-summary-stat"><span class="mewyse-summary-stat-label">' + this.t('summary.readingTime') + '</span> <span class="mewyse-summary-stat-value">' + this.getReadingTime() + '</span></div>' +
+      '</div>';
+    body.appendChild(stats);
+
+    // Índice de títulos (esquema)
+    var headings = this.getHeadingsIndex();
+    if (headings.length > 0) {
+      var indexSection = document.createElement('div');
+      indexSection.className = 'mewyse-summary-index';
+      var indexTitle = document.createElement('h4');
+      indexTitle.textContent = this.t('summary.index');
+      indexSection.appendChild(indexTitle);
+      var indexList = document.createElement('div');
+      indexList.className = 'mewyse-summary-index-list';
+      headings.forEach(function(heading) {
+        var item = document.createElement('div');
+        item.className = 'mewyse-summary-index-item mewyse-summary-' + heading.type;
+        item.textContent = heading.text;
+        item.addEventListener('click', function() {
+          self.navigateToHeading(heading.id);
+        });
+        indexList.appendChild(item);
+      });
+      indexSection.appendChild(indexList);
+      body.appendChild(indexSection);
+    } else {
+      var noHeadings = document.createElement('p');
+      noHeadings.className = 'mewyse-summary-no-headings';
+      noHeadings.textContent = this.t('summary.noHeadings');
+      body.appendChild(noHeadings);
+    }
+  };
+
+  /**
+   * Abre el panel de esquema anclado a la derecha (empuja el contenido).
+   */
+  meWYSE.prototype.openOutlinePanel = function() {
+    var self = this;
+    if (!this.editorWrapper || this.outlinePanel) return;
+
+    var panel = document.createElement('div');
+    panel.className = 'mewyse-outline-panel';
+    this._applyMenuTheme(panel);
+
+    var header = document.createElement('div');
+    header.className = 'mewyse-outline-header';
+    header.innerHTML = '<span class="mewyse-outline-title">' + this.t('summary.title') + '</span>';
+    var closeBtn = document.createElement('button');
+    closeBtn.className = 'mewyse-outline-close';
+    closeBtn.innerHTML = WYSIWYG_ICONS.close;
+    closeBtn.title = this.t('summary.close');
+    closeBtn.setAttribute('aria-label', this.t('summary.close'));
+    closeBtn.onclick = function(e) { e.preventDefault(); self.closeOutlinePanel(); };
+    header.appendChild(closeBtn);
+    panel.appendChild(header);
+
+    var bodyEl = document.createElement('div');
+    bodyEl.className = 'mewyse-outline-body';
+    panel.appendChild(bodyEl);
+
+    this.editorWrapper.appendChild(panel);
+    this.editorWrapper.classList.add('mewyse-has-outline');
+    this.outlinePanel = panel;
+
+    if (this.summaryButton) {
+      this.summaryButton.classList.add('active');
+      this.summaryButton.setAttribute('aria-pressed', 'true');
+    }
+
+    this._buildOutlineContent();
+  };
+
+  /**
+   * Cierra el panel de esquema y restaura el ancho del editor.
+   */
+  meWYSE.prototype.closeOutlinePanel = function() {
+    if (this.outlinePanel && this.outlinePanel.parentNode) {
+      this.outlinePanel.parentNode.removeChild(this.outlinePanel);
+    }
+    this.outlinePanel = null;
+    if (this.editorWrapper) {
+      this.editorWrapper.classList.remove('mewyse-has-outline');
+    }
+    if (this.summaryButton) {
+      this.summaryButton.classList.remove('active');
+      this.summaryButton.setAttribute('aria-pressed', 'false');
     }
   };
 
@@ -14238,6 +14411,16 @@
     var target = this.editorWrapper || this.container;
     if (!target) return;
 
+    // Reparentar a <body> para que `position: fixed` cubra TODO el viewport.
+    // Si un ancestro tiene transform/filter/perspective/contain, el fixed se
+    // ancla a ese ancestro y solo cubriría "el padre"; moverlo a body lo evita.
+    // Guardamos la posición original con un placeholder para restaurarla al salir.
+    if (target.parentNode && target.parentNode !== document.body) {
+      this._fsPlaceholder = document.createComment('mewyse-fullscreen-placeholder');
+      target.parentNode.insertBefore(this._fsPlaceholder, target);
+      document.body.appendChild(target);
+    }
+
     target.classList.add('mewyse-fullscreen');
     document.body.classList.add('mewyse-fullscreen-lock');
     this.isFullscreen = true;
@@ -14268,6 +14451,13 @@
     document.body.classList.remove('mewyse-fullscreen-lock');
     this.isFullscreen = false;
 
+    // Restaurar el wrapper a su posición original (donde quedó el placeholder)
+    if (this._fsPlaceholder && this._fsPlaceholder.parentNode) {
+      this._fsPlaceholder.parentNode.insertBefore(target, this._fsPlaceholder);
+      this._fsPlaceholder.parentNode.removeChild(this._fsPlaceholder);
+    }
+    this._fsPlaceholder = null;
+
     if (this.fullscreenButton) {
       this.fullscreenButton.innerHTML = WYSIWYG_ICONS.fullscreen;
       this.fullscreenButton.title = this.t('tooltips.fullscreen');
@@ -14292,6 +14482,17 @@
     this.showingBlocks = !this.showingBlocks;
     if (this.container) {
       this.container.classList.toggle('mewyse-show-blocks', this.showingBlocks);
+    }
+  };
+
+  /**
+   * Alterna el ajuste de texto (wordWrap): el contenido largo envuelve dentro
+   * del bloque o desborda. Refleja el estado en this.wordWrap y la clase.
+   */
+  meWYSE.prototype.toggleWordWrap = function() {
+    this.wordWrap = !this.wordWrap;
+    if (this.container) {
+      this.container.classList.toggle('mewyse-word-wrap', this.wordWrap);
     }
   };
 
