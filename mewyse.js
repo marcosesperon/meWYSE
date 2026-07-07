@@ -907,14 +907,20 @@
     this._handleDocMouseUp = null;
     this._handleDocMouseDown = null;
 
+    // ¿El usuario fijó un theme explícito? Guardarlo ANTES de auto-detectar,
+    // porque la auto-detección muta this.options.theme y, si no, la comprobación
+    // posterior para instalar el listener quedaría contaminada (bug: al arrancar
+    // el sistema en oscuro no se registraba el listener y cambiar a claro no surtía efecto).
+    var v_theme_explicito = !!this.options.theme;
+
     // Auto-detectar dark mode del sistema si no hay theme explícito
-    if (!this.options.theme && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    if (!v_theme_explicito && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
       this.options.theme = 'dark';
     }
 
-    // Escuchar cambios en la preferencia del sistema
+    // Escuchar cambios en la preferencia del sistema (solo si no hubo theme explícito)
     this._darkModeMediaQuery = null;
-    if (!options.theme && window.matchMedia) {
+    if (!v_theme_explicito && window.matchMedia) {
       this._darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
       var self = this;
       this._handleDarkModeChange = function(e) {
@@ -1647,6 +1653,14 @@
 
       // Caso 2: archivos OS (comportamiento existente)
       if (!hasImageFile(e.dataTransfer)) return;
+
+      // Es un drop de ficheros: prevenir SIEMPRE la acción por defecto del
+      // navegador (que abriría el fichero y navegaría fuera de la página,
+      // perdiendo el contenido), aunque luego ninguno resulte ser imagen.
+      e.preventDefault();
+      e.stopPropagation();
+      self.container.classList.remove('mewyse-image-drop-target');
+
       var files = e.dataTransfer.files;
       if (!files || files.length === 0) return;
 
@@ -1659,10 +1673,6 @@
         }
       }
       if (!imageFile) return;
-
-      e.preventDefault();
-      e.stopPropagation();
-      self.container.classList.remove('mewyse-image-drop-target');
 
       // Calcular insertIndex: después del bloque sobre el que se soltó, o al final.
       // Si ese bloque está vacío, la imagen lo reemplaza en su sitio.
@@ -2628,6 +2638,12 @@
             document.body.style.cursor = 'nwse-resize';
             imageContainer.classList.add('mewyse-image-resizing');
             document.body.style.userSelect = 'none';
+
+            // Registrar los listeners SOLO durante el arrastre (se quitan en
+            // mouseUpHandler): así el resize funciona en CADA uso, no solo el
+            // primero, y no quedan listeners colgando en document tras insertar.
+            document.addEventListener('mousemove', mouseMoveHandler);
+            document.addEventListener('mouseup', mouseUpHandler);
           };
 
           var mouseMoveHandler = function(e) {
@@ -2678,9 +2694,6 @@
             // Tras redimensionar, dejar la imagen de la celda seleccionada/enfocada
             self.selectImage(imgElement, null, true, tableCell);
           };
-
-          document.addEventListener('mousemove', mouseMoveHandler);
-          document.addEventListener('mouseup', mouseUpHandler);
 
           imageContainer.appendChild(resizeHandle);
 
@@ -5742,12 +5755,15 @@
             }
             // Los átomos siempre son contenteditable=false en el editor
             atomAttrs += ' contenteditable="false"';
-            // Para tag, derivar el style inline del color (con contraste)
+            // Para tag, derivar el style inline del color (con contraste).
+            // El data-tag-color viene de HTML pegado: se pasa por _sanitizeStyle
+            // para descartar inyecciones CSS (p.ej. "red;position:fixed;inset:0").
             if (atomicClass === 'mewyse-tag') {
               var tagColor = node.getAttribute('data-tag-color');
               if (tagColor && self._pickContrastColor) {
                 var fg = self._pickContrastColor(tagColor);
-                atomAttrs += ' style="background-color: ' + escAttr(tagColor) + '; color: ' + fg + '"';
+                var v_tag_style = self._sanitizeStyle('background-color: ' + tagColor + '; color: ' + fg);
+                if (v_tag_style) atomAttrs += ' style="' + escAttr(v_tag_style) + '"';
               }
             }
             var inner = '';
@@ -5776,6 +5792,12 @@
           var attrName = allowed[j];
           var attrValue = node.getAttribute(attrName);
           if (attrValue) {
+            // El href debe validarse contra esquemas peligrosos (javascript:,
+            // vbscript:, data:text/html...). Si no es seguro, neutralizarlo a "#"
+            // en vez de dejar que se persista y se ejecute al clicar el enlace.
+            if (tagName === 'A' && attrName === 'href' && !self._isSafeUrl(attrValue)) {
+              attrValue = '#';
+            }
             // Sanitizar el valor del atributo
             var safeValue = attrValue
               .replace(/"/g, '&quot;')
@@ -6566,6 +6588,38 @@
         e.preventDefault();
         self.clearTableCellSelection();
       }
+    });
+
+    // Interceptar el pegado dentro de la celda. Sin esto, el paste nativo mete
+    // HTML crudo (Word, estilos arbitrarios, enlaces javascript:) directo al DOM
+    // de la celda y el listener `input` lo persiste sin sanear. Saneamos a HTML
+    // inline seguro (mismo sanitizeHTML que el paste normal) antes de insertar.
+    cell.addEventListener('paste', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      var v_clipboard = e.clipboardData || window.clipboardData;
+      if (!v_clipboard) return;
+
+      var v_html = '';
+      try { v_html = v_clipboard.getData('text/html'); } catch (err) { v_html = ''; }
+
+      var v_insert;
+      if (v_html) {
+        // Parsear el HTML pegado y reducirlo a inline seguro.
+        var v_tmp = document.createElement('div');
+        v_tmp.innerHTML = v_html;
+        v_insert = self.sanitizeHTML(v_tmp);
+      } else {
+        // Sin HTML: pegar texto plano escapado, respetando saltos de línea.
+        var v_plain = '';
+        try {
+          v_plain = v_clipboard.getData('text/plain') || v_clipboard.getData('Text') || '';
+        } catch (err2) { v_plain = ''; }
+        v_insert = escapeHtml(v_plain).replace(/\r\n|\r|\n/g, '<br>');
+      }
+
+      // Insertar en el caret; execCommand dispara `input`, que persiste la tabla.
+      document.execCommand('insertHTML', false, v_insert);
     });
 
     // Obtener la celda contenedora (td o th)
@@ -8244,17 +8298,12 @@
   meWYSE.prototype.selectSlashMenuItem = function(index) {
     if (!this.slashMenu || !this.slashMenuElement) return;
 
-    // Si el índice es el índice visual (de elementos visibles), necesitamos encontrar el índice real
-    var visibleItems = this.slashMenu.querySelectorAll('.mewyse-slash-menu-item:not([style*="display: none"])');
-    var actualIndex = index;
-
-    // Si index es menor que visibleItems.length, es un índice visual
-    if (index < visibleItems.length) {
-      var selectedItem = visibleItems[index];
-      actualIndex = parseInt(selectedItem.getAttribute('data-index'));
-    }
-
-    var typeInfo = this.slashMenuTypes[actualIndex];
+    // `index` es SIEMPRE el índice real en slashMenuTypes (el data-index del item):
+    // el clic lo pasa directamente y el teclado lo resuelve antes con
+    // _resolveMenuFullIndex. Así no hay ambigüedad visual/real (que hacía que un
+    // clic con filtro activo eligiera el item equivocado).
+    var typeInfo = this.slashMenuTypes[index];
+    if (!typeInfo) return;
     var element = this.slashMenuElement;
     var blockId = this.slashMenuBlockId;
 
@@ -8581,20 +8630,10 @@
   meWYSE.prototype.selectMentionItem = function(index) {
     if (!this.mentionMenu || !this.mentionMenuElement) return;
 
-    // Obtener el item visible seleccionado
-    var visibleItems = this.mentionMenu.querySelectorAll('.mewyse-mention-menu-item:not([style*="display: none"])');
-    if (!visibleItems[index]) {
-      // Si se llama desde click, buscar el índice real
-      var mention = this.mentions[index];
-      if (!mention) return;
-      this.insertMention(mention);
-      return;
-    }
-
-    // Si se navega con teclado, usar mentionMenuItems filtrado
-    var mention = this.mentionMenuItems[index];
+    // `index` es SIEMPRE el índice real en this.mentions (el data-index del item):
+    // el clic lo pasa directamente y el teclado lo resuelve con _resolveMenuFullIndex.
+    var mention = this.mentions[index];
     if (!mention) return;
-
     this.insertMention(mention);
   };
 
@@ -8924,9 +8963,10 @@
    * @param {number} index
    */
   meWYSE.prototype.selectEmojiItem = function(index) {
-    if (index >= 0 && index < this.emojiMenuItems.length) {
-      var emojiData = this.emojiMenuItems[index];
-      this.insertEmoji(emojiData);
+    // `index` es SIEMPRE el índice real en WYSIWYG_EMOJIS (el data-index del item):
+    // el clic lo pasa directamente y el teclado lo resuelve con _resolveMenuFullIndex.
+    if (index >= 0 && index < WYSIWYG_EMOJIS.length) {
+      this.insertEmoji(WYSIWYG_EMOJIS[index]);
     }
   };
 
@@ -9229,14 +9269,9 @@
 
   meWYSE.prototype.selectTagItem = function(index) {
     if (!this.tagMenu || !this.tagMenuElement) return;
-    var visibleItems = this.tagMenu.querySelectorAll('.mewyse-tag-menu-item:not([style*="display: none"])');
-    if (!visibleItems[index]) {
-      var tag = this.tags[index];
-      if (!tag) return;
-      this.insertTag(tag);
-      return;
-    }
-    var tag = this.tagMenuItems[index];
+    // `index` es SIEMPRE el índice real en this.tags (el data-index del item):
+    // el clic lo pasa directamente y el teclado lo resuelve con _resolveMenuFullIndex.
+    var tag = this.tags[index];
     if (!tag) return;
     this.insertTag(tag);
   };
@@ -9410,10 +9445,10 @@
         return;
       }
 
-      // Enter: seleccionar elemento del menú
+      // Enter: seleccionar elemento del menú (convertir índice visual → real)
       if (e.key === 'Enter') {
         e.preventDefault();
-        this.selectSlashMenuItem(this.slashMenuSelectedIndex);
+        this.selectSlashMenuItem(this._resolveMenuFullIndex(this.slashMenu, '.mewyse-slash-menu-item', this.slashMenuSelectedIndex));
         return;
       }
 
@@ -9461,10 +9496,10 @@
         return;
       }
 
-      // Enter: seleccionar elemento del menú
+      // Enter: seleccionar elemento del menú (convertir índice visual → real)
       if (e.key === 'Enter') {
         e.preventDefault();
-        this.selectMentionItem(this.mentionMenuSelectedIndex);
+        this.selectMentionItem(this._resolveMenuFullIndex(this.mentionMenu, '.mewyse-mention-menu-item', this.mentionMenuSelectedIndex));
         return;
       }
 
@@ -9490,7 +9525,7 @@
       }
       if (e.key === 'Enter') {
         e.preventDefault();
-        this.selectTagItem(this.tagMenuSelectedIndex);
+        this.selectTagItem(this._resolveMenuFullIndex(this.tagMenu, '.mewyse-tag-menu-item', this.tagMenuSelectedIndex));
         return;
       }
       if (e.key === 'Escape') {
@@ -9516,10 +9551,10 @@
         return;
       }
 
-      // Enter: seleccionar elemento del menú
+      // Enter: seleccionar elemento del menú (convertir índice visual → real)
       if (e.key === 'Enter') {
         e.preventDefault();
-        this.selectEmojiItem(this.emojiMenuSelectedIndex);
+        this.selectEmojiItem(this._resolveMenuFullIndex(this.emojiMenu, '.mewyse-emoji-menu-item', this.emojiMenuSelectedIndex));
         return;
       }
 
@@ -10532,6 +10567,47 @@
       block.content = content;
       this.triggerChange();
     }
+  };
+
+  /**
+   * Sincroniza al modelo el HTML del bloque donde está la selección actual.
+   *
+   * Las operaciones de formato de un solo bloque (color, enlace, cambio de
+   * mayúsculas...) mutan el DOM directamente (extractContents/insertNode/
+   * setAttribute), pero eso NO dispara el listener `input`, único punto que
+   * normalmente sincroniza DOM→modelo. Sin esta persistencia, el cambio se
+   * pierde en el siguiente render y `onChange` emite HTML obsoleto.
+   *
+   * @returns {boolean} true si persistió algún bloque.
+   */
+  meWYSE.prototype._persistActiveBlockContent = function() {
+    var v_selection = window.getSelection();
+    if (!v_selection || !v_selection.rangeCount) return false;
+
+    var v_node = v_selection.getRangeAt(0).commonAncestorContainer;
+    var v_element = (v_node.nodeType === 1) ? v_node : v_node.parentElement;
+    if (!v_element || !v_element.closest) return false;
+
+    var v_block_element = v_element.closest('.mewyse-block[data-block-id]');
+    if (!v_block_element) return false;
+
+    var v_block_id = parseInt(v_block_element.getAttribute('data-block-id'), 10);
+    var v_block = this.getBlock(v_block_id);
+    if (!v_block) return false;
+
+    // En un bloque tabla, la selección vive dentro de una celda; hay que
+    // persistir el HTML de TODA la tabla, no el de la celda editable, para no
+    // sobrescribir la tabla con el contenido de una sola celda.
+    if (v_block.type === 'table') {
+      var v_table = v_element.closest('table');
+      if (v_table) this.updateBlockContent(v_block_id, v_table.innerHTML);
+      return true;
+    }
+
+    var v_editable = this.getEditableElement(v_block_element);
+    if (!v_editable) return false;
+    this.updateBlockContent(v_block_id, v_editable.innerHTML);
+    return true;
   };
 
   /**
@@ -11630,6 +11706,11 @@
 
     // Sanitizar contra XSS (maneja currentBlockId internamente)
     this.blocks = this._sanitizeBlocks(data);
+    // Garantizar que siempre haya al menos un bloque (igual que loadFromHTML):
+    // un JSON vacío o íntegramente inválido dejaría el editor sin bloques.
+    if (this.blocks.length === 0) {
+      this.blocks.push({ id: ++this.currentBlockId, type: 'paragraph', content: '' });
+    }
 
     this.render();
     // Igual que loadFromHTML/loadFromMarkdown: refresca el panel de esquema si
@@ -12279,6 +12360,8 @@
     // Si hay varios bloques seleccionados, aplicar a todos; si no, comportamiento normal.
     if (this._applyInlineAcrossSelection(function() { self.applyInlineStyle('color', color); })) return;
     this.applyInlineStyle('color', color);
+    // applyInlineStyle solo muta el DOM: persistir el cambio al modelo.
+    this._persistActiveBlockContent();
   };
 
   /**
@@ -12289,6 +12372,8 @@
     var self = this;
     if (this._applyInlineAcrossSelection(function() { self.applyInlineStyle('backgroundColor', color); })) return;
     this.applyInlineStyle('backgroundColor', color);
+    // applyInlineStyle solo muta el DOM: persistir el cambio al modelo.
+    this._persistActiveBlockContent();
   };
 
   /**
@@ -12342,6 +12427,8 @@
    */
   meWYSE.prototype.removeTextColor = function() {
     this.removeInlineStyle('color');
+    // removeInlineStyle solo muta el DOM: persistir el cambio al modelo.
+    this._persistActiveBlockContent();
   };
 
   /**
@@ -12349,6 +12436,8 @@
    */
   meWYSE.prototype.removeBackgroundColor = function() {
     this.removeInlineStyle('backgroundColor');
+    // removeInlineStyle solo muta el DOM: persistir el cambio al modelo.
+    this._persistActiveBlockContent();
   };
 
   /**
@@ -12830,7 +12919,9 @@
         }
       }
 
-      self.triggerChange();
+      // La creación/edición del enlace muta el DOM (execCommand/insertNode/
+      // setAttribute); persistir el HTML al modelo (además dispara triggerChange).
+      if (!self._persistActiveBlockContent()) self.triggerChange();
     }
 
     // Event listeners
@@ -12960,6 +13051,12 @@
         if (!text) continue;
         range2.deleteContents();
         range2.insertNode(document.createTextNode(transformer(text)));
+        // La mutación es solo DOM: persistir el HTML del editable al modelo,
+        // igual que _applyInlineAcrossSelection (si no, se pierde al re-render).
+        var v_block_el = this.getBlockElementById(blockId);
+        var v_editable = v_block_el ? this.getEditableElement(v_block_el) : null;
+        var v_block = this.getBlock(blockId);
+        if (v_editable && v_block) v_block.content = v_editable.innerHTML;
       }
       this.clearCrossBlockSelection();
       this.closeFormatMenu();
@@ -12984,7 +13081,8 @@
     selection.removeAllRanges();
     selection.addRange(newRange);
 
-    this.triggerChange();
+    // La transformación es solo DOM: persistir el cambio al modelo.
+    if (!this._persistActiveBlockContent()) this.triggerChange();
   };
 
   /**
@@ -14574,6 +14672,26 @@
   };
 
   /**
+   * Traduce un índice VISUAL (posición entre los items visibles, que es lo que
+   * maneja la navegación por teclado) al índice REAL en el array fuente del menú
+   * (el `data-index` del item, estable aunque el filtro oculte items). Devuelve
+   * -1 si no hay item visible en esa posición. Evita la ambigüedad que hacía que
+   * un clic con filtro activo insertara el item equivocado.
+   * @param {HTMLElement} menu
+   * @param {string} itemSelector
+   * @param {number} visualIndex
+   * @returns {number} índice real o -1
+   */
+  meWYSE.prototype._resolveMenuFullIndex = function(menu, itemSelector, visualIndex) {
+    if (!menu) return -1;
+    var visible = menu.querySelectorAll(itemSelector + ':not([style*="display: none"])');
+    var item = visible[visualIndex];
+    if (!item) return -1;
+    var v_full = parseInt(item.getAttribute('data-index'), 10);
+    return isNaN(v_full) ? -1 : v_full;
+  };
+
+  /**
    * Enfoca el editor (primer bloque o bloque especificado)
    * @param {number} [blockId] - ID del bloque a enfocar. Sin parámetro, enfoca el primer bloque.
    */
@@ -14736,7 +14854,8 @@
 
     if (wordsEl) wordsEl.textContent = words;
     if (charsEl) charsEl.textContent = chars;
-    if (timeEl) timeEl.textContent = readingTime + ' min';
+    // getReadingTime() ya incluye la unidad ("1 min", "< 1 min"): no volver a añadirla.
+    if (timeEl) timeEl.textContent = readingTime;
   };
 
   /**
@@ -15003,8 +15122,15 @@
     parent.replaceChild(textNode, span);
     parent.normalize();
 
-    // Actualizar el bloque correspondiente en el array de blocks
+    // Localizar el bloque afectado ANTES de seguir tocando el DOM.
     var blockElement = parent.closest && parent.closest('[data-block-id]');
+
+    // Quitar los spans de resaltado que quedan (los otros matches del mismo
+    // bloque): si no, al leer innerHTML se persistirían en block.content y
+    // sobrevivirían a la exportación. _searchInEditor los reconstruye después.
+    this._clearSearchHighlights();
+
+    // Actualizar el bloque correspondiente en el array de blocks
     if (blockElement) {
       var blockId = parseInt(blockElement.getAttribute('data-block-id'));
       var contentEditable = blockElement.querySelector('[contenteditable="true"]') ||
@@ -15014,9 +15140,8 @@
       }
     }
 
-    // Re-buscar para actualizar posiciones
+    // Re-buscar para actualizar posiciones (reconstruye los resaltados)
     this._searchInEditor();
-    this.triggerChange();
   };
 
   meWYSE.prototype._replaceAll = function() {
@@ -15797,7 +15922,9 @@
   /**
    * Sanitiza HTML string contra whitelist.
    * @param {string} html - HTML a sanitizar
-   * @param {Object} opts - { allowTable: boolean, allowImg: boolean }
+   * @param {Object} opts - { allowTable, allowImg, allowMedia, tableInnards }.
+   *   tableInnards=true SOLO cuando el html son hijos sueltos de tabla (tbody/tr/td);
+   *   para un documento con <table> completas, dejarlo en false (evita foster parenting).
    * @returns {string} HTML sanitizado seguro para innerHTML
    */
   meWYSE.prototype._sanitizeBlockContent = function(html, opts) {
@@ -15807,14 +15934,20 @@
     var allowTable = opts.allowTable === true;
     var allowImg = opts.allowImg === true;
     var allowMedia = opts.allowMedia === true;
+    // tableInnards: el html es contenido INTERNO de una tabla (tbody/tr/td sueltos),
+    // no un documento con <table> completas. Solo en ese caso se envuelve en <table>.
+    var tableInnards = opts.tableInnards === true;
     var self = this;
 
     // Parsear en DOM desechable.
-    // Si se permite contenido de tabla (tbody/tr/td son hijos), envolver en <table>
-    // porque <div> no es un padre válido para ellos y el navegador los descartaría.
+    // Si el contenido son hijos de tabla (tbody/tr/td), envolver en <table> porque
+    // <div> no es un padre válido para ellos y el navegador los descartaría. En
+    // cambio, un documento normal (con <table> completas o sin ellas) se envuelve
+    // en <div>: envolverlo en <table> activaría el "foster parenting" de HTML5, que
+    // expulsa de la tabla todo el contenido no-tabla (h1/p/ul/texto) y vaciaría el root.
     var doc;
     var wrapperOpen, wrapperClose, rootSelector;
-    if (allowTable) {
+    if (tableInnards) {
       wrapperOpen = '<table id="__mewyse_root__">';
       wrapperClose = '</table>';
       rootSelector = 'table#__mewyse_root__';
@@ -16092,9 +16225,11 @@
       // No es HTML, solo texto. Igual escapamos para seguridad.
       clean.content = typeof block.content === 'string' ? block.content : '';
     } else if (type === 'table') {
+      // El contenido de un bloque tabla es el INNER de la tabla (tbody/tr/td),
+      // por eso se marca tableInnards para que se envuelva en <table> al parsear.
       clean.content = this._sanitizeBlockContent(
         typeof block.content === 'string' ? block.content : '',
-        { allowTable: true }
+        { allowTable: true, tableInnards: true }
       );
       // Preservar estilos de tabla (aplicados vía "Propiedades de la tabla")
       if (typeof block.tableStyle === 'string' && block.tableStyle) {
@@ -17242,6 +17377,13 @@
     TABLE: 1, TD: 1, TH: 1, COL: 1, IMG: 1, IFRAME: 1, VIDEO: 1, AUDIO: 1
   };
 
+  /**
+   * Propiedades CSS "de contenido" que SÍ conservamos en elementos genéricos
+   * (spans de color de la toolbar) al hacer getHTML/copy. Todo lo demás (márgenes,
+   * font-size, font-family... típica basura de Word) se descarta.
+   */
+  var CONTENT_STYLE_PROPS = { 'color': 1, 'background-color': 1 };
+
   meWYSE.prototype._isStyleNativeElement = function(el) {
     if (!el || el.nodeType !== 1) return false;
     if (STYLE_NATIVE_TAGS[el.tagName]) return true;
@@ -17280,10 +17422,38 @@
     var styled = root.querySelectorAll('[style]');
     for (var i = 0; i < styled.length; i++) {
       if (!this._isStyleNativeElement(styled[i])) {
-        styled[i].removeAttribute('style');
+        // En elementos genéricos (p.ej. spans de color de la toolbar) no borramos
+        // el style entero: conservamos solo color/fondo y descartamos el resto,
+        // para no perder el color aplicado por el usuario en el export HTML.
+        var v_filtered = this._filterContentStyle(styled[i].getAttribute('style'));
+        if (v_filtered) styled[i].setAttribute('style', v_filtered);
+        else styled[i].removeAttribute('style');
       }
     }
     return root.innerHTML;
+  };
+
+  /**
+   * Filtra un string de style dejando SOLO las propiedades de contenido
+   * (color/background-color) y validando sus valores con _sanitizeStyle.
+   * @param {string} styleStr
+   * @returns {string} style filtrado (o '' si no queda nada seguro)
+   */
+  meWYSE.prototype._filterContentStyle = function(styleStr) {
+    if (!styleStr || typeof styleStr !== 'string') return '';
+    var v_parts = styleStr.split(';');
+    var v_kept = [];
+    for (var i = 0; i < v_parts.length; i++) {
+      var v_colon = v_parts[i].indexOf(':');
+      if (v_colon < 0) continue;
+      var v_prop = v_parts[i].substring(0, v_colon).trim().toLowerCase();
+      var v_value = v_parts[i].substring(v_colon + 1).trim();
+      if (!CONTENT_STYLE_PROPS[v_prop] || !v_value) continue;
+      v_kept.push(v_prop + ': ' + v_value);
+    }
+    if (v_kept.length === 0) return '';
+    // _sanitizeStyle bloquea valores peligrosos (url(), expression(), comillas...)
+    return this._sanitizeStyle(v_kept.join('; '));
   };
 
   // ============================================
