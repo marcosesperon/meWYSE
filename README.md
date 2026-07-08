@@ -149,6 +149,9 @@ new meWYSE(options)
 | `escapeHtmlEntities` | boolean | `true` | Escapar entidades HTML en el HTML exportado por `getHTML()` |
 | `htmlNumericEntities` | boolean | `true` | Compat TinyMCE (`entity_encoding: 'numeric'`): escapar no-ASCII como referencias numéricas |
 | `tags` | Array | `[]` | Lista de etiquetas para el trigger `#`. Cada item: `{ id, name, color? }` |
+| `autosave` | boolean | `false` | Guarda el contenido (JSON) en `localStorage` con debounce en cada cambio. No auto-restaura (usa `restoreDraft()`) |
+| `autosaveKey` | string | `'mewyse-draft'` | Clave de `localStorage` para el borrador de autosave |
+| `fontControls` | boolean | `false` | Añade a la toolbar un botón de fuente (familia / tamaño / interlineado) |
 | `imageMaxSize` | number | `0` | Tamaño máximo permitido al insertar imagen, en bytes. `0` = sin límite |
 | `imageMaxSizeError` | string | auto | Mensaje de alerta cuando la imagen excede `imageMaxSize` |
 | `onImageUpload` | Function | — | Hook para subir imágenes al servidor. Recibe `(file, callback)`. El callback espera `{ url, fileName?, width?, height? }` |
@@ -241,6 +244,19 @@ editor.getHeadingsIndex();   // Array de títulos { level, text, id } para naveg
 editor.navigateToHeading(id);// Desplazar hasta un título del índice
 ```
 
+#### Borrador / autosave
+
+Con `autosave: true`, el editor guarda el contenido (JSON) en `localStorage` con debounce. No se
+restaura automáticamente para no pisar `options.blocks`; el consumidor decide:
+
+```javascript
+var editor = new meWYSE({ target: '#editor', autosave: true, autosaveKey: 'doc-42' });
+
+editor.hasDraft();     // ¿hay un borrador guardado?
+editor.restoreDraft(); // Cargar el borrador (pasa por el sanitizer). Devuelve true si había
+editor.clearDraft();   // Borrar el borrador (p.ej. tras guardar de verdad en el servidor)
+```
+
 #### Otros
 
 ```javascript
@@ -286,6 +302,7 @@ var editor = new meWYSE({
 | `video` | Vídeo (YouTube/Vimeo/.mp4) | `/video` |
 | `audio` | Audio (.mp3/.ogg/.wav) | `/audio` |
 | `divider` | Separador horizontal | `/separador` |
+| `pageBreak` | Salto de página (impresión/export) | `/salto` |
 
 ### Estructura de un bloque
 
@@ -324,6 +341,8 @@ Para bloques de imagen, `content` es un objeto:
 | `Ctrl/Cmd+K` | Insertar enlace |
 | `Ctrl/Cmd+Shift+K` | Limpiar formato |
 | `Ctrl/Cmd+E` | Código inline (`<code>`) |
+| `Ctrl/Cmd+.` | Superíndice (`<sup>`) |
+| `Ctrl/Cmd+,` | Subíndice (`<sub>`) |
 | `Ctrl/Cmd+Shift+X` | Tachado |
 | `Ctrl/Cmd+F` | Buscar y reemplazar |
 | `Ctrl/Cmd+Z` | Deshacer |
@@ -349,12 +368,16 @@ Para bloques de imagen, `content` es un objeto:
 Al seleccionar texto aparece un menú flotante con:
 
 - **Negrita** / **Cursiva** / **Subrayado** / **Tachado**
-- **Enlace**: Crear hipervínculo con modal
+- **Subíndice** / **Superíndice** (`<sub>` / `<sup>`)
+- **Enlace**: Crear hipervínculo con modal (y quitarlo)
 - **Color de texto**: Selector de colores
 - **Color de fondo**: Selector de colores para highlight
 - **Alineación**: Izquierda, centro, derecha, justificado
 - **Cambiar mayúsculas/minúsculas**: Toggle de capitalización
 - **Limpiar formato**: Eliminar todo el formato inline
+
+Con la toolbar, además: **fuente / tamaño / interlineado** (opción `fontControls`) y un picker de
+**caracteres especiales** (©, →, €, ½…).
 
 ## Tablas
 

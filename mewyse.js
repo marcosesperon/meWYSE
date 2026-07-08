@@ -25,6 +25,7 @@
         table: 'Tabla',
         image: 'Imagen',
         divider: 'Separador',
+        pageBreak: 'Salto de página',
         video: 'Vídeo',
         audio: 'Audio'
       },
@@ -41,6 +42,7 @@
         table: 'Tabla de datos',
         image: 'Insertar imagen',
         divider: 'Línea divisoria',
+        pageBreak: 'Corte de página al imprimir/exportar',
         video: 'YouTube, Vimeo o archivo .mp4',
         audio: 'Archivo de audio (mp3, ogg...)'
       },
@@ -55,6 +57,8 @@
         italic: 'Cursiva',
         underline: 'Subrayado',
         strikethrough: 'Tachado',
+        subscript: 'Subíndice',
+        superscript: 'Superíndice',
         toggleCase: 'Alternar mayúsculas/minúsculas',
         alignLeft: 'Alinear izquierda',
         alignCenter: 'Alinear centro',
@@ -82,7 +86,18 @@
         caseLower: 'minúsculas',
         caseTitle: 'Tipo Título',
         caseSentence: 'Tipo oración',
-        caseToggle: 'Invertir tipo'
+        caseToggle: 'Invertir tipo',
+        font: 'Fuente y tamaño',
+        specialChars: 'Caracteres especiales'
+      },
+      font: {
+        family: 'Familia',
+        size: 'Tamaño',
+        lineHeight: 'Interlineado',
+        default: 'Predeterminada',
+        lhTight: 'Compacto',
+        lhNormal: 'Normal',
+        lhLoose: 'Amplio'
       },
       blockMenu: {
         insertAbove: 'Insertar bloque arriba',
@@ -249,6 +264,7 @@
         table: 'Table',
         image: 'Image',
         divider: 'Divider',
+        pageBreak: 'Page break',
         video: 'Video',
         audio: 'Audio'
       },
@@ -265,6 +281,7 @@
         table: 'Data table',
         image: 'Insert image',
         divider: 'Dividing line',
+        pageBreak: 'Page break for print/export',
         video: 'YouTube, Vimeo or .mp4 file',
         audio: 'Audio file (mp3, ogg...)'
       },
@@ -279,6 +296,8 @@
         italic: 'Italic',
         underline: 'Underline',
         strikethrough: 'Strikethrough',
+        subscript: 'Subscript',
+        superscript: 'Superscript',
         toggleCase: 'Toggle uppercase/lowercase',
         alignLeft: 'Align left',
         alignCenter: 'Align center',
@@ -306,7 +325,18 @@
         caseLower: 'lowercase',
         caseTitle: 'Title Case',
         caseSentence: 'Sentence case',
-        caseToggle: 'tOGGLE cASE'
+        caseToggle: 'tOGGLE cASE',
+        font: 'Font and size',
+        specialChars: 'Special characters'
+      },
+      font: {
+        family: 'Family',
+        size: 'Size',
+        lineHeight: 'Line height',
+        default: 'Default',
+        lhTight: 'Tight',
+        lhNormal: 'Normal',
+        lhLoose: 'Loose'
       },
       blockMenu: {
         insertAbove: 'Insert block above',
@@ -700,6 +730,7 @@
     numberList: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><text x="1" y="5.5" font-size="5" font-family="sans-serif" font-weight="bold">1</text><text x="1" y="9.5" font-size="5" font-family="sans-serif" font-weight="bold">2</text><text x="1" y="13.5" font-size="5" font-family="sans-serif" font-weight="bold">3</text><rect x="7" y="3" width="7" height="2" rx="1"/><rect x="7" y="7" width="7" height="2" rx="1"/><rect x="7" y="11" width="7" height="2" rx="1"/></svg>',
     checklist: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="12" height="12" rx="2"/><polyline points="5,8 7,10.5 11,5.5"/></svg>',
     divider: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" xmlns="http://www.w3.org/2000/svg"><line x1="2" y1="8" x2="14" y2="8"/></svg>',
+    pageBreak: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M4 2h5l3 3v3"/><path d="M9 2v3h3"/><path d="M4 8v6h8"/><line x1="1.5" y1="11" x2="14.5" y2="11" stroke-dasharray="2 1.5"/></svg>',
     paragraph: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M7 2h6v1.5h-1.5V14H10V3.5H8.5V14H7V8.5C4.5 8.5 3 7 3 5.2S4.5 2 7 2z"/></svg>',
     heading1: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M1 3h1.5v4.5H6V3h1.5v11H6V9H2.5v5H1V3z"/><path d="M10 13V5.5L8.5 7V5.2L10.5 3H12v10h-2z"/></svg>',
     heading2: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M1 3h1.5v4.5H6V3h1.5v11H6V9H2.5v5H1V3z"/><path d="M9 11.5c1.2-1.5 3.5-3.2 3.5-5C12.5 5.5 12 4.8 11 4.8c-.8 0-1.4.6-1.5 1.5H8c.1-1.8 1.3-3 3-3 1.8 0 3 1.1 3 2.8 0 2.3-2.5 3.8-3.5 5.2H14V13H9v-1.5z"/></svg>',
@@ -741,6 +772,10 @@
     showBlocks: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="12" height="3" rx="0.5"/><rect x="2" y="6.5" width="12" height="3" rx="0.5"/><rect x="2" y="11" width="12" height="3" rx="0.5"/></svg>',
     wordWrap: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><line x1="2" y1="3.5" x2="14" y2="3.5"/><path d="M2 8h9a2.5 2.5 0 0 1 0 5h-3"/><polyline points="9.5,11 7.5,13 9.5,15"/><line x1="2" y1="12.5" x2="5" y2="12.5"/></svg>',
     removeFormat: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M3 3h9M6 3v10M5 13h4"/><line x1="11" y1="10" x2="15" y2="14"/><line x1="15" y1="10" x2="11" y2="14"/></svg>',
+    font: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M3 13l3.5-9 3.5 9"/><line x1="4.2" y1="10" x2="8.8" y2="10"/><path d="M12 8.5c1.5 0 2.5 1 2.5 2.3S13.5 13 12 13s-2-.7-2-1.5c0-1 1-1.4 2.5-1.4h2"/></svg>',
+    specialChars: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M8 2.5a3.5 3.5 0 0 0-2.6 5.8c.6.7 1.1 1.3 1.1 2.2H4v1.5h3v-1c0-.9.4-1.5 1-2.2A3.5 3.5 0 0 0 8 2.5z"/><line x1="9" y1="12" x2="12" y2="12"/></svg>',
+    subscript: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M2 3l6 8M8 3l-6 8"/><path d="M11.5 14.5h3M11.5 14.5c0-1.2 3-1.6 3-3 0-.8-.7-1.3-1.5-1.3s-1.5.5-1.5 1.2"/></svg>',
+    superscript: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M2 5l6 8M8 5l-6 8"/><path d="M11.5 5.5h3M11.5 5.5c0-1.2 3-1.6 3-3C14.5 1.7 13.8 1.2 13 1.2s-1.5.5-1.5 1.2"/></svg>',
     video: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="3" width="12" height="10" rx="1.5"/><polygon points="6.5,6 6.5,10 10,8" fill="currentColor"/></svg>',
     audio: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M9 3 L9 11 a2 2 0 1 1 -2 -1.7 L7 5 L12 3.5 z"/></svg>'
   };
@@ -790,6 +825,17 @@
     this.htmlNumericEntities = this.options.htmlNumericEntities !== false;
     this.imageMaxSize = (typeof this.options.imageMaxSize === 'number' && this.options.imageMaxSize > 0)
       ? this.options.imageMaxSize : 0; // Tamaño máx. de imagen en bytes (0 = sin límite)
+
+    // fontControls: añade a la toolbar un botón de fuente (familia/tamaño/
+    // interlineado). Opt-in (default false) para no recargar la toolbar por defecto.
+    this.fontControls = this.options.fontControls === true;
+
+    // Autosave: si está activo, guarda el contenido (JSON) en localStorage con
+    // debounce en cada cambio. NO auto-restaura (el consumidor decide vía
+    // hasDraft()/restoreDraft()) para no pisar options.blocks.
+    this.autosave = this.options.autosave === true;
+    this.autosaveKey = (typeof this.options.autosaveKey === 'string' && this.options.autosaveKey)
+      ? this.options.autosaveKey : 'mewyse-draft';
 
     // styleFormats: lista de estilos custom definidos por el consumidor.
     // Cada uno: { title, block, className }
@@ -2028,6 +2074,8 @@
       { action: 'italic', labelKey: 'tooltips.italic', icon: '<em>I</em>', command: 'italic' },
       { action: 'underline', labelKey: 'tooltips.underline', icon: '<u>U</u>', command: 'underline' },
       { action: 'strikethrough', labelKey: 'tooltips.strikethrough', icon: '<s>S</s>', command: 'strikeThrough' },
+      { action: 'subscript', labelKey: 'tooltips.subscript', icon: WYSIWYG_ICONS.subscript, type: 'wrapTag', tag: 'sub' },
+      { action: 'superscript', labelKey: 'tooltips.superscript', icon: WYSIWYG_ICONS.superscript, type: 'wrapTag', tag: 'sup' },
       { action: 'caseMenu', labelKey: 'tooltips.toggleCase', icon: '<span style="font-size:13px;font-weight:600">Aa</span> <span class="dropdown-arrow">' + WYSIWYG_ICONS.chevronDown + '</span>', type: 'caseMenu' },
       { action: 'removeFormat', labelKey: 'tooltips.removeFormat', icon: WYSIWYG_ICONS.removeFormat, type: 'removeFormat' }
     ];
@@ -2045,6 +2093,18 @@
           self.showCaseMenu(button);
         } else if (tool.type === 'removeFormat') {
           self.removeFormat();
+        } else if (tool.type === 'wrapTag') {
+          // Sub/superíndice: envolver en <sub>/<sup> (toggle fiable). No usa
+          // execCommand porque su markup es inconsistente entre navegadores.
+          var v_tag = tool.tag;
+          var v_wrapped = self._applyInlineAcrossSelection(function() {
+            self._wrapSelectionInTag(v_tag);
+          });
+          if (!v_wrapped) {
+            self._wrapSelectionInTag(v_tag);
+            // _wrapSelectionInTag muta el DOM sin disparar input: persistir.
+            self._persistActiveBlockContent();
+          }
         } else {
           var v_command = tool.command;
           // Si hay varios bloques seleccionados, aplicar a todos; si no, normal.
@@ -2092,6 +2152,32 @@
       self.showUnifiedColorPicker(colorButton);
     };
     extrasGroup.appendChild(colorButton);
+
+    // Botón de fuente (familia/tamaño/interlineado) — opt-in con `fontControls`.
+    if (this.fontControls) {
+      var fontButton = document.createElement('button');
+      fontButton.className = 'mewyse-toolbar-button mewyse-toolbar-dropdown';
+      fontButton.innerHTML = WYSIWYG_ICONS.font + ' <span class="dropdown-arrow">' + WYSIWYG_ICONS.chevronDown + '</span>';
+      fontButton.title = this.t('tooltips.font');
+      fontButton.onclick = function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        self.showFontMenu(fontButton);
+      };
+      extrasGroup.appendChild(fontButton);
+    }
+
+    // Botón de caracteres especiales (siempre disponible en la toolbar).
+    var charsButton = document.createElement('button');
+    charsButton.className = 'mewyse-toolbar-button';
+    charsButton.innerHTML = WYSIWYG_ICONS.specialChars;
+    charsButton.title = this.t('tooltips.specialChars');
+    charsButton.onclick = function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      self.showSpecialCharsMenu(charsButton);
+    };
+    extrasGroup.appendChild(charsButton);
 
     host.appendChild(extrasGroup);
 
@@ -4944,6 +5030,18 @@
         element = document.createElement('hr');
         break;
 
+      case 'pageBreak':
+        // Bloque estructural no editable (como divider). El marcador visual solo
+        // se ve en el editor; el export emite un <div class="mewyse-page-break">.
+        element = document.createElement('div');
+        element.className = 'mewyse-page-break';
+        element.contentEditable = false;
+        var v_pbLabel = document.createElement('span');
+        v_pbLabel.className = 'mewyse-page-break-label';
+        v_pbLabel.textContent = self.t('blockTypes.pageBreak');
+        element.appendChild(v_pbLabel);
+        break;
+
       default: // paragraph
         element = document.createElement('p');
         element.contentEditable = true;
@@ -5059,7 +5157,7 @@
     // especial de los separadores, que no reciben foco ni selección y siguen
     // usando hover como única vía de acceso al handle.
     var block = this.getBlock(blockId);
-    if (block && block.type === 'divider') {
+    if (block && (block.type === 'divider' || block.type === 'pageBreak')) {
       element.addEventListener('mouseenter', function() {
         if (self.floatingHandleHideTimeout) {
           clearTimeout(self.floatingHandleHideTimeout);
@@ -5849,7 +5947,7 @@
     // intermedios se conservan (separación visual intencionada del usuario).
     // Imágenes/tablas/divisores/medios nunca se consideran "vacíos".
     var isEmptyTextBlock = function(block) {
-      if (block.type === 'divider' || block.type === 'image' ||
+      if (block.type === 'divider' || block.type === 'pageBreak' || block.type === 'image' ||
           block.type === 'video' || block.type === 'audio' || block.type === 'table') {
         return false;
       }
@@ -7951,7 +8049,8 @@
       { type: 'image', icon: WYSIWYG_ICONS.image },
       { type: 'video', icon: WYSIWYG_ICONS.video },
       { type: 'audio', icon: WYSIWYG_ICONS.audio },
-      { type: 'divider', icon: WYSIWYG_ICONS.divider }
+      { type: 'divider', icon: WYSIWYG_ICONS.divider },
+      { type: 'pageBreak', icon: WYSIWYG_ICONS.pageBreak }
     ];
 
     this.slashMenuTypes = types;
@@ -9446,6 +9545,14 @@
         this.triggerChange();
         return;
       }
+      // Ctrl+. → superíndice, Ctrl+, → subíndice (envuelven en <sup>/<sub>)
+      if (e.key === '.' || e.key === ',') {
+        e.preventDefault();
+        this._wrapSelectionInTag(e.key === '.' ? 'sup' : 'sub');
+        this.updateBlockContent(blockId, element.innerHTML);
+        this.triggerChange();
+        return;
+      }
       if (e.key === 'z' || e.key === 'Z') {
         e.preventDefault();
         this.undo();
@@ -9504,7 +9611,7 @@
       // Bloques que NO se pueden dividir como texto (image, divider, video, audio,
       // table, code). Para estos mantenemos el comportamiento clásico (paragraph
       // nuevo a continuación).
-      var nonSplittable = { image: 1, divider: 1, video: 1, audio: 1, table: 1, code: 1 };
+      var nonSplittable = { image: 1, divider: 1, pageBreak: 1, video: 1, audio: 1, table: 1, code: 1 };
       var canSplit = currentBlock && !nonSplittable[currentBlock.type];
 
       // Tipo del nuevo bloque cuando NO se hace split (clásico).
@@ -9712,7 +9819,7 @@
           var idx = this.getBlockIndex(blockId);
           if (idx > 0) {
             var prevBlock = this.blocks[idx - 1];
-            var nonMergeable = { table: 1, image: 1, divider: 1, video: 1, audio: 1 };
+            var nonMergeable = { table: 1, image: 1, divider: 1, pageBreak: 1, video: 1, audio: 1 };
             if (prevBlock && !nonMergeable[prevBlock.type]) {
               e.preventDefault();
               this._mergeBlockIntoPrevious(blockId);
@@ -9897,7 +10004,8 @@
       'numberList': WYSIWYG_ICONS.numberList,
       'table': WYSIWYG_ICONS.table,
       'image': WYSIWYG_ICONS.image,
-      'divider': WYSIWYG_ICONS.divider
+      'divider': WYSIWYG_ICONS.divider,
+      'pageBreak': WYSIWYG_ICONS.pageBreak
     };
     return icons[type] || WYSIWYG_ICONS.paragraph;
   };
@@ -10709,7 +10817,7 @@
       var isEmpty = !lastBlock.content ||
                     (typeof lastBlock.content === 'string' && lastBlock.content.trim() === '');
 
-      if (isEmpty && lastBlock.type !== 'divider' && lastBlock.type !== 'image') {
+      if (isEmpty && lastBlock.type !== 'divider' && lastBlock.type !== 'pageBreak' && lastBlock.type !== 'image') {
         blocks.pop();
       }
     }
@@ -10876,6 +10984,9 @@
           case 'divider':
             html += '<hr>';
             break;
+          case 'pageBreak':
+            html += '<div class="mewyse-page-break"></div>';
+            break;
           default:
             html += '<p' + classAttr(block) + '>' + inline(content) + '</p>';
         }
@@ -11002,6 +11113,9 @@
             break;
           case 'divider':
             html += '<hr>';
+            break;
+          case 'pageBreak':
+            html += '<div class="mewyse-page-break"></div>';
             break;
           default:
             html += '<p' + classAttr(block) + '>' + content + '</p>';
@@ -11160,6 +11274,10 @@
             break;
           case 'divider':
             lines.push('---');
+            break;
+          case 'pageBreak':
+            // Sin sintaxis Markdown estándar: comentario HTML reconocible.
+            lines.push('<!-- pagebreak -->');
             break;
           case 'table':
             // Parsear HTML de tabla
@@ -11527,6 +11645,34 @@
   };
 
   /**
+   * Autosave — API pública. El guardado ocurre automáticamente en triggerChange
+   * si `autosave` está activo; estos métodos permiten al consumidor gestionar el
+   * borrador (comprobar/restaurar/limpiar) sin auto-restauración implícita.
+   */
+  meWYSE.prototype.hasDraft = function() {
+    try {
+      return !!window.localStorage.getItem(this.autosaveKey);
+    } catch (e) { return false; }
+  };
+
+  meWYSE.prototype.restoreDraft = function() {
+    var v_raw;
+    try {
+      v_raw = window.localStorage.getItem(this.autosaveKey);
+    } catch (e) { return false; }
+    if (!v_raw) return false;
+    // loadFromJSON pasa por _sanitizeBlocks (trust boundary intacto).
+    this.loadFromJSON(v_raw);
+    return true;
+  };
+
+  meWYSE.prototype.clearDraft = function() {
+    try {
+      window.localStorage.removeItem(this.autosaveKey);
+    } catch (e) {}
+  };
+
+  /**
    * Carga contenido desde una cadena HTML.
    * Útil para migrar contenido guardado por editores WYSIWYG previos (TinyMCE, CKEditor).
    * Detecta automáticamente iframes de YouTube/Vimeo, <video>, <audio>, <img>, tablas
@@ -11577,6 +11723,18 @@
     // Refrescar el panel de esquema si está abierto (índice en vivo)
     if (this.outlinePanel) {
       this._buildOutlineContent();
+    }
+
+    // Autosave: guardar el borrador (JSON) en localStorage con debounce propio,
+    // independiente del de history. En readOnly no hay cambios que guardar.
+    if (this.autosave && !this.readOnly) {
+      var v_self = this;
+      if (this._autosaveTimer) clearTimeout(this._autosaveTimer);
+      this._autosaveTimer = setTimeout(function() {
+        try {
+          window.localStorage.setItem(v_self.autosaveKey, v_self.getJSON());
+        } catch (e) {} // cuota llena / modo privado / sin localStorage
+      }, 800);
     }
 
     // En modo readOnly no notificamos cambios — el contenido no muta y los
@@ -11854,6 +12012,7 @@
     if (this.summaryTooltipTimeout) { clearTimeout(this.summaryTooltipTimeout); this.summaryTooltipTimeout = null; }
     if (this.floatingHandleHideTimeout) { clearTimeout(this.floatingHandleHideTimeout); this.floatingHandleHideTimeout = null; }
     if (this._handleHideTimer) { clearTimeout(this._handleHideTimer); this._handleHideTimer = null; }
+    if (this._autosaveTimer) { clearTimeout(this._autosaveTimer); this._autosaveTimer = null; }
     if (this._crossBlockRafId) { cancelAnimationFrame(this._crossBlockRafId); this._crossBlockRafId = null; }
 
     // Red de seguridad: retirar cualquier listener de click en document que
@@ -11996,6 +12155,8 @@
       { action: 'italic', label: 'I', titleKey: 'tooltips.italic', command: 'italic' },
       { action: 'underline', label: 'U', titleKey: 'tooltips.underline', command: 'underline' },
       { action: 'strikethrough', label: 'S', titleKey: 'tooltips.strikethrough', command: 'strikeThrough' },
+      { action: 'subscript', label: WYSIWYG_ICONS.subscript, titleKey: 'tooltips.subscript', type: 'wrapTag', tag: 'sub', crossCommand: 'subscript' },
+      { action: 'superscript', label: WYSIWYG_ICONS.superscript, titleKey: 'tooltips.superscript', type: 'wrapTag', tag: 'sup', crossCommand: 'superscript' },
       { action: 'caseMenu', label: 'Aa', titleKey: 'tooltips.toggleCase', type: 'caseMenu' },
       { action: 'removeFormat', label: WYSIWYG_ICONS.removeFormat, titleKey: 'tooltips.removeFormat', type: 'removeFormat' },
       { action: 'separator', type: 'separator' },
@@ -12043,6 +12204,10 @@
             self.removeFormat();
           } else if (tool.type === 'colorPicker') {
             self.showUnifiedColorPicker(button);
+          } else if (tool.type === 'wrapTag') {
+            // Sub/sup en cross-block: usar el comando nativo (coherente con el
+            // resto de formatos cross-block, que van por execCommand).
+            self.applyCrossBlockFormat(tool.crossCommand);
           } else if (tool.command === 'createLink') {
             // Links no soportados en cross-block, ignorar
           } else if (tool.command) {
@@ -12056,6 +12221,10 @@
             self.removeFormat();
           } else if (tool.type === 'colorPicker') {
             self.showUnifiedColorPicker(button);
+          } else if (tool.type === 'wrapTag') {
+            // Sub/superíndice: envolver en <sub>/<sup> (toggle) + persistir.
+            self._wrapSelectionInTag(tool.tag);
+            self._persistActiveBlockContent();
           } else if (tool.command === 'createLink') {
             self.createLink();
           } else if (tool.command) {
@@ -13000,6 +13169,202 @@
     }, 0);
 
     this._showBackdrop('caseMenu', closeCaseMenu);
+  };
+
+  /**
+   * Aplica un estilo de fuente (fontFamily/fontSize/lineHeight) a la selección.
+   * Reutiliza applyInlineStyle (spans inline) + _applyInlineAcrossSelection para
+   * multi-bloque, y persiste al modelo. Para lineHeight expande la selección a
+   * todo el bloque (una line-height sobre una selección parcial no tendría efecto).
+   * @param {string} styleProp - 'fontFamily' | 'fontSize' | 'lineHeight'
+   * @param {string} value
+   * @param {boolean} wholeBlock
+   */
+  meWYSE.prototype._applyFontStyle = function(styleProp, value, wholeBlock) {
+    var self = this;
+    if (wholeBlock) {
+      var sel = window.getSelection();
+      if (sel && sel.rangeCount) {
+        var node = sel.getRangeAt(0).commonAncestorContainer;
+        var el = (node.nodeType === 1) ? node : node.parentElement;
+        var blockEl = (el && el.closest) ? el.closest('.mewyse-block[data-block-id]') : null;
+        var editable = blockEl ? self.getEditableElement(blockEl) : null;
+        if (editable) {
+          var r = document.createRange();
+          r.selectNodeContents(editable);
+          sel.removeAllRanges();
+          sel.addRange(r);
+        }
+      }
+    }
+    if (self._applyInlineAcrossSelection(function() { self.applyInlineStyle(styleProp, value); })) return;
+    self.applyInlineStyle(styleProp, value);
+    self._persistActiveBlockContent();
+  };
+
+  /**
+   * Menú de fuente: familia, tamaño e interlineado. Anclado a un botón de la
+   * toolbar (solo si `fontControls`). Las familias van SIN comillas (el sanitizer
+   * las rechaza) y los valores son listas cerradas (evita font-size disparatados).
+   */
+  meWYSE.prototype.showFontMenu = function(button) {
+    var self = this;
+    if (this._fontMenu && this._fontMenu.parentNode) {
+      this._fontMenu.remove(); this._fontMenu = null; return;
+    }
+
+    // Familias sin comillas ni nombres multi-palabra (compat con el sanitizer).
+    var families = [
+      { label: this.t('font.default'), value: 'inherit' },
+      { label: 'Sans-serif', value: 'Arial, sans-serif' },
+      { label: 'Serif', value: 'Georgia, serif' },
+      { label: 'Monospace', value: 'Consolas, monospace' },
+      { label: 'Verdana', value: 'Verdana, sans-serif' },
+      { label: 'Tahoma', value: 'Tahoma, sans-serif' }
+    ];
+    var sizes = ['12px', '14px', '16px', '18px', '24px', '32px'];
+    var lineHeights = [
+      { label: this.t('font.lhTight'), value: '1' },
+      { label: this.t('font.lhNormal'), value: '1.5' },
+      { label: this.t('font.lhLoose'), value: '2' }
+    ];
+
+    var menu = document.createElement('div');
+    menu.className = 'mewyse-options-menu mewyse-font-menu';
+    menu.setAttribute('role', 'menu');
+    // Preservar la selección del editor al interactuar (como el color picker).
+    menu.addEventListener('mousedown', function(e) { e.preventDefault(); });
+
+    var v_click_handler = null;
+    var closeMenu = function() {
+      if (self._fontMenu && self._fontMenu.parentNode) self._fontMenu.remove();
+      self._fontMenu = null;
+      if (v_click_handler) { self._remove_doc_click(v_click_handler); v_click_handler = null; }
+      self._hideBackdrop('fontMenu');
+    };
+
+    var addLabel = function(text) {
+      var l = document.createElement('div');
+      l.className = 'mewyse-font-menu-label';
+      l.textContent = text;
+      menu.appendChild(l);
+    };
+    var addItem = function(text, onPick, styleAttr) {
+      var item = document.createElement('div');
+      item.className = 'mewyse-options-menu-item';
+      item.setAttribute('role', 'menuitem');
+      item.textContent = text;
+      if (styleAttr) item.setAttribute('style', styleAttr);
+      item.onclick = function(e) {
+        e.preventDefault(); e.stopPropagation();
+        onPick();
+        closeMenu();
+      };
+      menu.appendChild(item);
+    };
+
+    addLabel(this.t('font.family'));
+    families.forEach(function(f) {
+      addItem(f.label, function() { self._applyFontStyle('fontFamily', f.value, false); },
+        f.value === 'inherit' ? null : 'font-family:' + f.value);
+    });
+    addLabel(this.t('font.size'));
+    var sizeRow = document.createElement('div');
+    sizeRow.className = 'mewyse-font-size-row';
+    sizes.forEach(function(s) {
+      var b = document.createElement('button');
+      b.className = 'mewyse-font-size-btn';
+      b.textContent = parseInt(s, 10);
+      b.onclick = function(e) {
+        e.preventDefault(); e.stopPropagation();
+        self._applyFontStyle('fontSize', s, false);
+        closeMenu();
+      };
+      sizeRow.appendChild(b);
+    });
+    menu.appendChild(sizeRow);
+    addLabel(this.t('font.lineHeight'));
+    lineHeights.forEach(function(lh) {
+      addItem(lh.label, function() { self._applyFontStyle('lineHeight', lh.value, true); });
+    });
+
+    self._applyMenuTheme(menu);
+    document.body.appendChild(menu);
+    this._fontMenu = menu;
+    this.anchorMenu(menu, button, { offsetY: 5 });
+
+    setTimeout(function() {
+      v_click_handler = function(e) {
+        if (!menu.contains(e.target) && !button.contains(e.target)) closeMenu();
+      };
+      self._add_doc_click(v_click_handler);
+    }, 0);
+    this._showBackdrop('fontMenu', closeMenu);
+  };
+
+  /**
+   * Picker de caracteres especiales. Inserta el símbolo como TEXTO (execCommand
+   * insertText) → sin riesgo para el sanitizer. Anclado a un botón de la toolbar.
+   */
+  meWYSE.prototype.showSpecialCharsMenu = function(button) {
+    var self = this;
+    if (this._specialCharsMenu && this._specialCharsMenu.parentNode) {
+      this._specialCharsMenu.remove(); this._specialCharsMenu = null; return;
+    }
+
+    var chars = ['©','®','™','§','¶','†','‡','•','…','«','»','“','”','‘','’',
+                 '–','—','±','×','÷','≈','≠','≤','≥','½','¼','¾','°','µ','€',
+                 '£','¥','¢','←','→','↑','↓','✓','✗','★'];
+
+    var menu = document.createElement('div');
+    menu.className = 'mewyse-special-chars-menu';
+    menu.setAttribute('role', 'menu');
+    // Guardar el range actual para restaurarlo antes de insertar.
+    var v_saved = null;
+    var v_sel0 = window.getSelection();
+    if (v_sel0 && v_sel0.rangeCount) v_saved = v_sel0.getRangeAt(0).cloneRange();
+    menu.addEventListener('mousedown', function(e) { e.preventDefault(); });
+
+    var v_click_handler = null;
+    var closeMenu = function() {
+      if (self._specialCharsMenu && self._specialCharsMenu.parentNode) self._specialCharsMenu.remove();
+      self._specialCharsMenu = null;
+      if (v_click_handler) { self._remove_doc_click(v_click_handler); v_click_handler = null; }
+      self._hideBackdrop('specialCharsMenu');
+    };
+
+    chars.forEach(function(ch) {
+      var b = document.createElement('button');
+      b.className = 'mewyse-special-char';
+      b.textContent = ch;
+      b.title = ch;
+      b.onclick = function(e) {
+        e.preventDefault(); e.stopPropagation();
+        // Restaurar la selección y insertar el carácter como texto plano.
+        if (v_saved) {
+          var sel = window.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(v_saved);
+        }
+        document.execCommand('insertText', false, ch);
+        self._persistActiveBlockContent();
+        closeMenu();
+      };
+      menu.appendChild(b);
+    });
+
+    self._applyMenuTheme(menu);
+    document.body.appendChild(menu);
+    this._specialCharsMenu = menu;
+    this.anchorMenu(menu, button, { offsetY: 5 });
+
+    setTimeout(function() {
+      v_click_handler = function(e) {
+        if (!menu.contains(e.target) && !button.contains(e.target)) closeMenu();
+      };
+      self._add_doc_click(v_click_handler);
+    }, 0);
+    this._showBackdrop('specialCharsMenu', closeMenu);
   };
 
   /**
@@ -15076,7 +15441,7 @@
   var ALLOWED_CSS_PROPS = {
     'color': 1, 'background-color': 1, 'background': 1,
     'font-weight': 1, 'font-style': 1, 'font-size': 1, 'font-family': 1,
-    'text-decoration': 1, 'text-align': 1,
+    'text-decoration': 1, 'text-align': 1, 'line-height': 1,
     'width': 1, 'height': 1, 'min-width': 1, 'min-height': 1,
     'max-width': 1, 'max-height': 1,
     'padding': 1, 'padding-top': 1, 'padding-right': 1,
@@ -15093,7 +15458,7 @@
     'paragraph': 1, 'heading1': 1, 'heading2': 1, 'heading3': 1,
     'quote': 1, 'code': 1, 'bulletList': 1, 'numberList': 1,
     'checklist': 1, 'table': 1, 'image': 1, 'divider': 1,
-    'video': 1, 'audio': 1
+    'video': 1, 'audio': 1, 'pageBreak': 1
   };
 
   /**
@@ -16063,6 +16428,8 @@
         if (cleanTableStyle) clean.tableStyle = cleanTableStyle;
       }
     } else if (type === 'divider') {
+      clean.content = '';
+    } else if (type === 'pageBreak') {
       clean.content = '';
     } else if (type === 'video') {
       // content: { provider, videoId, url, width, height }
@@ -17208,7 +17575,10 @@
    * (spans de color de la toolbar) al hacer getHTML/copy. Todo lo demás (márgenes,
    * font-size, font-family... típica basura de Word) se descarta.
    */
-  var CONTENT_STYLE_PROPS = { 'color': 1, 'background-color': 1 };
+  var CONTENT_STYLE_PROPS = {
+    'color': 1, 'background-color': 1,
+    'font-family': 1, 'font-size': 1, 'line-height': 1
+  };
 
   meWYSE.prototype._isStyleNativeElement = function(el) {
     if (!el || el.nodeType !== 1) return false;
@@ -17410,7 +17780,7 @@
     this.pushHistory(true);
     var v_validClass = (customClass && this._customClassWhitelist &&
                         this._customClassWhitelist[customClass]) ? customClass : null;
-    var v_nonConvertible = { table: 1, image: 1, divider: 1, video: 1, audio: 1 };
+    var v_nonConvertible = { table: 1, image: 1, divider: 1, pageBreak: 1, video: 1, audio: 1 };
 
     for (var i = 0; i < info.ids.length; i++) {
       var v_block = this.getBlock(info.ids[i]);

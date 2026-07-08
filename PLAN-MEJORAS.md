@@ -28,19 +28,24 @@ especiales, merge tags, imprimir/PDF/Word, autosave, TOC como bloque, salto de p
 
 ---
 
-## Sprint 1 — Mejoras limpias de alto ROI (bajo esfuerzo, bajo riesgo)
-- [ ] **1.1 Subíndice / superíndice**: botones en toolbar (`formatTools`, [mewyse.js:2026](mewyse.js:2026))
-  y format menu ([mewyse.js:11994](mewyse.js:11994)) con rama `wrapTag` → `_wrapSelectionInTag('sub'/'sup')`
-  (toggle), envuelto en `_applyInlineAcrossSelection`. Infra ya existe (INLINE_TAGS + conversión MD). Sin cambios de modelo.
-- [ ] **1.2 Autosave / borrador**: opciones `autosave`+`autosaveKey`; debounce en `triggerChange`
-  ([mewyse.js:11552](mewyse.js:11552)) que guarda `getJSON()` en localStorage (try/catch). API
-  `hasDraft()`/`restoreDraft()`/`clearDraft()`. No auto-restaurar.
-- [ ] **1.3 Salto de página**: tipo `pageBreak` (como `divider`). Render `div.mewyse-page-break`;
-  CSS `@media print { break-after: page }`; export como **clase**. Rama trivial en `_sanitizeBlock`.
-- [ ] **1.4 Fuente / tamaño / interlineado + caracteres especiales**: añadir `line-height` a
-  `ALLOWED_CSS_PROPS`; dropdowns → `applyInlineStyle` con **listas cerradas** de valores; familias
-  **sin comillas** (el sanitizer las rechaza); `line-height` mejor vía `customClass` (`.mewyse-lh-*`).
-  Picker de caracteres (patrón emoji) con `execCommand('insertText')`.
+## Sprint 1 — Mejoras limpias de alto ROI (bajo esfuerzo, bajo riesgo) ✅ COMPLETADO
+- [x] **1.1 ✅ Subíndice / superíndice**: botones en toolbar y format menu (rama `wrapTag` →
+  `_wrapSelectionInTag('sub'/'sup')` + `_persistActiveBlockContent`); cross-block vía
+  `applyCrossBlockFormat('subscript'/'superscript')`; atajos `Ctrl+.`/`Ctrl+,`. Iconos + i18n.
+  VERIFICADO: aplica/toggle y round-trip HTML/Markdown conservan `<sub>/<sup>`.
+- [x] **1.2 ✅ Autosave / borrador**: opciones `autosave`+`autosaveKey`; debounce (~800ms) en
+  `triggerChange` → `getJSON()` a localStorage (try/catch); timer cancelado en `destroy()`. API
+  `hasDraft()`/`restoreDraft()` (vía sanitizer)/`clearDraft()`. NO auto-restaura.
+  VERIFICADO: guarda tras el debounce, restaura vía loadFromJSON, no pisa `options.blocks`.
+- [x] **1.3 ✅ Salto de página**: tipo `pageBreak` (VALID_BLOCK_TYPES + createBlockElement +
+  _sanitizeBlock + getHTML/getHTMLSource/getMarkdown + slash menu + i18n + sets no-editable). Render
+  `div.mewyse-page-break` con marcador visual; CSS `@media print { break-after: page }`; export HTML
+  = `<div class="mewyse-page-break">`, MD = `<!-- pagebreak -->`. VERIFICADO: sobrevive al sanitizer en round-trip JSON.
+- [x] **1.4 ✅ Fuente / tamaño / interlineado + caracteres especiales**: `line-height` añadido a
+  `ALLOWED_CSS_PROPS` y `font-family`/`font-size`/`line-height` a `CONTENT_STYLE_PROPS` (sobreviven al
+  export). Opción opt-in `fontControls` → `showFontMenu` (familia sin comillas, tamaños en lista
+  cerrada, interlineado a todo el bloque) vía `_applyFontStyle`. Picker `showSpecialCharsMenu` inserta
+  símbolos con `execCommand('insertText')`. VERIFICADO: los 3 estilos persisten y se exportan; el picker inserta.
 
 ## Sprint 2 — UX moderna y documentos (medio, riesgo bajo-medio)
 - [ ] **2.1 Autoformato Markdown en vivo (reglas de BLOQUE)**: en `handleKeyDown`

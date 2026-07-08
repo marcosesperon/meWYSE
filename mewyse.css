@@ -466,6 +466,35 @@
   margin: 0 0 0.5em 0;
   padding: 0;
 }
+/* Salto de página: marcador visible solo en el editor (una línea discontinua con
+   una etiqueta). Al imprimir/exportar fuerza el corte de página y se oculta. */
+.mewyse-page-break {
+  margin: 0.75em 0;
+  border-top: 2px dashed var(--mewyse-border-medium);
+  text-align: center;
+  user-select: none;
+  position: relative;
+}
+.mewyse-page-break-label {
+  display: inline-block;
+  transform: translateY(-50%);
+  padding: 0 8px;
+  background: var(--mewyse-bg-primary);
+  color: var(--mewyse-text-muted);
+  font-size: 0.7em;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+@media print {
+  .mewyse-page-break {
+    border-top: 0;
+    break-after: page;
+    page-break-after: always;
+    margin: 0;
+    height: 0;
+  }
+  .mewyse-page-break-label { display: none; }
+}
 .mewyse-editor-styled .mewyse-block-selected {
   background-color: rgba(59, 130, 246, 0.1);
   border-radius: 4px;
@@ -991,6 +1020,72 @@
 .mewyse-options-menu-item .icon svg {
   width: 16px;
   height: 16px;
+}
+
+/* Menú de fuente (familia/tamaño/interlineado) */
+.mewyse-font-menu {
+  min-width: 180px;
+}
+.mewyse-font-menu-label {
+  padding: 6px 12px 2px;
+  font-size: 0.7em;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--mewyse-text-muted);
+}
+.mewyse-font-size-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px 12px 8px;
+}
+.mewyse-font-size-btn {
+  min-width: 34px;
+  padding: 4px 6px;
+  border: 1px solid var(--mewyse-border-light);
+  border-radius: var(--mewyse-radius-md);
+  background: var(--mewyse-bg-primary);
+  color: var(--mewyse-text-primary);
+  cursor: pointer;
+  font-size: 0.85em;
+}
+.mewyse-font-size-btn:hover {
+  background: var(--mewyse-bg-hover);
+  border-color: var(--mewyse-text-muted);
+}
+
+/* Picker de caracteres especiales */
+.mewyse-special-chars-menu {
+  position: fixed;
+  z-index: 1002;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 2px;
+  padding: 8px;
+  max-width: 280px;
+  background: var(--mewyse-bg-primary);
+  border: 1px solid var(--mewyse-border-light);
+  border-radius: var(--mewyse-radius-lg);
+  box-shadow: var(--mewyse-shadow-md);
+  animation: fadeIn 0.2s ease;
+}
+.mewyse-special-char {
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: var(--mewyse-radius-md);
+  background: transparent;
+  color: var(--mewyse-text-primary);
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1;
+}
+.mewyse-special-char:hover {
+  background: var(--mewyse-bg-hover);
+}
+.mewyse-special-char:focus-visible {
+  outline: 2px solid var(--mewyse-accent);
+  outline-offset: 1px;
 }
 
 /* Menú de tipo de bloque */
@@ -2252,7 +2347,8 @@
 .mewyse-modal-overlay.mewyse-dark,
 .mewyse-modal-container.mewyse-dark,
 .mewyse-summary-modal.mewyse-dark,
-.mewyse-find-replace.mewyse-dark {
+.mewyse-find-replace.mewyse-dark,
+.mewyse-special-chars-menu.mewyse-dark {
   /* Paleta neutra (negro/gris) — coherente con el editor en dark */
   --mewyse-text-primary: #e6e6e6;
   --mewyse-text-secondary: #a0a0a0;
