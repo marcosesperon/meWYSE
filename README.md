@@ -15,7 +15,7 @@ Si este proyecto te resulta util, puedes apoyar su desarrollo:
 
 - **Funciona con cualquier elemento**: `textarea`, `div`, `span`, o cualquier otro elemento HTML
 - **Sistema de bloques**: Cada línea es un bloque independiente que puede ser de diferentes tipos
-- **14 tipos de bloques**: Párrafo, H1, H2, H3, Cita, Código, Lista con viñetas, Lista numerada, Checklist, Tabla, Imagen, Separador, **Vídeo** (YouTube/Vimeo/archivo), **Audio**
+- **18 tipos de bloques**: Párrafo, H1, H2, H3, Cita, Código, Lista con viñetas, Lista numerada, Checklist, Tabla, Imagen, Separador, **Vídeo** (YouTube/Vimeo/archivo), **Audio**, Salto de página, Aviso (callout), **Desplegable** (toggle), **Índice** (TOC)
 - **Tablas avanzadas**: Selección de celdas, merge/unmerge, añadir/eliminar filas y columnas, redimensionar columnas, color de fondo, modal de propiedades (ancho/alto, borde, padding, spacing, alineación)
 - **Imágenes**: Inserción desde archivo, drag & drop, paste desde clipboard, redimensionado con drag, edición de dimensiones, validación de tamaño (`imageMaxSize`), hook custom de upload (`onImageUpload`)
 - **Formato de texto enriquecido**: Menú flotante con negrita, cursiva, subrayado, tachado, enlaces, colores, alineación y **limpiar formato** (removeFormat)
@@ -25,6 +25,9 @@ Si este proyecto te resulta util, puedes apoyar su desarrollo:
 - **Imágenes con estilos avanzados**: Modal con border, margin y alineación (left/center/right)
 - **Vídeo embed**: YouTube/Vimeo (auto-detección por URL) + archivos locales .mp4/.webm vía `<video>` nativo
 - **Audio embed**: archivos .mp3/.ogg/.wav vía `<audio>` nativo
+- **Resaltado de sintaxis**: coloreado de código por lenguaje con dependencia opcional lazy (`codeHighlight`); el modelo se mantiene en texto plano y hay fallback sin librería
+- **Bloques desplegables (toggle)**: título + cuerpo plegable (`/desplegable`), exporta a `<details>`
+- **Índice de contenidos (TOC)**: `/indice` genera un índice navegable de los títulos que se actualiza solo
 - **Migración desde TinyMCE/CKEditor**: método `loadFromHTML()` que importa HTML legacy y convierte iframes/tablas/imágenes a bloques nativos
 - **Sistema de menciones (@)**: Escribe `@` para mencionar usuarios con autocompletado y avatares
 - **Emoji picker**: Escribe `:` para insertar emojis con autocompletado
@@ -356,6 +359,71 @@ Para bloques de imagen, `content` es un objeto:
   }
 }
 ```
+
+## Resaltado de sintaxis en código
+
+Los bloques de código pueden colorearse por lenguaje mediante una dependencia **opcional y
+perezosa** (highlight.js). El núcleo sigue sin dependencias: la librería solo se carga si activas
+la opción, y si no carga (o no se activa) el bloque cae a texto plano escapado sin romperse.
+
+```javascript
+var editor = new meWYSE({
+  target: '#editor',
+  codeHighlight: true,   // activa el resaltado
+  // La librería se descarga una sola vez, solo si codeHighlight es true
+  codeHighlightUrl: 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js'
+});
+```
+
+- El **modelo se mantiene siempre en texto plano**: al editar se persiste el texto (no el HTML del
+  resaltado), así los `<span>` de los tokens nunca entran al contenido ni al sanitizador.
+- Cada bloque de código muestra un **selector de lenguaje** en la esquina (SQL, JavaScript,
+  Python, Java, JSON, HTML, CSS…). Sin lenguaje seleccionado se auto-detecta.
+- El resaltado se aplica al renderizar y se **re-pinta al perder el foco** (sin saltos de caret).
+- No necesita la hoja de estilos externa de la librería: los colores de los tokens se mapean a
+  las **variables del tema** de meWYSE (claro/oscuro).
+- Export: `<pre><code class="language-xxx">` en HTML y ` ```lenguaje ` en Markdown.
+
+```javascript
+// El lenguaje se guarda en block.language
+{ id: 3, type: 'code', language: 'sql', content: 'SELECT id FROM clientes' }
+```
+
+## Bloques desplegables (toggle)
+
+Bloque plegable con **título** y **cuerpo**, ideal para FAQs o secciones opcionales. El cuerpo es
+texto enriquecido inline/multilínea (no admite sub-bloques como tablas o imágenes).
+
+```javascript
+{
+  id: 4,
+  type: 'toggle',
+  toggleTitle: 'Ver detalles',   // título (HTML inline)
+  content: 'Cuerpo del <strong>desplegable</strong>.', // cuerpo (HTML inline)
+  collapsed: false               // true = plegado por defecto
+}
+```
+
+- Pulsa el **triángulo** para plegar/desplegar (o `/desplegable` para crear uno).
+- En el título, `Enter` salta al cuerpo (expandiéndolo si estaba plegado); en el cuerpo, `Enter`
+  inserta un salto de línea **dentro** del bloque (no lo parte).
+- Export: `<details><summary>título</summary>cuerpo</details>` (con `open` si no está plegado);
+  Markdown lo degrada a `**título**` + cuerpo.
+
+## Índice de contenidos (TOC)
+
+Bloque `toc` que genera un **índice navegable de los títulos** del documento. El contenido es
+derivado (no se almacena) y se **actualiza solo** a medida que editas los títulos.
+
+```javascript
+{ id: 1, type: 'toc', content: '' }   // o crea uno con /indice
+```
+
+- Cada entrada enlaza a su título (clic → scroll + foco), con indentación por nivel (h1/h2/h3).
+- Si aún no hay títulos, muestra un texto de "sin títulos".
+- Export: cuando existe un TOC, los títulos se emiten con un id de ancla
+  (`id="mewyse-h-{id}"`) y el índice como `<nav class="mewyse-toc">` con enlaces; Markdown lo
+  degrada a una lista anidada `- [texto](#ancla)`.
 
 ## Atajos de Teclado
 
