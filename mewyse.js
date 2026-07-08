@@ -27,6 +27,7 @@
         divider: 'Separador',
         pageBreak: 'Salto de página',
         callout: 'Aviso',
+        toggle: 'Desplegable',
         video: 'Vídeo',
         audio: 'Audio'
       },
@@ -36,6 +37,9 @@
         warning: 'Advertencia',
         success: 'Éxito',
         danger: 'Peligro'
+      },
+      toggle: {
+        toggle: 'Expandir/contraer'
       },
       blockTypeDescriptions: {
         paragraph: 'Texto normal',
@@ -52,6 +56,7 @@
         divider: 'Línea divisoria',
         pageBreak: 'Corte de página al imprimir/exportar',
         callout: 'Bloque destacado (info, aviso...)',
+        toggle: 'Contenido plegable (título + cuerpo)',
         video: 'YouTube, Vimeo o archivo .mp4',
         audio: 'Archivo de audio (mp3, ogg...)'
       },
@@ -193,6 +198,8 @@
         heading3: 'Encabezado 3',
         listItem: 'Elemento de lista',
         task: 'Tarea...',
+        toggleTitle: 'Título del desplegable',
+        toggleBody: 'Contenido del desplegable...',
         slashCommand: 'Escribe "/" para ver los comandos...'
       },
       alerts: {
@@ -281,6 +288,7 @@
         divider: 'Divider',
         pageBreak: 'Page break',
         callout: 'Callout',
+        toggle: 'Toggle',
         video: 'Video',
         audio: 'Audio'
       },
@@ -290,6 +298,9 @@
         warning: 'Warning',
         success: 'Success',
         danger: 'Danger'
+      },
+      toggle: {
+        toggle: 'Expand/collapse'
       },
       blockTypeDescriptions: {
         paragraph: 'Normal text',
@@ -306,6 +317,7 @@
         divider: 'Dividing line',
         pageBreak: 'Page break for print/export',
         callout: 'Highlighted block (info, warning...)',
+        toggle: 'Collapsible content (title + body)',
         video: 'YouTube, Vimeo or .mp4 file',
         audio: 'Audio file (mp3, ogg...)'
       },
@@ -447,6 +459,8 @@
         heading3: 'Heading 3',
         listItem: 'List item',
         task: 'Task...',
+        toggleTitle: 'Toggle title',
+        toggleBody: 'Toggle content...',
         slashCommand: 'Type "/" for commands...'
       },
       alerts: {
@@ -762,6 +776,8 @@
     divider: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" xmlns="http://www.w3.org/2000/svg"><line x1="2" y1="8" x2="14" y2="8"/></svg>',
     pageBreak: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M4 2h5l3 3v3"/><path d="M9 2v3h3"/><path d="M4 8v6h8"/><line x1="1.5" y1="11" x2="14.5" y2="11" stroke-dasharray="2 1.5"/></svg>',
     callout: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="6.5"/><line x1="8" y1="7" x2="8" y2="11.5"/><circle cx="8" cy="4.7" r="0.6" fill="currentColor"/></svg>',
+    toggle: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><polyline points="5.5,4 9.5,8 5.5,12"/><line x1="11" y1="4" x2="14" y2="4"/><line x1="11" y1="8" x2="14" y2="8"/><line x1="11" y1="12" x2="14" y2="12"/></svg>',
+    toggleCaret: '<svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><polygon points="4,2.5 9,6 4,9.5"/></svg>',
     print: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M4 6V2h8v4"/><rect x="2.5" y="6" width="11" height="5" rx="1"/><path d="M4 10h8v4H4z"/><circle cx="11.5" cy="8" r="0.6" fill="currentColor"/></svg>',
     exportWord: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M9 1.5H4a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V5.5z"/><path d="M9 1.5V5.5h4"/><path d="M5.5 8l1 3 1-2.2 1 2.2 1-3"/></svg>',
     mergeTag: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M6 2.5C4.5 2.5 4 3.5 4 5v1.5c0 1-.5 1.5-1.5 1.5C3.5 8 4 8.5 4 9.5V11c0 1.5.5 2.5 2 2.5"/><path d="M10 2.5c1.5 0 2 1 2 2.5v1.5c0 1 .5 1.5 1.5 1.5-1 0-1.5.5-1.5 1.5V11c0 1.5-.5 2.5-2 2.5"/></svg>',
@@ -5224,6 +5240,57 @@
         this.attachBlockEvents(v_coContent, block.id);
         break;
 
+      case 'toggle':
+        // Desplegable ligero: cabecera con triángulo (no editable) + título
+        // editable, y cuerpo editable (inline/multilínea, sin sub-bloques). El
+        // colapso lo controla la clase mewyse-toggle-collapsed. En vez de
+        // <details> nativo (cuyo click de summary pelea con la edición) usamos un
+        // div con caret propio; el export sí emite <details>/<summary>.
+        var v_tg_collapsed = block.collapsed === true;
+        element = document.createElement('div');
+        element.className = 'mewyse-toggle' + (v_tg_collapsed ? ' mewyse-toggle-collapsed' : '');
+
+        var v_tg_head = document.createElement('div');
+        v_tg_head.className = 'mewyse-toggle-head';
+
+        var v_tg_caret = document.createElement('button');
+        v_tg_caret.className = 'mewyse-toggle-caret';
+        v_tg_caret.setAttribute('contenteditable', 'false');
+        v_tg_caret.setAttribute('type', 'button');
+        v_tg_caret.setAttribute('aria-label', self.t('toggle.toggle'));
+        v_tg_caret.innerHTML = WYSIWYG_ICONS.toggleCaret;
+        v_tg_caret.onclick = function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          self.toggleCollapse(block.id);
+        };
+
+        var v_tg_title = document.createElement('div');
+        v_tg_title.className = 'mewyse-toggle-title';
+        v_tg_title.contentEditable = true;
+        v_tg_title.setAttribute('data-mewyse-field', 'toggleTitle');
+        v_tg_title.innerHTML = block.toggleTitle || '';
+        v_tg_title.setAttribute('data-placeholder', self.t('placeholders.toggleTitle'));
+
+        v_tg_head.appendChild(v_tg_caret);
+        v_tg_head.appendChild(v_tg_title);
+
+        var v_tg_body = document.createElement('div');
+        v_tg_body.className = 'mewyse-toggle-body';
+        v_tg_body.contentEditable = true;
+        v_tg_body.innerHTML = block.content || '';
+        v_tg_body.setAttribute('data-placeholder', self.t('placeholders.toggleBody'));
+
+        element.appendChild(v_tg_head);
+        element.appendChild(v_tg_body);
+
+        // Editables dedicados (no attachBlockEvents): el cuerpo es texto rico
+        // "contenido" (Enter = salto nativo dentro del div, sin partir en bloques);
+        // el título persiste en toggleTitle y salta al cuerpo con Enter.
+        this._attachToggleEditable(v_tg_title, block.id, true);
+        this._attachToggleEditable(v_tg_body, block.id, false);
+        break;
+
       default: // paragraph
         element = document.createElement('p');
         element.contentEditable = true;
@@ -5647,6 +5714,102 @@
     element.addEventListener('mousedown', function(e) {
       self.handleBlockClick(e, blockId);
     });
+  };
+
+  /**
+   * Engancha los listeners de un editable del bloque toggle (título o cuerpo).
+   * No usa attachBlockEvents porque el toggle NO parte en bloques con Enter: el
+   * cuerpo se comporta como texto rico contenido (Enter = salto nativo dentro del
+   * div) y el título salta al cuerpo con Enter. El formato inline sigue disponible
+   * vía la barra flotante de selección y los atajos Ctrl+B/I/U.
+   * @param {HTMLElement} v_editable
+   * @param {number} v_block_id
+   * @param {boolean} v_is_title - true = campo título; false = cuerpo (content)
+   */
+  meWYSE.prototype._attachToggleEditable = function(v_editable, v_block_id, v_is_title) {
+    if (this.readOnly) return;
+    var self = this;
+
+    // input: persistir al campo correspondiente del modelo
+    v_editable.addEventListener('input', function() {
+      if (v_is_title) {
+        self.updateBlockField(v_block_id, 'toggleTitle', v_editable.innerHTML);
+      } else {
+        self.updateBlockContent(v_block_id, v_editable.innerHTML);
+      }
+    });
+
+    // keydown: atajos de formato + navegación título→cuerpo con Enter
+    v_editable.addEventListener('keydown', function(e) {
+      var v_mod = e.ctrlKey || e.metaKey;
+      if (v_mod && !e.shiftKey && !e.altKey) {
+        var v_key = e.key ? e.key.toLowerCase() : '';
+        if (v_key === 'b' || v_key === 'i' || v_key === 'u') {
+          e.preventDefault();
+          document.execCommand(v_key === 'b' ? 'bold' : (v_key === 'i' ? 'italic' : 'underline'));
+          self._persistActiveBlockContent();
+          return;
+        }
+      }
+      // En el título, Enter (sin shift) salta al cuerpo en vez de insertar salto.
+      // Si el toggle está colapsado, se expande primero (el cuerpo oculto no puede
+      // recibir foco).
+      if (v_is_title && e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        var v_block = self.getBlock(v_block_id);
+        if (v_block && v_block.collapsed) self.toggleCollapse(v_block_id);
+        var v_block_el = self.getBlockElementById(v_block_id);
+        var v_body = v_block_el ? v_block_el.querySelector('.mewyse-toggle-body') : null;
+        if (v_body) v_body.focus();
+      }
+      // En el cuerpo, Enter usa el comportamiento nativo del contenteditable
+      // (salto DENTRO del div), por eso NO se intercepta aquí.
+    });
+
+    // paste: insertar como texto plano (evita meter HTML externo sin sanear)
+    v_editable.addEventListener('paste', function(e) {
+      e.preventDefault();
+      var v_cd = e.clipboardData || window.clipboardData;
+      var v_text = '';
+      try { v_text = v_cd ? v_cd.getData('text/plain') : ''; } catch (err) {}
+      if (v_text) document.execCommand('insertText', false, v_text);
+    });
+
+    // mousedown: mantener la coherencia de selección múltiple entre bloques
+    v_editable.addEventListener('mousedown', function(e) {
+      self.handleBlockClick(e, v_block_id);
+    });
+  };
+
+  /**
+   * Actualiza una propiedad arbitraria de un bloque y notifica el cambio.
+   * Usado por el toggle para persistir el título (toggleTitle) sin tocar content.
+   * @param {number} blockId
+   * @param {string} field
+   * @param {*} value
+   */
+  meWYSE.prototype.updateBlockField = function(blockId, field, value) {
+    var block = this.getBlock(blockId);
+    if (!block) return;
+    block[field] = value;
+    this.triggerChange();
+  };
+
+  /**
+   * Colapsa/expande un bloque toggle. Solo alterna la clase (sin re-render) para
+   * no perder el foco/caret del usuario.
+   * @param {number} blockId
+   */
+  meWYSE.prototype.toggleCollapse = function(blockId) {
+    var block = this.getBlock(blockId);
+    if (!block || block.type !== 'toggle') return;
+    block.collapsed = !block.collapsed;
+    var v_el = this.getBlockElementById(blockId);
+    if (v_el) {
+      if (block.collapsed) v_el.classList.add('mewyse-toggle-collapsed');
+      else v_el.classList.remove('mewyse-toggle-collapsed');
+    }
+    this.triggerChange();
   };
 
   /**
@@ -8258,7 +8421,8 @@
       { type: 'audio', icon: WYSIWYG_ICONS.audio },
       { type: 'divider', icon: WYSIWYG_ICONS.divider },
       { type: 'pageBreak', icon: WYSIWYG_ICONS.pageBreak },
-      { type: 'callout', icon: WYSIWYG_ICONS.callout }
+      { type: 'callout', icon: WYSIWYG_ICONS.callout },
+      { type: 'toggle', icon: WYSIWYG_ICONS.toggle }
     ];
 
     this.slashMenuTypes = types;
@@ -10469,7 +10633,8 @@
       'image': WYSIWYG_ICONS.image,
       'divider': WYSIWYG_ICONS.divider,
       'pageBreak': WYSIWYG_ICONS.pageBreak,
-      'callout': WYSIWYG_ICONS.callout
+      'callout': WYSIWYG_ICONS.callout,
+      'toggle': WYSIWYG_ICONS.toggle
     };
     return icons[type] || WYSIWYG_ICONS.paragraph;
   };
@@ -10841,6 +11006,8 @@
       if (typeof block.indentLevel === 'number') duplicatedBlock.indentLevel = block.indentLevel;
       if (typeof block.customClass === 'string') duplicatedBlock.customClass = block.customClass;
       if (typeof block.language === 'string') duplicatedBlock.language = block.language;
+      if (typeof block.toggleTitle === 'string') duplicatedBlock.toggleTitle = block.toggleTitle;
+      if (block.collapsed === true) duplicatedBlock.collapsed = true;
 
       this.blocks.splice(index + 1, 0, duplicatedBlock);
       this.render();
@@ -10964,6 +11131,20 @@
       var v_table = v_element.closest('table');
       if (v_table) this.updateBlockContent(v_block_id, v_table.innerHTML);
       return true;
+    }
+
+    // Un toggle tiene DOS editables (título y cuerpo); persistir el que contiene
+    // la selección, no el primero, para no volcar el título sobre el cuerpo.
+    if (v_block.type === 'toggle') {
+      var v_tg_edit = v_element.closest('[contenteditable="true"]');
+      if (v_tg_edit) {
+        if (v_tg_edit.getAttribute('data-mewyse-field') === 'toggleTitle') {
+          this.updateBlockField(v_block_id, 'toggleTitle', v_tg_edit.innerHTML);
+        } else {
+          this.updateBlockContent(v_block_id, v_tg_edit.innerHTML);
+        }
+        return true;
+      }
     }
 
     var v_editable = this.getEditableElement(v_block_element);
@@ -11459,6 +11640,11 @@
             html += '<div class="mewyse-callout mewyse-callout-' +
                     (block.calloutVariant || 'info') + '">' + inline(content) + '</div>';
             break;
+          case 'toggle':
+            // Export portable con <details>/<summary>; open si NO está colapsado.
+            html += '<details' + (block.collapsed ? '' : ' open') + '><summary>' +
+                    inline(block.toggleTitle || '') + '</summary>' + inline(content) + '</details>';
+            break;
           default:
             html += '<p' + classAttr(block) + '>' + inline(content) + '</p>';
         }
@@ -11594,6 +11780,10 @@
           case 'callout':
             html += '<div class="mewyse-callout mewyse-callout-' +
                     (block.calloutVariant || 'info') + '">' + content + '</div>';
+            break;
+          case 'toggle':
+            html += '<details' + (block.collapsed ? '' : ' open') + '><summary>' +
+                    inline_source(block.toggleTitle || '') + '</summary>' + content + '</details>';
             break;
           default:
             html += '<p' + classAttr(block) + '>' + content + '</p>';
@@ -11772,6 +11962,12 @@
             var v_coMap = { info: 'NOTE', success: 'TIP', warning: 'WARNING', danger: 'CAUTION' };
             var v_coTag = v_coMap[block.calloutVariant] || 'NOTE';
             lines.push('> [!' + v_coTag + ']\n> ' + self.htmlToMarkdownInline(content));
+            break;
+          case 'toggle':
+            // Markdown no tiene desplegable nativo: degradar a título en negrita
+            // seguido del cuerpo como texto.
+            lines.push('**' + self.htmlToMarkdownInline(block.toggleTitle || '') + '**');
+            lines.push(self.htmlToMarkdownInline(content));
             break;
           case 'table':
             // Parsear HTML de tabla
@@ -16076,7 +16272,8 @@
     'paragraph': 1, 'heading1': 1, 'heading2': 1, 'heading3': 1,
     'quote': 1, 'code': 1, 'bulletList': 1, 'numberList': 1,
     'checklist': 1, 'table': 1, 'image': 1, 'divider': 1,
-    'video': 1, 'audio': 1, 'pageBreak': 1, 'callout': 1
+    'video': 1, 'audio': 1, 'pageBreak': 1, 'callout': 1,
+    'toggle': 1
   };
 
   // Variantes válidas del bloque callout (validadas en el sanitizer).
@@ -17090,6 +17287,15 @@
       clean.content = this._sanitizeBlockContent(
         typeof block.content === 'string' ? block.content : ''
       );
+    } else if (type === 'toggle') {
+      // Cuerpo (content) y título (toggleTitle) son HTML inline saneado; el
+      // estado colapsado se preserva más abajo como booleano.
+      clean.content = this._sanitizeBlockContent(
+        typeof block.content === 'string' ? block.content : ''
+      );
+      clean.toggleTitle = this._sanitizeBlockContent(
+        typeof block.toggleTitle === 'string' ? block.toggleTitle : ''
+      );
     } else if (type === 'video') {
       // content: { provider, videoId, url, width, height }
       var vc = block.content;
@@ -17139,6 +17345,9 @@
     if (type === 'callout') {
       // Variante validada contra el set cerrado (default info).
       clean.calloutVariant = CALLOUT_VARIANTS[block.calloutVariant] ? block.calloutVariant : 'info';
+    }
+    if (type === 'toggle' && block.collapsed === true) {
+      clean.collapsed = true;
     }
     if (typeof block.alignment === 'string') {
       var align = block.alignment.toLowerCase();

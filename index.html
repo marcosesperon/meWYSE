@@ -1010,10 +1010,11 @@ editor.loadFromMarkdown(editor.getMarkdown());</code></pre>
     <!-- Demo: Novedades Sprint 4 -->
     <div class="demo-section">
       <h2>Novedades (Sprint 4)</h2>
-      <p>Resaltado de sintaxis en los bloques de c&oacute;digo mediante una dependencia <strong>opcional y perezosa</strong> (highlight.js). El modelo se mantiene siempre en texto plano.</p>
+      <p>Resaltado de sintaxis en c&oacute;digo (dependencia <strong>opcional y perezosa</strong>, highlight.js) y bloques <strong>desplegables</strong> (toggle) con t&iacute;tulo y cuerpo plegables.</p>
       <div class="config-hint">
-        Elige el lenguaje con el selector de la esquina del bloque de c&oacute;digo. Si la
-        librer&iacute;a no carga, el bloque cae a texto plano sin romperse.
+        C&oacute;digo: elige el lenguaje con el selector de la esquina (si la librer&iacute;a no carga,
+        cae a texto plano). Desplegable: pulsa el tri&aacute;ngulo para plegar/desplegar; escribe
+        <code>/desplegable</code> para crear uno.
       </div>
       <pre class="docs-code"><code>var editor = new meWYSE({
   target: '#sprint4Editor',
@@ -1745,7 +1746,9 @@ editor.loadFromMarkdown(editor.getMarkdown());</code></pre>
           { id: 2, type: 'paragraph', content: 'Consulta SQL de ejemplo:' },
           { id: 3, type: 'code', language: 'sql', content: "SELECT id, nombre\nFROM clientes\nWHERE activo = 1 AND fecha_alta > TO_DATE('01-01-2024','DD-MM-YYYY')" },
           { id: 4, type: 'paragraph', content: 'Y una funcion JavaScript:' },
-          { id: 5, type: 'code', language: 'javascript', content: 'function suma(a, b) {\n  return a + b; // 1 < 2\n}' }
+          { id: 5, type: 'code', language: 'javascript', content: 'function suma(a, b) {\n  return a + b; // 1 < 2\n}' },
+          { id: 6, type: 'toggle', toggleTitle: 'Ver detalles (desplegable)', content: 'Este es el cuerpo del desplegable. Admite <strong>formato</strong> y varias lineas.', collapsed: false },
+          { id: 7, type: 'toggle', toggleTitle: 'Seccion colapsada por defecto', content: 'Contenido oculto hasta que se expande.', collapsed: true }
         ]
       });
     }

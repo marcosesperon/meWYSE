@@ -557,6 +557,66 @@
   background: var(--mewyse-cc, #3b82f6);
 }
 
+/* ============================================================================
+   TOGGLE / DESPLEGABLE (bloque `toggle`). Cabecera con triángulo (rota al abrir)
+   + título editable; cuerpo editable indentado que se oculta al colapsar.
+   ============================================================================ */
+.mewyse-toggle {
+  margin: 0 0 0.5em 0;
+}
+.mewyse-toggle-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+.mewyse-toggle-caret {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--mewyse-text-secondary);
+  transform: rotate(90deg); /* expandido: apunta hacia abajo */
+  transition: transform 0.15s ease;
+}
+.mewyse-toggle-collapsed .mewyse-toggle-caret {
+  transform: rotate(0deg); /* colapsado: apunta a la derecha */
+}
+.mewyse-toggle-caret:focus-visible {
+  outline: 2px solid var(--mewyse-accent);
+  outline-offset: 1px;
+  border-radius: var(--mewyse-radius-sm, 4px);
+}
+.mewyse-toggle-title {
+  flex: 1;
+  min-width: 0;
+  outline: none;
+  font-weight: 600;
+  color: var(--mewyse-text-primary);
+}
+.mewyse-toggle-body {
+  outline: none;
+  margin-left: 26px; /* alinea con el título (ancho del caret + gap) */
+  color: var(--mewyse-text-primary);
+}
+.mewyse-toggle-collapsed .mewyse-toggle-body {
+  display: none;
+}
+/* Placeholders del toggle: sus editables NO son .mewyse-block, así que se
+   gestionan aparte (solo al enfocar y estar vacíos). */
+.mewyse-toggle-title:empty:focus:before,
+.mewyse-toggle-body:empty:focus:before {
+  content: attr(data-placeholder);
+  color: var(--mewyse-text-light);
+  pointer-events: none;
+}
+
 .mewyse-editor-styled .mewyse-block-selected {
   background-color: rgba(59, 130, 246, 0.1);
   border-radius: 4px;
