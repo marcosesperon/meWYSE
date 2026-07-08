@@ -77,14 +77,25 @@ especiales, merge tags, imprimir/PDF/Word, autosave, TOC como bloque, salto de p
   `exportTools`. `exportPdf(name)`: si hay `pdfLib` → carga lazy y genera desde `getSafeHTML()`; si no
   hay lib o falla → fallback a `print()`. VERIFICADO: fallback a print sin lib, botón presente, script inyectado.
 
-## Sprint 4 — Mayor riesgo (medio, riesgo medio-alto)
-- [ ] **4.1 Syntax highlight en código** (dep opcional lazy): opción `codeHighlight`+`codeHighlightUrl`;
-  añadir `language` (set cerrado) al bloque code. **Modelo siempre texto plano**: para `type==='code'`
-  leer `textContent` (no `innerHTML`), re-pintar highlight en `keyup` con debounce (los `span.token`
-  nunca entran al modelo). Export `escapeHtml`+`class="language-xxx"`; MD ` ```lang `. Fallback intacto.
-- [ ] **4.2 Toggle / desplegable ligero**: tipo `toggle` (`toggleTitle`+`content`+`collapsed`), render
-  `<details>/<summary>`. Cuerpo inline/multilínea (no sub-bloques). Toggle multi-bloque = fuera de alcance.
-- [ ] **4.3 (opcional) Tabla de contenidos como bloque**: reusar `getHeadingsIndex`; bloque TOC navegable.
+## Sprint 4 — Mayor riesgo (medio, riesgo medio-alto) ✅ COMPLETADO
+- [x] **4.1 ✅ Syntax highlight en código** (dep opcional lazy): opciones `codeHighlight`+`codeHighlightUrl`
+  (highlight.js). Bloque code con `language` (set cerrado `CODE_LANGUAGES` + selector por bloque). **Modelo
+  siempre texto plano**: el input lee `textContent` (marcador `data-mewyse-code`), resalta al render y
+  re-pinta al blur (`_highlightCode`/`_rehighlightCodeElement`); `_initCodeHighlight` carga la lib lazy.
+  Export `class="language-xxx"` (HTML) y ` ```lang ` (MD); fallback a texto escapado. Tokens `.hljs-*`
+  mapeados a variables de tema (self-contained). VERIFICADO: modelo plano tras editar, round-trip preserva
+  language válido y descarta inválido, blur re-resalta, fallback sin lib. (commit `4419ba5`)
+- [x] **4.2 ✅ Toggle / desplegable ligero**: tipo `toggle` (`content`+`toggleTitle`+`collapsed`). Render
+  div propio con caret (no `<details>` nativo, que peleaba con la edición); editables dedicados
+  (`_attachToggleEditable`) donde Enter no parte en bloques (cuerpo = salto nativo; título salta al cuerpo).
+  `updateBlockField`/`toggleCollapse` sin re-render; `_persistActiveBlockContent` enruta al editable con la
+  selección. Export a `<details>/<summary>`; MD degrada a `**título**` + cuerpo. VERIFICADO: colapso, edición
+  por campo, round-trip sanea XSS, Enter contenido. (commit `c0130a7`)
+- [x] **4.3 ✅ Tabla de contenidos como bloque**: tipo `toc` (content derivado, no editable). Render nav con
+  enlaces por nivel (`_buildTocElement`/`_fillTocContent`, reusa `getHeadingsIndex`), clic → `navigateToHeading`;
+  refresco en vivo desde `triggerChange` (`_refreshTocBlocks`). Export: títulos con id de ancla + `<nav>` con
+  enlaces (`_buildTocHTML`); MD lista anidada `[texto](#slug)` (`_slugify`). VERIFICADO: refresco en vivo,
+  navegación, round-trip content vacío, ids solo si hay TOC. (commit `88e266a`)
 
 ## No-objetivos (justificados)
 - [ ] **Columnas / layout multi-columna**: choca con el array de bloques plano; desaconsejado sin
