@@ -89,6 +89,7 @@
         showBlocks: 'Mostrar bloques',
         wordWrap: 'Ajuste de texto',
         removeFormat: 'Limpiar formato',
+        codeLanguage: 'Lenguaje del código',
         insertVideo: 'Insertar vídeo',
         insertAudio: 'Insertar audio',
         caseUpper: 'MAYÚSCULAS',
@@ -342,6 +343,7 @@
         showBlocks: 'Show blocks',
         wordWrap: 'Word wrap',
         removeFormat: 'Clear formatting',
+        codeLanguage: 'Code language',
         insertVideo: 'Insert video',
         insertAudio: 'Insert audio',
         caseUpper: 'UPPERCASE',
@@ -870,6 +872,15 @@
     // fidelidad. Si no se define, exportPdf() cae a print() ("Guardar como PDF").
     this.pdfLib = (typeof this.options.pdfLib === 'string') ? this.options.pdfLib : '';
 
+    // codeHighlight: resaltado de sintaxis en los bloques de código. Opt-in
+    // (default false). El modelo se mantiene SIEMPRE en texto plano (el input lee
+    // textContent); el coloreado solo afecta al DOM y se re-pinta al perder el foco.
+    // codeHighlightUrl: URL (lazy) de highlight.js. Si no se define o falla la
+    // carga, el bloque cae a texto plano escapado (fallback intacto).
+    this.codeHighlight = this.options.codeHighlight === true;
+    this.codeHighlightUrl = (typeof this.options.codeHighlightUrl === 'string')
+      ? this.options.codeHighlightUrl : '';
+
     // Autosave: si está activo, guarda el contenido (JSON) en localStorage con
     // debounce en cada cambio. NO auto-restaura (el consumidor decide vía
     // hasDraft()/restoreDraft()) para no pisar options.blocks.
@@ -1268,6 +1279,10 @@
     } else {
       this.render();
     }
+
+    // Cargar (lazy) la librería de resaltado de sintaxis si la feature está activa.
+    // Tras cargar re-pinta los bloques de código ya renderizados.
+    this._initCodeHighlight();
 
     // Crear botón de resumen flotante solo si está habilitado y NO hay toolbar
     // (con toolbar se usa this.toolbarSummaryButton en su lugar).
@@ -5046,11 +5061,58 @@
 
       case 'code':
         element = document.createElement('pre');
+
+        // Selector de lenguaje (solo si el resaltado está activo). No editable,
+        // ancla arriba a la derecha del bloque; al cambiar, fija block.language y
+        // re-pinta. Usamos mousedown+preventDefault para no perder el foco/caret.
+        if (self.codeHighlight) {
+          var v_lang_select = document.createElement('select');
+          v_lang_select.className = 'mewyse-code-lang';
+          v_lang_select.setAttribute('contenteditable', 'false');
+          v_lang_select.setAttribute('aria-label', self.t('tooltips.codeLanguage'));
+          for (var v_lang_key in CODE_LANGUAGES) {
+            if (!CODE_LANGUAGES.hasOwnProperty(v_lang_key)) continue;
+            var v_lang_opt = document.createElement('option');
+            v_lang_opt.value = v_lang_key;
+            v_lang_opt.textContent = CODE_LANGUAGES[v_lang_key];
+            v_lang_select.appendChild(v_lang_opt);
+          }
+          v_lang_select.value = (block.language && CODE_LANGUAGES.hasOwnProperty(block.language))
+            ? block.language : '';
+          v_lang_select.onchange = function() {
+            var v_blk = self.getBlock(block.id);
+            if (v_blk) {
+              v_blk.language = v_lang_select.value || null;
+              self._rehighlightCodeElement(code, block.id);
+              self.triggerChange();
+            }
+          };
+          element.appendChild(v_lang_select);
+        }
+
         var code = document.createElement('code');
         code.contentEditable = true;
-        code.innerHTML = block.content || '';
+        // Marca para que el listener de input lea textContent (no innerHTML) y así
+        // los <span> del resaltado nunca entren al modelo (que queda en texto plano).
+        code.setAttribute('data-mewyse-code', '1');
+        var v_code_text = block.content || '';
+        if (self.codeHighlight && window.hljs) {
+          // Resaltado inicial (el markup queda "congelado" mientras se edita y se
+          // re-pinta al perder el foco).
+          code.innerHTML = self._highlightCode(v_code_text, block.language);
+        } else {
+          // Sin resaltado: textContent evita interpretar el texto como HTML.
+          code.textContent = v_code_text;
+        }
         element.appendChild(code);
         this.attachBlockEvents(code, block.id);
+
+        // Re-pintar el resaltado al perder el foco (sin gimnasia de caret).
+        if (self.codeHighlight) {
+          code.addEventListener('blur', function() {
+            self._rehighlightCodeElement(code, block.id);
+          });
+        }
         break;
 
       case 'bulletList':
@@ -5557,7 +5619,13 @@
 
     // Event listener para input
     element.addEventListener('input', function(e) {
-      self.updateBlockContent(blockId, element.innerHTML);
+      // En bloques de código el modelo se mantiene en TEXTO PLANO: leemos
+      // textContent para que los <span> del resaltado de sintaxis no se persistan.
+      if (element.getAttribute('data-mewyse-code') === '1') {
+        self.updateBlockContent(blockId, element.textContent || '');
+      } else {
+        self.updateBlockContent(blockId, element.innerHTML);
+      }
     });
 
     // Event listener para keydown
@@ -10772,6 +10840,7 @@
       if (typeof block.alignment === 'string') duplicatedBlock.alignment = block.alignment;
       if (typeof block.indentLevel === 'number') duplicatedBlock.indentLevel = block.indentLevel;
       if (typeof block.customClass === 'string') duplicatedBlock.customClass = block.customClass;
+      if (typeof block.language === 'string') duplicatedBlock.language = block.language;
 
       this.blocks.splice(index + 1, 0, duplicatedBlock);
       this.render();
@@ -11307,8 +11376,11 @@
             html += '<blockquote' + classAttr(block) + '>' + inline(content) + '</blockquote>';
             break;
           case 'code':
-            // Solo escapar HTML en bloques de código
-            html += '<pre><code>' + escapeHtml(content) + '</code></pre>';
+            // Solo escapar HTML en bloques de código. Si hay lenguaje válido, se
+            // emite class="language-xxx" (convención de highlight.js/Prism).
+            var v_code_lang = (block.language && CODE_LANGUAGES.hasOwnProperty(block.language) && block.language !== '')
+              ? ' class="language-' + block.language + '"' : '';
+            html += '<pre><code' + v_code_lang + '>' + escapeHtml(content) + '</code></pre>';
             break;
           case 'table':
             // Solo incluir style si el usuario configuró propiedades de tabla;
@@ -11445,7 +11517,9 @@
             html += '<blockquote' + classAttr(block) + '>' + content + '</blockquote>';
             break;
           case 'code':
-            html += '<pre><code>' + escapeHtml(block.content || '') + '</code></pre>';
+            var v_code_lang_src = (block.language && CODE_LANGUAGES.hasOwnProperty(block.language) && block.language !== '')
+              ? ' class="language-' + block.language + '"' : '';
+            html += '<pre><code' + v_code_lang_src + '>' + escapeHtml(block.content || '') + '</code></pre>';
             break;
           case 'table':
             // Solo incluir style si el usuario configuró propiedades de tabla;
@@ -11673,14 +11747,18 @@
             lines.push('> ' + self.htmlToMarkdownInline(content));
             break;
           case 'code':
-            // Unescape HTML entities en bloques de código
+            // Unescape HTML entities en bloques de código (compat con contenido
+            // antiguo que se guardó escapado; el modelo actual ya es texto plano).
             var codeContent = content
               .replace(/&lt;/g, '<')
               .replace(/&gt;/g, '>')
               .replace(/&amp;/g, '&')
               .replace(/&quot;/g, '"')
               .replace(/&#39;/g, "'");
-            lines.push('```\n' + codeContent + '\n```');
+            // El lenguaje (si es válido) se emite tras la valla de apertura.
+            var v_md_lang = (block.language && CODE_LANGUAGES.hasOwnProperty(block.language) && block.language !== '')
+              ? block.language : '';
+            lines.push('```' + v_md_lang + '\n' + codeContent + '\n```');
             break;
           case 'divider':
             lines.push('---');
@@ -16004,6 +16082,30 @@
   // Variantes válidas del bloque callout (validadas en el sanitizer).
   var CALLOUT_VARIANTS = { 'info': 1, 'warning': 1, 'success': 1, 'danger': 1 };
 
+  // Lenguajes soportados en el selector del bloque de código (set cerrado que
+  // valida el sanitizer y alimenta el <select>). La clave es el id de highlight.js
+  // y el valor la etiqueta visible. '' = automático (highlightAuto / sin lenguaje).
+  var CODE_LANGUAGES = {
+    '': 'Auto',
+    'plaintext': 'Texto plano',
+    'javascript': 'JavaScript',
+    'typescript': 'TypeScript',
+    'json': 'JSON',
+    'html': 'HTML / XML',
+    'css': 'CSS',
+    'sql': 'SQL',
+    'python': 'Python',
+    'java': 'Java',
+    'csharp': 'C#',
+    'cpp': 'C / C++',
+    'php': 'PHP',
+    'go': 'Go',
+    'ruby': 'Ruby',
+    'bash': 'Bash / Shell',
+    'yaml': 'YAML',
+    'markdown': 'Markdown'
+  };
+
   /**
    * Valida un URL contra esquemas peligrosos (XSS via javascript:)
    * Permite: http(s), mailto, tel, relativos (/, ./, ../), anchors (#), sin protocolo
@@ -16960,8 +17062,13 @@
         }
       }
     } else if (type === 'code') {
-      // No es HTML, solo texto. Igual escapamos para seguridad.
+      // No es HTML, solo texto plano (el render lo escapa/resalta).
       clean.content = typeof block.content === 'string' ? block.content : '';
+      // Preservar el lenguaje solo si está en el set cerrado (y no es el vacío).
+      if (typeof block.language === 'string' && block.language &&
+          CODE_LANGUAGES.hasOwnProperty(block.language)) {
+        clean.language = block.language;
+      }
     } else if (type === 'table') {
       // El contenido de un bloque tabla es el INNER de la tabla (tbody/tr/td),
       // por eso se marca tableInnards para que se envuelva en <table> al parsear.
@@ -17170,6 +17277,71 @@
    * @param {string} url
    * @param {Function} cb
    */
+  /**
+   * Devuelve el HTML resaltado de un fragmento de código. Si highlight.js está
+   * disponible usa el lenguaje indicado (o auto-detección); si no, cae a texto
+   * escapado. El resultado es siempre HTML seguro (hljs escapa las entidades).
+   * @param {string} v_text - código en texto plano
+   * @param {string} v_language - id de lenguaje (o vacío = auto)
+   * @returns {string} HTML resaltado o escapado
+   */
+  meWYSE.prototype._highlightCode = function(v_text, v_language) {
+    var v_source = (typeof v_text === 'string') ? v_text : '';
+    if (window.hljs) {
+      try {
+        if (v_language && v_language !== 'plaintext' &&
+            window.hljs.getLanguage && window.hljs.getLanguage(v_language)) {
+          return window.hljs.highlight(v_source, { language: v_language }).value;
+        }
+        if (!v_language) {
+          return window.hljs.highlightAuto(v_source).value;
+        }
+      } catch (e) { /* fallback a texto escapado */ }
+    }
+    return escapeHtml(v_source);
+  };
+
+  /**
+   * Re-pinta el resaltado de un bloque de código concreto sin re-renderizar todo.
+   * Se llama al perder el foco y al cambiar el lenguaje. Lee el modelo (texto
+   * plano) y escribe el HTML resaltado directamente en el <code>.
+   * @param {HTMLElement} v_code_el - el elemento <code> del bloque
+   * @param {number} v_block_id
+   */
+  meWYSE.prototype._rehighlightCodeElement = function(v_code_el, v_block_id) {
+    if (!this.codeHighlight || !v_code_el) return;
+    var v_block = this.getBlock(v_block_id);
+    if (!v_block || v_block.type !== 'code') return;
+    var v_text = (typeof v_block.content === 'string') ? v_block.content : '';
+    if (window.hljs) {
+      v_code_el.innerHTML = this._highlightCode(v_text, v_block.language);
+    } else {
+      v_code_el.textContent = v_text;
+    }
+  };
+
+  /**
+   * Carga (lazy, una sola vez) la librería de resaltado si la feature está activa
+   * y aún no está en window. Al terminar, re-pinta todos los bloques de código ya
+   * renderizados. Sin lib (o error de carga) los bloques quedan en texto plano.
+   */
+  meWYSE.prototype._initCodeHighlight = function() {
+    if (!this.codeHighlight || !this.codeHighlightUrl) return;
+    if (window.hljs) return; // ya disponible: el render inicial ya resaltó
+    var self = this;
+    this._loadScriptOnce(this.codeHighlightUrl, function(ok) {
+      if (!ok || !window.hljs || self._destroyed || !self.container) return;
+      // Re-pintar los bloques de código ya presentes en el DOM
+      var v_codes = self.container.querySelectorAll('code[data-mewyse-code="1"]');
+      for (var i = 0; i < v_codes.length; i++) {
+        var v_blk_el = v_codes[i].closest('.mewyse-block');
+        if (!v_blk_el) continue;
+        var v_id = parseInt(v_blk_el.getAttribute('data-block-id'), 10);
+        if (!isNaN(v_id)) self._rehighlightCodeElement(v_codes[i], v_id);
+      }
+    });
+  };
+
   meWYSE.prototype._loadScriptOnce = function(url, cb) {
     if (!url) { cb(false); return; }
     if (!this._loadedScripts) this._loadedScripts = {};

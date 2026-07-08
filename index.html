@@ -1007,6 +1007,24 @@ editor.loadFromMarkdown(editor.getMarkdown());</code></pre>
       <div id="configEditorHost"></div>
     </div>
 
+    <!-- Demo: Novedades Sprint 4 -->
+    <div class="demo-section">
+      <h2>Novedades (Sprint 4)</h2>
+      <p>Resaltado de sintaxis en los bloques de c&oacute;digo mediante una dependencia <strong>opcional y perezosa</strong> (highlight.js). El modelo se mantiene siempre en texto plano.</p>
+      <div class="config-hint">
+        Elige el lenguaje con el selector de la esquina del bloque de c&oacute;digo. Si la
+        librer&iacute;a no carga, el bloque cae a texto plano sin romperse.
+      </div>
+      <pre class="docs-code"><code>var editor = new meWYSE({
+  target: '#sprint4Editor',
+  toolbar: true,
+  codeHighlight: true,   // activa el resaltado
+  // URL de highlight.js (se carga solo si codeHighlight es true)
+  codeHighlightUrl: 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js'
+});</code></pre>
+      <div id="sprint4Editor"></div>
+    </div>
+
   </div>
 
   <!-- ── Footer ──────────────────────────────────── -->
@@ -1714,6 +1732,24 @@ editor.loadFromMarkdown(editor.getMarkdown());</code></pre>
       }
     }
 
+    // ===== Demo Novedades (Sprint 4): resaltado de sintaxis =====
+    var sprint4Editor;
+    function initSprint4Editor() {
+      sprint4Editor = new meWYSE({
+        target: '#sprint4Editor',
+        toolbar: true,
+        codeHighlight: true,
+        codeHighlightUrl: 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js',
+        blocks: [
+          { id: 1, type: 'heading2', content: 'Resaltado de sintaxis' },
+          { id: 2, type: 'paragraph', content: 'Consulta SQL de ejemplo:' },
+          { id: 3, type: 'code', language: 'sql', content: "SELECT id, nombre\nFROM clientes\nWHERE activo = 1 AND fecha_alta > TO_DATE('01-01-2024','DD-MM-YYYY')" },
+          { id: 4, type: 'paragraph', content: 'Y una funcion JavaScript:' },
+          { id: 5, type: 'code', language: 'javascript', content: 'function suma(a, b) {\n  return a + b; // 1 < 2\n}' }
+        ]
+      });
+    }
+
     // ===== Configurador de opciones =====
     // Especificacion de las opciones. `def` = default REAL de la librería (se usa
     // para omitir del config lo que no cambia). `init` = estado inicial del control
@@ -1876,6 +1912,7 @@ editor.loadFromMarkdown(editor.getMarkdown());</code></pre>
       initMarkdownEditor();
       initNovedadesEditor();
       initConfigurator();
+      initSprint4Editor();
     };
   </script>
 </body>

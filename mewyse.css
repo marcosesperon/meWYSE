@@ -22,6 +22,17 @@
   --mewyse-bg-code: #f5f5f5;
   --mewyse-bg-overlay: rgba(0, 0, 0, 0.5);
 
+  /* Syntax highlight (tokens de highlight.js) — paleta tema claro */
+  --mewyse-hl-keyword: #d73a49;
+  --mewyse-hl-string: #032f62;
+  --mewyse-hl-number: #005cc5;
+  --mewyse-hl-comment: #6a737d;
+  --mewyse-hl-function: #6f42c1;
+  --mewyse-hl-title: #22863a;
+  --mewyse-hl-attr: #005cc5;
+  --mewyse-hl-tag: #22863a;
+  --mewyse-hl-meta: #6a737d;
+
   /* Border colors */
   --mewyse-border-light: #e0e0e0;
   --mewyse-border-medium: #ddd;
@@ -569,6 +580,7 @@
   border: 1px solid var(--mewyse-border-light);
   border-radius: var(--mewyse-radius-xl);
   overflow-x: auto;
+  position: relative; /* ancla del selector de lenguaje */
 }
 .mewyse-editor-styled pre.mewyse-block code {
   display: block;
@@ -578,6 +590,59 @@
   font-size: 0.8125em;
   line-height: 1.6;
 }
+
+/* Selector de lenguaje del bloque de código (esquina superior derecha). Solo se
+   inserta cuando la opción codeHighlight está activa. */
+.mewyse-code-lang {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  z-index: 2;
+  font-size: 11px;
+  line-height: 1;
+  padding: 2px 4px;
+  border: 1px solid var(--mewyse-border-light);
+  border-radius: var(--mewyse-radius-sm);
+  background: var(--mewyse-bg-primary);
+  color: var(--mewyse-text-secondary);
+  opacity: 0.6;
+  cursor: pointer;
+}
+.mewyse-code-lang:hover,
+.mewyse-code-lang:focus {
+  opacity: 1;
+}
+
+/* Tokens de highlight.js mapeados a las variables del tema (claro/oscuro). Así
+   el resaltado es self-contained: no requiere cargar una hoja de estilos externa
+   de la librería. */
+.mewyse-block .hljs-keyword,
+.mewyse-block .hljs-built_in,
+.mewyse-block .hljs-literal,
+.mewyse-block .hljs-selector-tag { color: var(--mewyse-hl-keyword); }
+.mewyse-block .hljs-string,
+.mewyse-block .hljs-regexp,
+.mewyse-block .hljs-symbol { color: var(--mewyse-hl-string); }
+.mewyse-block .hljs-number,
+.mewyse-block .hljs-variable,
+.mewyse-block .hljs-template-variable { color: var(--mewyse-hl-number); }
+.mewyse-block .hljs-comment,
+.mewyse-block .hljs-quote { color: var(--mewyse-hl-comment); font-style: italic; }
+.mewyse-block .hljs-function .hljs-title,
+.mewyse-block .hljs-title.function_,
+.mewyse-block .hljs-section { color: var(--mewyse-hl-function); }
+.mewyse-block .hljs-title,
+.mewyse-block .hljs-class .hljs-title,
+.mewyse-block .hljs-type { color: var(--mewyse-hl-title); }
+.mewyse-block .hljs-attr,
+.mewyse-block .hljs-attribute,
+.mewyse-block .hljs-property { color: var(--mewyse-hl-attr); }
+.mewyse-block .hljs-tag,
+.mewyse-block .hljs-name,
+.mewyse-block .hljs-selector-id,
+.mewyse-block .hljs-selector-class { color: var(--mewyse-hl-tag); }
+.mewyse-block .hljs-meta,
+.mewyse-block .hljs-comment.hljs-doctag { color: var(--mewyse-hl-meta); }
 .mewyse-editor-styled div.mewyse-block.mewyse-table-wrapper,
 .mewyse-editor-styled div.mewyse-block.mewyse-image-wrapper {
   display: block;
@@ -2333,6 +2398,17 @@
   --mewyse-bg-active: #3a3a3a;
   --mewyse-bg-code: #0d0d0d;
   --mewyse-bg-overlay: rgba(0, 0, 0, 0.7);
+
+  /* Syntax highlight (tokens de highlight.js) — paleta tema oscuro */
+  --mewyse-hl-keyword: #ff7b72;
+  --mewyse-hl-string: #a5d6ff;
+  --mewyse-hl-number: #79c0ff;
+  --mewyse-hl-comment: #8b949e;
+  --mewyse-hl-function: #d2a8ff;
+  --mewyse-hl-title: #7ee787;
+  --mewyse-hl-attr: #79c0ff;
+  --mewyse-hl-tag: #7ee787;
+  --mewyse-hl-meta: #8b949e;
 
   /* Border colors */
   --mewyse-border-light: #333333;
