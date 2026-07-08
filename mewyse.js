@@ -99,7 +99,8 @@
         font: 'Fuente y tamaño',
         specialChars: 'Caracteres especiales',
         print: 'Imprimir',
-        exportWord: 'Exportar a Word'
+        exportWord: 'Exportar a Word',
+        mergeTag: 'Insertar variable'
       },
       font: {
         family: 'Familia',
@@ -211,7 +212,8 @@
       aria: {
         mentions: 'Menciones',
         emoji: 'Emojis',
-        tags: 'Etiquetas'
+        tags: 'Etiquetas',
+        mergeTags: 'Variables'
       },
       findReplace: {
         title: 'Buscar y reemplazar',
@@ -349,7 +351,8 @@
         font: 'Font and size',
         specialChars: 'Special characters',
         print: 'Print',
-        exportWord: 'Export to Word'
+        exportWord: 'Export to Word',
+        mergeTag: 'Insert variable'
       },
       font: {
         family: 'Family',
@@ -461,7 +464,8 @@
       aria: {
         mentions: 'Mentions',
         emoji: 'Emojis',
-        tags: 'Tags'
+        tags: 'Tags',
+        mergeTags: 'Variables'
       },
       findReplace: {
         title: 'Find and replace',
@@ -756,6 +760,7 @@
     callout: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="6.5"/><line x1="8" y1="7" x2="8" y2="11.5"/><circle cx="8" cy="4.7" r="0.6" fill="currentColor"/></svg>',
     print: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M4 6V2h8v4"/><rect x="2.5" y="6" width="11" height="5" rx="1"/><path d="M4 10h8v4H4z"/><circle cx="11.5" cy="8" r="0.6" fill="currentColor"/></svg>',
     exportWord: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M9 1.5H4a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V5.5z"/><path d="M9 1.5V5.5h4"/><path d="M5.5 8l1 3 1-2.2 1 2.2 1-3"/></svg>',
+    mergeTag: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M6 2.5C4.5 2.5 4 3.5 4 5v1.5c0 1-.5 1.5-1.5 1.5C3.5 8 4 8.5 4 9.5V11c0 1.5.5 2.5 2 2.5"/><path d="M10 2.5c1.5 0 2 1 2 2.5v1.5c0 1 .5 1.5 1.5 1.5-1 0-1.5.5-1.5 1.5V11c0 1.5-.5 2.5-2 2.5"/></svg>',
     paragraph: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M7 2h6v1.5h-1.5V14H10V3.5H8.5V14H7V8.5C4.5 8.5 3 7 3 5.2S4.5 2 7 2z"/></svg>',
     heading1: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M1 3h1.5v4.5H6V3h1.5v11H6V9H2.5v5H1V3z"/><path d="M10 13V5.5L8.5 7V5.2L10.5 3H12v10h-2z"/></svg>',
     heading2: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M1 3h1.5v4.5H6V3h1.5v11H6V9H2.5v5H1V3z"/><path d="M9 11.5c1.2-1.5 3.5-3.2 3.5-5C12.5 5.5 12 4.8 11 4.8c-.8 0-1.4.6-1.5 1.5H8c.1-1.8 1.3-3 3-3 1.8 0 3 1.1 3 2.8 0 2.3-2.5 3.8-3.5 5.2H14V13H9v-1.5z"/></svg>',
@@ -966,6 +971,11 @@
     // aplica el color genérico del tema (ver CSS de .mewyse-tag).
     this.tags = this.options.tags || [];
     this.tagMenu = null;
+    // Merge tags / variables ({{campo}}). Cada uno: { id, name, label? }.
+    // name es el identificador que se emite en export ({{name}}); label es un
+    // texto amigable opcional solo para el menú de inserción.
+    this.mergeTags = this.options.mergeTags || [];
+    this.mergeTagMenu = null;
     this.tagMenuElement = null;
     this.tagMenuBlockId = null;
     this.tagMenuSelectedIndex = 0;
@@ -2302,6 +2312,30 @@
       self.insertAudioBlock();
     };
     insertGroup.appendChild(audioButton);
+
+    // Botón de variables / merge tags (solo si hay mergeTags configuradas).
+    if (this.mergeTags && this.mergeTags.length > 0) {
+      var mergeBtn = document.createElement('button');
+      mergeBtn.className = 'mewyse-toolbar-button';
+      mergeBtn.innerHTML = WYSIWYG_ICONS.mergeTag;
+      mergeBtn.title = this.t('tooltips.mergeTag');
+      mergeBtn.setAttribute('aria-label', this.t('tooltips.mergeTag'));
+      // mousedown+preventDefault: conservar el caret del editor al pulsar.
+      mergeBtn.onmousedown = function(e) { e.preventDefault(); };
+      mergeBtn.onclick = function(e) {
+        e.preventDefault();
+        var sel = window.getSelection();
+        if (!sel || !sel.rangeCount) return;
+        var node = sel.getRangeAt(0).commonAncestorContainer;
+        var elx = (node.nodeType === 1) ? node : node.parentElement;
+        var blockEl = (elx && elx.closest) ? elx.closest('.mewyse-block[data-block-id]') : null;
+        if (!blockEl) return;
+        var editable = self.getEditableElement(blockEl);
+        var bId = parseInt(blockEl.getAttribute('data-block-id'), 10);
+        if (editable) self.showMergeTagMenu(bId, editable);
+      };
+      insertGroup.appendChild(mergeBtn);
+    }
 
     host.appendChild(insertGroup);
 
@@ -5636,9 +5670,10 @@
 
     // Atributos data-* específicos de cada átomo meWYSE
     var ATOMIC_DATA_ATTRS = {
-      'mewyse-tag':     ['data-tag-id', 'data-tag-name', 'data-tag-color'],
-      'mewyse-mention': ['data-mention-id', 'data-mention-name'],
-      'mewyse-emoji':   ['data-emoji']
+      'mewyse-tag':      ['data-tag-id', 'data-tag-name', 'data-tag-color'],
+      'mewyse-mention':  ['data-mention-id', 'data-mention-name'],
+      'mewyse-emoji':    ['data-emoji'],
+      'mewyse-mergetag': ['data-merge-name']
     };
 
     function escAttr(v) {
@@ -5671,6 +5706,7 @@
           if (node.classList.contains('mewyse-tag')) atomicClass = 'mewyse-tag';
           else if (node.classList.contains('mewyse-mention')) atomicClass = 'mewyse-mention';
           else if (node.classList.contains('mewyse-emoji')) atomicClass = 'mewyse-emoji';
+          else if (node.classList.contains('mewyse-mergetag')) atomicClass = 'mewyse-mergetag';
           if (atomicClass) {
             var atomAttrs = ' class="' + atomicClass + '"';
             var keepData = ATOMIC_DATA_ATTRS[atomicClass] || [];
@@ -8062,6 +8098,23 @@
       }
     }
 
+    // ===== MENÚ DE VARIABLES / MERGE TAGS ({{) =====
+    // Puede aparecer en cualquier posición inline (no solo al inicio/tras espacio).
+    if (this.mergeTags.length > 0) {
+      var mergeMatch = text.match(/\{\{([\w.]*)$/);
+      if (mergeMatch) {
+        if (!this.mergeTagMenu) {
+          this.showMergeTagMenu(blockId, element);
+        }
+        if (this.mergeTagMenu) {
+          this.filterMergeTagMenu(mergeMatch[1]);
+        }
+        return;
+      } else if (this.mergeTagMenu) {
+        this.closeMergeTagMenu();
+      }
+    }
+
     // ===== MENÚ DE EMOJI PICKER (:) =====
     // Buscar ":" al inicio o después de espacio (no pegado a palabra)
     var emojiMatch = text.match(/(^|\s):([a-zA-Z0-9_]*)$/);
@@ -9038,7 +9091,7 @@
    * matcher no vea el texto de los átomos como si fuera texto del usuario.
    */
   meWYSE.prototype._editableTextContent = function(element) {
-    var ATOMIC_CLASSES = { 'mewyse-mention': 1, 'mewyse-tag': 1, 'mewyse-emoji': 1 };
+    var ATOMIC_CLASSES = { 'mewyse-mention': 1, 'mewyse-tag': 1, 'mewyse-emoji': 1, 'mewyse-mergetag': 1 };
     var out = '';
     function walk(node) {
       if (!node) return;
@@ -9294,6 +9347,202 @@
     this._hideBackdrop('tagMenu');
   };
 
+  /* =========================================================================
+   * MERGE TAGS / VARIABLES ({{campo}}) — clona el patrón de tags (cápsula no
+   * editable + menú filtrable). Trigger `{{`.
+   * ======================================================================= */
+
+  meWYSE.prototype._renderMergeTagCapsule = function(mt) {
+    var span = document.createElement('span');
+    span.className = 'mewyse-mergetag';
+    span.setAttribute('data-merge-name', String(mt.name));
+    span.setAttribute('contenteditable', 'false');
+    span.textContent = '{{' + mt.name + '}}';
+    return span;
+  };
+
+  meWYSE.prototype.showMergeTagMenu = function(blockId, element) {
+    var self = this;
+    this.closeMergeTagMenu();
+
+    var menu = document.createElement('div');
+    menu.className = 'mewyse-mergetag-menu';
+    menu.setAttribute('role', 'listbox');
+    menu.setAttribute('aria-label', self.t('aria.mergeTags'));
+    this.mergeTagMenu = menu;
+    this.mergeTagMenuSelectedIndex = 0;
+    this.mergeTagMenuElement = element;
+    this.mergeTagMenuBlockId = blockId;
+
+    var selection = window.getSelection();
+    if (selection.rangeCount > 0) {
+      this.mergeTagMenuRange = selection.getRangeAt(0).cloneRange();
+    }
+
+    this.mergeTags.forEach(function(mt, index) {
+      var item = document.createElement('div');
+      item.className = 'mewyse-mergetag-menu-item';
+      item.setAttribute('role', 'option');
+      item.setAttribute('data-index', index);
+
+      var nameSpan = document.createElement('span');
+      nameSpan.className = 'mewyse-mergetag-menu-name';
+      nameSpan.textContent = '{{' + mt.name + '}}';
+      item.appendChild(nameSpan);
+      if (mt.label) {
+        var lbl = document.createElement('span');
+        lbl.className = 'mewyse-mergetag-menu-label';
+        lbl.textContent = mt.label;
+        item.appendChild(lbl);
+      }
+
+      item.addEventListener('mousedown', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (self.mergeTagMenuRange) {
+          var sel = window.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(self.mergeTagMenuRange);
+        }
+        self.selectMergeTagItem(index);
+      });
+
+      menu.appendChild(item);
+    });
+
+    self._applyMenuTheme(menu);
+    document.body.appendChild(menu);
+    this.positionMentionMenuAtCaret(menu);
+    this.updateMergeTagMenuSelection();
+    this._showBackdrop('mergeTagMenu', function() { self.closeMergeTagMenu(); });
+  };
+
+  meWYSE.prototype.filterMergeTagMenu = function(searchText) {
+    if (!this.mergeTagMenu) return;
+    var searchLower = searchText.toLowerCase();
+    var items = this.mergeTagMenu.querySelectorAll('.mewyse-mergetag-menu-item');
+    var visibleCount = 0;
+    this.mergeTags.forEach(function(mt, index) {
+      var item = items[index];
+      if (!item) return;
+      var hay = (mt.name + ' ' + (mt.label || '')).toLowerCase();
+      if (hay.indexOf(searchLower) !== -1) {
+        item.style.display = '';
+        visibleCount++;
+      } else {
+        item.style.display = 'none';
+      }
+    });
+    if (this.mergeTagMenuSelectedIndex >= visibleCount) this.mergeTagMenuSelectedIndex = 0;
+    this.updateMergeTagMenuSelection();
+    if (visibleCount === 0) this.closeMergeTagMenu();
+  };
+
+  meWYSE.prototype.updateMergeTagMenuSelection = function() {
+    if (!this.mergeTagMenu) return;
+    var items = this.mergeTagMenu.querySelectorAll('.mewyse-mergetag-menu-item');
+    var visibleItems = this.mergeTagMenu.querySelectorAll('.mewyse-mergetag-menu-item:not([style*="display: none"])');
+    items.forEach(function(item) {
+      item.classList.remove('selected');
+      item.setAttribute('aria-selected', 'false');
+    });
+    if (visibleItems[this.mergeTagMenuSelectedIndex]) {
+      visibleItems[this.mergeTagMenuSelectedIndex].classList.add('selected');
+      visibleItems[this.mergeTagMenuSelectedIndex].setAttribute('aria-selected', 'true');
+    }
+  };
+
+  meWYSE.prototype.mergeTagMenuNavigateUp = function() {
+    this._navigateMenu('mergeTagMenu', '.mewyse-mergetag-menu-item', 'mergeTagMenuSelectedIndex', 'updateMergeTagMenuSelection', 'up');
+  };
+  meWYSE.prototype.mergeTagMenuNavigateDown = function() {
+    this._navigateMenu('mergeTagMenu', '.mewyse-mergetag-menu-item', 'mergeTagMenuSelectedIndex', 'updateMergeTagMenuSelection', 'down');
+  };
+
+  meWYSE.prototype.selectMergeTagItem = function(index) {
+    if (!this.mergeTagMenu || !this.mergeTagMenuElement) return;
+    var mt = this.mergeTags[index];
+    if (!mt) return;
+    this.insertMergeTag(mt);
+  };
+
+  meWYSE.prototype.insertMergeTag = function(mt) {
+    var element = this.mergeTagMenuElement;
+    var capsule = this._renderMergeTagCapsule(mt);
+
+    var selection = window.getSelection();
+    if (!selection.rangeCount) { this.closeMergeTagMenu(); return; }
+
+    // Eliminar el "{{..." que activó el menú (si lo hubo) e insertar la cápsula.
+    var textContent = element.textContent;
+    var trigMatch = textContent.match(/\{\{[\w.]*$/);
+    var range;
+    if (trigMatch) {
+      var trigPos = textContent.lastIndexOf('{{');
+      var walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null, false);
+      var currentPos = 0, targetNode = null, nodeOffset = 0;
+      while (walker.nextNode()) {
+        var node = walker.currentNode;
+        var nodeLength = node.textContent.length;
+        if (currentPos + nodeLength > trigPos) { targetNode = node; nodeOffset = trigPos - currentPos; break; }
+        currentPos += nodeLength;
+      }
+      if (targetNode) {
+        range = document.createRange();
+        range.setStart(targetNode, nodeOffset);
+        range.setEndAfter(element.lastChild || element);
+        range.deleteContents();
+      }
+    }
+    if (!range) {
+      // Sin trigger (inserción desde botón): usar el caret actual.
+      range = selection.getRangeAt(0);
+      range.deleteContents();
+    }
+    range.insertNode(capsule);
+    var spaceNode = document.createTextNode(' ');
+    capsule.parentNode.insertBefore(spaceNode, capsule.nextSibling);
+    var newRange = document.createRange();
+    newRange.setStartAfter(spaceNode);
+    newRange.collapse(true);
+    selection.removeAllRanges();
+    selection.addRange(newRange);
+
+    this.updateBlockContent(this.mergeTagMenuBlockId, element.innerHTML);
+    this.closeMergeTagMenu();
+  };
+
+  meWYSE.prototype.closeMergeTagMenu = function() {
+    this._closeMenu('mergeTagMenu');
+    this.mergeTagMenuSelectedIndex = 0;
+    this.mergeTagMenuElement = null;
+    this.mergeTagMenuBlockId = null;
+    this.mergeTagMenuRange = null;
+    this._hideBackdrop('mergeTagMenu');
+  };
+
+  /**
+   * Devuelve el HTML del documento con las variables {{campo}} sustituidas por
+   * su valor (escapado). NO muta el modelo — pensado para generar el documento
+   * final. `valuesMap` es un objeto { nombreVariable: valor }.
+   * @param {Object} valuesMap
+   * @returns {string}
+   */
+  meWYSE.prototype.getResolvedHTML = function(valuesMap) {
+    var map = valuesMap || {};
+    var html = this.getSafeHTML();
+    var tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    var caps = tmp.querySelectorAll('span.mewyse-mergetag');
+    for (var i = 0; i < caps.length; i++) {
+      var name = caps[i].getAttribute('data-merge-name');
+      var val = (map.hasOwnProperty(name)) ? map[name] : ('{{' + name + '}}');
+      // Sustituir la cápsula por el valor como TEXTO (escapado por textContent).
+      caps[i].parentNode.replaceChild(document.createTextNode(val), caps[i]);
+    }
+    return tmp.innerHTML;
+  };
+
   /**
    * Maneja los eventos de teclado en los bloques
    * @param {KeyboardEvent} e
@@ -9519,6 +9768,30 @@
       if (e.key === 'Escape') {
         e.preventDefault();
         this.closeTagMenu();
+        return;
+      }
+    }
+
+    // Si el menú de variables / merge tags está abierto, manejar navegación
+    if (this.mergeTagMenu) {
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        this.mergeTagMenuNavigateUp();
+        return;
+      }
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        this.mergeTagMenuNavigateDown();
+        return;
+      }
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        this.selectMergeTagItem(this._resolveMenuFullIndex(this.mergeTagMenu, '.mewyse-mergetag-menu-item', this.mergeTagMenuSelectedIndex));
+        return;
+      }
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        this.closeMergeTagMenu();
         return;
       }
     }
@@ -11277,6 +11550,12 @@
         return inner;
       }
 
+      // Merge tags / variables: emitir el literal {{name}} (plantilla).
+      if (tag === 'span' && node.classList.contains('mewyse-mergetag')) {
+        var mn = node.getAttribute('data-merge-name');
+        return mn ? ('{{' + mn + '}}') : inner;
+      }
+
       // Estilos inline (color, background) y otros spans con style: conservar como HTML
       if (tag === 'span' && node.getAttribute('style')) {
         return '<span style="' + node.getAttribute('style') + '">' + inner + '</span>';
@@ -12049,6 +12328,7 @@
     }
     // Cerrar también el tag-menu si sigue abierto (por si no estaba en backdrop).
     if (this.closeTagMenu) this.closeTagMenu();
+    if (this.closeMergeTagMenu) this.closeMergeTagMenu();
     this._removeBackdrop();
 
     // Limpiar listeners y observer del scroll horizontal de la toolbar
@@ -15591,6 +15871,7 @@
     'SPAN': { 'class': 1, 'style': 1, 'contenteditable': 1,
               'data-mention-id': 1, 'data-mention-name': 1,
               'data-tag-id': 1, 'data-tag-name': 1, 'data-tag-color': 1,
+              'data-merge-name': 1,
               'data-name': 1, 'data-type': 1 },
     'FONT': { 'color': 1, 'face': 1, 'size': 1 },
     'TD': { 'colspan': 1, 'rowspan': 1, 'style': 1 },
@@ -15609,6 +15890,7 @@
     'mewyse-mention': 1,
     'mewyse-emoji': 1,
     'mewyse-tag': 1,
+    'mewyse-mergetag': 1,
     'mewyse-search-highlight': 1
   };
 
@@ -16489,6 +16771,10 @@
         } else if (attrName === 'contenteditable') {
           // Solo permitir "false" (para mentions/emojis)
           if (attr.value !== 'false') node.removeAttribute(attr.name);
+        } else if (attrName === 'data-merge-name') {
+          // Nombre de variable: solo identificadores seguros (letras, dígitos,
+          // guion bajo y punto). Cualquier otra cosa se descarta.
+          if (!/^[\w.]+$/.test(attr.value)) node.removeAttribute(attr.name);
         } else if (attrName === 'target') {
           // Forzar rel="noopener noreferrer" si target="_blank"
           if (attr.value === '_blank') {

@@ -1406,6 +1406,62 @@
 }
 
 /* ============================================ */
+/* VARIABLES / MERGE TAGS ({{campo}}) */
+/* ============================================ */
+.mewyse-mergetag-menu {
+  position: fixed;
+  background: var(--mewyse-bg-primary);
+  color: var(--mewyse-text-primary);
+  border: 1px solid var(--mewyse-border-light);
+  border-radius: var(--mewyse-radius-xl);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  padding: 8px;
+  min-width: 220px;
+  max-width: 320px;
+  z-index: 1000;
+  max-height: 300px;
+  overflow-y: auto;
+}
+.mewyse-mergetag-menu-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: var(--mewyse-radius-lg);
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  transition: background-color 0.15s ease;
+}
+.mewyse-mergetag-menu-item:hover,
+.mewyse-mergetag-menu-item.selected { background-color: var(--mewyse-bg-active); }
+.mewyse-mergetag-menu-item:focus-visible { outline: 2px solid var(--mewyse-accent); outline-offset: -2px; }
+.mewyse-mergetag-menu-name {
+  font-family: var(--mewyse-font-mono, ui-monospace, 'SF Mono', monospace);
+  color: var(--mewyse-text-primary);
+  white-space: nowrap;
+}
+.mewyse-mergetag-menu-label {
+  flex: 1;
+  font-size: 0.85em;
+  color: var(--mewyse-text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* Cápsula de la variable insertada en el contenido (aspecto de "chip" de código). */
+.mewyse-mergetag {
+  display: inline;
+  white-space: nowrap;
+  background-color: var(--mewyse-bg-active);
+  color: var(--mewyse-text-primary);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-family: var(--mewyse-font-mono, ui-monospace, 'SF Mono', monospace);
+  font-size: 0.9em;
+  cursor: default;
+  user-select: all;
+}
+
+/* ============================================ */
 /* MENÚ DE EMOJI PICKER */
 /* ============================================ */
 
@@ -2388,6 +2444,7 @@
 .mewyse-slash-menu.mewyse-dark,
 .mewyse-mention-menu.mewyse-dark,
 .mewyse-tag-menu.mewyse-dark,
+.mewyse-mergetag-menu.mewyse-dark,
 .mewyse-emoji-menu.mewyse-dark,
 .mewyse-format-menu.mewyse-dark,
 .mewyse-options-menu.mewyse-dark,

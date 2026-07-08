@@ -149,6 +149,7 @@ new meWYSE(options)
 | `escapeHtmlEntities` | boolean | `true` | Escapar entidades HTML en el HTML exportado por `getHTML()` |
 | `htmlNumericEntities` | boolean | `true` | Compat TinyMCE (`entity_encoding: 'numeric'`): escapar no-ASCII como referencias numéricas |
 | `tags` | Array | `[]` | Lista de etiquetas para el trigger `#`. Cada item: `{ id, name, color? }` |
+| `mergeTags` | Array | `[]` | Lista de variables `{{campo}}` (trigger `{{` y botón de toolbar). Cada item: `{ id, name, label? }` |
 | `autosave` | boolean | `false` | Guarda el contenido (JSON) en `localStorage` con debounce en cada cambio. No auto-restaura (usa `restoreDraft()`) |
 | `autosaveKey` | string | `'mewyse-draft'` | Clave de `localStorage` para el borrador de autosave |
 | `fontControls` | boolean | `false` | Añade a la toolbar un botón de fuente (familia / tamaño / interlineado) |
@@ -578,6 +579,28 @@ Escribe `:` seguido del nombre del emoji para abrir el selector:
 2. Continúa escribiendo para filtrar (ej: `:son` → "sonrisa")
 3. Navega con `↑` `↓` y selecciona con `Enter`
 4. `Escape` para cerrar
+
+## Variables / Merge tags (`{{campo}}`)
+
+Para plantillas de documento (facturas, cartas, informes del ERP). Se insertan como cápsulas no
+editables y se resuelven al generar el documento:
+
+```javascript
+var editor = new meWYSE({
+  target: '#editor', toolbar: true,
+  mergeTags: [
+    { id: 'cli', name: 'cliente', label: 'Nombre del cliente' },
+    { id: 'imp', name: 'importe', label: 'Importe total' }
+  ]
+});
+```
+
+- **Insertar**: escribe `{{` (abre el menú filtrable) o usa el botón de la toolbar. Se inserta una
+  cápsula `<span class="mewyse-mergetag" data-merge-name="cliente">{{cliente}}</span>`.
+- **Exportar como plantilla**: `getHTML()`/`getMarkdown()` emiten el literal `{{cliente}}`.
+- **Resolver** (generar el documento final): `editor.getResolvedHTML({ cliente: 'ACME S.L.', importe: '1.250,00' })`
+  sustituye cada variable por su valor **escapado** (sin mutar el editor). Las variables sin valor
+  quedan como `{{campo}}`.
 
 ## Etiquetas (#tags)
 
