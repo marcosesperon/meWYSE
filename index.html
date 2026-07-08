@@ -1010,11 +1010,12 @@ editor.loadFromMarkdown(editor.getMarkdown());</code></pre>
     <!-- Demo: Novedades Sprint 4 -->
     <div class="demo-section">
       <h2>Novedades (Sprint 4)</h2>
-      <p>Resaltado de sintaxis en c&oacute;digo (dependencia <strong>opcional y perezosa</strong>, highlight.js) y bloques <strong>desplegables</strong> (toggle) con t&iacute;tulo y cuerpo plegables.</p>
+      <p>Resaltado de sintaxis en c&oacute;digo (dependencia <strong>opcional y perezosa</strong>, highlight.js), bloques <strong>desplegables</strong> (toggle) y <strong>&iacute;ndice</strong> (TOC) navegable de los t&iacute;tulos.</p>
       <div class="config-hint">
         C&oacute;digo: elige el lenguaje con el selector de la esquina (si la librer&iacute;a no carga,
-        cae a texto plano). Desplegable: pulsa el tri&aacute;ngulo para plegar/desplegar; escribe
-        <code>/desplegable</code> para crear uno.
+        cae a texto plano). Desplegable: pulsa el tri&aacute;ngulo para plegar/desplegar
+        (<code>/desplegable</code>). &Iacute;ndice: se actualiza solo con los t&iacute;tulos
+        (<code>/indice</code>).
       </div>
       <pre class="docs-code"><code>var editor = new meWYSE({
   target: '#sprint4Editor',
@@ -1742,11 +1743,13 @@ editor.loadFromMarkdown(editor.getMarkdown());</code></pre>
         codeHighlight: true,
         codeHighlightUrl: 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js',
         blocks: [
+          { id: 8, type: 'toc', content: '' },
           { id: 1, type: 'heading2', content: 'Resaltado de sintaxis' },
           { id: 2, type: 'paragraph', content: 'Consulta SQL de ejemplo:' },
           { id: 3, type: 'code', language: 'sql', content: "SELECT id, nombre\nFROM clientes\nWHERE activo = 1 AND fecha_alta > TO_DATE('01-01-2024','DD-MM-YYYY')" },
           { id: 4, type: 'paragraph', content: 'Y una funcion JavaScript:' },
           { id: 5, type: 'code', language: 'javascript', content: 'function suma(a, b) {\n  return a + b; // 1 < 2\n}' },
+          { id: 9, type: 'heading2', content: 'Desplegables' },
           { id: 6, type: 'toggle', toggleTitle: 'Ver detalles (desplegable)', content: 'Este es el cuerpo del desplegable. Admite <strong>formato</strong> y varias lineas.', collapsed: false },
           { id: 7, type: 'toggle', toggleTitle: 'Seccion colapsada por defecto', content: 'Contenido oculto hasta que se expande.', collapsed: true }
         ]

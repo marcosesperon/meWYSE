@@ -322,6 +322,7 @@ var editor = new meWYSE({
 | `pageBreak` | Salto de página (impresión/export) | `/salto` |
 | `callout` | Aviso destacado (info/warning/success/danger) | `/aviso` |
 | `toggle` | Desplegable con título + cuerpo plegable (`<details>`) | `/desplegable` |
+| `toc` | Índice navegable de los títulos (se actualiza solo) | `/indice` |
 
 **Autoformato Markdown en vivo**: en un párrafo, al teclear un marcador seguido de espacio se
 convierte el bloque automáticamente: `# `/`## `/`### ` → título; `- `/`* `/`+ ` → lista; `1. ` →

@@ -28,6 +28,7 @@
         pageBreak: 'Salto de página',
         callout: 'Aviso',
         toggle: 'Desplegable',
+        toc: 'Índice',
         video: 'Vídeo',
         audio: 'Audio'
       },
@@ -40,6 +41,11 @@
       },
       toggle: {
         toggle: 'Expandir/contraer'
+      },
+      toc: {
+        title: 'Índice',
+        empty: 'Sin títulos todavía',
+        untitled: '(sin título)'
       },
       blockTypeDescriptions: {
         paragraph: 'Texto normal',
@@ -57,6 +63,7 @@
         pageBreak: 'Corte de página al imprimir/exportar',
         callout: 'Bloque destacado (info, aviso...)',
         toggle: 'Contenido plegable (título + cuerpo)',
+        toc: 'Índice navegable de los títulos',
         video: 'YouTube, Vimeo o archivo .mp4',
         audio: 'Archivo de audio (mp3, ogg...)'
       },
@@ -289,6 +296,7 @@
         pageBreak: 'Page break',
         callout: 'Callout',
         toggle: 'Toggle',
+        toc: 'Table of contents',
         video: 'Video',
         audio: 'Audio'
       },
@@ -301,6 +309,11 @@
       },
       toggle: {
         toggle: 'Expand/collapse'
+      },
+      toc: {
+        title: 'Table of contents',
+        empty: 'No headings yet',
+        untitled: '(untitled)'
       },
       blockTypeDescriptions: {
         paragraph: 'Normal text',
@@ -318,6 +331,7 @@
         pageBreak: 'Page break for print/export',
         callout: 'Highlighted block (info, warning...)',
         toggle: 'Collapsible content (title + body)',
+        toc: 'Navigable index of headings',
         video: 'YouTube, Vimeo or .mp4 file',
         audio: 'Audio file (mp3, ogg...)'
       },
@@ -778,6 +792,7 @@
     callout: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="6.5"/><line x1="8" y1="7" x2="8" y2="11.5"/><circle cx="8" cy="4.7" r="0.6" fill="currentColor"/></svg>',
     toggle: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><polyline points="5.5,4 9.5,8 5.5,12"/><line x1="11" y1="4" x2="14" y2="4"/><line x1="11" y1="8" x2="14" y2="8"/><line x1="11" y1="12" x2="14" y2="12"/></svg>',
     toggleCaret: '<svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><polygon points="4,2.5 9,6 4,9.5"/></svg>',
+    toc: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><line x1="2" y1="3.5" x2="3" y2="3.5"/><line x1="5" y1="3.5" x2="14" y2="3.5"/><line x1="2" y1="8" x2="3" y2="8"/><line x1="5" y1="8" x2="14" y2="8"/><line x1="2" y1="12.5" x2="3" y2="12.5"/><line x1="5" y1="12.5" x2="14" y2="12.5"/></svg>',
     print: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M4 6V2h8v4"/><rect x="2.5" y="6" width="11" height="5" rx="1"/><path d="M4 10h8v4H4z"/><circle cx="11.5" cy="8" r="0.6" fill="currentColor"/></svg>',
     exportWord: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M9 1.5H4a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V5.5z"/><path d="M9 1.5V5.5h4"/><path d="M5.5 8l1 3 1-2.2 1 2.2 1-3"/></svg>',
     mergeTag: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M6 2.5C4.5 2.5 4 3.5 4 5v1.5c0 1-.5 1.5-1.5 1.5C3.5 8 4 8.5 4 9.5V11c0 1.5.5 2.5 2 2.5"/><path d="M10 2.5c1.5 0 2 1 2 2.5v1.5c0 1 .5 1.5 1.5 1.5-1 0-1.5.5-1.5 1.5V11c0 1.5-.5 2.5-2 2.5"/></svg>',
@@ -5291,6 +5306,13 @@
         this._attachToggleEditable(v_tg_body, block.id, false);
         break;
 
+      case 'toc':
+        // Tabla de contenidos: bloque no editable cuyo contenido se DERIVA de los
+        // títulos del documento (no se almacena). Se reconstruye en cada render y
+        // en triggerChange (_refreshTocBlocks) para reflejar los títulos en vivo.
+        element = this._buildTocElement(block.id);
+        break;
+
       default: // paragraph
         element = document.createElement('p');
         element.contentEditable = true;
@@ -8422,7 +8444,8 @@
       { type: 'divider', icon: WYSIWYG_ICONS.divider },
       { type: 'pageBreak', icon: WYSIWYG_ICONS.pageBreak },
       { type: 'callout', icon: WYSIWYG_ICONS.callout },
-      { type: 'toggle', icon: WYSIWYG_ICONS.toggle }
+      { type: 'toggle', icon: WYSIWYG_ICONS.toggle },
+      { type: 'toc', icon: WYSIWYG_ICONS.toc }
     ];
 
     this.slashMenuTypes = types;
@@ -10238,7 +10261,7 @@
       // Bloques que NO se pueden dividir como texto (image, divider, video, audio,
       // table, code). Para estos mantenemos el comportamiento clásico (paragraph
       // nuevo a continuación).
-      var nonSplittable = { image: 1, divider: 1, pageBreak: 1, video: 1, audio: 1, table: 1, code: 1 };
+      var nonSplittable = { image: 1, divider: 1, pageBreak: 1, video: 1, audio: 1, table: 1, code: 1, toc: 1 };
       var canSplit = currentBlock && !nonSplittable[currentBlock.type];
 
       // Tipo del nuevo bloque cuando NO se hace split (clásico).
@@ -10446,7 +10469,7 @@
           var idx = this.getBlockIndex(blockId);
           if (idx > 0) {
             var prevBlock = this.blocks[idx - 1];
-            var nonMergeable = { table: 1, image: 1, divider: 1, pageBreak: 1, video: 1, audio: 1 };
+            var nonMergeable = { table: 1, image: 1, divider: 1, pageBreak: 1, video: 1, audio: 1, toc: 1 };
             if (prevBlock && !nonMergeable[prevBlock.type]) {
               e.preventDefault();
               this._mergeBlockIntoPrevious(blockId);
@@ -10634,7 +10657,8 @@
       'divider': WYSIWYG_ICONS.divider,
       'pageBreak': WYSIWYG_ICONS.pageBreak,
       'callout': WYSIWYG_ICONS.callout,
-      'toggle': WYSIWYG_ICONS.toggle
+      'toggle': WYSIWYG_ICONS.toggle,
+      'toc': WYSIWYG_ICONS.toc
     };
     return icons[type] || WYSIWYG_ICONS.paragraph;
   };
@@ -11515,6 +11539,16 @@
       return b.customClass ? ' class="' + b.customClass + '"' : '';
     };
 
+    // Si el documento contiene un bloque TOC, los títulos se emiten con un id de
+    // ancla (para que los enlaces del índice funcionen en el HTML exportado).
+    var v_has_toc = false;
+    for (var v_k = 0; v_k < blocks.length; v_k++) {
+      if (blocks[v_k].type === 'toc') { v_has_toc = true; break; }
+    }
+    var idAttr = function(b) {
+      return v_has_toc ? ' id="mewyse-h-' + b.id + '"' : '';
+    };
+
     // Transformer del contenido inline. Pasos:
     //  1. Sanear: garantiza HTML válido inline (unwrap de bloques anidados
     //     a <br>, etc.).
@@ -11545,13 +11579,13 @@
         // Procesar bloques que no son listas
         switch (block.type) {
           case 'heading1':
-            html += '<h1' + classAttr(block) + '>' + inline(content) + '</h1>';
+            html += '<h1' + idAttr(block) + classAttr(block) + '>' + inline(content) + '</h1>';
             break;
           case 'heading2':
-            html += '<h2' + classAttr(block) + '>' + inline(content) + '</h2>';
+            html += '<h2' + idAttr(block) + classAttr(block) + '>' + inline(content) + '</h2>';
             break;
           case 'heading3':
-            html += '<h3' + classAttr(block) + '>' + inline(content) + '</h3>';
+            html += '<h3' + idAttr(block) + classAttr(block) + '>' + inline(content) + '</h3>';
             break;
           case 'quote':
             html += '<blockquote' + classAttr(block) + '>' + inline(content) + '</blockquote>';
@@ -11645,6 +11679,9 @@
             html += '<details' + (block.collapsed ? '' : ' open') + '><summary>' +
                     inline(block.toggleTitle || '') + '</summary>' + inline(content) + '</details>';
             break;
+          case 'toc':
+            html += self._buildTocHTML(blocks);
+            break;
           default:
             html += '<p' + classAttr(block) + '>' + inline(content) + '</p>';
         }
@@ -11665,6 +11702,13 @@
     var blocks = this.getFilteredBlocks();
     var i = 0;
     var classAttr = function(b) { return b.customClass ? ' class="' + b.customClass + '"' : ''; };
+
+    // Ids de ancla en títulos si hay TOC (igual que getHTML).
+    var v_has_toc = false;
+    for (var v_k = 0; v_k < blocks.length; v_k++) {
+      if (blocks[v_k].type === 'toc') { v_has_toc = true; break; }
+    }
+    var idAttr = function(b) { return v_has_toc ? ' id="mewyse-h-' + b.id + '"' : ''; };
 
     // Transformer del contenido inline para la vista "fuente": sanea el HTML
     // (whitelist de tags) y limpia styles no nativos, pero NO escapa las
@@ -11691,13 +11735,13 @@
         // Procesar bloques que no son listas
         switch (block.type) {
           case 'heading1':
-            html += '<h1' + classAttr(block) + '>' + content + '</h1>';
+            html += '<h1' + idAttr(block) + classAttr(block) + '>' + content + '</h1>';
             break;
           case 'heading2':
-            html += '<h2' + classAttr(block) + '>' + content + '</h2>';
+            html += '<h2' + idAttr(block) + classAttr(block) + '>' + content + '</h2>';
             break;
           case 'heading3':
-            html += '<h3' + classAttr(block) + '>' + content + '</h3>';
+            html += '<h3' + idAttr(block) + classAttr(block) + '>' + content + '</h3>';
             break;
           case 'quote':
             html += '<blockquote' + classAttr(block) + '>' + content + '</blockquote>';
@@ -11784,6 +11828,9 @@
           case 'toggle':
             html += '<details' + (block.collapsed ? '' : ' open') + '><summary>' +
                     inline_source(block.toggleTitle || '') + '</summary>' + content + '</details>';
+            break;
+          case 'toc':
+            html += self._buildTocHTML(blocks);
             break;
           default:
             html += '<p' + classAttr(block) + '>' + content + '</p>';
@@ -11968,6 +12015,22 @@
             // seguido del cuerpo como texto.
             lines.push('**' + self.htmlToMarkdownInline(block.toggleTitle || '') + '**');
             lines.push(self.htmlToMarkdownInline(content));
+            break;
+          case 'toc':
+            // Índice: lista de títulos con enlaces a un ancla derivada del texto.
+            var v_toc_lines = [];
+            for (var v_ti = 0; v_ti < blocks.length; v_ti++) {
+              var v_th = blocks[v_ti];
+              if (v_th.type === 'heading1' || v_th.type === 'heading2' || v_th.type === 'heading3') {
+                var v_tmp2 = document.createElement('div');
+                v_tmp2.innerHTML = v_th.content || '';
+                var v_ttxt = v_tmp2.textContent || '';
+                // Indentación por nivel (h2 = 1 nivel, h3 = 2 niveles).
+                var v_indent = (v_th.type === 'heading2') ? '  ' : (v_th.type === 'heading3' ? '    ' : '');
+                v_toc_lines.push(v_indent + '- [' + v_ttxt + '](#' + self._slugify(v_ttxt) + ')');
+              }
+            }
+            if (v_toc_lines.length) lines.push(v_toc_lines.join('\n'));
             break;
           case 'table':
             // Parsear HTML de tabla
@@ -12414,6 +12477,9 @@
     if (this.outlinePanel) {
       this._buildOutlineContent();
     }
+
+    // Refrescar los bloques TOC (índice de títulos) para reflejar cambios en vivo.
+    this._refreshTocBlocks();
 
     // Autosave: guardar el borrador (JSON) en localStorage con debounce propio,
     // independiente del de history. En readOnly no hay cambios que guardar.
@@ -14636,6 +14702,116 @@
   };
 
   /**
+   * Rellena el contenido de un elemento TOC (tabla de contenidos) a partir de los
+   * títulos actuales del documento. Se separa de _buildTocElement para poder
+   * refrescar el mismo nodo sin recrear el bloque (conserva clases/atributos).
+   * @param {HTMLElement} v_nav - el elemento .mewyse-toc a rellenar
+   */
+  meWYSE.prototype._fillTocContent = function(v_nav) {
+    var self = this;
+    v_nav.innerHTML = '';
+
+    var v_title = document.createElement('div');
+    v_title.className = 'mewyse-toc-title';
+    v_title.textContent = this.t('toc.title');
+    v_nav.appendChild(v_title);
+
+    var v_headings = this.getHeadingsIndex();
+    if (!v_headings.length) {
+      var v_empty = document.createElement('div');
+      v_empty.className = 'mewyse-toc-empty';
+      v_empty.textContent = this.t('toc.empty');
+      v_nav.appendChild(v_empty);
+      return;
+    }
+
+    var v_list = document.createElement('ul');
+    v_list.className = 'mewyse-toc-list';
+    v_headings.forEach(function(v_h) {
+      var v_li = document.createElement('li');
+      // Clase por nivel (heading1/2/3) para la indentación visual.
+      v_li.className = 'mewyse-toc-item mewyse-toc-' + v_h.type;
+      var v_link = document.createElement('a');
+      v_link.className = 'mewyse-toc-link';
+      v_link.href = '#';
+      v_link.textContent = v_h.text || self.t('toc.untitled');
+      v_link.onclick = function(e) {
+        e.preventDefault();
+        self.navigateToHeading(v_h.id);
+      };
+      v_li.appendChild(v_link);
+      v_list.appendChild(v_li);
+    });
+    v_nav.appendChild(v_list);
+  };
+
+  /**
+   * Crea el elemento de un bloque TOC (tabla de contenidos). No editable.
+   * @param {number} blockId
+   * @returns {HTMLElement}
+   */
+  meWYSE.prototype._buildTocElement = function(blockId) {
+    var v_nav = document.createElement('nav');
+    v_nav.className = 'mewyse-toc';
+    v_nav.setAttribute('contenteditable', 'false');
+    v_nav.setAttribute('aria-label', this.t('toc.title'));
+    this._fillTocContent(v_nav);
+    return v_nav;
+  };
+
+  /**
+   * Refresca todos los bloques TOC presentes en el DOM para reflejar los títulos
+   * en vivo. Se llama desde triggerChange. No-op si no hay ninguno.
+   */
+  meWYSE.prototype._refreshTocBlocks = function() {
+    if (!this.container) return;
+    var v_tocs = this.container.querySelectorAll('.mewyse-block[data-block-type="toc"]');
+    for (var i = 0; i < v_tocs.length; i++) {
+      this._fillTocContent(v_tocs[i]);
+    }
+  };
+
+  /**
+   * Construye el HTML del índice (TOC) para el export, con enlaces a los ids de
+   * ancla de los títulos (id="mewyse-h-{id}", emitidos por getHTML/getHTMLSource
+   * cuando hay un TOC). Recibe la lista de bloques ya filtrada.
+   * @param {Array} v_blocks
+   * @returns {string}
+   */
+  meWYSE.prototype._buildTocHTML = function(v_blocks) {
+    var v_items = '';
+    for (var i = 0; i < v_blocks.length; i++) {
+      var b = v_blocks[i];
+      if (b.type === 'heading1' || b.type === 'heading2' || b.type === 'heading3') {
+        // Extraer el texto plano del título (sin etiquetas HTML)
+        var v_tmp = document.createElement('div');
+        v_tmp.innerHTML = b.content || '';
+        var v_txt = v_tmp.textContent || '';
+        v_items += '<li class="mewyse-toc-' + b.type + '"><a href="#mewyse-h-' +
+                   b.id + '">' + escapeHtml(v_txt) + '</a></li>';
+      }
+    }
+    if (!v_items) return '<nav class="mewyse-toc"></nav>';
+    return '<nav class="mewyse-toc"><ul class="mewyse-toc-list">' + v_items + '</ul></nav>';
+  };
+
+  /**
+   * Convierte un texto en un slug apto para ancla (#id): minúsculas, sin acentos
+   * ni caracteres especiales, espacios a guiones. Usado por el export del TOC.
+   * @param {string} v_text
+   * @returns {string}
+   */
+  meWYSE.prototype._slugify = function(v_text) {
+    var v_str = (typeof v_text === 'string') ? v_text : '';
+    // normalizeText: minúsculas + sin diacríticos (á→a). Reutiliza el helper.
+    return this.normalizeText(v_str)
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+  };
+
+  /**
    * Obtiene el número de palabras
    */
   meWYSE.prototype.getWordCount = function() {
@@ -16273,7 +16449,7 @@
     'quote': 1, 'code': 1, 'bulletList': 1, 'numberList': 1,
     'checklist': 1, 'table': 1, 'image': 1, 'divider': 1,
     'video': 1, 'audio': 1, 'pageBreak': 1, 'callout': 1,
-    'toggle': 1
+    'toggle': 1, 'toc': 1
   };
 
   // Variantes válidas del bloque callout (validadas en el sanitizer).
@@ -17281,6 +17457,9 @@
     } else if (type === 'divider') {
       clean.content = '';
     } else if (type === 'pageBreak') {
+      clean.content = '';
+    } else if (type === 'toc') {
+      // El contenido se deriva de los títulos; no se almacena.
       clean.content = '';
     } else if (type === 'callout') {
       // Contenido inline editable (como paragraph); la variante se valida aparte.
@@ -18834,7 +19013,7 @@
     this.pushHistory(true);
     var v_validClass = (customClass && this._customClassWhitelist &&
                         this._customClassWhitelist[customClass]) ? customClass : null;
-    var v_nonConvertible = { table: 1, image: 1, divider: 1, pageBreak: 1, video: 1, audio: 1 };
+    var v_nonConvertible = { table: 1, image: 1, divider: 1, pageBreak: 1, video: 1, audio: 1, toc: 1 };
 
     for (var i = 0; i < info.ids.length; i++) {
       var v_block = this.getBlock(info.ids[i]);
