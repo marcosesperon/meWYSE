@@ -294,6 +294,49 @@
       color: #3f3f46;
     }
 
+    /* ===== Configurador de opciones ===== */
+    .config-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 8px 16px;
+      margin-bottom: 14px;
+    }
+    .config-opt {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #3f3f46;
+    }
+    .config-opt input[type="checkbox"] { width: 15px; height: 15px; cursor: pointer; }
+    .config-opt label { cursor: pointer; user-select: none; }
+    .config-opt select {
+      margin-left: auto;
+      padding: 3px 6px;
+      font-size: 12px;
+      font-family: inherit;
+      border: 1px solid rgba(0, 0, 0, 0.15);
+      border-radius: 6px;
+      background: #fff;
+      color: #3f3f46;
+    }
+    .config-hint {
+      margin: 6px 0 14px;
+      padding: 10px 12px;
+      background: rgba(59, 130, 246, 0.06);
+      border: 1px solid rgba(59, 130, 246, 0.15);
+      border-radius: 8px;
+      font-size: 13px;
+      color: #3f3f46;
+    }
+    .config-hint code {
+      background: rgba(0, 0, 0, 0.06);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 12px;
+    }
+
     /* ===== Features ===== */
     .feature-list {
       list-style: none;
@@ -924,6 +967,44 @@ editor.loadFromMarkdown(editor.getMarkdown());</code></pre>
       </div>
     </div>
 
+    <!-- Demo: Novedades Sprint 1 y 2 -->
+    <div class="demo-section">
+      <h2>Novedades (Sprint 1 y 2)</h2>
+      <p>Autoformato Markdown en vivo, sub/super&iacute;ndice, callouts, salto de p&aacute;gina, fuente/tama&ntilde;o/interlineado, caracteres especiales, autosave e imprimir/Word.</p>
+      <div class="config-hint">
+        Pru&eacute;balo tecleando en un p&aacute;rrafo: <code>#&nbsp;</code> t&iacute;tulo &middot; <code>-&nbsp;</code> lista &middot;
+        <code>1.&nbsp;</code> numerada &middot; <code>&gt;&nbsp;</code> cita &middot; <code>[]&nbsp;</code> checklist &middot;
+        <code>```&nbsp;</code> c&oacute;digo. Sub/super&iacute;ndice con <code>Ctrl+.</code> / <code>Ctrl+,</code>.
+        En la toolbar: fuente (<strong>Aa</strong>), caracteres especiales (&Omega;), imprimir y Word.
+      </div>
+      <pre class="docs-code"><code>var editor = new meWYSE({
+  target: '#novedadesEditor',
+  toolbar: true,
+  fontControls: true,   // botón de fuente/tamaño/interlineado
+  exportTools: true,    // botones de imprimir y Word
+  autosave: true,       // guarda el borrador en localStorage
+  autosaveKey: 'mewyse-demo-novedades'
+});</code></pre>
+      <div id="novedadesEditor"></div>
+      <div class="controls">
+        <h3>Borrador (autosave)</h3>
+        <div class="button-group">
+          <button class="btn" onclick="novedadesRestore()">Restaurar borrador</button>
+          <button class="btn btn-secondary" onclick="novedadesClear()">Limpiar borrador</button>
+        </div>
+        <p style="font-size:12px;color:#71717a;margin:8px 0 0;">El contenido se guarda solo en <code>localStorage</code> al editar. Recarga la p&aacute;gina y pulsa &quot;Restaurar borrador&quot;.</p>
+      </div>
+    </div>
+
+    <!-- Demo: Configurador de opciones -->
+    <div class="demo-section">
+      <h2>Configurador de opciones</h2>
+      <p>Activa/desactiva opciones y el editor se <strong>reinicializa autom&aacute;ticamente</strong>. Abajo se muestra la configuraci&oacute;n generada.</p>
+      <div id="configPanel" class="config-grid"></div>
+      <pre class="docs-code" id="configCode" aria-live="polite"></pre>
+      <div id="configEditorHost"></div>
+    </div>
+
   </div>
 
   <!-- ── Footer ──────────────────────────────────── -->
@@ -949,6 +1030,8 @@ editor.loadFromMarkdown(editor.getMarkdown());</code></pre>
     var toolsEditor;
     var rtlEditor;
     var scrollToolbarEditor;
+    var novedadesEditor;
+    var configEditor;
     var currentI18nLang = 'en';
 
     // Inicializar editor basico
@@ -1590,6 +1673,175 @@ editor.loadFromMarkdown(editor.getMarkdown());</code></pre>
       container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
+    // ===== Demo Novedades (Sprint 1 y 2) =====
+    function initNovedadesEditor() {
+      novedadesEditor = new meWYSE({
+        target: '#novedadesEditor',
+        toolbar: true,
+        fontControls: true,
+        exportTools: true,
+        autosave: true,
+        autosaveKey: 'mewyse-demo-novedades',
+        blocks: [
+          { id: 1, type: 'heading1', content: 'Novedades del editor' },
+          { id: 2, type: 'paragraph', content: 'Formula del agua: H<sub>2</sub>O. Area = r<sup>2</sup>&middot;&pi;.' },
+          { id: 3, type: 'callout', content: 'Bloque de informacion (variante info).', calloutVariant: 'info' },
+          { id: 4, type: 'callout', content: 'Advertencia importante.', calloutVariant: 'warning' },
+          { id: 5, type: 'callout', content: 'Operacion completada con exito.', calloutVariant: 'success' },
+          { id: 6, type: 'callout', content: 'Cuidado: accion destructiva.', calloutVariant: 'danger' },
+          { id: 7, type: 'paragraph', content: 'Debajo hay un salto de pagina (visible al imprimir):' },
+          { id: 8, type: 'pageBreak', content: '' },
+          { id: 9, type: 'paragraph', content: 'Escribe "# " o "- " al inicio de esta linea para probar el autoformato.' }
+        ]
+      });
+    }
+    function novedadesRestore() {
+      if (novedadesEditor && !novedadesEditor.restoreDraft()) {
+        alert('No hay borrador guardado. Edita el contenido y vuelve a intentarlo.');
+      }
+    }
+    function novedadesClear() {
+      if (novedadesEditor) {
+        novedadesEditor.clearDraft();
+        alert('Borrador eliminado de localStorage.');
+      }
+    }
+
+    // ===== Configurador de opciones =====
+    // Especificacion de las opciones: booleanas (checkbox) y de lista (select).
+    var CONFIG_OPTIONS = [
+      { key: 'toolbar', label: 'toolbar', type: 'bool', def: true },
+      { key: 'summary', label: 'summary', type: 'bool', def: true },
+      { key: 'charCounter', label: 'charCounter', type: 'bool', def: false },
+      { key: 'findReplace', label: 'findReplace', type: 'bool', def: true },
+      { key: 'fullscreen', label: 'fullscreen', type: 'bool', def: true },
+      { key: 'showBlocksToggle', label: 'showBlocksToggle', type: 'bool', def: true },
+      { key: 'wordWrapToggle', label: 'wordWrapToggle', type: 'bool', def: true },
+      { key: 'wordWrap', label: 'wordWrap', type: 'bool', def: true },
+      { key: 'fontControls', label: 'fontControls', type: 'bool', def: false },
+      { key: 'exportTools', label: 'exportTools', type: 'bool', def: false },
+      { key: 'autosave', label: 'autosave', type: 'bool', def: false },
+      { key: 'rtl', label: 'rtl', type: 'bool', def: false },
+      { key: 'readOnly', label: 'readOnly', type: 'bool', def: false },
+      { key: 'pasteAsText', label: 'pasteAsText', type: 'bool', def: false },
+      { key: 'contentStyles', label: 'contentStyles', type: 'bool', def: true },
+      { key: 'escapeHtmlEntities', label: 'escapeHtmlEntities', type: 'bool', def: true },
+      { key: 'htmlNumericEntities', label: 'htmlNumericEntities', type: 'bool', def: true },
+      { key: 'theme', label: 'theme', type: 'select', def: '', options: [
+          { value: '', label: 'auto' }, { value: 'dark', label: 'dark' }, { value: 'compact', label: 'compact' } ] },
+      { key: 'lang', label: 'lang', type: 'select', def: 'es', options: [
+          { value: 'es', label: 'es' }, { value: 'en', label: 'en' } ] },
+      { key: 'toolbarOverflow', label: 'toolbarOverflow', type: 'select', def: 'wrap', options: [
+          { value: 'wrap', label: 'wrap' }, { value: 'scroll', label: 'scroll' } ] }
+    ];
+
+    function buildConfigurator() {
+      var panel = document.getElementById('configPanel');
+      if (!panel) return;
+      panel.innerHTML = '';
+      CONFIG_OPTIONS.forEach(function(opt) {
+        var row = document.createElement('div');
+        row.className = 'config-opt';
+        var id = 'cfg-' + opt.key;
+        if (opt.type === 'bool') {
+          var cb = document.createElement('input');
+          cb.type = 'checkbox';
+          cb.id = id;
+          cb.checked = !!opt.def;
+          cb.setAttribute('data-key', opt.key);
+          cb.onchange = reinitConfigEditor;
+          var lb = document.createElement('label');
+          lb.setAttribute('for', id);
+          lb.textContent = opt.label;
+          row.appendChild(cb);
+          row.appendChild(lb);
+        } else {
+          var lb2 = document.createElement('label');
+          lb2.setAttribute('for', id);
+          lb2.textContent = opt.label;
+          var sel = document.createElement('select');
+          sel.id = id;
+          sel.setAttribute('data-key', opt.key);
+          opt.options.forEach(function(o) {
+            var op = document.createElement('option');
+            op.value = o.value;
+            op.textContent = o.label;
+            if (o.value === opt.def) op.selected = true;
+            sel.appendChild(op);
+          });
+          sel.onchange = reinitConfigEditor;
+          row.appendChild(lb2);
+          row.appendChild(sel);
+        }
+        panel.appendChild(row);
+      });
+    }
+
+    // Lee el panel y devuelve el objeto de config (omitiendo los valores por
+    // defecto para que la config mostrada sea mínima y legible).
+    function readConfigFromPanel() {
+      var cfg = {};
+      CONFIG_OPTIONS.forEach(function(opt) {
+        var el = document.getElementById('cfg-' + opt.key);
+        if (!el) return;
+        var val = (opt.type === 'bool') ? el.checked : el.value;
+        if (val !== opt.def) {
+          // theme '' significa auto → no incluirlo
+          if (opt.key === 'theme' && val === '') return;
+          cfg[opt.key] = val;
+        }
+      });
+      return cfg;
+    }
+
+    function configDemoBlocks() {
+      return [
+        { id: 1, type: 'heading2', content: 'Editor configurable' },
+        { id: 2, type: 'paragraph', content: 'Cambia las opciones de arriba y este editor se recrea al instante.' },
+        { id: 3, type: 'callout', content: 'Un callout para ver los temas y estilos.', calloutVariant: 'info' },
+        { id: 4, type: 'bulletList', content: 'Elemento de lista' },
+        { id: 5, type: 'bulletList', content: 'Otro elemento' }
+      ];
+    }
+
+    function updateConfigCode(cfg) {
+      var codeEl = document.getElementById('configCode');
+      if (!codeEl) return;
+      var lines = ["var editor = new meWYSE({", "  target: '#configEditor',"];
+      var keys = [];
+      for (var k in cfg) { if (cfg.hasOwnProperty(k)) keys.push(k); }
+      keys.forEach(function(k, i) {
+        var v = cfg[k];
+        var valStr = (typeof v === 'string') ? ("'" + v + "'") : v;
+        lines.push('  ' + k + ': ' + valStr + (i < keys.length - 1 ? ',' : ''));
+      });
+      // quitar coma sobrante de target si no hay más opciones
+      if (keys.length === 0) lines[1] = "  target: '#configEditor'";
+      lines.push('});');
+      codeEl.textContent = lines.join('\n');
+    }
+
+    function reinitConfigEditor() {
+      var host = document.getElementById('configEditorHost');
+      if (!host) return;
+      if (configEditor) { try { configEditor.destroy(); } catch (e) {} configEditor = null; }
+      host.innerHTML = '';
+      var div = document.createElement('div');
+      div.id = 'configEditor';
+      host.appendChild(div);
+      var cfg = readConfigFromPanel();
+      updateConfigCode(cfg);
+      // Construir la config real (con target y contenido de ejemplo)
+      var full = { target: '#configEditor', blocks: configDemoBlocks() };
+      for (var k in cfg) { if (cfg.hasOwnProperty(k)) full[k] = cfg[k]; }
+      configEditor = new meWYSE(full);
+    }
+
+    function initConfigurator() {
+      buildConfigurator();
+      reinitConfigEditor();
+    }
+
     // Inicializar editores al cargar la pagina
     window.onload = function() {
       initBasicEditor();
@@ -1611,6 +1863,8 @@ editor.loadFromMarkdown(editor.getMarkdown());</code></pre>
       initFocusEditor();
       initDragDropEditor();
       initMarkdownEditor();
+      initNovedadesEditor();
+      initConfigurator();
     };
   </script>
 </body>
