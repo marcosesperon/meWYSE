@@ -1708,9 +1708,11 @@ editor.loadFromMarkdown(editor.getMarkdown());</code></pre>
     }
 
     // ===== Configurador de opciones =====
-    // Especificacion de las opciones: booleanas (checkbox) y de lista (select).
+    // Especificacion de las opciones. `def` = default REAL de la librería (se usa
+    // para omitir del config lo que no cambia). `init` = estado inicial del control
+    // en el panel (cuando difiere del default de la librería).
     var CONFIG_OPTIONS = [
-      { key: 'toolbar', label: 'toolbar', type: 'bool', def: true },
+      { key: 'toolbar', label: 'toolbar', type: 'bool', def: false, init: true },
       { key: 'summary', label: 'summary', type: 'bool', def: true },
       { key: 'charCounter', label: 'charCounter', type: 'bool', def: false },
       { key: 'findReplace', label: 'findReplace', type: 'bool', def: true },
@@ -1743,11 +1745,13 @@ editor.loadFromMarkdown(editor.getMarkdown());</code></pre>
         var row = document.createElement('div');
         row.className = 'config-opt';
         var id = 'cfg-' + opt.key;
+        // Estado inicial del control: `init` si está definido, si no el default real.
+        var initVal = ('init' in opt) ? opt.init : opt.def;
         if (opt.type === 'bool') {
           var cb = document.createElement('input');
           cb.type = 'checkbox';
           cb.id = id;
-          cb.checked = !!opt.def;
+          cb.checked = !!initVal;
           cb.setAttribute('data-key', opt.key);
           cb.onchange = reinitConfigEditor;
           var lb = document.createElement('label');
@@ -1766,7 +1770,7 @@ editor.loadFromMarkdown(editor.getMarkdown());</code></pre>
             var op = document.createElement('option');
             op.value = o.value;
             op.textContent = o.label;
-            if (o.value === opt.def) op.selected = true;
+            if (o.value === initVal) op.selected = true;
             sel.appendChild(op);
           });
           sel.onchange = reinitConfigEditor;
