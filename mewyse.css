@@ -3060,3 +3060,30 @@ th.mewyse-image-drop-target-cell {
   outline: 2px solid var(--mewyse-accent);
   outline-offset: 1px;
 }
+
+/* ============================================
+   Impresión: ocultar el "chrome" del editor (toolbar, handles, menús,
+   backdrops, controles de tabla) para que Ctrl+P imprima solo el contenido.
+   El método print() abre una ventana limpia; esto es defensa para Ctrl+P directo.
+   ============================================ */
+@media print {
+  .mewyse-toolbar,
+  .mewyse-floating-handle,
+  .mewyse-char-counter,
+  .mewyse-outline-panel,
+  .mewyse-summary-button,
+  .mewyse-add-block,
+  .mewyse-table-toolbar,
+  .mewyse-callout-variant,
+  .mewyse-overlay,
+  [class*="mewyse-"][class*="-menu"],
+  [class*="mewyse-"][class*="-picker"],
+  [class*="mewyse-"][class*="-modal"] {
+    display: none !important;
+  }
+  .mewyse-editor {
+    max-height: none !important;
+    overflow: visible !important;
+    padding-left: 0 !important;
+  }
+}

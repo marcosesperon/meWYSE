@@ -97,7 +97,9 @@
         caseSentence: 'Tipo oración',
         caseToggle: 'Invertir tipo',
         font: 'Fuente y tamaño',
-        specialChars: 'Caracteres especiales'
+        specialChars: 'Caracteres especiales',
+        print: 'Imprimir',
+        exportWord: 'Exportar a Word'
       },
       font: {
         family: 'Familia',
@@ -345,7 +347,9 @@
         caseSentence: 'Sentence case',
         caseToggle: 'tOGGLE cASE',
         font: 'Font and size',
-        specialChars: 'Special characters'
+        specialChars: 'Special characters',
+        print: 'Print',
+        exportWord: 'Export to Word'
       },
       font: {
         family: 'Family',
@@ -750,6 +754,8 @@
     divider: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" xmlns="http://www.w3.org/2000/svg"><line x1="2" y1="8" x2="14" y2="8"/></svg>',
     pageBreak: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M4 2h5l3 3v3"/><path d="M9 2v3h3"/><path d="M4 8v6h8"/><line x1="1.5" y1="11" x2="14.5" y2="11" stroke-dasharray="2 1.5"/></svg>',
     callout: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="6.5"/><line x1="8" y1="7" x2="8" y2="11.5"/><circle cx="8" cy="4.7" r="0.6" fill="currentColor"/></svg>',
+    print: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M4 6V2h8v4"/><rect x="2.5" y="6" width="11" height="5" rx="1"/><path d="M4 10h8v4H4z"/><circle cx="11.5" cy="8" r="0.6" fill="currentColor"/></svg>',
+    exportWord: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M9 1.5H4a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V5.5z"/><path d="M9 1.5V5.5h4"/><path d="M5.5 8l1 3 1-2.2 1 2.2 1-3"/></svg>',
     paragraph: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M7 2h6v1.5h-1.5V14H10V3.5H8.5V14H7V8.5C4.5 8.5 3 7 3 5.2S4.5 2 7 2z"/></svg>',
     heading1: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M1 3h1.5v4.5H6V3h1.5v11H6V9H2.5v5H1V3z"/><path d="M10 13V5.5L8.5 7V5.2L10.5 3H12v10h-2z"/></svg>',
     heading2: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M1 3h1.5v4.5H6V3h1.5v11H6V9H2.5v5H1V3z"/><path d="M9 11.5c1.2-1.5 3.5-3.2 3.5-5C12.5 5.5 12 4.8 11 4.8c-.8 0-1.4.6-1.5 1.5H8c.1-1.8 1.3-3 3-3 1.8 0 3 1.1 3 2.8 0 2.3-2.5 3.8-3.5 5.2H14V13H9v-1.5z"/></svg>',
@@ -848,6 +854,10 @@
     // fontControls: añade a la toolbar un botón de fuente (familia/tamaño/
     // interlineado). Opt-in (default false) para no recargar la toolbar por defecto.
     this.fontControls = this.options.fontControls === true;
+
+    // exportTools: añade a la toolbar los botones de imprimir y exportar a Word.
+    // Opt-in (default false). Los métodos print()/exportWord() están siempre disponibles.
+    this.exportTools = this.options.exportTools === true;
 
     // Autosave: si está activo, guarda el contenido (JSON) en localStorage con
     // debounce en cada cambio. NO auto-restaura (el consumidor decide vía
@@ -2387,6 +2397,23 @@
       };
       this.fullscreenButton = fullscreenBtn;
       viewGroup.appendChild(fullscreenBtn);
+    }
+
+    // Botones de imprimir y exportar a Word (opt-in con `exportTools`).
+    if (this.exportTools) {
+      var printBtn = document.createElement('button');
+      printBtn.className = 'mewyse-toolbar-button';
+      printBtn.innerHTML = WYSIWYG_ICONS.print;
+      printBtn.title = this.t('tooltips.print');
+      printBtn.onclick = function(e) { e.preventDefault(); self.print(); };
+      viewGroup.appendChild(printBtn);
+
+      var wordBtn = document.createElement('button');
+      wordBtn.className = 'mewyse-toolbar-button';
+      wordBtn.innerHTML = WYSIWYG_ICONS.exportWord;
+      wordBtn.title = this.t('tooltips.exportWord');
+      wordBtn.onclick = function(e) { e.preventDefault(); self.exportWord(); };
+      viewGroup.appendChild(wordBtn);
     }
 
     if (viewGroup.children.length > 0) {
@@ -16697,6 +16724,75 @@
   meWYSE.prototype.getSafeHTML = function() {
     var raw = this.getHTML();
     return this._sanitizeBlockContent(raw, { allowTable: true, allowImg: true, allowMedia: true });
+  };
+
+  /**
+   * Hoja de estilos autocontenida para imprimir / exportar el documento (sin
+   * el chrome del editor). Se usa en print() y exportWord().
+   * @returns {string} CSS
+   */
+  meWYSE.prototype._documentStyles = function() {
+    return [
+      'body{font-family:system-ui,Segoe UI,Arial,sans-serif;color:#111;line-height:1.5;',
+      'max-width:800px;margin:24px auto;padding:0 16px;}',
+      'h1,h2,h3{line-height:1.25;margin:1em 0 .4em;}h1{font-size:2em}h2{font-size:1.5em}h3{font-size:1.2em}',
+      'p{margin:0 0 .6em}blockquote{border-left:3px solid #ccc;margin:0 0 .6em;padding:.3em 1em;color:#444}',
+      'pre{background:#f5f5f5;border:1px solid #e0e0e0;border-radius:6px;padding:.75em 1em;overflow:auto}',
+      'code{font-family:Consolas,monospace;font-size:.9em}',
+      'ul,ol{margin:0 0 .6em;padding-left:1.5em}',
+      'table{border-collapse:collapse;width:100%;margin:0 0 .6em}td,th{border:1px solid #ccc;padding:6px 8px}',
+      'img{max-width:100%;height:auto}',
+      '.mewyse-callout{border-left:3px solid #2563eb;background:#eff4ff;border-radius:6px;padding:.6em .9em;margin:0 0 .6em}',
+      '.mewyse-callout-warning{border-left-color:#d97706;background:#fff7ed}',
+      '.mewyse-callout-success{border-left-color:#16a34a;background:#f0fdf4}',
+      '.mewyse-callout-danger{border-left-color:#dc2626;background:#fef2f2}',
+      '.mewyse-page-break{break-after:page;page-break-after:always;border:0}'
+    ].join('');
+  };
+
+  /**
+   * Imprime SOLO el documento (sin toolbar/handles/menús): abre una ventana con
+   * el HTML saneado + la hoja de estilos de documento y lanza print().
+   */
+  meWYSE.prototype.print = function() {
+    var v_html = this.getSafeHTML();
+    var v_win = window.open('', '_blank');
+    if (!v_win) return; // popup bloqueado
+    var v_doc = v_win.document;
+    v_doc.open();
+    v_doc.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>' +
+      escapeHtml(document.title || 'Documento') + '</title><style>' +
+      this._documentStyles() + '</style></head><body>' + v_html + '</body></html>');
+    v_doc.close();
+    v_win.focus();
+    // Dar un margen a que el layout/imágenes carguen antes de imprimir.
+    setTimeout(function() { try { v_win.print(); } catch (e) {} }, 300);
+  };
+
+  /**
+   * Exporta el documento a un archivo .doc (Word abre HTML con cabecera MHTML).
+   * Sin librerías: parte de getSafeHTML() y descarga vía Blob.
+   * @param {string} filename - nombre sin extensión (default 'documento')
+   */
+  meWYSE.prototype.exportWord = function(filename) {
+    var v_html = this.getSafeHTML();
+    var v_pre = '<html xmlns:o="urn:schemas-microsoft-com:office:office" ' +
+      'xmlns:w="urn:schemas-microsoft-com:office:word" ' +
+      'xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8">' +
+      '<style>' + this._documentStyles() + '</style></head><body>';
+    var v_full = v_pre + v_html + '</body></html>';
+    var v_name = (typeof filename === 'string' && filename ? filename : 'documento') + '.doc';
+    try {
+      var v_blob = new Blob(['﻿', v_full], { type: 'application/msword' });
+      var v_url = URL.createObjectURL(v_blob);
+      var v_a = document.createElement('a');
+      v_a.href = v_url;
+      v_a.download = v_name;
+      document.body.appendChild(v_a);
+      v_a.click();
+      document.body.removeChild(v_a);
+      setTimeout(function() { URL.revokeObjectURL(v_url); }, 1000);
+    } catch (e) {}
   };
 
   /**

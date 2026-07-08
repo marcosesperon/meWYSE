@@ -47,17 +47,20 @@ especiales, merge tags, imprimir/PDF/Word, autosave, TOC como bloque, salto de p
   cerrada, interlineado a todo el bloque) vía `_applyFontStyle`. Picker `showSpecialCharsMenu` inserta
   símbolos con `execCommand('insertText')`. VERIFICADO: los 3 estilos persisten y se exportan; el picker inserta.
 
-## Sprint 2 — UX moderna y documentos (medio, riesgo bajo-medio)
-- [ ] **2.1 Autoformato Markdown en vivo (reglas de BLOQUE)**: en `handleKeyDown`
-  ([mewyse.js:9130](mewyse.js:9130)) interceptar espacio; `# ## ###`→heading, `- * +`→bullet,
-  `1.`→number, `>`→quote, `[] [x]`→checklist, ` ``` `→code, `---`→divider (solo en `paragraph`).
-  `preventDefault` + vaciar marcador + `changeBlockType`. Reusar rutas de atajos Ctrl+número.
-- [ ] **2.2 Callout / aviso**: tipo `callout` + `calloutVariant` (set cerrado). Render
-  `div.mewyse-callout` (icono no editable + div editable). Export HTML = variante como clase; MD =
-  `> [!INFO]`. Registrar en `_sanitizeBlock` (patrón `alignment`).
-- [ ] **2.3 Imprimir + Word .doc**: `print()` = `window.print()` + `@media print` (oculta chrome), o
-  `window.open()` con `getSafeHTML()`. Word: `getSafeHTML()` en header MHTML → Blob `application/msword`
-  (.doc), sin librería. Siempre desde `getSafeHTML()`.
+## Sprint 2 — UX moderna y documentos (medio, riesgo bajo-medio) ✅ COMPLETADO
+- [x] **2.1 ✅ Autoformato Markdown en vivo (reglas de bloque)**: en el handler de espacio de
+  `handleKeyDown`, si el párrafo solo contiene un marcador → `changeBlockType`. `# ## ###`→heading,
+  `- * +`→bullet, `1.`→number, `>`→quote, ` ``` `→code, `[] [x]`→checklist. Usa `_editableTextContent`
+  (ignora cápsulas). VERIFICADO: todos convierten; texto normal no dispara. (commit `d5eaea3`)
+- [x] **2.2 ✅ Callout / aviso**: tipo `callout` + `calloutVariant` (CALLOUT_VARIANTS, default info).
+  Render `div.mewyse-callout` (icono no editable que abre `showCalloutVariantMenu` + div editable);
+  `_sanitizeBlock` (content + variante validada); export HTML = clase, MD = `> [!NOTE/TIP/WARNING/CAUTION]`;
+  slash menu + i18n + CSS (4 variantes, texto con color explícito). VERIFICADO: round-trip sobrevive al
+  sanitizer; variante inválida → info; cambio de variante y edición OK. (commit `9e695e6`)
+- [x] **2.3 ✅ Imprimir + Word .doc**: `print()` abre ventana con `getSafeHTML()` + hoja de estilos de
+  documento (`_documentStyles`) y lanza `print()`; `exportWord(name)` envuelve `getSafeHTML()` en header
+  MHTML y descarga `.doc` vía Blob (sin librería). Opción opt-in `exportTools` (botones en toolbar) +
+  `@media print` que oculta el chrome. VERIFICADO: Blob `application/msword` con cabecera+estilos+contenido.
 
 ## Sprint 3 — ERP y autoformato inline (medio, riesgo bajo-medio)
 - [ ] **3.1 Merge tags / variables `{{campo}}`** (mejor encaje ERP): clonar pipeline de `tags`
