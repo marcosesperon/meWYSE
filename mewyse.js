@@ -9280,6 +9280,35 @@
     // tag) y el siguiente texto que escribes podría asociarse visualmente al
     // tag o no aparecer.
     if ((e.key === ' ' || e.code === 'Space') && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      // --- Autoformato Markdown en vivo (reglas de BLOQUE) ---
+      // Al teclear espacio en un párrafo cuyo único texto es un marcador
+      // Markdown (#, -, 1., >, [], ```...), convertir el tipo de bloque.
+      var v_afBlock = this.getBlock(blockId);
+      var v_afSel = window.getSelection();
+      if (v_afBlock && v_afBlock.type === 'paragraph' &&
+          v_afSel && v_afSel.rangeCount > 0 && v_afSel.getRangeAt(0).collapsed) {
+        var v_marker = this._editableTextContent(element);
+        var v_afType = null;
+        var v_afChecked = false;
+        if (v_marker === '#') v_afType = 'heading1';
+        else if (v_marker === '##') v_afType = 'heading2';
+        else if (v_marker === '###') v_afType = 'heading3';
+        else if (v_marker === '-' || v_marker === '*' || v_marker === '+') v_afType = 'bulletList';
+        else if (v_marker === '1.') v_afType = 'numberList';
+        else if (v_marker === '>') v_afType = 'quote';
+        else if (v_marker === '```') v_afType = 'code';
+        else if (v_marker === '[]' || v_marker === '[ ]') v_afType = 'checklist';
+        else if (v_marker === '[x]' || v_marker === '[X]') { v_afType = 'checklist'; v_afChecked = true; }
+        if (v_afType) {
+          e.preventDefault();
+          v_afBlock.content = '';
+          if (v_afType === 'checklist') v_afBlock.checked = v_afChecked;
+          // changeBlockType hace pushHistory + render (recoloca el caret) + triggerChange.
+          this.changeBlockType(blockId, v_afType);
+          return;
+        }
+      }
+
       var spaceSel = window.getSelection();
       if (spaceSel && spaceSel.rangeCount > 0) {
         var spaceRange = spaceSel.getRangeAt(0);
