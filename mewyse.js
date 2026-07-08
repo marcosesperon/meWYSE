@@ -2484,6 +2484,7 @@
 
     var modalContainer = document.createElement('div');
     modalContainer.className = 'mewyse-modal-container';
+    self._applyMenuTheme(modalContainer); // dark mode si el editor está en oscuro
 
     // Modal title
     var modalTitle = document.createElement('h3');
@@ -2789,6 +2790,7 @@
 
     var modalContainer = document.createElement('div');
     modalContainer.className = 'mewyse-modal-container';
+    self._applyMenuTheme(modalContainer); // dark mode si el editor está en oscuro
 
     // Modal title
     var modalTitle = document.createElement('h3');
@@ -3713,6 +3715,7 @@
     // Crear el contenedor del modal
     var modalContainer = document.createElement('div');
     modalContainer.className = 'mewyse-modal-container';
+    self._applyMenuTheme(modalContainer); // dark mode si el editor está en oscuro
 
     // Título
     var modalTitle = document.createElement('h3');
@@ -3952,6 +3955,7 @@
     // Crear el contenedor del modal
     var modalContainer = document.createElement('div');
     modalContainer.className = 'mewyse-modal-container';
+    self._applyMenuTheme(modalContainer); // dark mode si el editor está en oscuro
 
     // Título
     var modalTitle = document.createElement('h3');
@@ -12857,6 +12861,7 @@
 
     var container = document.createElement('div');
     container.className = 'mewyse-modal-container';
+    self._applyMenuTheme(container); // dark mode si el editor está en oscuro
 
     var title = document.createElement('h3');
     title.className = 'mewyse-modal-title';
@@ -13664,6 +13669,7 @@
     // Crear modal
     var modal = document.createElement('div');
     modal.className = 'mewyse-summary-modal';
+    self._applyMenuTheme(modal); // dark mode si el editor está en oscuro
 
     // Título del modal
     var header = document.createElement('div');
@@ -15646,7 +15652,7 @@
     overlay.className = 'mewyse-modal-overlay';
     var modal = document.createElement('div');
     modal.className = 'mewyse-modal-container';
-    if (self.options.theme) modal.classList.add('mewyse-editor-' + self.options.theme);
+    self._applyMenuTheme(modal); // dark mode si el editor está en oscuro
 
     var title = document.createElement('h3');
     title.className = 'mewyse-modal-title';
@@ -16508,7 +16514,7 @@
     // Contenedor
     var modal = document.createElement('div');
     modal.className = 'mewyse-modal-container mewyse-table-properties-modal';
-    if (self.options.theme) modal.classList.add('mewyse-editor-' + self.options.theme);
+    self._applyMenuTheme(modal); // dark mode si el editor está en oscuro
 
     // Título
     var title = document.createElement('h3');

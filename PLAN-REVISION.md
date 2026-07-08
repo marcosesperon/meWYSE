@@ -165,24 +165,30 @@ Los tres primeros están **reproducidos en vivo**.
 
 ## Fase 5 — CSS (MEDIO/limpieza) 🟡🔵
 
-- [ ] **5.1 Dark mode roto en TODOS los modales** (`.mewyse-modal-container`, summary): cuelgan de `body`
-  y no cumplen los selectores dark → aparecen en claro. → [mewyse.css:2944](mewyse.css:2944), [mewyse.css:2295](mewyse.css:2295).
-- [ ] **5.2 `@keyframes fadeIn` duplicado y contradictorio** (la 2ª anula el deslizamiento). `slideUp`
-  también duplicado. → [mewyse.css:1354](mewyse.css:1354), [mewyse.css:1871](mewyse.css:1871), [mewyse.css:1641](mewyse.css:1641).
-- [ ] **5.3 Hardcodes de color en dark**: `#e8f0fe` ([mewyse.css:1067](mewyse.css:1067)), `#fee`/`#d33`
-  ([mewyse.css:973](mewyse.css:973)), familia `#4a9eff` como 2º acento, más lista de `#ddd`/`#aaa`/`#999`/`#000`
-  con variable exacta disponible. Migrar a variables `--mewyse-*`.
-- [ ] **5.4 Selector dark de cita probablemente inaplicable**: `.mewyse-editor-dark .mewyse-block blockquote`
-  debería ser `blockquote.mewyse-block`. → [mewyse.css:2214](mewyse.css:2214).
-- [ ] **5.5 Diálogo find/replace con paleta dark propia inconsistente** (violeta). → [mewyse.css:2519](mewyse.css:2519).
-- [ ] **5.6 Modo readonly pisado por estilos de contenido** (misma especificidad, gana el posterior).
-  → [mewyse.css:191](mewyse.css:191) vs [mewyse.css:403](mewyse.css:403).
-- [ ] **5.7 Declaraciones `color` duplicadas dentro de la misma regla** (`.mewyse-color-remove`,
-  `.mewyse-modal-button-cancel`, `.mewyse-summary-button`, `.mewyse-toolbar-button`) y bloque
-  `.mewyse-color-grid` que duplica reglas base. → varias, ver [mewyse.css:1531](mewyse.css:1531), [mewyse.css:1575](mewyse.css:1575).
-- [ ] **5.8 Reglas muertas** (~40 líneas): `.mewyse-full`, `.mewyse-block-content`, scrollbars vacías,
-  spacer RTL vacío. `.mewyse-summary-heading1/2/3` desproporciona el tooltip. → [mewyse.css:386](mewyse.css:386), [mewyse.css:1372](mewyse.css:1372), [mewyse.css:1838](mewyse.css:1838).
-- [ ] **5.9 `:focus-visible` ausente en ~13 elementos interactivos** (convención del proyecto).
+- [x] **5.1 ✅ Dark mode roto en modales. RESUELTO.** Los contenedores de modal (imagen, enlace, media,
+  propiedades de tabla, summary) llaman a `_applyMenuTheme` (añade `mewyse-dark` si el editor está en
+  oscuro) y se añadieron `.mewyse-modal-overlay/.mewyse-modal-container/.mewyse-summary-modal.mewyse-dark`
+  al grupo de variables dark. Sustituido el `mewyse-editor-'+theme` (incorrecto) de media/tabla.
+  - VERIFICADO: modal de propiedades en editor dark → fondo `#1a1a1a`, texto claro.
+- [x] **5.2 ✅ Keyframes duplicados. RESUELTO.** Eliminados los duplicados tardíos de `fadeIn`
+  (opacity-only, anulaba el slide) y `slideUp`; quedan las versiones con deslizamiento.
+  - VERIFICADO: `@keyframes fadeIn` vuelve a incluir `translateY`.
+- [x] **5.3 ✅ Hardcodes de color migrados a variables.** `#e8f0fe`→`--mewyse-bg-hover`; `#fee`/`#d33`→
+  `--mewyse-danger-bg`/`--mewyse-danger`; familia `#4a9eff`/`#3a8eef`/`#5568d3`→`--mewyse-accent`/`-hover`;
+  `#ddd`/`#e0e0e0`/`#aaa`/`#999` de contenido y estados activos/separadores→variables de borde/texto/bg.
+  - Se conservan a propósito: `#000` del contenedor de vídeo (letterbox) y el botón claro sobre imagen (`#fff`/`#333`/`#999`).
+- [x] **5.4 ✅ Selector dark de cita corregido** a `.mewyse-editor-dark blockquote.mewyse-block`.
+- [x] **5.5 ✅ Find/replace dark unificado** con la paleta neutra común (añadido al grupo `.mewyse-dark`,
+  eliminada la paleta violeta propia).
+- [x] **5.6 ✅ Readonly ya no lo pisan los estilos de contenido**: la regla pasa a
+  `.mewyse-editor.mewyse-editor-styled.mewyse-readonly` (cubre minimal y con toolbar, mayor especificidad).
+- [x] **5.7 ✅ Declaraciones `color` duplicadas eliminadas** (`.mewyse-toolbar-button`,
+  `.mewyse-modal-button-cancel`, `.mewyse-summary-button`, `.mewyse-color-remove`) y bloque redundante
+  `.mewyse-color-grid .mewyse-color-*` eliminado.
+- [x] **5.8 ✅ Reglas muertas eliminadas**: `.mewyse-full`, `.mewyse-block-content`, `::-webkit-scrollbar`
+  vacías, spacer RTL vacío; `.mewyse-summary-heading1/2/3` del tooltip reescaladas a tamaños razonables.
+- [x] **5.9 ✅ `:focus-visible` añadido** a los ~12 elementos interactivos que faltaban (bloque agrupado al
+  final del CSS, misma convención `outline` con el acento del tema).
 
 ---
 

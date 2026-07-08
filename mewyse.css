@@ -105,7 +105,6 @@
   border-radius: var(--mewyse-radius-md);
   padding: 6px 10px;
   cursor: pointer;
-  color: var(--mewyse-text-primary);
   transition: all 0.15s ease;
   min-width: 32px;
   height: 32px;
@@ -125,7 +124,7 @@
 }
 
 .mewyse-toolbar-button:active {
-  background: #ddd;
+  background: var(--mewyse-bg-active);
 }
 
 .mewyse-toolbar-button:focus-visible {
@@ -164,7 +163,7 @@
 .mewyse-toolbar-separator {
   width: 1px;
   height: 24px;
-  background: #ddd;
+  background: var(--mewyse-border-medium);
   margin: 0 4px;
 }
 
@@ -382,11 +381,6 @@
   padding-left: var(--mewyse-padding-handle);
 }
 
-/* Modo completo */
-.mewyse-full {
-  /* Sin estilos visuales - hereda del contenedor padre */
-}
-
 /* ============================================================================
    ESTILOS DE CONTENIDO (default).
    Aplican cuando JS añade `mewyse-editor-styled` al wrapper y al container —
@@ -416,7 +410,10 @@
   max-height: 400px;
   overflow-y: auto;
 }
-.mewyse-editor.mewyse-editor-styled.mewyse-minimal.mewyse-readonly {
+/* Readonly con estilos de contenido: gana a .mewyse-editor-styled (misma
+   especificidad, iba después) añadiendo .mewyse-readonly al selector. Cubre
+   tanto el modo minimal como el que tiene toolbar. */
+.mewyse-editor.mewyse-editor-styled.mewyse-readonly {
   padding: 0.5em;
   min-height: auto;
 }
@@ -436,15 +433,15 @@
 }
 /* Títulos: margen superior e inferior (relativos a su propio tamaño). */
 .mewyse-editor-styled h1.mewyse-block {
-  margin: 0.8em 0 0.4em 0;
+  margin: 2em 0 .75em;
   padding: 0;
 }
 .mewyse-editor-styled h2.mewyse-block {
-  margin: 0.7em 0 0.35em 0;
+  margin: 2em 0 .75em;
   padding: 0;
 }
 .mewyse-editor-styled h3.mewyse-block {
-  margin: 0.6em 0 0.3em 0;
+  margin: 1.5em 0 .5em;
   padding: 0;
 }
 /* El primer bloque del editor nunca lleva margen superior. */
@@ -454,7 +451,7 @@
 .mewyse-editor-styled blockquote.mewyse-block {
   margin: 0 0 0.5em 0;
   padding: 0.5em 1em;
-  border-left: 3px solid #ddd;
+  border-left: 3px solid var(--mewyse-border-medium);
 }
 .mewyse-editor-styled hr.mewyse-block {
   margin: 0 0 0.5em 0;
@@ -472,7 +469,7 @@
 .mewyse-editor-styled .mewyse-block:only-child:empty:before,
 .mewyse-editor-styled .mewyse-block[data-placeholder]:only-child:empty:before {
   content: attr(data-placeholder);
-  color: #aaa;
+  color: var(--mewyse-text-light);
   pointer-events: none;
 }
 /* Bloque de código: estilo tipo .docs-code (adaptado al tema). */
@@ -601,7 +598,7 @@
 
 /* Mention y emoji (la cápsula del tag se estila ya en su sección dedicada arriba) */
 .mewyse-editor-styled .mewyse-mention {
-  background-color: #e8f0fe;
+  background-color: var(--mewyse-bg-hover);
   color: #1a73e8;
   padding: 0.125em 0.375em;
   border-radius: 4px;
@@ -655,7 +652,7 @@
 }
 .mewyse-editor-styled ul.mewyse-checklist-group > li.mewyse-block.checked .mewyse-checklist-content {
   text-decoration: line-through;
-  color: #999;
+  color: var(--mewyse-text-muted);
 }
 
 /* ----------------------------------------------------------------------------
@@ -723,10 +720,10 @@
   transition: border-color 0.2s ease;
 }
 .mewyse-editor-styled .mewyse-image-container:hover .mewyse-image {
-  border-color: #4a9eff;
+  border-color: var(--mewyse-accent);
 }
 .mewyse-editor-styled .mewyse-image.selected {
-  border-color: #4a9eff !important;
+  border-color: var(--mewyse-accent) !important;
   box-shadow: 0 4px 16px rgba(74,158,255,0.3);
   cursor: pointer;
 }
@@ -735,7 +732,7 @@
   top: 8px;
   right: 8px;
   background: rgba(255,255,255,0.95);
-  border: 1px solid #ddd;
+  border: 1px solid var(--mewyse-border-medium);
   border-radius: 4px;
   padding: 6px 10px;
   cursor: pointer;
@@ -767,7 +764,7 @@
   right: 0;
   width: 16px;
   height: 16px;
-  background: #4a9eff;
+  background: var(--mewyse-accent);
   border: 2px solid #fff;
   border-radius: 2px;
   cursor: nwse-resize;
@@ -780,7 +777,7 @@
   opacity: 1;
 }
 .mewyse-editor-styled .mewyse-image-resize-handle:hover {
-  background: #3a8eef;
+  background: var(--mewyse-accent-hover);
   transform: scale(1.1);
 }
 .mewyse-editor-styled .mewyse-image-resizing {
@@ -820,8 +817,8 @@
 
 .mewyse-handle:active {
   cursor: grabbing;
-  color: #000;
-  background: #e0e0e0;
+  color: var(--mewyse-text-primary);
+  background: var(--mewyse-bg-active);
 }
 
 
@@ -844,7 +841,7 @@
 }
 
 .mewyse-table-resize-handle:active {
-  background: #5568d3;
+  background: var(--mewyse-accent-hover);
 }
 
 /* Tabla durante redimensionamiento */
@@ -971,8 +968,8 @@
 }
 
 .mewyse-options-menu-item.danger:hover {
-  background-color: #fee;
-  color: #d33;
+  background-color: var(--mewyse-danger-bg);
+  color: var(--mewyse-danger);
 }
 
 .mewyse-options-menu-item .icon {
@@ -1064,7 +1061,7 @@
 
 .mewyse-slash-menu-item:hover,
 .mewyse-slash-menu-item.selected {
-  background-color: #e8f0fe;
+  background-color: var(--mewyse-bg-hover);
   border-left: 3px solid var(--mewyse-accent);
   padding-left: 9px;
 }
@@ -1135,7 +1132,7 @@
 
 .mewyse-mention-menu-item:hover,
 .mewyse-mention-menu-item.selected {
-  background-color: #e8f0fe;
+  background-color: var(--mewyse-bg-hover);
 }
 
 .mewyse-mention-menu-item:focus-visible {
@@ -1315,7 +1312,7 @@
   padding: 10px;
   margin-top: 12px;
   background: var(--mewyse-bg-secondary);
-  border: 2px dashed #ddd;
+  border: 2px dashed var(--mewyse-border-medium);
   border-radius: var(--mewyse-radius-lg);
   color: var(--mewyse-text-secondary);
   cursor: pointer;
@@ -1329,26 +1326,8 @@
   color: var(--mewyse-text-primary);
 }
 
-/* Scrollbar personalizado */
-.mewyse-editor::-webkit-scrollbar,
-.mewyse-type-menu::-webkit-scrollbar {
-  /* Sin estilos visuales - usa scrollbar del sistema */
-}
-
-.mewyse-editor::-webkit-scrollbar-track,
-.mewyse-type-menu::-webkit-scrollbar-track {
-  /* Sin estilos visuales - usa scrollbar del sistema */
-}
-
-.mewyse-editor::-webkit-scrollbar-thumb,
-.mewyse-type-menu::-webkit-scrollbar-thumb {
-  /* Sin estilos visuales - usa scrollbar del sistema */
-}
-
-.mewyse-editor::-webkit-scrollbar-thumb:hover,
-.mewyse-type-menu::-webkit-scrollbar-thumb:hover {
-  /* Sin estilos visuales - usa scrollbar del sistema */
-}
+/* (Reglas ::-webkit-scrollbar vacías eliminadas: usaban la scrollbar del
+   sistema sin estilos, no aportaban nada.) */
 
 /* Animaciones */
 @keyframes fadeIn {
@@ -1364,16 +1343,6 @@
 
 .mewyse-type-menu {
   animation: fadeIn 0.2s ease;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .mewyse-full,
-  .mewyse-block-content h1,
-  .mewyse-block-content h2,
-  .mewyse-block-content h3 {
-    /* Sin estilos visuales - hereda del contenedor padre */
-  }
 }
 
 /* Estados de arrastre */
@@ -1430,8 +1399,8 @@
 
 .mewyse-floating-handle .mewyse-handle:active {
   cursor: grabbing;
-  color: #000;
-  background: #e0e0e0;
+  color: var(--mewyse-text-primary);
+  background: var(--mewyse-bg-active);
 }
 
 /* ============================================ */
@@ -1479,7 +1448,7 @@
 }
 
 .mewyse-format-button:active {
-  background-color: #e0e0e0;
+  background-color: var(--mewyse-bg-active);
 }
 
 .mewyse-format-button:focus-visible {
@@ -1490,7 +1459,7 @@
 .mewyse-format-separator {
   width: 1px;
   height: 24px;
-  background-color: #e0e0e0;
+  background-color: var(--mewyse-border-medium);
   margin: 0 4px;
 }
 
@@ -1513,7 +1482,7 @@
 .mewyse-color-button {
   width: 28px;
   height: 28px;
-  border: 2px solid #e0e0e0;
+  border: 2px solid var(--mewyse-border-light);
   border-radius: var(--mewyse-radius-md);
   cursor: pointer;
   transition: all 0.15s ease;
@@ -1528,8 +1497,7 @@
 
 .mewyse-color-remove {
   background: var(--mewyse-bg-primary);
-  color: var(--mewyse-text-primary);
-  color: #d33;
+  color: var(--mewyse-danger);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1572,36 +1540,8 @@
   gap: 4px;
 }
 
-.mewyse-color-grid .mewyse-color-button {
-  width: 28px;
-  height: 28px;
-  border: 2px solid #e0e0e0;
-  border-radius: var(--mewyse-radius-md);
-  cursor: pointer;
-  transition: all 0.15s ease;
-  padding: 0;
-}
-
-.mewyse-color-grid .mewyse-color-button:hover {
-  transform: scale(1.1);
-  border-color: var(--mewyse-text-muted);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-.mewyse-color-grid .mewyse-color-remove {
-  background: var(--mewyse-bg-primary);
-  color: var(--mewyse-text-primary);
-  color: #d33;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  grid-column: span 7;
-}
-
-.mewyse-color-grid .mewyse-color-remove svg {
-  width: 14px;
-  height: 14px;
-}
+/* (Bloque .mewyse-color-grid .mewyse-color-* eliminado: era redundante — los
+   botones ya están dentro de .mewyse-color-grid y matchean las reglas base.) */
 
 /* ============================================ */
 /* BLOQUE DE IMAGEN */
@@ -1705,7 +1645,7 @@
 
 .mewyse-modal-input:focus {
   outline: none;
-  border-color: #4a9eff;
+  border-color: var(--mewyse-accent);
   box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.1);
 }
 
@@ -1745,7 +1685,6 @@
 
 .mewyse-modal-button-cancel {
   background: var(--mewyse-bg-primary);
-  color: var(--mewyse-text-primary);
   color: var(--mewyse-text-secondary);
 }
 
@@ -1755,14 +1694,14 @@
 }
 
 .mewyse-modal-button-primary {
-  background: #4a9eff;
+  background: var(--mewyse-accent);
   color: #fff;
-  border-color: #4a9eff;
+  border-color: var(--mewyse-accent);
 }
 
 .mewyse-modal-button-primary:hover {
-  background: #3a8eef;
-  border-color: #3a8eef;
+  background: var(--mewyse-accent-hover);
+  border-color: var(--mewyse-accent-hover);
 }
 
 .mewyse-modal-button:focus-visible {
@@ -1778,7 +1717,6 @@
   width: 36px;
   height: 36px;
   background: var(--mewyse-bg-primary);
-  color: var(--mewyse-text-primary);
   border: 1px solid var(--mewyse-border-medium);
   border-radius: var(--mewyse-radius-lg);
   cursor: pointer;
@@ -1835,21 +1773,24 @@
   background: var(--mewyse-bg-hover);
 }
 
+/* Items del tooltip de resumen: tamaños moderados (viven en un tooltip de
+   ~250px; antes eran 2em/1.75em/1.5em y desproporcionaban el tooltip). La
+   indentación por nivel se conserva. */
 .mewyse-summary-heading1 {
   font-weight: 600;
-  font-size: 2em;
+  font-size: 1.1em;
   padding-left: 16px;
 }
 
 .mewyse-summary-heading2 {
   font-weight: 500;
-  font-size: 1.75em;
+  font-size: 1em;
   padding-left: 28px;
 }
 
 .mewyse-summary-heading3 {
   font-weight: 400;
-  font-size: 1.5em;
+  font-size: 0.9em;
   padding-left: 40px;
 }
 
@@ -1868,14 +1809,7 @@
   animation: fadeIn 0.2s ease;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
+/* (fadeIn duplicado eliminado: se usa el definido arriba, con deslizamiento) */
 
 /* Modal de resumen */
 .mewyse-summary-modal {
@@ -1892,16 +1826,7 @@
   animation: slideUp 0.3s ease;
 }
 
-@keyframes slideUp {
-  from {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
+/* (slideUp duplicado eliminado: idéntico al definido arriba) */
 
 /* Header del modal */
 .mewyse-summary-modal-header {
@@ -2211,7 +2136,7 @@
 }
 
 /* Estilos adicionales para dark mode que no se resuelven solo con variables */
-.mewyse-editor-dark .mewyse-block blockquote {
+.mewyse-editor-dark blockquote.mewyse-block {
   background: rgba(255, 255, 255, 0.04);
   border-left-color: rgba(255, 255, 255, 0.2);
 }
@@ -2301,7 +2226,11 @@
 .mewyse-type-menu.mewyse-dark,
 .mewyse-table-toolbar.mewyse-dark,
 .mewyse-color-picker.mewyse-dark,
-.mewyse-unified-color-picker.mewyse-dark {
+.mewyse-unified-color-picker.mewyse-dark,
+.mewyse-modal-overlay.mewyse-dark,
+.mewyse-modal-container.mewyse-dark,
+.mewyse-summary-modal.mewyse-dark,
+.mewyse-find-replace.mewyse-dark {
   /* Paleta neutra (negro/gris) — coherente con el editor en dark */
   --mewyse-text-primary: #e6e6e6;
   --mewyse-text-secondary: #a0a0a0;
@@ -2492,11 +2421,6 @@ body.mewyse-fullscreen-lock {
   padding-left: 0;
 }
 
-/* La toolbar nativa RTL invierte el orden, pero los spacers flex siguen funcionando */
-.mewyse-editor-wrapper.mewyse-rtl .mewyse-toolbar > div[style*="flex: 1"] {
-  /* spacer mantiene su rol de empujar elementos al extremo contrario */
-}
-
 /* ============================================
    FIND & REPLACE DIALOG
    ============================================ */
@@ -2516,17 +2440,8 @@ body.mewyse-fullscreen-lock {
   color: var(--mewyse-text-primary);
 }
 
-.mewyse-find-replace.mewyse-dark {
-  --mewyse-text-primary: #ddd;
-  --mewyse-text-secondary: #aaa;
-  --mewyse-text-muted: #777;
-  --mewyse-bg-primary: #1e1e2e;
-  --mewyse-bg-secondary: #2a2a3d;
-  --mewyse-bg-hover: #383850;
-  --mewyse-border-light: #383850;
-  --mewyse-border-medium: #44445a;
-  --mewyse-accent: #7b8ff0;
-}
+/* (Paleta dark propia del find/replace eliminada: ahora usa la paleta neutra
+   común del grupo .mewyse-dark, coherente con el resto de la UI.) */
 
 .mewyse-fr-header {
   display: flex;
@@ -2955,4 +2870,24 @@ th.mewyse-image-drop-target-cell {
   .mewyse-table-properties-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* ============================================
+   Accesibilidad: :focus-visible en elementos interactivos que faltaban.
+   Misma convención que el resto (contorno con el color de acento del tema).
+   ============================================ */
+.mewyse-options-menu-item:focus-visible,
+.mewyse-type-menu-item:focus-visible,
+.mewyse-summary-button:focus-visible,
+.mewyse-summary-close:focus-visible,
+.mewyse-outline-close:focus-visible,
+.mewyse-fr-close:focus-visible,
+.mewyse-fr-btn:focus-visible,
+.mewyse-color-button:focus-visible,
+.mewyse-add-block:focus-visible,
+.mewyse-toolbar-scroll-arrow:focus-visible,
+.mewyse-modal-advanced-toggle:focus-visible,
+.mewyse-modal-btn-small:focus-visible {
+  outline: 2px solid var(--mewyse-accent);
+  outline-offset: 1px;
 }
