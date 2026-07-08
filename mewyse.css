@@ -495,6 +495,57 @@
   }
   .mewyse-page-break-label { display: none; }
 }
+
+/* Callout / aviso: fondo translúcido (funciona en claro y oscuro) + borde e
+   icono con el color de la variante. El texto usa el color primario del tema
+   (explícito, para que no lo deje invisible una regla de la página anfitriona). */
+.mewyse-callout {
+  display: flex;
+  gap: 10px;
+  margin: 0 0 0.5em 0;
+  padding: 0.6em 0.9em;
+  border-radius: var(--mewyse-radius-lg);
+  border-left: 3px solid var(--mewyse-c--callout, #3b82f6);
+  background: var(--mewyse-cbg, rgba(59, 130, 246, 0.10));
+  align-items: flex-start;
+}
+.mewyse-callout-content {
+  flex: 1;
+  outline: none;
+  color: var(--mewyse-text-primary);
+  min-width: 0;
+}
+.mewyse-callout-variant {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--mewyse-cc, #3b82f6);
+}
+.mewyse-callout-variant:focus-visible {
+  outline: 2px solid var(--mewyse-accent);
+  outline-offset: 1px;
+  border-radius: var(--mewyse-radius-sm, 4px);
+}
+.mewyse-callout-info    { --mewyse-cc: #2563eb; --mewyse-cbg: rgba(37, 99, 235, 0.10);  border-left-color: #2563eb; }
+.mewyse-callout-warning { --mewyse-cc: #d97706; --mewyse-cbg: rgba(217, 119, 6, 0.12);  border-left-color: #d97706; }
+.mewyse-callout-success { --mewyse-cc: #16a34a; --mewyse-cbg: rgba(22, 163, 74, 0.12);  border-left-color: #16a34a; }
+.mewyse-callout-danger  { --mewyse-cc: #dc2626; --mewyse-cbg: rgba(220, 38, 38, 0.10);  border-left-color: #dc2626; }
+/* Swatch del menú de variante */
+.mewyse-callout-swatch {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--mewyse-cc, #3b82f6);
+}
+
 .mewyse-editor-styled .mewyse-block-selected {
   background-color: rgba(59, 130, 246, 0.1);
   border-radius: 4px;

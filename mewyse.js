@@ -26,8 +26,16 @@
         image: 'Imagen',
         divider: 'Separador',
         pageBreak: 'Salto de página',
+        callout: 'Aviso',
         video: 'Vídeo',
         audio: 'Audio'
+      },
+      callout: {
+        variant: 'Estilo del aviso',
+        info: 'Información',
+        warning: 'Advertencia',
+        success: 'Éxito',
+        danger: 'Peligro'
       },
       blockTypeDescriptions: {
         paragraph: 'Texto normal',
@@ -43,6 +51,7 @@
         image: 'Insertar imagen',
         divider: 'Línea divisoria',
         pageBreak: 'Corte de página al imprimir/exportar',
+        callout: 'Bloque destacado (info, aviso...)',
         video: 'YouTube, Vimeo o archivo .mp4',
         audio: 'Archivo de audio (mp3, ogg...)'
       },
@@ -265,8 +274,16 @@
         image: 'Image',
         divider: 'Divider',
         pageBreak: 'Page break',
+        callout: 'Callout',
         video: 'Video',
         audio: 'Audio'
+      },
+      callout: {
+        variant: 'Callout style',
+        info: 'Information',
+        warning: 'Warning',
+        success: 'Success',
+        danger: 'Danger'
       },
       blockTypeDescriptions: {
         paragraph: 'Normal text',
@@ -282,6 +299,7 @@
         image: 'Insert image',
         divider: 'Dividing line',
         pageBreak: 'Page break for print/export',
+        callout: 'Highlighted block (info, warning...)',
         video: 'YouTube, Vimeo or .mp4 file',
         audio: 'Audio file (mp3, ogg...)'
       },
@@ -731,6 +749,7 @@
     checklist: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="12" height="12" rx="2"/><polyline points="5,8 7,10.5 11,5.5"/></svg>',
     divider: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" xmlns="http://www.w3.org/2000/svg"><line x1="2" y1="8" x2="14" y2="8"/></svg>',
     pageBreak: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M4 2h5l3 3v3"/><path d="M9 2v3h3"/><path d="M4 8v6h8"/><line x1="1.5" y1="11" x2="14.5" y2="11" stroke-dasharray="2 1.5"/></svg>',
+    callout: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="6.5"/><line x1="8" y1="7" x2="8" y2="11.5"/><circle cx="8" cy="4.7" r="0.6" fill="currentColor"/></svg>',
     paragraph: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M7 2h6v1.5h-1.5V14H10V3.5H8.5V14H7V8.5C4.5 8.5 3 7 3 5.2S4.5 2 7 2z"/></svg>',
     heading1: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M1 3h1.5v4.5H6V3h1.5v11H6V9H2.5v5H1V3z"/><path d="M10 13V5.5L8.5 7V5.2L10.5 3H12v10h-2z"/></svg>',
     heading2: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M1 3h1.5v4.5H6V3h1.5v11H6V9H2.5v5H1V3z"/><path d="M9 11.5c1.2-1.5 3.5-3.2 3.5-5C12.5 5.5 12 4.8 11 4.8c-.8 0-1.4.6-1.5 1.5H8c.1-1.8 1.3-3 3-3 1.8 0 3 1.1 3 2.8 0 2.3-2.5 3.8-3.5 5.2H14V13H9v-1.5z"/></svg>',
@@ -5042,6 +5061,33 @@
         element.appendChild(v_pbLabel);
         break;
 
+      case 'callout':
+        // Aviso: contenedor con variante de color + icono no editable (que abre
+        // el selector de variante) + contenido editable.
+        var v_variant = CALLOUT_VARIANTS[block.calloutVariant] ? block.calloutVariant : 'info';
+        element = document.createElement('div');
+        element.className = 'mewyse-callout mewyse-callout-' + v_variant;
+        var v_coBtn = document.createElement('button');
+        v_coBtn.className = 'mewyse-callout-variant';
+        v_coBtn.setAttribute('contenteditable', 'false');
+        v_coBtn.setAttribute('type', 'button');
+        v_coBtn.title = self.t('callout.variant');
+        v_coBtn.innerHTML = WYSIWYG_ICONS.callout;
+        v_coBtn.onclick = function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          self.showCalloutVariantMenu(block.id, v_coBtn);
+        };
+        var v_coContent = document.createElement('div');
+        v_coContent.className = 'mewyse-callout-content';
+        v_coContent.contentEditable = true;
+        v_coContent.innerHTML = block.content || '';
+        v_coContent.setAttribute('data-placeholder', self.t('placeholders.slashCommand'));
+        element.appendChild(v_coBtn);
+        element.appendChild(v_coContent);
+        this.attachBlockEvents(v_coContent, block.id);
+        break;
+
       default: // paragraph
         element = document.createElement('p');
         element.contentEditable = true;
@@ -8050,7 +8096,8 @@
       { type: 'video', icon: WYSIWYG_ICONS.video },
       { type: 'audio', icon: WYSIWYG_ICONS.audio },
       { type: 'divider', icon: WYSIWYG_ICONS.divider },
-      { type: 'pageBreak', icon: WYSIWYG_ICONS.pageBreak }
+      { type: 'pageBreak', icon: WYSIWYG_ICONS.pageBreak },
+      { type: 'callout', icon: WYSIWYG_ICONS.callout }
     ];
 
     this.slashMenuTypes = types;
@@ -10034,7 +10081,8 @@
       'table': WYSIWYG_ICONS.table,
       'image': WYSIWYG_ICONS.image,
       'divider': WYSIWYG_ICONS.divider,
-      'pageBreak': WYSIWYG_ICONS.pageBreak
+      'pageBreak': WYSIWYG_ICONS.pageBreak,
+      'callout': WYSIWYG_ICONS.callout
     };
     return icons[type] || WYSIWYG_ICONS.paragraph;
   };
@@ -11016,6 +11064,10 @@
           case 'pageBreak':
             html += '<div class="mewyse-page-break"></div>';
             break;
+          case 'callout':
+            html += '<div class="mewyse-callout mewyse-callout-' +
+                    (block.calloutVariant || 'info') + '">' + inline(content) + '</div>';
+            break;
           default:
             html += '<p' + classAttr(block) + '>' + inline(content) + '</p>';
         }
@@ -11145,6 +11197,10 @@
             break;
           case 'pageBreak':
             html += '<div class="mewyse-page-break"></div>';
+            break;
+          case 'callout':
+            html += '<div class="mewyse-callout mewyse-callout-' +
+                    (block.calloutVariant || 'info') + '">' + content + '</div>';
             break;
           default:
             html += '<p' + classAttr(block) + '>' + content + '</p>';
@@ -11307,6 +11363,12 @@
           case 'pageBreak':
             // Sin sintaxis Markdown estándar: comentario HTML reconocible.
             lines.push('<!-- pagebreak -->');
+            break;
+          case 'callout':
+            // Estilo GitHub: > [!NOTE] / [!TIP] / [!WARNING] / [!CAUTION].
+            var v_coMap = { info: 'NOTE', success: 'TIP', warning: 'WARNING', danger: 'CAUTION' };
+            var v_coTag = v_coMap[block.calloutVariant] || 'NOTE';
+            lines.push('> [!' + v_coTag + ']\n> ' + self.htmlToMarkdownInline(content));
             break;
           case 'table':
             // Parsear HTML de tabla
@@ -13394,6 +13456,63 @@
       self._add_doc_click(v_click_handler);
     }, 0);
     this._showBackdrop('specialCharsMenu', closeMenu);
+  };
+
+  /**
+   * Menú de variante del bloque callout (info/warning/success/danger). Cambia
+   * block.calloutVariant y re-renderiza el bloque.
+   */
+  meWYSE.prototype.showCalloutVariantMenu = function(blockId, button) {
+    var self = this;
+    if (this._calloutMenu && this._calloutMenu.parentNode) {
+      this._calloutMenu.remove(); this._calloutMenu = null; return;
+    }
+    var variants = ['info', 'warning', 'success', 'danger'];
+
+    var menu = document.createElement('div');
+    menu.className = 'mewyse-options-menu mewyse-callout-menu';
+    menu.setAttribute('role', 'menu');
+    menu.addEventListener('mousedown', function(e) { e.preventDefault(); });
+
+    var v_click_handler = null;
+    var closeMenu = function() {
+      if (self._calloutMenu && self._calloutMenu.parentNode) self._calloutMenu.remove();
+      self._calloutMenu = null;
+      if (v_click_handler) { self._remove_doc_click(v_click_handler); v_click_handler = null; }
+      self._hideBackdrop('calloutMenu');
+    };
+
+    variants.forEach(function(v) {
+      var item = document.createElement('div');
+      item.className = 'mewyse-options-menu-item';
+      item.setAttribute('role', 'menuitem');
+      item.innerHTML = '<span class="mewyse-callout-swatch mewyse-callout-' + v + '"></span> ' + self.t('callout.' + v);
+      item.onclick = function(e) {
+        e.preventDefault(); e.stopPropagation();
+        var blk = self.getBlock(blockId);
+        if (blk && blk.type === 'callout') {
+          blk.calloutVariant = v;
+          self._suppressBlurUntil = Date.now() + 300;
+          self.render(blockId);
+          self.triggerChange();
+        }
+        closeMenu();
+      };
+      menu.appendChild(item);
+    });
+
+    self._applyMenuTheme(menu);
+    document.body.appendChild(menu);
+    this._calloutMenu = menu;
+    this.anchorMenu(menu, button, { offsetY: 5 });
+
+    setTimeout(function() {
+      v_click_handler = function(e) {
+        if (!menu.contains(e.target) && !button.contains(e.target)) closeMenu();
+      };
+      self._add_doc_click(v_click_handler);
+    }, 0);
+    this._showBackdrop('calloutMenu', closeMenu);
   };
 
   /**
@@ -15487,8 +15606,11 @@
     'paragraph': 1, 'heading1': 1, 'heading2': 1, 'heading3': 1,
     'quote': 1, 'code': 1, 'bulletList': 1, 'numberList': 1,
     'checklist': 1, 'table': 1, 'image': 1, 'divider': 1,
-    'video': 1, 'audio': 1, 'pageBreak': 1
+    'video': 1, 'audio': 1, 'pageBreak': 1, 'callout': 1
   };
+
+  // Variantes válidas del bloque callout (validadas en el sanitizer).
+  var CALLOUT_VARIANTS = { 'info': 1, 'warning': 1, 'success': 1, 'danger': 1 };
 
   /**
    * Valida un URL contra esquemas peligrosos (XSS via javascript:)
@@ -16460,6 +16582,11 @@
       clean.content = '';
     } else if (type === 'pageBreak') {
       clean.content = '';
+    } else if (type === 'callout') {
+      // Contenido inline editable (como paragraph); la variante se valida aparte.
+      clean.content = this._sanitizeBlockContent(
+        typeof block.content === 'string' ? block.content : ''
+      );
     } else if (type === 'video') {
       // content: { provider, videoId, url, width, height }
       var vc = block.content;
@@ -16505,6 +16632,10 @@
     // Preservar propiedades opcionales whitelisteadas
     if (type === 'checklist' && block.checked === true) {
       clean.checked = true;
+    }
+    if (type === 'callout') {
+      // Variante validada contra el set cerrado (default info).
+      clean.calloutVariant = CALLOUT_VARIANTS[block.calloutVariant] ? block.calloutVariant : 'info';
     }
     if (typeof block.alignment === 'string') {
       var align = block.alignment.toLowerCase();
