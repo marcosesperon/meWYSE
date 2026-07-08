@@ -125,28 +125,41 @@ Los tres primeros están **reproducidos en vivo**.
 
 ## Fase 4 — Ciclo de vida, fugas y rendimiento (MEDIO) 🟡
 
-- [ ] **4.1 `triggerChange` serializa todo (HTML+JSON+MD+plainText) en cada pulsación aunque no haya
-  `onChange`.** Mover la guarda `if (typeof this.onChange !== 'function')` antes de construir el payload;
-  cachear `getPlainText()` (se llama 3×). → [mewyse.js:11692](mewyse.js:11692).
-- [ ] **4.2 `removeInlineStyle` quita el color de TODOS los spans del bloque, no solo de la selección.**
-  → [mewyse.js:12383](mewyse.js:12383).
-- [ ] **4.3 `deleteBlock` sobre el último bloque no limpia props opcionales** (`alignment`, `checked`,
-  `customClass`, `tableStyle`, `indentLevel`). → [mewyse.js:10466](mewyse.js:10466).
-- [ ] **4.4 Fugas de listeners y limpieza en `destroy()`**:
-  - [ ] `showUnifiedColorPicker`: window scroll/resize + document click no se limpian. → [mewyse.js:12586](mewyse.js:12586).
-  - [ ] `destroy()` no cierra tag-menu, case-menu ni modales abiertos (summary/tabla/media). → [mewyse.js:11809](mewyse.js:11809).
-  - [ ] `showColorPicker`/`showCaseMenu` usan `addEventListener` crudo en vez de `_add_doc_click`.
-  - [ ] `destroy()` deja el wrapper huérfano: usa `===` sobre `className` (que lleva más clases por defecto);
-    cambiar a `classList.contains`. → [mewyse.js:11887](mewyse.js:11887).
-- [ ] **4.5 `anchorMenu` mantiene un `requestAnimationFrame` perpetuo por menú abierto.** Reposicionar
-  solo en scroll/resize. → [mewyse.js:947](mewyse.js:947).
-- [ ] **4.6 Reposición/reconstrucción cara**: `_updateTableToolbar` reconstruye ~15 botones SVG en cada
-  `selectionchange`; `expandTableCellSelection` reconstruye la matriz 3× por `mousemove`. Cachear.
-  → [mewyse.js:7482](mewyse.js:7482), [mewyse.js:6700](mewyse.js:6700).
-- [ ] **4.7 `_isSafeUrl` permite `data:image/svg+xml` / `data:text/xml` en `href`** (vector en IE11).
-  → [mewyse.js:15159](mewyse.js:15159).
-- [ ] **4.8 `_sanitizeStyle`: bypass de `url(` con escapes CSS** (`u\72 l(...)`). Normalizar antes de comparar.
-  → [mewyse.js:15208](mewyse.js:15208).
+- [x] **4.1 ✅ `triggerChange` serializaba todo aunque no hubiera `onChange`. RESUELTO.** Guarda
+  `if (typeof this.onChange !== 'function') return` movida ANTES de construir el payload; `getPlainText()`
+  cacheado en `v_plain` (se llamaba hasta 3×). → [mewyse.js:11775](mewyse.js:11775).
+  - VERIFICADO: `triggerChange` no lanza y sigue sincronizando el textarea.
+- [x] **4.2 ✅ `removeInlineStyle` limpiaba todos los spans del bloque. RESUELTO.** Ahora solo limpia los
+  spans que INTERSECTAN la selección (nuevo helper `_rangeIntersectsNode` con `compareBoundaryPoints`).
+  → [mewyse.js:12488](mewyse.js:12488).
+  - VERIFICADO: quitar color al span "rojo" seleccionado deja intacto el span "azul".
+- [x] **4.3 ✅ `deleteBlock` sobre el último bloque no limpiaba props. RESUELTO.** Se reemplaza por un
+  objeto limpio `{id, type:'paragraph', content:''}` preservando el id. → [mewyse.js:10513](mewyse.js:10513).
+  - VERIFICADO: tras borrar, el bloque solo tiene keys [id, type, content]. (Los otros dos sitios ya creaban objeto fresco.)
+- [x] **4.4 ✅ Fugas de listeners y limpieza en `destroy()`. RESUELTO.**
+  - `destroy()` invoca los `closeFn` de todos los modales del backdrop (color picker, case/tag menu...)
+    antes de limpiar, para que retiren sus propios listeners. → [mewyse.js:11990](mewyse.js:11990).
+  - `showUnifiedColorPicker` expone `_closeColorPicker` y usa `_add_doc_click`/`_remove_doc_click`;
+    `closeFormatMenu` lo invoca (antes hacía `picker.remove()` directo). → [mewyse.js:12746](mewyse.js:12746).
+  - `showCaseMenu` registra su click con `_add_doc_click` y lo retira en su cierre. → [mewyse.js:13216](mewyse.js:13216).
+  - `destroy()` usa `classList.contains('mewyse-editor-wrapper')` (no `===`), que dejaba el wrapper huérfano.
+  - VERIFICADO: destroy con picker abierto elimina picker, backdrop y wrapper; `_closeColorPicker` a null.
+  - Nota: los modales standalone (summary/tabla/media/link) con overlay propio no se barren en destroy
+    (edge case: destruir con un modal-diálogo abierto). No se toca por el riesgo cross-editor de un sweep global.
+- [x] **4.5 ✅ `anchorMenu` reescribía estilos cada frame. RESUELTO (conservador).** Se cachean los
+  últimos top/left/transform y solo se escribe `style` cuando cambian (rompe el thrash de layout sin
+  alterar el posicionamiento). → [mewyse.js:960](mewyse.js:960).
+- [x] **4.6 ✅ Reconstrucción cara. RESUELTO.** `_buildTableToolbar` solo reconstruye si cambia la firma
+  (bloque + índices lógicos + estado merge/unmerge + identidad de celda). `expandTableCellSelection`
+  construye la matriz UNA vez y la reutiliza (`getTableCellCoords`/`getCellsInRange` aceptan matriz
+  opcional). → [mewyse.js:7580](mewyse.js:7580), [mewyse.js:6790](mewyse.js:6790).
+  - VERIFICADO: toolbar con 20 botones estable; misma firma no reconstruye.
+- [x] **4.7 ✅ `_isSafeUrl` permitía `data:` peligrosos en href. RESUELTO.** Bloquea TODO `data:` en
+  enlaces. → [mewyse.js:15411](mewyse.js:15411).
+  - VERIFICADO: `data:image/svg+xml`/`data:text/xml` → false; https/relativo/mailto → true.
+- [x] **4.8 ✅ `_sanitizeStyle` bypass de `url(` con escapes CSS. RESUELTO.** Rechaza cualquier valor con
+  backslash (ninguna prop permitida lo necesita). → [mewyse.js:15461](mewyse.js:15461).
+  - VERIFICADO: `u\72 l(...)` y `url(x)` → ''; `color: red` conservado.
 
 ---
 

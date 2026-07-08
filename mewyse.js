@@ -959,6 +959,10 @@
 
     var animationFrameId = null;
     var isActive = true;
+    // Últimos valores escritos: solo reescribimos style cuando cambian. Escribir
+    // en cada frame invalidaba el layout y forzaba un reflow continuo (thrash)
+    // aunque nada se moviera; el posicionamiento calculado es idéntico.
+    var v_last_top = null, v_last_left = null, v_last_transform = null;
 
     function updatePosition() {
       if (!isActive || !menu.parentNode) {
@@ -973,7 +977,7 @@
       var viewportWidth = window.innerWidth || document.documentElement.clientWidth;
       var viewportHeight = window.innerHeight || document.documentElement.clientHeight;
 
-      menu.style.position = 'fixed';
+      if (menu.style.position !== 'fixed') menu.style.position = 'fixed';
 
       // Calcular posición vertical inicial
       var top;
@@ -996,7 +1000,10 @@
         }
       }
 
-      menu.style.top = top + 'px';
+      if (top !== v_last_top) {
+        menu.style.top = top + 'px';
+        v_last_top = top;
+      }
 
       // Calcular posición horizontal inicial
       var left;
@@ -1029,8 +1036,14 @@
         }
       }
 
-      menu.style.left = left + 'px';
-      menu.style.transform = transform;
+      if (left !== v_last_left) {
+        menu.style.left = left + 'px';
+        v_last_left = left;
+      }
+      if (transform !== v_last_transform) {
+        menu.style.transform = transform;
+        v_last_transform = transform;
+      }
 
       // Continuar actualizando mientras el menú esté activo
       animationFrameId = requestAnimationFrame(updatePosition);
@@ -6757,9 +6770,13 @@
     var table = cell.closest('table');
     if (table !== this.currentSelectionTable) return;
 
+    // Construir la matriz una sola vez y reutilizarla (antes se reconstruía 3
+    // veces por cada mousemove: 2 getTableCellCoords + getCellsInRange).
+    var matrix = this.buildTableMatrix(table);
+
     // Obtener las coordenadas de las celdas
-    var startCoords = this.getTableCellCoords(this.tableCellSelectionStart);
-    var endCoords = this.getTableCellCoords(cell);
+    var startCoords = this.getTableCellCoords(this.tableCellSelectionStart, matrix);
+    var endCoords = this.getTableCellCoords(cell, matrix);
 
     if (!startCoords || !endCoords) return;
 
@@ -6775,8 +6792,8 @@
     });
     this.selectedTableCells = [];
 
-    // Obtener todas las celdas en el rango usando la matriz lógica
-    var cellsInRange = this.getCellsInRange(table, minRow, maxRow, minCol, maxCol);
+    // Obtener todas las celdas en el rango usando la matriz lógica (reutilizada)
+    var cellsInRange = this.getCellsInRange(table, minRow, maxRow, minCol, maxCol, matrix);
 
     // Seleccionar las celdas
     for (var i = 0; i < cellsInRange.length; i++) {
@@ -6808,15 +6825,16 @@
    * @param {HTMLElement} cell
    * @returns {Object|null}
    */
-  meWYSE.prototype.getTableCellCoords = function(cell) {
+  meWYSE.prototype.getTableCellCoords = function(cell, matrix) {
     var row = cell.closest('tr');
     if (!row) return null;
 
     var table = row.closest('table');
     if (!table) return null;
 
-    // Construir una matriz lógica de la tabla
-    var matrix = this.buildTableMatrix(table);
+    // Construir la matriz lógica solo si no la pasa el llamador (permite
+    // reutilizar una misma matriz y evitar reconstruirla varias veces por gesto).
+    if (!matrix) matrix = this.buildTableMatrix(table);
 
     // Buscar la celda en la matriz
     for (var r = 0; r < matrix.length; r++) {
@@ -6886,8 +6904,8 @@
    * @param {number} maxCol
    * @returns {Array}
    */
-  meWYSE.prototype.getCellsInRange = function(table, minRow, maxRow, minCol, maxCol) {
-    var matrix = this.buildTableMatrix(table);
+  meWYSE.prototype.getCellsInRange = function(table, minRow, maxRow, minCol, maxCol, matrix) {
+    if (!matrix) matrix = this.buildTableMatrix(table);
     var cells = [];
     var seen = [];
 
@@ -7563,6 +7581,20 @@
       var rs = parseInt(checkCell.getAttribute('rowspan')) || 1;
       if (cs > 1 || rs > 1) unmergeTarget = checkCell;
     }
+
+    // Evitar reconstruir los ~15 botones SVG en cada selectionchange (p.ej. al
+    // teclear o mover el caret dentro de la MISMA celda). Solo se reconstruye si
+    // cambia algo que afecte a los botones: bloque, índices lógicos, estado de
+    // combinar/descombinar o la propia celda (identidad, cubre re-renders).
+    var v_sig = blockId + '|' + rowIndex + '|' + colIndex + '|' +
+                (mergeEnabled ? 1 : 0) + '|' + (unmergeTarget ? 1 : 0);
+    if (this._tableToolbar._sig === v_sig &&
+        this._tableToolbar._sigCell === info.cell &&
+        this._tableToolbar.childNodes.length) {
+      return;
+    }
+    this._tableToolbar._sig = v_sig;
+    this._tableToolbar._sigCell = info.cell;
 
     // Limpiar contenido previo
     this._tableToolbar.innerHTML = '';
@@ -10509,11 +10541,14 @@
     this.pushHistory(true);
     var index = this.getBlockIndex(blockId);
     if (index !== -1) {
-      // Si es el último bloque, vaciarlo en vez de eliminarlo
+      // Si es el último bloque, vaciarlo en vez de eliminarlo. Se reemplaza por
+      // un objeto limpio (preservando el id) para no arrastrar propiedades
+      // opcionales del bloque anterior (alignment, checked, tableStyle,
+      // indentLevel, customClass) al párrafo vacío resultante.
       if (this.blocks.length === 1) {
-        this.blocks[0].type = 'paragraph';
-        this.blocks[0].content = '';
-        this.render(this.blocks[0].id);
+        var v_id = this.blocks[0].id;
+        this.blocks[0] = { id: v_id, type: 'paragraph', content: '' };
+        this.render(v_id);
         this.triggerChange();
         return;
       }
@@ -11777,13 +11812,18 @@
       this.pushHistory();
     }
 
+    // Texto plano: lo usan el textarea y el elemento original. Se calcula una
+    // sola vez y se cachea (antes se llamaba a getPlainText hasta 3 veces).
+    var v_plain = null;
+
     // Actualizar textarea en modo minimal
     if (this.target.tagName === 'TEXTAREA') {
-      this.target.value = this.getPlainText();
+      v_plain = this.getPlainText();
+      this.target.value = v_plain;
 
       // Si hay un elemento original (no-textarea), sincronizarlo también
       if (this.originalTarget) {
-        this.originalTarget.textContent = this.getPlainText();
+        this.originalTarget.textContent = v_plain;
       }
     }
 
@@ -11801,9 +11841,14 @@
     // callbacks (onChange/onFocus/onBlur) deben ser inertes.
     if (this.readOnly) return;
 
+    // El payload es costoso (serializa HTML + JSON + Markdown, con DOMParser por
+    // bloque). Solo construirlo si hay un consumidor de onChange.
+    if (typeof this.onChange !== 'function') return;
+
+    if (v_plain === null) v_plain = this.getPlainText();
     this._fireChangeCallback({
       blocks: this.blocks,
-      plainText: this.getPlainText(),
+      plainText: v_plain,
       html: this.getHTML(),
       json: this.getJSON(),
       markdown: this.getMarkdown()
@@ -11973,8 +12018,21 @@
     this.closeOutlinePanel();
     this.hideSummaryTooltip();
 
-    // Retirar overlay/backdrop si quedaba activo
-    if (this._activeBackdropModals) this._activeBackdropModals.length = 0;
+    // Cerrar cualquier modal/menú registrado en el backdrop (color picker, case
+    // menu, tag menu...) invocando su closeFn, para que limpien sus PROPIOS
+    // listeners (scroll/resize/click). Se itera sobre una copia porque closeFn
+    // suele mutar _activeBackdropModals vía _hideBackdrop.
+    if (this._activeBackdropModals) {
+      var v_open_modals = this._activeBackdropModals.slice();
+      for (var bm = 0; bm < v_open_modals.length; bm++) {
+        try {
+          if (typeof v_open_modals[bm].closeFn === 'function') v_open_modals[bm].closeFn();
+        } catch (e) {}
+      }
+      this._activeBackdropModals.length = 0;
+    }
+    // Cerrar también el tag-menu si sigue abierto (por si no estaba en backdrop).
+    if (this.closeTagMenu) this.closeTagMenu();
     this._removeBackdrop();
 
     // Limpiar listeners y observer del scroll horizontal de la toolbar
@@ -11994,9 +12052,12 @@
 
     // Limpiar toolbar y wrapper si existen
     if (this.toolbar && this.toolbar.parentNode) {
-      // El toolbar está dentro de un wrapper, eliminar el wrapper completo
+      // El toolbar está dentro de un wrapper, eliminar el wrapper completo.
+      // Se usa classList.contains (no === className) porque el wrapper lleva más
+      // clases por defecto (mewyse-editor-styled, tema, rtl...) y el === fallaba,
+      // dejando el div del wrapper huérfano en el DOM.
       var wrapper = this.toolbar.parentNode;
-      if (wrapper.className === 'mewyse-editor-wrapper') {
+      if (wrapper.classList && wrapper.classList.contains('mewyse-editor-wrapper')) {
         wrapper.remove();
       } else {
         this.toolbar.remove();
@@ -12500,12 +12561,14 @@
       }
     }
 
-    // Buscar spans dentro de la selección que tengan el estilo
+    // Buscar spans que tengan el estilo Y que INTERSECTEN la selección. Antes se
+    // limpiaban todos los spans del contenedor común (todo el bloque cuando la
+    // selección cruzaba varios spans), borrando el color fuera de la selección.
     var spans = [];
     if (container.querySelectorAll) {
       var allSpans = container.querySelectorAll('span');
       for (var i = 0; i < allSpans.length; i++) {
-        if (allSpans[i].style[styleProperty]) {
+        if (allSpans[i].style[styleProperty] && this._rangeIntersectsNode(range, allSpans[i])) {
           spans.push(allSpans[i]);
         }
       }
@@ -12520,6 +12583,25 @@
         this.unwrapElement(spans[j]);
       }
     }
+  };
+
+  /**
+   * Indica si un rango DOM se solapa (aunque sea parcialmente) con un nodo.
+   * Usa compareBoundaryPoints (soporte amplio) en vez de intersectsNode.
+   * @param {Range} range
+   * @param {Node} node
+   * @returns {boolean}
+   */
+  meWYSE.prototype._rangeIntersectsNode = function(range, node) {
+    var v_node_range = document.createRange();
+    try {
+      v_node_range.selectNode(node);
+    } catch (e) {
+      v_node_range.selectNodeContents(node);
+    }
+    // Se solapan si: inicio_rango < fin_nodo  Y  fin_rango > inicio_nodo.
+    return range.compareBoundaryPoints(Range.END_TO_START, v_node_range) < 0 &&
+           range.compareBoundaryPoints(Range.START_TO_END, v_node_range) > 0;
   };
 
   /**
@@ -12714,9 +12796,13 @@
       if (picker.parentNode) picker.remove();
       window.removeEventListener('scroll', scrollHandler, true);
       window.removeEventListener('resize', scrollHandler);
-      document.removeEventListener('click', clickHandler);
+      self._remove_doc_click(clickHandler);
+      self._closeColorPicker = null;
       self._hideBackdrop('colorPicker');
     };
+    // Exponer el cleanup en la instancia para que otras vías de cierre
+    // (closeFormatMenu, destroy) lo invoquen y no dejen listeners colgando.
+    this._closeColorPicker = closePicker;
 
     // Cerrar al hacer clic fuera
     var clickHandler = function(e) {
@@ -12725,8 +12811,9 @@
       }
     };
 
+    // Registrado vía _add_doc_click para que destroy() lo barra si hiciera falta.
     setTimeout(function() {
-      document.addEventListener('click', clickHandler);
+      self._add_doc_click(clickHandler);
     }, 10);
 
     // Evitar que se cierre al hacer clic en el picker
@@ -13179,11 +13266,16 @@
       { mode: 'toggle',   label: this.t('tooltips.caseToggle'),   sample: 'aA' }
     ];
 
+    var v_case_click_handler = null;
     var closeCaseMenu = function() {
       if (self._caseMenu && self._caseMenu.parentNode) {
         self._caseMenu.remove();
       }
       self._caseMenu = null;
+      if (v_case_click_handler) {
+        self._remove_doc_click(v_case_click_handler);
+        v_case_click_handler = null;
+      }
       self._hideBackdrop('caseMenu');
     };
 
@@ -13207,15 +13299,15 @@
     this._caseMenu = menu;
     this.anchorMenu(menu, button, { offsetY: 5 });
 
-    // Cerrar al hacer click fuera
+    // Cerrar al hacer click fuera (registrado vía _add_doc_click para que
+    // closeCaseMenu/destroy puedan retirarlo aunque no llegue a dispararse).
     setTimeout(function() {
-      var closeHandler = function(e) {
+      v_case_click_handler = function(e) {
         if (!menu.contains(e.target) && !button.contains(e.target)) {
           closeCaseMenu();
-          document.removeEventListener('click', closeHandler);
         }
       };
-      document.addEventListener('click', closeHandler);
+      self._add_doc_click(v_case_click_handler);
     }, 0);
 
     this._showBackdrop('caseMenu', closeCaseMenu);
@@ -13239,10 +13331,14 @@
 
     this._hideBackdrop('formatMenu');
 
-    // Cerrar también el color picker si está abierto
-    var picker = document.querySelector('.mewyse-color-picker');
-    if (picker) {
-      picker.remove();
+    // Cerrar también el color picker si está abierto, usando su cleanup para no
+    // dejar listeners de scroll/resize/click colgando (antes hacía picker.remove()
+    // directo y se saltaba closePicker).
+    if (this._closeColorPicker) {
+      this._closeColorPicker();
+    } else {
+      var picker = document.querySelector('.mewyse-color-picker');
+      if (picker) picker.remove();
     }
   };
 
@@ -15321,8 +15417,10 @@
     if (normalized.indexOf('javascript:') === 0) return false;
     if (normalized.indexOf('vbscript:') === 0) return false;
     if (normalized.indexOf('livescript:') === 0) return false;
-    if (normalized.indexOf('data:text/html') === 0) return false;
-    if (normalized.indexOf('data:application') === 0) return false;
+    // Bloquear TODO data: en enlaces (href): un data:image/svg+xml o data:text/xml
+    // puede ejecutar script al navegar (vector real en IE/navegadores antiguos).
+    // Las imágenes data: se validan aparte con _isSafeImageUrl.
+    if (normalized.indexOf('data:') === 0) return false;
     if (normalized.indexOf('file:') === 0) return false;
     return true;
   };
@@ -15361,6 +15459,10 @@
       if (!ALLOWED_CSS_PROPS[prop]) continue;
       // Bloquear valores peligrosos
       var valueLower = value.toLowerCase();
+      // Rechazar backslashes: son escapes CSS (u\72 l(...)) que se usan para
+      // ofuscar url()/expression() y eludir los indexOf de abajo. Ninguna de las
+      // propiedades permitidas (colores, tamaños, bordes) los necesita.
+      if (value.indexOf('\\') >= 0) continue;
       if (valueLower.indexOf('url(') >= 0) continue;
       if (valueLower.indexOf('expression(') >= 0) continue;
       if (valueLower.indexOf('@import') >= 0) continue;
