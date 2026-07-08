@@ -196,21 +196,28 @@ Los tres primeros están **reproducidos en vivo**.
 
 > Pase aparte, sin mezclar con los fixes de comportamiento.
 
-- [ ] **6.1 Eliminar código muerto**: `createContentElement` (~290 líneas, `@deprecated`, contiene
-  `document.onmousemove=`) [mewyse.js:5268](mewyse.js:5268); `showColorPicker` (~80 líneas)
-  [mewyse.js:12193](mewyse.js:12193); `updateConsecutiveNumberLists` no-op y su trabajo asociado;
-  `scrollHandlers`/`clearScrollHandlers`; emojis duplicados en `WYSIWYG_EMOJIS`.
-- [ ] **6.2 Extraer helpers ES5 (sin cambiar comportamiento)**:
-  - [ ] `_buildImageDimensionsModal(opts, onAccept)` — unifica los 4 modales de imagen (~150 líneas c/u;
-    el bug 2.2 nació de esta duplicación).
-  - [ ] `getHTML`/`getHTMLSource` — case table/image/video/audio idénticos (~90 líneas).
-  - [ ] `_positionMenuAtCaret` / `_updateMenuSelection` — mention y emoji comparten algoritmo.
-  - [ ] `_restoreCursorAtOffset(editable, offset)` — `findCursorPosition` duplicada verbatim.
-  - [ ] Helper de snapshot compartido entre `pushHistory` y `undo` (y hacer que `redo` también flushee el debounce).
-- [ ] **6.3 Render incremental** donde bastaría: `duplicateBlock` (`render(id)`), `moveBlock`, `deleteBlock`.
-  → [mewyse.js:10452](mewyse.js:10452).
-- [ ] **6.4 `_searchInEditor` recompila la regex por nodo**; reutilizar una instancia con `lastIndex=0`.
-  → [mewyse.js:14899](mewyse.js:14899).
+- [x] **6.1 ✅ Código muerto eliminado (parcial).** `createContentElement` (~295 líneas, `@deprecated`,
+  sin callers, contenía `document.onmousemove=`); `showColorPicker` (~84 líneas, sin callers);
+  `scrollHandlers` (array sin uso) + `clearScrollHandlers` (no-op) + su llamada en `destroy`; emojis
+  alias duplicados (`blush`=😊, `cool`=😎).
+  - VERIFICADO: las funciones ya no existen en el prototipo; sintaxis OK; editor funciona.
+  - PENDIENTE: `updateConsecutiveNumberLists` (no-op) — tiene 7 call sites entrelazados con lógica de
+    foco/rAF/minIndex; quitarlo bien exige tocar addBlock/changeBlockType/delete*, con riesgo de
+    regresión. Se deja como no-op inofensivo. Ver "Pendientes".
+- [x] **6.4 ✅ `_searchInEditor` reutiliza la instancia de regex** (reseteando `lastIndex`) en vez de
+  compilar una por nodo de texto. → [mewyse.js:14769](mewyse.js:14769).
+  - VERIFICADO: find & replace sigue encontrando todos los matches.
+
+### Pendientes de Fase 6 (refactors DRY pospuestos por relación riesgo/beneficio)
+> Son extracciones/optimizaciones **sin ganancia funcional** sobre código que ya funciona. En un fichero
+> único ES5 sin tests, el riesgo de regresión no compensa hacerlos "a presión"; conviene abordarlos por
+> separado, uno a uno y con verificación dedicada.
+- [ ] **6.2 Extraer helpers**: `_buildImageDimensionsModal` (unifica los 4 modales de imagen ~150 líneas
+  c/u), dedup `getHTML`/`getHTMLSource`, `_positionMenuAtCaret`/`_updateMenuSelection` (mention/emoji),
+  `_findCursorPosition` (duplicada verbatim en changeBlockTypeFromToolbar y changeTableCellBlockType;
+  ojo: la 2ª no tiene `self` en scope), helper de snapshot compartido `pushHistory`/`undo`.
+- [ ] **6.3 Render incremental** en `duplicateBlock`/`moveBlock`/`deleteBlock` (cambia foco/scroll — probar bien).
+- [ ] **6.1b `updateConsecutiveNumberLists`** (no-op) y el trabajo muerto asociado en sus 7 call sites.
 
 ---
 

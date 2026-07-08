@@ -440,7 +440,6 @@
     { name: 'joy', emoji: '😂', category: 'faces' },
     { name: 'rofl', emoji: '🤣', category: 'faces' },
     { name: 'wink', emoji: '😉', category: 'faces' },
-    { name: 'blush', emoji: '😊', category: 'faces' },
     { name: 'heart_eyes', emoji: '😍', category: 'faces' },
     { name: 'kissing', emoji: '😘', category: 'faces' },
     { name: 'thinking', emoji: '🤔', category: 'faces' },
@@ -481,7 +480,6 @@
     { name: 'exploding_head', emoji: '🤯', category: 'faces' },
     { name: 'cowboy', emoji: '🤠', category: 'faces' },
     { name: 'party', emoji: '🥳', category: 'faces' },
-    { name: 'cool', emoji: '😎', category: 'faces' },
     { name: 'angel', emoji: '😇', category: 'faces' },
     { name: 'devil', emoji: '😈', category: 'faces' },
     { name: 'clown', emoji: '🤡', category: 'faces' },
@@ -813,7 +811,6 @@
     this.slashMenu = null;
     this.formatMenu = null;
     this.formatMenuTimeout = null;
-    this.scrollHandlers = [];
     this.lastFocusedElement = null;
     this.summaryButton = null;
     this.toolbarSummaryButton = null; // Botón de resumen en la toolbar (modo con toolbar)
@@ -1121,15 +1118,6 @@
     }
 
     return value;
-  };
-
-  /**
-   * Limpia todos los handlers de scroll y animaciones
-   * Ya no se usa el array scrollHandlers, cada menú gestiona su propio cancelador
-   */
-  meWYSE.prototype.clearScrollHandlers = function() {
-    // Esta función ahora es un no-op, pero la mantenemos por compatibilidad
-    // Cada menú se limpia individualmente cuando se cierra
   };
 
   /**
@@ -5287,303 +5275,6 @@
     self._attachImageDragHandlers(img, { source: 'block', blockId: block.id });
 
     return imageWrapper;
-  };
-
-  /**
-   * Crea el elemento de contenido según el tipo de bloque (LEGACY - mantener por compatibilidad)
-   * @param {Object} block - Datos del bloque
-   * @returns {HTMLElement}
-   * @deprecated Usar createBlockElement en su lugar
-   */
-  meWYSE.prototype.createContentElement = function(block) {
-    var self = this;
-    var element;
-
-    switch (block.type) {
-      case 'heading1':
-        element = document.createElement('h1');
-        break;
-      case 'heading2':
-        element = document.createElement('h2');
-        break;
-      case 'heading3':
-        element = document.createElement('h3');
-        break;
-      case 'quote':
-        element = document.createElement('blockquote');
-        break;
-      case 'code':
-        element = document.createElement('pre');
-        var code = document.createElement('code');
-        code.contentEditable = true;
-        code.innerHTML = block.content || '';
-        element.appendChild(code);
-        this.attachBlockEvents(code, block.id);
-        return element;
-      case 'bulletList':
-        element = document.createElement('ul');
-        var li = document.createElement('li');
-        li.contentEditable = true;
-        li.innerHTML = block.content || '';
-        element.appendChild(li);
-        this.attachBlockEvents(li, block.id);
-        return element;
-      case 'numberList':
-        element = document.createElement('ol');
-
-        // Calcular el número de inicio basado en bloques consecutivos anteriores
-        var startNumber = 1;
-        var currentIndex = this.getBlockIndex(block.id);
-
-        if (currentIndex > 0) {
-          // Contar cuántos bloques numberList consecutivos hay antes de este
-          for (var i = currentIndex - 1; i >= 0; i--) {
-            var prevBlock = this.blocks[i];
-            if (prevBlock.type === 'numberList') {
-              startNumber++;
-            } else {
-              break; // Dejar de contar si encontramos un bloque que no es numberList
-            }
-          }
-        }
-
-        element.setAttribute('start', startNumber);
-        var oli = document.createElement('li');
-        oli.contentEditable = true;
-        oli.innerHTML = block.content || '';
-        element.appendChild(oli);
-        this.attachBlockEvents(oli, block.id);
-        return element;
-      case 'table':
-        // Crear wrapper para la tabla
-        var tableWrapper = document.createElement('div');
-        tableWrapper.className = 'mewyse-table-wrapper';
-
-        element = document.createElement('table');
-        // Solo aplicar inline el tableStyle personalizado. Sin él, los defaults
-        // vienen del CSS inyectado y quedan fuera del export.
-        if (typeof block.tableStyle === 'string' && block.tableStyle) {
-          element.setAttribute('style', block.tableStyle);
-        }
-
-        // Si ya hay contenido (tabla cargada), parsearlo
-        if (block.content && block.content !== '') {
-          element.innerHTML = block.content;
-
-          // Hacer todas las celdas editables y añadir controles
-          // Estilos default cubiertos por CSS inyectado (no inline para que el export quede limpio)
-          var cells = element.querySelectorAll('td, th');
-          for (var c = 0; c < cells.length; c++) {
-            var cell = cells[c];
-
-            // Verificar si la celda contiene una imagen
-            var imgInCell = cell.querySelector('img.mewyse-image');
-            if (imgInCell) {
-              // La celda contiene una imagen, añadir event listeners
-              imgInCell.onclick = function(e) {
-                e.stopPropagation();
-                var cellElement = this.closest('td, th');
-                self.selectImage(this, null, true, cellElement);
-              };
-              imgInCell.setAttribute('data-in-table', 'true');
-              imgInCell.setAttribute('tabindex', '0');
-              // Habilitar drag & drop
-              self._attachImageDragHandlers(imgInCell, { source: 'cell', tableCell: cell });
-              continue; // Saltar al siguiente elemento, esta celda ya está procesada
-            }
-
-            var existingContent = cell.innerHTML.trim();
-            var cellContent;
-
-            // Si ya existe un elemento de bloque válido, mantenerlo
-            if (cell.firstElementChild && ['P', 'H1', 'H2', 'H3', 'BLOCKQUOTE', 'PRE', 'UL', 'OL'].indexOf(cell.firstElementChild.tagName) !== -1) {
-              cellContent = cell.firstElementChild;
-            } else {
-              // Crear nuevo párrafo con el contenido existente
-              cellContent = document.createElement('p');
-              cellContent.innerHTML = existingContent || '';
-              cell.innerHTML = '';
-              cell.appendChild(cellContent);
-            }
-
-            cellContent.contentEditable = true;
-
-            this.attachTableCellEvents(cellContent, block.id);
-          }
-        } else {
-          // Crear tabla 3x3 por defecto (sin estilos inline — CSS inyectado)
-          var tbody = document.createElement('tbody');
-          for (var r = 0; r < 3; r++) {
-            var row = document.createElement('tr');
-            for (var col = 0; col < 3; col++) {
-              var cell = document.createElement('td');
-
-              var cellContent = document.createElement('p');
-              cellContent.contentEditable = true;
-              cellContent.setAttribute('data-placeholder', '');
-
-              cell.appendChild(cellContent);
-              this.attachTableCellEvents(cellContent, block.id);
-              row.appendChild(cell);
-            }
-            tbody.appendChild(row);
-          }
-          element.appendChild(tbody);
-        }
-
-        // Añadir controles de fila/columna a las celdas
-        this.addTableControls(element, block.id);
-
-        // Añadir eventos de selección de celdas a la tabla
-        this.addTableSelectionEvents(element, block.id);
-
-        // Habilitar redimensionamiento de columnas
-        this.enableColumnResizing(element, block.id);
-
-        tableWrapper.appendChild(element);
-
-        // Los botones +fila/+columna se eliminaron: las inserciones se hacen
-        // desde la toolbar contextual de tabla.
-
-        return tableWrapper;
-      case 'image':
-        // Crear wrapper para la imagen
-        var imageWrapper = document.createElement('div');
-        imageWrapper.className = 'mewyse-image-wrapper';
-
-        // Crear contenedor interno con posición relativa
-        var imageContainer = document.createElement('div');
-        imageContainer.className = 'mewyse-image-container';
-
-        element = document.createElement('img');
-        element.className = 'mewyse-image';
-
-        // Si el contenido es un objeto con la información de la imagen
-        if (typeof block.content === 'object' && block.content.blob) {
-          element.src = block.content.blob;
-          element.alt = block.content.fileName || 'Imagen';
-          element.style.width = block.content.width + 'px';
-          element.style.height = block.content.height + 'px';
-
-          // Guardar las dimensiones en atributos data
-          element.setAttribute('data-original-width', block.content.width);
-          element.setAttribute('data-original-height', block.content.height);
-        }
-
-        imageContainer.appendChild(element);
-
-        // Botón para editar dimensiones
-        var editImageBtn = document.createElement('button');
-        editImageBtn.className = 'mewyse-image-edit-btn';
-        editImageBtn.innerHTML = WYSIWYG_ICONS.gear;
-        editImageBtn.title = self.t('tooltips.editDimensions');
-        editImageBtn.onclick = function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          self.editImageDimensions(block.id, element);
-        };
-        imageContainer.appendChild(editImageBtn);
-
-        // Handle de redimensionamiento
-        var resizeHandle = document.createElement('div');
-        resizeHandle.className = 'mewyse-image-resize-handle';
-        resizeHandle.title = self.t('tooltips.dragToResize');
-
-        // Variables para el redimensionamiento
-        var isResizing = false;
-        var startX, startY, startWidth;
-        var aspectRatio = block.content.width / block.content.height;
-
-        resizeHandle.onmousedown = function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-
-          isResizing = true;
-          startX = e.clientX;
-          startY = e.clientY;
-          startWidth = parseInt(element.style.width);
-
-          // Añadir clase para cambiar cursor globalmente
-          document.body.style.cursor = 'nwse-resize';
-          imageContainer.classList.add('mewyse-image-resizing');
-
-          // Prevenir selección de texto durante el resize
-          document.body.style.userSelect = 'none';
-        };
-
-        document.onmousemove = function(e) {
-          if (!isResizing) return;
-
-          var deltaX = e.clientX - startX;
-          var deltaY = e.clientY - startY;
-
-          // Usar el mayor delta para mantener proporciones
-          var delta = Math.abs(deltaX) > Math.abs(deltaY) ? deltaX : deltaY;
-
-          var newWidth = startWidth + delta;
-          var newHeight = Math.round(newWidth / aspectRatio);
-
-          // Límites mínimos
-          if (newWidth < 50) {
-            newWidth = 50;
-            newHeight = Math.round(newWidth / aspectRatio);
-          }
-
-          // Aplicar nuevas dimensiones
-          element.style.width = newWidth + 'px';
-          element.style.height = newHeight + 'px';
-        };
-
-        document.onmouseup = function(e) {
-          if (!isResizing) return;
-
-          isResizing = false;
-          document.body.style.cursor = '';
-          imageContainer.classList.remove('mewyse-image-resizing');
-          document.body.style.userSelect = '';
-
-          // Actualizar las dimensiones en el bloque
-          var finalWidth = parseInt(element.style.width);
-          var finalHeight = parseInt(element.style.height);
-
-          block.content.width = finalWidth;
-          block.content.height = finalHeight;
-
-          self.triggerChange();
-        };
-
-        imageContainer.appendChild(resizeHandle);
-        imageWrapper.appendChild(imageContainer);
-
-        // Hacer la imagen seleccionable y eliminable
-        element.onclick = function(e) {
-          e.stopPropagation();
-          self.selectImage(element, block.id, false);
-        };
-
-        // Marcar la imagen con el ID del bloque para poder eliminarla
-        element.setAttribute('data-block-id', block.id);
-        element.setAttribute('tabindex', '0'); // Permitir foco con teclado
-
-        return imageWrapper;
-      case 'video':
-        return this.createVideoElement(block);
-      case 'audio':
-        return this.createAudioElement(block);
-      case 'divider':
-        element = document.createElement('hr');
-        return element;
-      default: // paragraph
-        element = document.createElement('p');
-    }
-
-    element.contentEditable = true;
-    element.innerHTML = block.content || '';
-    element.setAttribute('data-placeholder', 'Escribe "/" para ver los comandos...');
-
-    this.attachBlockEvents(element, block.id);
-
-    return element;
   };
 
   /**
@@ -12007,8 +11698,6 @@
       this.crossBlockOverlay = null;
     }
 
-    // Limpiar handlers de scroll
-    this.clearScrollHandlers();
 
     // Remover event listener de selección
     if (this.handleSelectionChange) {
@@ -12360,91 +12049,6 @@
     });
 
     this._showBackdrop('formatMenu', function() { self.closeFormatMenu(); });
-  };
-
-  /**
-   * Muestra un selector de color
-   * @param {string} command - 'foreColor' o 'backColor'
-   * @param {HTMLElement} button
-   */
-  meWYSE.prototype.showColorPicker = function(command, button) {
-    var self = this;
-
-    // Cerrar picker existente
-    var existingPicker = document.querySelector('.mewyse-color-picker');
-    if (existingPicker) {
-      existingPicker.remove();
-    }
-
-    var picker = document.createElement('div');
-    picker.className = 'mewyse-color-picker';
-
-    var closeLegacyPicker = function() {
-      if (picker.parentNode) picker.remove();
-      self._hideBackdrop('legacyColorPicker');
-    };
-
-    var colors = [
-      '#000000', '#444444', '#666666', '#999999', '#cccccc', '#eeeeee', '#ffffff',
-      '#ff0000', '#ff9900', '#ffff00', '#00ff00', '#00ffff', '#0000ff', '#9900ff', '#ff00ff',
-      '#f4cccc', '#fce5cd', '#fff2cc', '#d9ead3', '#d0e0e3', '#cfe2f3', '#d9d2e9', '#ead1dc'
-    ];
-
-    colors.forEach(function(color) {
-      var colorBtn = document.createElement('button');
-      colorBtn.className = 'mewyse-color-button';
-      colorBtn.style.backgroundColor = color;
-      colorBtn.title = color;
-
-      colorBtn.onclick = function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        document.execCommand(command, false, color);
-        self.triggerChange();
-        closeLegacyPicker();
-      };
-
-      picker.appendChild(colorBtn);
-    });
-
-    // Botón para remover color
-    var removeBtn = document.createElement('button');
-    removeBtn.className = 'mewyse-color-button mewyse-color-remove';
-    removeBtn.innerHTML = WYSIWYG_ICONS.close;
-    removeBtn.title = self.t('colors.removeColor');
-    removeBtn.onclick = function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      document.execCommand(command, false, 'transparent');
-      self.triggerChange();
-      closeLegacyPicker();
-    };
-    picker.appendChild(removeBtn);
-
-    // Posicionar el picker
-    var rect = button.getBoundingClientRect();
-    picker.style.position = 'fixed';
-    picker.style.top = (rect.bottom + 5) + 'px';
-    picker.style.left = rect.left + 'px';
-
-    document.body.appendChild(picker);
-
-    // Cerrar al hacer clic fuera
-    setTimeout(function() {
-      document.addEventListener('click', function closePicker(e) {
-        if (!picker.contains(e.target) && !button.contains(e.target)) {
-          closeLegacyPicker();
-          document.removeEventListener('click', closePicker);
-        }
-      });
-    }, 10);
-
-    // Evitar que se cierre al hacer clic en el picker
-    picker.addEventListener('mousedown', function(e) {
-      e.preventDefault();
-    });
-
-    this._showBackdrop('legacyColorPicker', closeLegacyPicker);
   };
 
   /**
@@ -15166,7 +14770,10 @@
       var tn = textNodes[i];
       var text = tn.textContent;
       if (!text) continue;
-      var local = new RegExp(escaped, flags);
+      // Reutilizar la instancia de regex (reseteando lastIndex) en vez de
+      // compilar una nueva por cada nodo de texto.
+      var local = regex;
+      local.lastIndex = 0;
       var m, lastIndex = 0;
       var parent = tn.parentNode;
       if (!parent) continue;
