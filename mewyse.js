@@ -157,7 +157,13 @@
       placeholders: {
         quote: 'Cita...',
         urlExample: 'https://ejemplo.com',
-        linkTextPlaceholder: 'Texto a mostrar'
+        linkTextPlaceholder: 'Texto a mostrar',
+        heading1: 'Encabezado 1',
+        heading2: 'Encabezado 2',
+        heading3: 'Encabezado 3',
+        listItem: 'Elemento de lista',
+        task: 'Tarea...',
+        slashCommand: 'Escribe "/" para ver los comandos...'
       },
       alerts: {
         cannotDeleteLastRow: 'No se puede eliminar la única fila de la tabla',
@@ -169,7 +175,16 @@
       misc: {
         text: 'Texto',
         addBlock: '+ Añadir bloque',
-        image: 'Imagen'
+        image: 'Imagen',
+        videoUnavailable: '(vídeo no disponible)',
+        audioUnavailable: '(audio no disponible)',
+        markdownVideo: 'Vídeo',
+        markdownAudio: 'Audio'
+      },
+      aria: {
+        mentions: 'Menciones',
+        emoji: 'Emojis',
+        tags: 'Etiquetas'
       },
       findReplace: {
         title: 'Buscar y reemplazar',
@@ -365,7 +380,13 @@
       placeholders: {
         quote: 'Quote...',
         urlExample: 'https://example.com',
-        linkTextPlaceholder: 'Display text'
+        linkTextPlaceholder: 'Display text',
+        heading1: 'Heading 1',
+        heading2: 'Heading 2',
+        heading3: 'Heading 3',
+        listItem: 'List item',
+        task: 'Task...',
+        slashCommand: 'Type "/" for commands...'
       },
       alerts: {
         cannotDeleteLastRow: 'Cannot delete the only row in the table',
@@ -377,7 +398,16 @@
       misc: {
         text: 'Text',
         addBlock: '+ Add block',
-        image: 'Image'
+        image: 'Image',
+        videoUnavailable: '(video not available)',
+        audioUnavailable: '(audio not available)',
+        markdownVideo: 'Video',
+        markdownAudio: 'Audio'
+      },
+      aria: {
+        mentions: 'Mentions',
+        emoji: 'Emojis',
+        tags: 'Tags'
       },
       findReplace: {
         title: 'Find and replace',
@@ -2309,6 +2339,17 @@
       toolbar.appendChild(moveGroup);
     }
 
+    // Accesibilidad: los botones icon-only solo tienen `title`. Copiar el title
+    // a `aria-label` (si no lo tienen ya) para los lectores de pantalla. Barrido
+    // único en vez de repetirlo en cada botón.
+    var v_btns = toolbar.querySelectorAll('button');
+    for (var vb = 0; vb < v_btns.length; vb++) {
+      var v_b = v_btns[vb];
+      if (!v_b.getAttribute('aria-label') && v_b.getAttribute('title')) {
+        v_b.setAttribute('aria-label', v_b.getAttribute('title'));
+      }
+    }
+
     return toolbar;
   };
 
@@ -4171,6 +4212,7 @@
 
     var menu = document.createElement('div');
     menu.className = 'mewyse-type-menu mewyse-toolbar-menu';
+    menu.setAttribute('role', 'listbox');
 
     var blockTypes = [
       { type: 'paragraph', icon: WYSIWYG_ICONS.paragraph },
@@ -4190,6 +4232,7 @@
     blockTypes.forEach(function(blockType) {
       var item = document.createElement('div');
       item.className = 'mewyse-type-menu-item';
+      item.setAttribute('role', 'option');
       item.innerHTML = '<span class="icon">' + blockType.icon + '</span>' + self.t('blockTypes.' + blockType.type);
       item.onclick = function(e) {
         e.preventDefault();
@@ -4209,6 +4252,7 @@
       this.styleFormats.forEach(function(sf) {
         var item = document.createElement('div');
         item.className = 'mewyse-type-menu-item';
+        item.setAttribute('role', 'option');
         // Preview: aplicar la clase al span del label para que el usuario vea el estilo
         item.innerHTML = '<span class="icon">' + (WYSIWYG_ICONS[sf.block] || WYSIWYG_ICONS.paragraph) +
                         '</span><span class="mewyse-style-preview ' + sf.className + '">' + sf.title + '</span>';
@@ -4791,7 +4835,7 @@
         element = document.createElement('h1');
         element.contentEditable = true;
         element.innerHTML = block.content || '';
-        element.setAttribute('data-placeholder', 'Encabezado 1');
+        element.setAttribute('data-placeholder', self.t('placeholders.heading1'));
         this.attachBlockEvents(element, block.id);
         break;
 
@@ -4799,7 +4843,7 @@
         element = document.createElement('h2');
         element.contentEditable = true;
         element.innerHTML = block.content || '';
-        element.setAttribute('data-placeholder', 'Encabezado 2');
+        element.setAttribute('data-placeholder', self.t('placeholders.heading2'));
         this.attachBlockEvents(element, block.id);
         break;
 
@@ -4807,7 +4851,7 @@
         element = document.createElement('h3');
         element.contentEditable = true;
         element.innerHTML = block.content || '';
-        element.setAttribute('data-placeholder', 'Encabezado 3');
+        element.setAttribute('data-placeholder', self.t('placeholders.heading3'));
         this.attachBlockEvents(element, block.id);
         break;
 
@@ -4834,7 +4878,7 @@
         element = document.createElement('li');
         element.contentEditable = true;
         element.innerHTML = block.content || '';
-        element.setAttribute('data-placeholder', 'Elemento de lista');
+        element.setAttribute('data-placeholder', self.t('placeholders.listItem'));
         this.attachBlockEvents(element, block.id);
         break;
 
@@ -4844,7 +4888,7 @@
         element = document.createElement('li');
         element.contentEditable = true;
         element.innerHTML = block.content || '';
-        element.setAttribute('data-placeholder', 'Elemento de lista');
+        element.setAttribute('data-placeholder', self.t('placeholders.listItem'));
         this.attachBlockEvents(element, block.id);
         break;
 
@@ -4867,7 +4911,7 @@
         contentSpan.className = 'mewyse-checklist-content';
         contentSpan.contentEditable = true;
         contentSpan.innerHTML = block.content || '';
-        contentSpan.setAttribute('data-placeholder', 'Tarea...');
+        contentSpan.setAttribute('data-placeholder', self.t('placeholders.task'));
         element.appendChild(checkbox);
         element.appendChild(contentSpan);
         if (block.checked) {
@@ -4902,7 +4946,7 @@
         element = document.createElement('p');
         element.contentEditable = true;
         element.innerHTML = block.content || '';
-        element.setAttribute('data-placeholder', 'Escribe "/" para ver los comandos...');
+        element.setAttribute('data-placeholder', self.t('placeholders.slashCommand'));
         this.attachBlockEvents(element, block.id);
     }
 
@@ -7780,7 +7824,7 @@
 
     // ===== MENÚ SLASH =====
     // Buscar "/" al inicio o después de espacio
-    var slashMatch = text.match(/(^|\s)\/(\w*)$/);
+    var slashMatch = text.match(/(^|\s)\/([\wÀ-ſ]*)$/);
 
     if (slashMatch) {
       var searchText = slashMatch[2]; // Texto después del "/"
@@ -7803,7 +7847,7 @@
     // ===== MENÚ DE MENCIONES (@) =====
     if (this.mentions.length > 0) {
       // Buscar "@" al inicio o después de espacio
-      var mentionMatch = text.match(/(^|\s)@(\w*)$/);
+      var mentionMatch = text.match(/(^|\s)@([\wÀ-ſ]*)$/);
 
       if (mentionMatch) {
         var mentionSearchText = mentionMatch[2]; // Texto después del "@"
@@ -7827,7 +7871,7 @@
     // ===== MENÚ DE ETIQUETAS (#) =====
     // Mismo patrón que @mentions: trigger al inicio o tras espacio.
     if (this.tags.length > 0) {
-      var tagMatch = text.match(/(^|\s)#([\w-]*)$/);
+      var tagMatch = text.match(/(^|\s)#([\wÀ-ſ-]*)$/);
 
       if (tagMatch) {
         var tagSearchText = tagMatch[2];
@@ -8051,7 +8095,7 @@
     if (block) {
       var text = block.content;
       // Usar regex para encontrar y eliminar "/" seguido de texto de búsqueda
-      var slashMatch = text.match(/(^|\s)\/\w*$/);
+      var slashMatch = text.match(/(^|\s)\/[\wÀ-ſ]*$/);
       if (slashMatch) {
         block.content = text.substring(0, text.length - slashMatch[0].length + (slashMatch[1] ? 1 : 0));
       }
@@ -8126,7 +8170,7 @@
     var menu = document.createElement('div');
     menu.className = 'mewyse-mention-menu';
     menu.setAttribute('role', 'listbox');
-    menu.setAttribute('aria-label', 'Mentions');
+    menu.setAttribute('aria-label', self.t('aria.mentions'));
     // Mantener el foco del bloque al clicar el menú (evita onBlur espurio)
     menu.addEventListener('mousedown', function(e) { e.preventDefault(); });
     this.mentionMenu = menu;
@@ -8400,7 +8444,7 @@
 
     // Buscar y eliminar el "@..." que activó el menú
     var textContent = element.textContent;
-    var mentionMatch = textContent.match(/(^|\s)@(\w*)$/);
+    var mentionMatch = textContent.match(/(^|\s)@([\wÀ-ſ]*)$/);
 
     if (mentionMatch) {
       // Encontrar la posición del @ en el texto
@@ -8492,7 +8536,7 @@
     var menu = document.createElement('div');
     menu.className = 'mewyse-emoji-menu';
     menu.setAttribute('role', 'listbox');
-    menu.setAttribute('aria-label', 'Emoji');
+    menu.setAttribute('aria-label', self.t('aria.emoji'));
     // Mantener el foco del bloque al clicar el menú (evita onBlur espurio)
     menu.addEventListener('mousedown', function(e) { e.preventDefault(); });
 
@@ -8679,6 +8723,7 @@
         visibleIndex++;
       } else {
         item.classList.remove('selected');
+        item.setAttribute('aria-selected', 'false');
       }
     }
   };
@@ -8897,7 +8942,7 @@
     var menu = document.createElement('div');
     menu.className = 'mewyse-tag-menu';
     menu.setAttribute('role', 'listbox');
-    menu.setAttribute('aria-label', 'Tags');
+    menu.setAttribute('aria-label', self.t('aria.tags'));
     this.tagMenu = menu;
     this.tagMenuSelectedIndex = 0;
     this.tagMenuElement = element;
@@ -9027,7 +9072,7 @@
 
     // Buscar y eliminar el "#..." que activó el menú
     var textContent = element.textContent;
-    var hashMatch = textContent.match(/(^|\s)#([\w-]*)$/);
+    var hashMatch = textContent.match(/(^|\s)#([\wÀ-ſ-]*)$/);
     if (hashMatch) {
       var hashPosition = textContent.lastIndexOf('#');
       var walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null, false);
@@ -11155,12 +11200,12 @@
             break;
           case 'video':
             if (typeof content === 'object' && content.url) {
-              lines.push('[Video](' + content.url + ')');
+              lines.push('[' + self.t('misc.markdownVideo') + '](' + content.url + ')');
             }
             break;
           case 'audio':
             if (typeof content === 'object' && content.url) {
-              lines.push('[Audio](' + content.url + ')');
+              lines.push('[' + self.t('misc.markdownAudio') + '](' + content.url + ')');
             }
             break;
           default:
@@ -15423,7 +15468,7 @@
       // fallback: placeholder si los datos no son válidos
       media = document.createElement('div');
       media.className = 'mewyse-video-placeholder';
-      media.textContent = '(video no disponible)';
+      media.textContent = this.t('misc.videoUnavailable');
     }
 
     wrapper.appendChild(media);
@@ -15447,7 +15492,7 @@
     } else {
       var placeholder = document.createElement('div');
       placeholder.className = 'mewyse-audio-placeholder';
-      placeholder.textContent = '(audio no disponible)';
+      placeholder.textContent = this.t('misc.audioUnavailable');
       wrapper.appendChild(placeholder);
     }
 

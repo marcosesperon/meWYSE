@@ -241,13 +241,18 @@ template literals reales; los backticks encontrados están en comentarios) — e
 
 ## Fase 8 — i18n y accesibilidad 🟡
 
-- [ ] **8.1 i18n**: mover a `this.t()` los strings hardcodeados: placeholders 'Encabezado 1/2/3',
-  'Elemento de lista', 'Tarea...', 'Escribe "/"...' ([mewyse.js:4776](mewyse.js:4776)), '(video/audio no
-  disponible)' ([mewyse.js:15555](mewyse.js:15555)), aria-labels 'Mentions'/'Emoji'/'Tags', etiquetas
-  `[Video]`/`[Audio]` del Markdown. Añadir las claves a `WYSIWYG_TRANSLATIONS`.
-- [ ] **8.2** Regex de triggers `\w` no cubren acentos/ñ (`@josé`, `/título` cierran el menú). Ampliar.
-- [ ] **8.3 Accesibilidad**: `aria-label` en los ~14 botones icon-only de la toolbar; `role="listbox"`/
-  `role="option"` en el menú de tipos; `aria-selected="false"` en ítems ocultos de emoji menu.
+- [x] **8.1 ✅ i18n. RESUELTO.** Nuevas claves `placeholders.heading1/2/3/listItem/task/slashCommand`,
+  `misc.videoUnavailable/audioUnavailable/markdownVideo/markdownAudio` y grupo `aria.mentions/emoji/tags`
+  (en `es` y `en`). Aplicadas en `createBlockElement` (placeholders), media placeholders, aria-labels de los
+  menús mención/emoji/tag y etiquetas `[Vídeo]`/`[Audio]` del export Markdown.
+  - VERIFICADO: editor `lang:'en'` → placeholder "Heading 1"/"List item", Markdown `[Video]`.
+- [x] **8.2 ✅ Triggers con acentos/ñ. RESUELTO.** Las regex de slash/mención/tag amplían `\w` a
+  `[\wÀ-ſ]` (rango U+00C0–U+017F: español, francés, portugués). Emoji queda ASCII (shortcodes).
+  - VERIFICADO: `/título`, `@josé`, `@niño`, `#acción` matchean y capturan el query con tilde.
+- [x] **8.3 ✅ Accesibilidad. RESUELTO.** Barrido al final de `createToolbar` que copia `title`→`aria-label`
+  en todos los botones icon-only; `role="listbox"`/`role="option"` en el menú de tipos; `aria-selected="false"`
+  en los ítems ocultos del emoji menu.
+  - VERIFICADO: 26/26 botones de la toolbar con `aria-label`.
 
 ---
 
