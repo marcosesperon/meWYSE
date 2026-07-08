@@ -46,7 +46,7 @@ Si este proyecto te resulta util, puedes apoyar su desarrollo:
 - **Temas**: Dark mode con auto-detección del sistema, tema compact, temas custom
 - **Content Styles**: Opción para heredar estilos CSS de la página
 - **Accesibilidad**: ARIA attributes, focus-visible, navegación por teclado
-- **Compatible ES5**: Funciona en navegadores modernos e IE11+
+- **Código ES5 sin dependencias**: Funciona en todos los navegadores modernos (Chrome, Firefox, Safari, Edge) sin build tools
 
 ## Inicio Rápido
 
@@ -998,9 +998,14 @@ Las variables se definen en `:root` y pueden sobreescribirse por tema:
 ## Compatibilidad
 
 - ECMAScript 5 (no requiere transpilación)
-- Todos los navegadores modernos (Chrome, Firefox, Safari, Edge)
-- IE11+
+- Todos los navegadores modernos: Chrome, Firefox, Safari y Edge (versiones actuales)
 - No requiere build tools, bundler ni package manager
+
+> **Nota sobre IE11**: aunque el código fuente es ES5 (sin `const`/`let`/arrow/etc.),
+> el editor usa APIs del DOM no disponibles en Internet Explorer 11 (`Element.closest`,
+> `ChildNode.remove`, `String.prototype.normalize`, selector `:scope`, `NodeList.forEach`)
+> sin polyfills, por lo que **no es compatible con IE11**. IE11 está fuera de soporte
+> desde junio de 2022.
 
 ## Licencia
 

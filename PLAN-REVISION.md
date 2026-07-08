@@ -221,15 +221,21 @@ Los tres primeros están **reproducidos en vivo**.
 
 ---
 
-## Fase 7 — Compatibilidad IE11 (decisión de alcance) ⚠️
+## Fase 7 — Compatibilidad IE11 (decisión de alcance) ✅
 
-El proyecto declara IE11+ pero usa APIs no soportadas **sin polyfill**, que rompen funciones enteras:
-`String.prototype.normalize`, `Element.remove()`, `NodeList.forEach`, `Element.closest()`,
-selector `:scope > li`, `scrollIntoView({block:'nearest'})`.
+El proyecto declaraba IE11+ pero usa APIs no soportadas **sin polyfill** (`Element.closest` ×60,
+`ChildNode.remove` ×39, `String.prototype.normalize`, selector `:scope`, `NodeList.forEach`), por lo que
+**no funcionaba en IE11**. Auditoría: el código es ES5 puro a nivel de sintaxis (sin const/let/arrow/
+template literals reales; los backticks encontrados están en comentarios) — el problema era solo de APIs.
 
-- [ ] **7.1 Decidir**: (a) añadir polyfills ES5 en el IIFE, o (b) actualizar la afirmación de compatibilidad
-  en README/CLAUDE.md a los navegadores realmente soportados.
-- [ ] **7.2** Según la decisión, corregir los usos o documentar el nuevo baseline.
+- [x] **7.1 ✅ DECISIÓN DEL USUARIO: actualizar la afirmación de compatibilidad** (opción b), sin tocar
+  código. IE11 está EOL desde junio 2022.
+- [x] **7.2 ✅ Documentación actualizada**:
+  - `README.md`: sección "Compatibilidad" y lista de características → navegadores modernos, con nota
+    explícita de por qué NO es compatible con IE11.
+  - `CLAUDE.md` (gitignored): Project Overview corregido — mantiene la regla ES5 como constraint, pero
+    aclara que el target son navegadores modernos y que IE11 no está soportado.
+  - El badge "ES5 Compatible" del demo se conserva (es correcto: la sintaxis ES5 es real; no afirma IE11).
 
 ---
 
