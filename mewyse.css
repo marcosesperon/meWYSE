@@ -458,6 +458,9 @@
   margin: 0 0 0.5em 0;
   padding: 0.5em 1em;
   border-left: 3px solid var(--mewyse-border-medium);
+  /* Color explícito (no solo heredado): una regla `blockquote {color:…}` de la
+     página anfitriona no debe dejar la cita invisible en modo oscuro. */
+  color: var(--mewyse-text-primary);
 }
 .mewyse-editor-styled hr.mewyse-block {
   margin: 0 0 0.5em 0;
