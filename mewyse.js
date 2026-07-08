@@ -3622,6 +3622,33 @@
   };
 
   /**
+   * Calcula los niveles de indentación EFECTIVOS de un grupo de lista (bloques
+   * consecutivos del mismo tipo desde startIndex). Normaliza para que:
+   *   - el primer ítem del grupo sea siempre nivel 0 (no tiene padre), y
+   *   - ningún ítem salte más de un nivel respecto al anterior
+   *     (nivel efectivo = min(indentLevel, nivelAnterior + 1)).
+   * Así el render y el export nunca ven saltos (que producen HTML inválido tipo
+   * `<ul><ul>`) aunque el modelo los tenga (p. ej. tras borrar un ítem padre).
+   *
+   * @param {Array} blocks - array de bloques
+   * @param {number} startIndex - índice del primer bloque de la lista
+   * @returns {Array<number>} niveles efectivos (índice relativo a startIndex)
+   */
+  meWYSE.prototype._normalizeListLevels = function(blocks, startIndex) {
+    var type = blocks[startIndex].type;
+    var levels = [];
+    var prevEff = -1; // -1 fuerza a 0 el primer ítem
+    for (var i = startIndex; i < blocks.length && blocks[i].type === type; i++) {
+      var raw = blocks[i].indentLevel || 0;
+      if (raw < 0) raw = 0;
+      var eff = (prevEff < 0) ? 0 : Math.min(raw, prevEff + 1);
+      levels.push(eff);
+      prevEff = eff;
+    }
+    return levels;
+  };
+
+  /**
    * Construye el HTML anidado de una lista consecutiva del mismo tipo.
    * Se usa desde getHTML y getHTMLSource.
    *
@@ -3648,13 +3675,17 @@
       return '<li' + classStr + '>' + content;
     };
 
+    // Niveles EFECTIVOS normalizados (sin saltos, primero = 0): garantiza HTML
+    // válido y que coincida con el render del DOM.
+    var effLevels = this._normalizeListLevels(blocks, startIndex);
+
     // Stack basado en niveles. Emite HTML progresivamente.
     var html = '<' + tag + listClass + '>';
-    var stack = [{ level: blocks[startIndex].indentLevel || 0, openLi: false }];
+    var stack = [{ level: effLevels[0] || 0, openLi: false }];
     var i = startIndex;
 
     while (i < blocks.length && blocks[i].type === startType) {
-      var level = blocks[i].indentLevel || 0;
+      var level = effLevels[i - startIndex];
 
       // Si subimos de nivel: abrir listas anidadas dentro del último <li>
       while (level > stack[stack.length - 1].level) {
@@ -3693,6 +3724,35 @@
     }
 
     return { html: html, consumed: i - startIndex };
+  };
+
+  /**
+   * Re-normaliza el indentLevel de TODOS los grupos de lista del modelo para que
+   * no queden saltos de nivel (p. ej. tras borrar un ítem padre que dejaba un
+   * huérfano en nivel N+2). Cada grupo empieza en 0 y ningún ítem supera al
+   * anterior + 1. Mantiene el modelo coherente con lo que se renderiza/exporta.
+   * Los niveles 0 se eliminan de la propiedad (para no ensuciar el JSON).
+   */
+  meWYSE.prototype._normalizeListModel = function() {
+    var blocks = this.blocks;
+    var i = 0;
+    while (i < blocks.length) {
+      var type = blocks[i].type;
+      if (type === 'bulletList' || type === 'numberList' || type === 'checklist') {
+        var effLevels = this._normalizeListLevels(blocks, i);
+        for (var k = 0; k < effLevels.length; k++) {
+          var block = blocks[i + k];
+          if (effLevels[k] === 0) {
+            if (block.indentLevel) delete block.indentLevel;
+          } else {
+            block.indentLevel = effLevels[k];
+          }
+        }
+        i += effLevels.length;
+      } else {
+        i++;
+      }
+    }
   };
 
   /**
@@ -3763,8 +3823,12 @@
       return el;
     };
 
+    // Niveles EFECTIVOS normalizados (sin saltos, primero = 0): mismo criterio
+    // que el export HTML, para que el DOM y getHTML coincidan siempre.
+    var effLevels = this._normalizeListLevels(blocks, startIndex);
+
     // Crear root al nivel 0 del primer ítem
-    var rootLevel = blocks[startIndex].indentLevel || 0;
+    var rootLevel = effLevels[0] || 0;
     var root = createListEl(startType);
     // Stack de { level, list, lastLi }
     var stack = [{ level: rootLevel, list: root, lastLi: null, type: startType }];
@@ -3772,7 +3836,7 @@
     var i = startIndex;
     while (i < blocks.length && blocks[i].type === startType) {
       var item = blocks[i];
-      var level = item.indentLevel || 0;
+      var level = effLevels[i - startIndex];
 
       // Pop stack hasta encontrar un nivel <= current
       while (stack.length > 1 && stack[stack.length - 1].level > level) {
@@ -11060,6 +11124,11 @@
       }
 
       this.blocks.splice(index, 1);
+
+      // Re-normalizar los niveles de lista: borrar un ítem padre puede dejar un
+      // hijo huérfano con un salto de nivel; lo corregimos en el modelo.
+      this._normalizeListModel();
+
       this.render();
 
       // Actualizar las listas numeradas si es necesario
@@ -11373,6 +11442,9 @@
         content: ''
       });
     }
+
+    // Re-normalizar niveles de lista tras el borrado múltiple
+    this._normalizeListModel();
 
     // Re-renderizar
     this.render();
@@ -15476,6 +15548,10 @@
 
     this.clearCrossBlockSelection();
     this.closeFormatMenu();
+
+    // Re-normalizar niveles de lista en el modelo (por si el borrado dejó un
+    // salto de nivel). El export/siguiente render ya usan los niveles efectivos.
+    this._normalizeListModel();
 
     // Si no quedan bloques, crear un párrafo vacío
     if (this.blocks.length === 0) {
