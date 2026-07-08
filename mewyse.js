@@ -100,6 +100,7 @@
         specialChars: 'Caracteres especiales',
         print: 'Imprimir',
         exportWord: 'Exportar a Word',
+        exportPdf: 'Exportar a PDF',
         mergeTag: 'Insertar variable'
       },
       font: {
@@ -352,6 +353,7 @@
         specialChars: 'Special characters',
         print: 'Print',
         exportWord: 'Export to Word',
+        exportPdf: 'Export to PDF',
         mergeTag: 'Insert variable'
       },
       font: {
@@ -761,6 +763,7 @@
     print: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M4 6V2h8v4"/><rect x="2.5" y="6" width="11" height="5" rx="1"/><path d="M4 10h8v4H4z"/><circle cx="11.5" cy="8" r="0.6" fill="currentColor"/></svg>',
     exportWord: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M9 1.5H4a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V5.5z"/><path d="M9 1.5V5.5h4"/><path d="M5.5 8l1 3 1-2.2 1 2.2 1-3"/></svg>',
     mergeTag: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M6 2.5C4.5 2.5 4 3.5 4 5v1.5c0 1-.5 1.5-1.5 1.5C3.5 8 4 8.5 4 9.5V11c0 1.5.5 2.5 2 2.5"/><path d="M10 2.5c1.5 0 2 1 2 2.5v1.5c0 1 .5 1.5 1.5 1.5-1 0-1.5.5-1.5 1.5V11c0 1.5-.5 2.5-2 2.5"/></svg>',
+    exportPdf: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M9 1.5H4a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V5.5z"/><path d="M9 1.5V5.5h4"/><text x="8" y="12" font-size="4.5" text-anchor="middle" fill="currentColor" stroke="none" font-family="sans-serif" font-weight="700">PDF</text></svg>',
     paragraph: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M7 2h6v1.5h-1.5V14H10V3.5H8.5V14H7V8.5C4.5 8.5 3 7 3 5.2S4.5 2 7 2z"/></svg>',
     heading1: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M1 3h1.5v4.5H6V3h1.5v11H6V9H2.5v5H1V3z"/><path d="M10 13V5.5L8.5 7V5.2L10.5 3H12v10h-2z"/></svg>',
     heading2: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M1 3h1.5v4.5H6V3h1.5v11H6V9H2.5v5H1V3z"/><path d="M9 11.5c1.2-1.5 3.5-3.2 3.5-5C12.5 5.5 12 4.8 11 4.8c-.8 0-1.4.6-1.5 1.5H8c.1-1.8 1.3-3 3-3 1.8 0 3 1.1 3 2.8 0 2.3-2.5 3.8-3.5 5.2H14V13H9v-1.5z"/></svg>',
@@ -863,6 +866,9 @@
     // exportTools: añade a la toolbar los botones de imprimir y exportar a Word.
     // Opt-in (default false). Los métodos print()/exportWord() están siempre disponibles.
     this.exportTools = this.options.exportTools === true;
+    // pdfLib: URL (lazy) de una librería tipo html2pdf.js para exportar a PDF con
+    // fidelidad. Si no se define, exportPdf() cae a print() ("Guardar como PDF").
+    this.pdfLib = (typeof this.options.pdfLib === 'string') ? this.options.pdfLib : '';
 
     // Autosave: si está activo, guarda el contenido (JSON) en localStorage con
     // debounce en cada cambio. NO auto-restaura (el consumidor decide vía
@@ -2448,6 +2454,13 @@
       wordBtn.title = this.t('tooltips.exportWord');
       wordBtn.onclick = function(e) { e.preventDefault(); self.exportWord(); };
       viewGroup.appendChild(wordBtn);
+
+      var pdfBtn = document.createElement('button');
+      pdfBtn.className = 'mewyse-toolbar-button';
+      pdfBtn.innerHTML = WYSIWYG_ICONS.exportPdf;
+      pdfBtn.title = this.t('tooltips.exportPdf');
+      pdfBtn.onclick = function(e) { e.preventDefault(); self.exportPdf(); };
+      viewGroup.appendChild(pdfBtn);
     }
 
     if (viewGroup.children.length > 0) {
@@ -17149,6 +17162,54 @@
       document.body.removeChild(v_a);
       setTimeout(function() { URL.revokeObjectURL(v_url); }, 1000);
     } catch (e) {}
+  };
+
+  /**
+   * Carga un script externo una sola vez (deps OPCIONALES lazy). El callback
+   * recibe true si cargó, false si falló. ES5, sin Promise.
+   * @param {string} url
+   * @param {Function} cb
+   */
+  meWYSE.prototype._loadScriptOnce = function(url, cb) {
+    if (!url) { cb(false); return; }
+    if (!this._loadedScripts) this._loadedScripts = {};
+    var state = this._loadedScripts[url];
+    if (state === 'loaded') { cb(true); return; }
+    var existing = document.querySelector('script[data-mewyse-lib="' + url + '"]');
+    if (existing) {
+      existing.addEventListener('load', function() { cb(true); });
+      existing.addEventListener('error', function() { cb(false); });
+      return;
+    }
+    var self = this;
+    var s = document.createElement('script');
+    s.src = url;
+    s.setAttribute('data-mewyse-lib', url);
+    s.onload = function() { self._loadedScripts[url] = 'loaded'; cb(true); };
+    s.onerror = function() { self._loadedScripts[url] = 'error'; cb(false); };
+    this._loadedScripts[url] = 'loading';
+    document.head.appendChild(s);
+  };
+
+  /**
+   * Exporta a PDF. Si hay `pdfLib` (URL de html2pdf.js) la carga lazy y genera el
+   * PDF desde getSafeHTML(); si no hay lib o falla, cae a print() (el usuario elige
+   * "Guardar como PDF" del navegador). Siempre parte de contenido saneado.
+   * @param {string} filename - nombre sin extensión (default 'documento')
+   */
+  meWYSE.prototype.exportPdf = function(filename) {
+    var self = this;
+    var v_name = (typeof filename === 'string' && filename ? filename : 'documento') + '.pdf';
+    var v_fallback = function() { self.print(); };
+    if (!this.pdfLib) { v_fallback(); return; }
+    this._loadScriptOnce(this.pdfLib, function(ok) {
+      if (!ok || typeof window.html2pdf === 'undefined') { v_fallback(); return; }
+      try {
+        var wrap = document.createElement('div');
+        wrap.innerHTML = '<style>' + self._documentStyles() + '</style>' + self.getSafeHTML();
+        window.html2pdf().set({ filename: v_name, margin: 10 }).from(wrap).save();
+      } catch (e) { v_fallback(); }
+    });
   };
 
   /**

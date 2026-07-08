@@ -62,18 +62,20 @@ especiales, merge tags, imprimir/PDF/Word, autosave, TOC como bloque, salto de p
   MHTML y descarga `.doc` vía Blob (sin librería). Opción opt-in `exportTools` (botones en toolbar) +
   `@media print` que oculta el chrome. VERIFICADO: Blob `application/msword` con cabecera+estilos+contenido.
 
-## Sprint 3 — ERP y autoformato inline (medio, riesgo bajo-medio)
-- [ ] **3.1 Merge tags / variables `{{campo}}`** (mejor encaje ERP): clonar pipeline de `tags`
-  (`_renderTagCapsule` [mewyse.js:8893](mewyse.js:8893), `insertTag` [mewyse.js:9065](mewyse.js:9065)).
-  Opción `mergeTags`; inserción por botón de toolbar y/o trigger `{{`. Cápsula
-  `span.mewyse-mergetag[data-merge-name]`. Sanitizer: clase en `ALLOWED_SPAN_CLASSES` + `data-merge-name`
-  (regex `^[\w.]+$`) en `ATTR_WHITELIST.SPAN`. Export dual: plantilla (`{{campo}}` literal) o resuelto
-  (`setMergeValues(map)`).
-- [ ] **3.2 Autoformato inline**: `**x**`/`*x*`/`` `x` ``/`~~x~~` al cerrar + espacio. Mutar DOM in
-  situ (no render) + `updateBlockContent` + `triggerChange`; `pushHistory(true)` para undo atómico.
-  Reusar regex de `markdownInlineToHtml`.
-- [ ] **3.3 Export PDF**: dep **opcional lazy** (html2pdf/jsPDF) vía helper `_loadScriptOnce`;
-  alimentar con `getSafeHTML()`. Fallback: `print()`.
+## Sprint 3 — ERP y autoformato inline (medio, riesgo bajo-medio) ✅ COMPLETADO
+- [x] **3.1 ✅ Merge tags / variables `{{campo}}`**: opción `mergeTags: [{id,name,label?}]`; inserción
+  por trigger `{{` (menú filtrable) y botón de toolbar. Cápsula `span.mewyse-mergetag[data-merge-name]`
+  no editable. Sanitizer: clase en `ALLOWED_SPAN_CLASSES` + `data-merge-name` (regex `^[\w.]+$`) en
+  `ATTR_WHITELIST.SPAN` + `_editableTextContent` + paste. Export: `getMarkdown`/`htmlToMarkdownInline`
+  → `{{name}}`; `getResolvedHTML(valuesMap)` sustituye por el valor escapado (sin mutar el modelo).
+  VERIFICADO: round-trip sobrevive al sanitizer, resolución escapa (sin XSS), name malicioso descartado. (commit `9cf58d2`)
+- [x] **3.2 ✅ Autoformato inline**: `**x**`/`*x*`/`` `x` ``/`~~x~~` al cerrar + espacio → tag. Nuevo
+  `_tryInlineAutoformat` (muta el DOM in situ, `pushHistory(true)`, `updateBlockContent`+`triggerChange`,
+  sin re-render; no actúa en `code`). Reglas anti-falsos-positivos (contenido sin espacios en los bordes).
+  VERIFICADO: los 4 patrones convierten; `2 * 3 * 4` y `**hola` no disparan. (commit `6207b09`)
+- [x] **3.3 ✅ Export PDF**: helper `_loadScriptOnce` (deps lazy). Opción `pdfLib` (URL) + botón PDF en
+  `exportTools`. `exportPdf(name)`: si hay `pdfLib` → carga lazy y genera desde `getSafeHTML()`; si no
+  hay lib o falla → fallback a `print()`. VERIFICADO: fallback a print sin lib, botón presente, script inyectado.
 
 ## Sprint 4 — Mayor riesgo (medio, riesgo medio-alto)
 - [ ] **4.1 Syntax highlight en código** (dep opcional lazy): opción `codeHighlight`+`codeHighlightUrl`;

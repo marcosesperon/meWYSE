@@ -975,7 +975,9 @@ editor.loadFromMarkdown(editor.getMarkdown());</code></pre>
         Pru&eacute;balo tecleando en un p&aacute;rrafo: <code>#&nbsp;</code> t&iacute;tulo &middot; <code>-&nbsp;</code> lista &middot;
         <code>1.&nbsp;</code> numerada &middot; <code>&gt;&nbsp;</code> cita &middot; <code>[]&nbsp;</code> checklist &middot;
         <code>```&nbsp;</code> c&oacute;digo. Sub/super&iacute;ndice con <code>Ctrl+.</code> / <code>Ctrl+,</code>.
-        En la toolbar: fuente (<strong>Aa</strong>), caracteres especiales (&Omega;), imprimir y Word.
+        En la toolbar: fuente (<strong>Aa</strong>), caracteres especiales (&Omega;), imprimir, Word y PDF.
+        Variables: escribe <code>{{</code> o usa el bot&oacute;n de variable para insertar
+        <code>{{cliente}}</code>, <code>{{importe}}</code>&hellip;
       </div>
       <pre class="docs-code"><code>var editor = new meWYSE({
   target: '#novedadesEditor',
@@ -1682,6 +1684,11 @@ editor.loadFromMarkdown(editor.getMarkdown());</code></pre>
         exportTools: true,
         autosave: true,
         autosaveKey: 'mewyse-demo-novedades',
+        mergeTags: [
+          { id: 'cli', name: 'cliente', label: 'Nombre del cliente' },
+          { id: 'imp', name: 'importe', label: 'Importe total' },
+          { id: 'fec', name: 'fecha', label: 'Fecha del documento' }
+        ],
         blocks: [
           { id: 1, type: 'heading1', content: 'Novedades del editor' },
           { id: 2, type: 'paragraph', content: 'Formula del agua: H<sub>2</sub>O. Area = r<sup>2</sup>&middot;&pi;.' },

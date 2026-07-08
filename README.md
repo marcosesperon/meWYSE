@@ -153,7 +153,8 @@ new meWYSE(options)
 | `autosave` | boolean | `false` | Guarda el contenido (JSON) en `localStorage` con debounce en cada cambio. No auto-restaura (usa `restoreDraft()`) |
 | `autosaveKey` | string | `'mewyse-draft'` | Clave de `localStorage` para el borrador de autosave |
 | `fontControls` | boolean | `false` | Añade a la toolbar un botón de fuente (familia / tamaño / interlineado) |
-| `exportTools` | boolean | `false` | Añade a la toolbar los botones de imprimir y exportar a Word (los métodos `print()`/`exportWord()` están siempre disponibles) |
+| `exportTools` | boolean | `false` | Añade a la toolbar los botones de imprimir, exportar a Word y a PDF (los métodos `print()`/`exportWord()`/`exportPdf()` están siempre disponibles) |
+| `pdfLib` | string | `''` | URL (lazy) de una librería tipo html2pdf.js para `exportPdf()` con fidelidad. Sin ella, `exportPdf()` cae a `print()` |
 | `imageMaxSize` | number | `0` | Tamaño máximo permitido al insertar imagen, en bytes. `0` = sin límite |
 | `imageMaxSizeError` | string | auto | Mensaje de alerta cuando la imagen excede `imageMaxSize` |
 | `onImageUpload` | Function | — | Hook para subir imágenes al servidor. Recibe `(file, callback)`. El callback espera `{ url, fileName?, width?, height? }` |
@@ -251,10 +252,12 @@ editor.navigateToHeading(id);// Desplazar hasta un título del índice
 ```javascript
 editor.print();            // Abre una ventana con solo el documento y lanza la impresión
 editor.exportWord('doc');  // Descarga el documento como .doc (Word abre el HTML). Sin librerías
+editor.exportPdf('doc');   // PDF con la lib de `pdfLib` (lazy); si no hay lib, cae a print()
 ```
 
-Ambos parten de `getSafeHTML()` (contenido saneado). Con `exportTools: true` aparecen además los
-botones correspondientes en la toolbar.
+Todos parten de `getSafeHTML()` (contenido saneado). Con `exportTools: true` aparecen además los
+botones correspondientes en la toolbar. Para un PDF con fidelidad, define `pdfLib` con la URL de
+una librería tipo html2pdf.js (se carga solo la primera vez que se usa).
 
 #### Borrador / autosave
 
