@@ -94,15 +94,32 @@ Los tres primeros están **reproducidos en vivo**.
 
 ## Fase 3 — Tablas matrix-aware y Markdown (ALTO) 🟠
 
-- [ ] **3.1 `findInsertPosition` ignora rowspans de filas superiores.** Insertar/borrar columnas o
-  unmerge con celdas rowspan desalinea columnas. Pasarle la matriz lógica. → [mewyse.js:7275](mewyse.js:7275).
-- [ ] **3.2 `mergeSelectedCells` no expande el rectángulo iterativamente** (corrompe tabla con spans
-  que salen del rango; `firstCell` puede ser `undefined` → TypeError). → [mewyse.js:7095](mewyse.js:7095).
-- [ ] **3.3 Round-trip Markdown corrompe formato.** `htmlToMarkdownInline` emite HTML crudo
-  (`<u>`,`<sub>`,`<mark>`,`<span style>`) y `markdownInlineToHtml` lo escapa → aparece literal.
-  Además `<br>` parte el bloque, metacaracteres (`*`,`#`,`-`) sin escapar, imágenes clavadas a 300×200.
-  → [mewyse.js:11190](mewyse.js:11190), [mewyse.js:11377](mewyse.js:11377), [mewyse.js:11580](mewyse.js:11580).
-  - Criterio: `getMarkdown()`→`loadFromMarkdown()` preserva subrayado/color/saltos y no reinterpreta texto literal.
+- [x] **3.1 ✅ `findInsertPosition` ignoraba rowspans de filas superiores. RESUELTO.** Reescrita como
+  matrix-aware `findInsertPosition(matrix, rowIdx, rowEl, targetCol)` (calcula la columna de inicio real
+  de cada celda vía matriz). Actualizados los 3 usos: `_insertTableColumnAt`, `_deleteTableRowAt` y
+  `unmergeCell` (reescrito para usar la matriz + `_createEmptyTableCell`). → [mewyse.js:7340](mewyse.js:7340).
+  - VERIFICADO: insertar columna en tabla con rowspan coloca la celda en la posición lógica correcta en todas las filas; borrar fila reubica el rowspan; unmerge mantiene la integridad.
+
+- [x] **3.2 ✅ `mergeSelectedCells` no expandía el rectángulo. RESUELTO.** Bucle de expansión iterativa
+  hasta contener por completo cualquier celda con span que solape el borde; guard `if (!firstCell) return`
+  para tablas irregulares; quitado el `triggerChange` redundante (también en `unmergeCell`). → [mewyse.js:7160](mewyse.js:7160).
+  - VERIFICADO: merge con solape parcial de un rowspan expande el rango y no corrompe la tabla.
+
+- [x] **3.3 ✅ Round-trip Markdown (formato inline + saltos). RESUELTO (parcial).** `markdownInlineToHtml`
+  protege con placeholders las etiquetas inline que emite `htmlToMarkdownInline` (`<u>`,`<sub>`,`<sup>`,
+  `<mark>`,`<span style>`,`<br>`) antes de `escapeHtml` y las restaura después; `<br>` se emite literal
+  (no `\n`) para no partir el bloque. → [mewyse.js:11266](mewyse.js:11266), [mewyse.js:11464](mewyse.js:11464).
+  - VERIFICADO: subrayado/mark/sub/sup/color y saltos `<br>` sobreviven al round-trip (sin partir bloques);
+    markdown estándar hace round-trip exacto; el saneo final (`_sanitizeBlocks`) sigue limpiando estilos peligrosos.
+
+### Pendientes de Fase 3 (requieren capa de escape de Markdown, mayor riesgo)
+- [ ] **Metacaracteres sin escapar**: un párrafo cuyo texto empieza por `- `, `# `, `> `, `N. `, o que
+  contiene `*`/`_`/`~~`, se reinterpreta como bloque/formato al recargar. Requiere un escaper de Markdown
+  (backslash) coordinado entre `getMarkdown` (escapar) y `loadFromMarkdown`/`markdownInlineToHtml`
+  (desescapar). Se pospone por el riesgo de regresión en contenido con backslashes.
+- [ ] **Dimensiones de imagen a 300×200**: `getMarkdown` emite `![alt](url)` (Markdown estándar no tiene
+  sintaxis de tamaño) y al recargar `width/height:'auto'` → `parseInt` NaN → defaults 300×200. Requeriría
+  emitir `<img>` HTML con dimensiones (se aparta del Markdown puro) o un formato propio.
 
 ---
 

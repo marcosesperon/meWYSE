@@ -6976,7 +6976,7 @@
       // findInsertPosition devuelve la celda DOM ante la que insertar (o null=fin).
       var v_template = v_occ || v_left || null;
       var v_new = this._createEmptyTableCell(blockId, 'td', v_template);
-      var v_ref = this.findInsertPosition(rows[r], insertCol);
+      var v_ref = this.findInsertPosition(matrix, r, rows[r], insertCol);
       if (v_ref) {
         rows[r].insertBefore(v_new, v_ref);
       } else {
@@ -7107,7 +7107,7 @@
         } else {
           v_cell.setAttribute('rowspan', v_rs - 1);
         }
-        var v_ref = this.findInsertPosition(v_nextRow, c);
+        var v_ref = this.findInsertPosition(matrix, delRow + 1, v_nextRow, c);
         if (v_ref) {
           v_nextRow.insertBefore(v_cell, v_ref);
         } else {
@@ -7173,10 +7173,33 @@
       }
     });
 
+    if (maxRow < 0 || maxCol < 0) return; // sin coordenadas válidas
+
+    // Expandir el rectángulo hasta que contenga POR COMPLETO cualquier celda con
+    // colspan/rowspan que lo solape parcialmente. Sin esto, una celda a caballo
+    // del borde se eliminaría igualmente y dejaría filas con menos celdas (tabla
+    // corrupta). El bucle repite hasta que el rectángulo se estabiliza.
+    var v_changed = true;
+    while (v_changed) {
+      v_changed = false;
+      var v_range = this.getCellsInRange(table, minRow, maxRow, minCol, maxCol);
+      for (var vi = 0; vi < v_range.length; vi++) {
+        var v_rc = v_range[vi];
+        var v_co = this.getTableCellCoords(v_rc);
+        if (!v_co) continue;
+        var v_cs = parseInt(v_rc.getAttribute('colspan')) || 1;
+        var v_rs = parseInt(v_rc.getAttribute('rowspan')) || 1;
+        if (v_co.row < minRow) { minRow = v_co.row; v_changed = true; }
+        if (v_co.row + v_rs - 1 > maxRow) { maxRow = v_co.row + v_rs - 1; v_changed = true; }
+        if (v_co.col < minCol) { minCol = v_co.col; v_changed = true; }
+        if (v_co.col + v_cs - 1 > maxCol) { maxCol = v_co.col + v_cs - 1; v_changed = true; }
+      }
+    }
+
     var rowSpan = maxRow - minRow + 1;
     var colSpan = maxCol - minCol + 1;
 
-    // Obtener todas las celdas únicas en el rango
+    // Obtener todas las celdas únicas en el rango (ya expandido)
     var cellsToMerge = this.getCellsInRange(table, minRow, maxRow, minCol, maxCol);
 
     // Obtener el contenido combinado de todas las celdas
@@ -7190,7 +7213,8 @@
     });
 
     // La primera celda en la matriz será la celda combinada
-    var firstCell = matrix[minRow][minCol];
+    var firstCell = matrix[minRow] ? matrix[minRow][minCol] : null;
+    if (!firstCell) return; // tabla irregular: abortar sin romper nada
 
     // Eliminar atributos anteriores
     firstCell.removeAttribute('colspan');
@@ -7219,9 +7243,8 @@
     // Refrescar controles de tabla
     this.refreshTableControls(table, blockId);
 
-    // Guardar cambios
+    // Guardar cambios (updateBlockContent ya dispara triggerChange)
     this.updateBlockContent(blockId, table.innerHTML);
-    this.triggerChange();
   };
 
   /**
@@ -7245,6 +7268,12 @@
     var startRow = coords.row;
     var startCol = coords.col;
 
+    // Matriz lógica ANTES de quitar los spans: refleja la región combinada que
+    // ocupa `cell`, para colocar las celdas nuevas respetando los rowspans de
+    // otras celdas (el cálculo anterior por colspans se desalineaba con ellos).
+    var v_matrix = this.buildTableMatrix(table);
+    var v_tag = cell.tagName.toLowerCase();
+
     // Eliminar atributos de combinación de la celda original
     cell.removeAttribute('colspan');
     cell.removeAttribute('rowspan');
@@ -7254,58 +7283,30 @@
       var row = rows[startRow + r];
       if (!row) continue;
 
-      // Para la primera fila, insertar celdas después de la celda original
-      // Para las demás filas, encontrar la posición correcta
-      var insertAfter = null;
-
       if (r === 0) {
-        insertAfter = cell;
-      } else {
-        // Encontrar la celda después de la cual insertar
-        // Buscar la última celda antes de startCol en esta fila
-        var existingCells = row.querySelectorAll('td, th');
-        var colCount = 0;
-        for (var i = 0; i < existingCells.length; i++) {
-          var cellColspan = parseInt(existingCells[i].getAttribute('colspan')) || 1;
-          if (colCount + cellColspan > startCol) {
-            insertAfter = existingCells[i - 1] || null;
-            break;
+        // Primera fila: insertar las celdas nuevas justo tras la celda original.
+        var v_after = cell;
+        for (var c0 = 1; c0 < colspan; c0++) {
+          var v_nc0 = this._createEmptyTableCell(blockId, v_tag, cell);
+          if (v_after.nextSibling) {
+            row.insertBefore(v_nc0, v_after.nextSibling);
+          } else {
+            row.appendChild(v_nc0);
           }
-          colCount += cellColspan;
-          insertAfter = existingCells[i];
+          v_after = v_nc0;
         }
-      }
-
-      for (var c = 0; c < colspan; c++) {
-        // Saltar la celda original
-        if (r === 0 && c === 0) continue;
-
-        // Crear nueva celda
-        var newCell = document.createElement(cell.tagName.toLowerCase());
-        newCell.style.border = '1px solid #ddd';
-        newCell.style.padding = '0';
-
-        // Crear contenido editable interno
-        var cellContent = document.createElement('p');
-        cellContent.contentEditable = true;
-        cellContent.style.padding = '8px';
-        cellContent.style.margin = '0';
-        cellContent.style.minHeight = '1em';
-
-        newCell.appendChild(cellContent);
-        this.attachTableCellEvents(cellContent, blockId);
-
-        // Insertar la celda
-        if (insertAfter && insertAfter.nextSibling) {
-          row.insertBefore(newCell, insertAfter.nextSibling);
-        } else if (insertAfter) {
-          row.appendChild(newCell);
-        } else {
-          // Insertar al principio de la fila
-          row.insertBefore(newCell, row.firstChild);
+      } else {
+        // Filas siguientes: insertar antes de la referencia lógica (matrix-aware),
+        // que respeta las columnas ocupadas por rowspans de otras celdas.
+        var v_ref = this.findInsertPosition(v_matrix, startRow + r, row, startCol);
+        for (var c1 = 0; c1 < colspan; c1++) {
+          var v_nc1 = this._createEmptyTableCell(blockId, v_tag, cell);
+          if (v_ref) {
+            row.insertBefore(v_nc1, v_ref);
+          } else {
+            row.appendChild(v_nc1);
+          }
         }
-
-        insertAfter = newCell;
       }
     }
 
@@ -7315,27 +7316,38 @@
     // Refrescar controles de tabla
     this.refreshTableControls(table, blockId);
 
-    // Guardar cambios
+    // Guardar cambios (updateBlockContent ya dispara triggerChange)
     this.updateBlockContent(blockId, table.innerHTML);
-    this.triggerChange();
   };
 
   /**
-   * Encuentra la posición de inserción correcta para una celda en una fila
-   * @param {HTMLElement} row - La fila
-   * @param {number} targetCol - Columna objetivo
+   * Encuentra la celda DOM ante la que insertar para colocar algo en la columna
+   * lógica `targetCol` de una fila. Es MATRIX-AWARE: usa la matriz lógica para
+   * calcular la columna de inicio real de cada celda de la fila, de modo que los
+   * rowspans que "cuelgan" de filas superiores (y que no son celdas DOM de esta
+   * fila) se tienen en cuenta. Devuelve la primera celda cuya columna de inicio
+   * es >= targetCol, o null si hay que insertar al final.
+   *
+   * @param {Array} matrix - matriz lógica (buildTableMatrix)
+   * @param {number} rowIdx - índice de la fila en la matriz
+   * @param {HTMLElement} rowEl - elemento <tr> correspondiente
+   * @param {number} targetCol - columna lógica objetivo
    * @returns {HTMLElement|null}
    */
-  meWYSE.prototype.findInsertPosition = function(row, targetCol) {
-    var cells = row.querySelectorAll('td, th');
-    var currentCol = 0;
+  meWYSE.prototype.findInsertPosition = function(matrix, rowIdx, rowEl, targetCol) {
+    var cells = rowEl.querySelectorAll('td, th');
+    var matrixRow = matrix[rowIdx] || [];
 
     for (var i = 0; i < cells.length; i++) {
-      if (currentCol >= targetCol) {
-        return cells[i];
+      var cell = cells[i];
+      // Columna lógica de INICIO de esta celda: primera columna que ocupa en su
+      // fila (respeta el desplazamiento causado por rowspans de filas de arriba).
+      var startCol = -1;
+      for (var c = 0; c < matrixRow.length; c++) {
+        if (matrixRow[c] === cell) { startCol = c; break; }
       }
-      var colspan = parseInt(cells[i].getAttribute('colspan')) || 1;
-      currentCol += colspan;
+      if (startCol === -1) continue; // celda no localizada en la matriz: ignorar
+      if (startCol >= targetCol) return cell;
     }
 
     return null;
@@ -11292,7 +11304,9 @@
         case 'mark':
           return '<mark>' + inner + '</mark>';
         case 'br':
-          return '\n';
+          // Emitir <br> literal (no '\n'): un salto real partiría el párrafo en
+          // varios bloques al recargar (loadFromMarkdown separa por líneas).
+          return '<br>';
         default:
           return inner;
       }
@@ -11448,6 +11462,18 @@
       return '\x00CODE' + idx + '\x00';
     });
 
+    // Proteger las etiquetas HTML inline que emite htmlToMarkdownInline
+    // (subrayado, sub/sup, mark, saltos <br> y spans de color). Sin esto, el
+    // escapeHtml de abajo las volvería texto literal (&lt;u&gt;...) y se perdería
+    // el formato en el round-trip getMarkdown -> loadFromMarkdown. Es seguro
+    // restaurarlas porque loadFromMarkdown pasa el resultado por _sanitizeBlocks.
+    var htmlTags = [];
+    text = text.replace(/<\/?(?:u|sub|sup|mark)>|<br\s*\/?>|<span style="[^"]*">|<\/span>/gi, function(match) {
+      var idx = htmlTags.length;
+      htmlTags.push(match);
+      return '\x00HTML' + idx + '\x00';
+    });
+
     // Escapar HTML del texto restante ANTES de aplicar transformaciones MD
     // Esto evita que `**<img onerror=...>**` se convierta en HTML peligroso.
     text = escapeHtml(text);
@@ -11490,6 +11516,11 @@
     // Restaurar bloques de código
     text = text.replace(/\x00CODE(\d+)\x00/g, function(match, idx) {
       return codeBlocks[parseInt(idx)];
+    });
+
+    // Restaurar las etiquetas HTML inline protegidas
+    text = text.replace(/\x00HTML(\d+)\x00/g, function(match, idx) {
+      return htmlTags[parseInt(idx)];
     });
 
     return text;
