@@ -1713,6 +1713,19 @@
   border-color: var(--mewyse-accent-hover);
 }
 
+/* Acción destructiva (p.ej. "Quitar enlace"): se alinea a la izquierda, separada
+   de cancelar/aceptar. */
+.mewyse-modal-button-danger {
+  margin-right: auto;
+  background: var(--mewyse-bg-primary);
+  color: var(--mewyse-danger);
+  border-color: var(--mewyse-danger);
+}
+
+.mewyse-modal-button-danger:hover {
+  background: var(--mewyse-danger-bg);
+}
+
 .mewyse-modal-button:focus-visible {
   outline: 2px solid var(--mewyse-accent);
   outline-offset: 2px;

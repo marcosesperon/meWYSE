@@ -121,6 +121,7 @@
         keepProportions: 'Mantener proporciones',
         insertLink: 'Insertar enlace',
         editLink: 'Editar enlace',
+        removeLink: 'Quitar enlace',
         url: 'URL',
         linkText: 'Texto del enlace (opcional)',
         openInNewTab: 'Abrir en nueva pestaña',
@@ -344,6 +345,7 @@
         keepProportions: 'Keep proportions',
         insertLink: 'Insert link',
         editLink: 'Edit link',
+        removeLink: 'Remove link',
         url: 'URL',
         linkText: 'Link text (optional)',
         openInNewTab: 'Open in new tab',
@@ -12581,11 +12583,22 @@
     cancelBtn.className = 'mewyse-modal-button mewyse-modal-button-cancel';
     cancelBtn.textContent = self.t('modals.cancel');
 
+    // Botón "Quitar enlace": solo al editar un enlace existente. Desenvuelve el
+    // <a> conservando su texto (antes no había forma de eliminar un enlace).
+    var removeBtn = null;
+    if (existingLink) {
+      removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.className = 'mewyse-modal-button mewyse-modal-button-danger';
+      removeBtn.textContent = self.t('modals.removeLink');
+    }
+
     var submitBtn = document.createElement('button');
     submitBtn.type = 'button';
     submitBtn.className = 'mewyse-modal-button mewyse-modal-button-primary';
     submitBtn.textContent = existingLink ? self.t('modals.update') : self.t('modals.insert');
 
+    if (removeBtn) buttonsDiv.appendChild(removeBtn);
     buttonsDiv.appendChild(cancelBtn);
     buttonsDiv.appendChild(submitBtn);
     container.appendChild(buttonsDiv);
@@ -12696,11 +12709,33 @@
       if (!self._persistActiveBlockContent()) self.triggerChange();
     }
 
+    // Función para quitar el enlace (desenvolver el <a> conservando el texto)
+    function removeLink() {
+      closeModal();
+      restoreSelection();
+      if (existingLink && existingLink.parentNode) {
+        var v_parent = existingLink.parentNode;
+        // Dejar el cursor en el texto que queda tras desenvolver, para que
+        // _persistActiveBlockContent localice el bloque afectado.
+        self.unwrapElement(existingLink);
+        v_parent.normalize();
+        var v_sel = window.getSelection();
+        var v_range = document.createRange();
+        v_range.selectNodeContents(v_parent);
+        v_range.collapse(false);
+        v_sel.removeAllRanges();
+        v_sel.addRange(v_range);
+      }
+      if (!self._persistActiveBlockContent()) self.triggerChange();
+    }
+
     // Event listeners
     cancelBtn.addEventListener('click', function() {
       closeModal();
       restoreSelection();
     });
+
+    if (removeBtn) removeBtn.addEventListener('click', removeLink);
 
     submitBtn.addEventListener('click', insertLink);
 
