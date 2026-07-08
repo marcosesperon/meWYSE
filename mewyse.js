@@ -9632,6 +9632,12 @@
         }
       }
 
+      // --- Autoformato inline (**x**, *x*, `x`, ~~x~~) al cerrar el patrón ---
+      if (v_afBlock && v_afBlock.type !== 'code' && this._tryInlineAutoformat(element, blockId)) {
+        e.preventDefault();
+        return;
+      }
+
       var spaceSel = window.getSelection();
       if (spaceSel && spaceSel.rangeCount > 0) {
         var spaceRange = spaceSel.getRangeAt(0);
@@ -13495,6 +13501,70 @@
       selection.removeAllRanges();
       selection.addRange(newRange);
     } catch (e) {}
+  };
+
+  /**
+   * Autoformato inline: al pulsar espacio, si el texto justo antes del caret cierra
+   * un patrón Markdown (**negrita**, *cursiva*, `código`, ~~tachado~~), lo envuelve
+   * en el tag correspondiente e inserta el espacio detrás. Muta el DOM in situ (no
+   * re-render) para preservar el caret. Devuelve true si transformó.
+   * @param {HTMLElement} element - editable del bloque
+   * @param {number} blockId
+   * @returns {boolean}
+   */
+  meWYSE.prototype._tryInlineAutoformat = function(element, blockId) {
+    var sel = window.getSelection();
+    if (!sel || !sel.rangeCount) return false;
+    var range = sel.getRangeAt(0);
+    if (!range.collapsed) return false;
+    var node = range.startContainer;
+    if (!node || node.nodeType !== 3) return false; // solo dentro de un nodo de texto
+    var offset = range.startOffset;
+    var before = node.textContent.slice(0, offset);
+
+    // Reglas (el contenido no puede empezar/terminar en espacio, salvo `código`).
+    // Bold antes que italic para que **x** no dispare la regla de un solo *.
+    var rules = [
+      { re: /\*\*(\S|\S[^*]*\S)\*\*$/, tag: 'b' },
+      { re: /~~(\S|\S[^~]*\S)~~$/, tag: 's' },
+      { re: /`([^`]+)`$/, tag: 'code' },
+      { re: /\*(\S|\S[^*]*\S)\*$/, tag: 'i' }
+    ];
+    var matched = null, tag = null;
+    for (var i = 0; i < rules.length; i++) {
+      var m = before.match(rules[i].re);
+      if (m) { matched = m; tag = rules[i].tag; break; }
+    }
+    if (!matched) return false;
+
+    var full = matched[0];        // p.ej. "**hola**"
+    var innerText = matched[1];   // "hola"
+    var startOffset = offset - full.length;
+    if (startOffset < 0) return false;
+
+    this.pushHistory(true); // undo atómico de la transformación
+
+    try {
+      var repl = document.createRange();
+      repl.setStart(node, startOffset);
+      repl.setEnd(node, offset);
+      repl.deleteContents();
+      var wrap = document.createElement(tag);
+      wrap.textContent = innerText;
+      repl.insertNode(wrap);
+      // Insertar el espacio (el keydown se preventDefault en el caller) tras el tag.
+      var spaceNode = document.createTextNode(' ');
+      wrap.parentNode.insertBefore(spaceNode, wrap.nextSibling);
+      var nr = document.createRange();
+      nr.setStartAfter(spaceNode);
+      nr.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(nr);
+    } catch (e) { return false; }
+
+    this.updateBlockContent(blockId, element.innerHTML);
+    this.triggerChange();
+    return true;
   };
 
   /**

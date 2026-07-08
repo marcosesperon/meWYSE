@@ -320,6 +320,8 @@ var editor = new meWYSE({
 **Autoformato Markdown en vivo**: en un párrafo, al teclear un marcador seguido de espacio se
 convierte el bloque automáticamente: `# `/`## `/`### ` → título; `- `/`* `/`+ ` → lista; `1. ` →
 lista numerada; `> ` → cita; `` ``` `` → código; `[] `/`[x] ` → checklist (des/marcada).
+También **formato inline** al cerrar el patrón y pulsar espacio: `**texto**` → negrita, `*texto*` →
+cursiva, `` `texto` `` → código, `~~texto~~` → tachado.
 
 ### Estructura de un bloque
 
