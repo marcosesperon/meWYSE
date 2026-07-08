@@ -135,13 +135,20 @@ new meWYSE(options)
 |--------|------|---------|-------------|
 | `target` | string | *requerido* | Selector CSS del elemento (`'#miEditor'`, `'.editor'`) |
 | `toolbar` | boolean | `false` | Mostrar barra de herramientas superior |
-| `summary` | boolean | `false` | Mostrar botón de resumen con estadísticas e índice |
+| `summary` | boolean | `true` | Mostrar botón de resumen con estadísticas e índice (abre el panel de esquema lateral) |
+| `readOnly` | boolean | `false` | Modo solo lectura: sin toolbar ni handle, `contenteditable="false"`, callbacks inertes |
 | `charCounter` | boolean | `false` | Mostrar barra inferior con contador de palabras, caracteres y tiempo de lectura |
 | `findReplace` | boolean | `true` | Habilitar buscar/reemplazar con atajo `Ctrl/Cmd+F` y botón en toolbar |
 | `fullscreen` | boolean | `true` | Mostrar botón de pantalla completa en toolbar |
 | `showBlocksToggle` | boolean | `true` | Mostrar botón de "mostrar bloques" (modo debug) en toolbar |
+| `wordWrap` | boolean | `true` | Ajuste de texto: el contenido largo salta de línea dentro del bloque |
+| `wordWrapToggle` | boolean | `true` | Mostrar botón de ajuste de texto en la toolbar |
+| `toolbarOverflow` | string | `'wrap'` | Comportamiento de la toolbar sin espacio: `'wrap'` (salto de línea) o `'scroll'` (scroll horizontal con flechas) |
 | `rtl` | boolean | `false` | Activar dirección derecha-a-izquierda (árabe, hebreo) |
 | `pasteAsText` | boolean | `false` | Forzar que todo paste entre como texto plano (sin preservar formato) |
+| `escapeHtmlEntities` | boolean | `true` | Escapar entidades HTML en el HTML exportado por `getHTML()` |
+| `htmlNumericEntities` | boolean | `true` | Compat TinyMCE (`entity_encoding: 'numeric'`): escapar no-ASCII como referencias numéricas |
+| `tags` | Array | `[]` | Lista de etiquetas para el trigger `#`. Cada item: `{ id, name, color? }` |
 | `imageMaxSize` | number | `0` | Tamaño máximo permitido al insertar imagen, en bytes. `0` = sin límite |
 | `imageMaxSizeError` | string | auto | Mensaje de alerta cuando la imagen excede `imageMaxSize` |
 | `onImageUpload` | Function | — | Hook para subir imágenes al servidor. Recibe `(file, callback)`. El callback espera `{ url, fileName?, width?, height? }` |
@@ -163,6 +170,7 @@ new meWYSE(options)
 ```javascript
 editor.getHTML();       // HTML semántico
 editor.getSafeHTML();   // HTML semántico + re-sanitizado (extra seguro para inserción externa)
+editor.getHTMLSource(); // HTML sin escape de entidades (útil para reinyectar en el editor)
 editor.getMarkdown();   // Markdown
 editor.getPlainText();  // Texto plano
 editor.getJSON();       // JSON string
@@ -179,6 +187,9 @@ editor.loadFromJSON([
 
 // Desde Markdown
 editor.loadFromMarkdown('# Título\n\nTexto con **negrita** y *cursiva*.');
+
+// Desde texto plano (cada línea → un párrafo)
+editor.loadFromText('Línea 1\nLínea 2');
 
 // Desde HTML (útil para migrar contenido de TinyMCE/CKEditor)
 editor.loadFromHTML(
@@ -199,6 +210,35 @@ editor.addBlock('heading1', 0);      // Añadir en posición específica
 editor.duplicateBlock(blockId);      // Duplicar bloque
 editor.deleteBlock(blockId);         // Eliminar bloque
 editor.moveBlock(fromId, toId);      // Mover bloque a posición de otro
+```
+
+#### Formato programático
+
+```javascript
+editor.removeFormat();              // Limpiar el formato inline de la selección
+editor.applyCaseTransform('upper'); // 'upper'|'lower'|'title'|'sentence'|'toggle'|'smart'
+editor.indentBlock(blockId, 1);     // Indentar (+1) / desindentar (-1) un item de lista
+```
+
+#### Vistas y herramientas
+
+```javascript
+editor.showFindReplace();    // Abrir el diálogo de buscar y reemplazar
+editor.toggleFullscreen();   // Alternar pantalla completa (o enterFullscreen/exitFullscreen)
+editor.toggleWordWrap();     // Alternar el ajuste de texto
+editor.toggleShowBlocks();   // Alternar la vista de bloques (debug)
+editor.toggleOutlinePanel(); // Alternar el panel de esquema lateral (índice de títulos)
+```
+
+#### Estadísticas
+
+```javascript
+editor.getWordCount();       // Número de palabras
+editor.getCharacterCount();  // Número de caracteres
+editor.getParagraphCount();  // Número de párrafos
+editor.getReadingTime();     // Tiempo estimado de lectura (string, p.ej. "3 min")
+editor.getHeadingsIndex();   // Array de títulos { level, text, id } para navegación
+editor.navigateToHeading(id);// Desplazar hasta un título del índice
 ```
 
 #### Otros
@@ -300,6 +340,7 @@ Para bloques de imagen, `content` es un objeto:
 | `↓` al final del bloque | Ir al bloque siguiente |
 | `/` | Abrir menú de tipos de bloque |
 | `@` | Abrir menú de menciones |
+| `#` | Abrir menú de etiquetas (si hay `tags`) |
 | `:` | Abrir selector de emojis |
 | `Escape` | Cerrar menú abierto |
 
@@ -317,7 +358,7 @@ Al seleccionar texto aparece un menú flotante con:
 
 ## Tablas
 
-Las tablas se crean desde el menú slash (`/tabla`) o el botón de la toolbar. Características:
+Las tablas se crean desde el menú slash (`/tabla`) o el botón de la toolbar. Al situar el cursor en una celda aparece una **toolbar contextual flotante** encima de la tabla, con todas las operaciones (los índices de fila/columna se refieren a la celda con foco). Características:
 
 ### Operaciones con celdas
 - **Selección por rango**: Click y arrastrar para seleccionar múltiples celdas
@@ -355,7 +396,7 @@ Las imágenes también se pueden insertar dentro de celdas de tabla.
 
 ## Drag & Drop
 
-Cada bloque tiene un handle flotante (icono de arrastre) que aparece al hacer hover en el lado izquierdo:
+Cada bloque tiene un handle flotante (icono de arrastre) que aparece junto al bloque **con foco** (no por hover; los separadores, que no reciben foco, sí usan hover):
 
 - **Arrastrar**: Click en el handle y arrastrar a otra posición
 - **Click**: Abre el menú contextual del bloque (cambiar tipo, insertar, duplicar, eliminar)
@@ -420,9 +461,9 @@ Cualquier valor de `theme` añade la clase `mewyse-editor-{theme}` al contenedor
 
 ## Estilos de Contenido
 
-Por defecto, el editor inyecta estilos dinámicos para los bloques de contenido. Cada instancia usa un ID único como clase CSS para aislar los estilos entre múltiples editores en la misma página.
+Todo el CSS vive en `mewyse.css` (cargado vía `<link>`). Por defecto, el editor activa los estilos de contenido añadiendo la clase `mewyse-editor-styled` al wrapper y al container (las reglas visuales de `mewyse.css` cuelgan de esa clase).
 
-Con `contentStyles: false`, el editor **no inyecta ningún estilo** de contenido ni del contenedor. La página es responsable de estilizar todo:
+Con `contentStyles: false`, el editor **no añade** `mewyse-editor-styled`, por lo que no se aplica ningún estilo visual de contenido ni del contenedor (solo unas reglas estructurales mínimas). La página es responsable de estilizar todo:
 
 ```javascript
 var editor = new meWYSE({
@@ -499,6 +540,29 @@ Escribe `:` seguido del nombre del emoji para abrir el selector:
 3. Navega con `↑` `↓` y selecciona con `Enter`
 4. `Escape` para cerrar
 
+## Etiquetas (#tags)
+
+Similar a las menciones, pero con el trigger `#` y una lista de etiquetas configurable:
+
+```javascript
+var editor = new meWYSE({
+  target: '#editor',
+  tags: [
+    { id: 'urgente', name: 'Urgente', color: '#e53935' },
+    { id: 'idea',    name: 'Idea',    color: '#43a047' },
+    { id: 'revisar', name: 'Revisar' }  // color es opcional
+  ]
+});
+```
+
+| Propiedad | Tipo | Descripción | Requerido |
+|-----------|------|-------------|-----------|
+| `id` | string | Identificador único | Sí |
+| `name` | string | Nombre a mostrar | Sí |
+| `color` | string | Color de fondo de la cápsula (hex) | No |
+
+**Uso:** escribe `#`, filtra escribiendo, navega con `↑`/`↓` y selecciona con `Enter`. Se inserta una cápsula `<span class="mewyse-tag" ...>` con el color de contraste calculado automáticamente.
+
 ## Soporte Markdown
 
 ### Exportar
@@ -556,12 +620,13 @@ editor.loadFromMarkdown(md);  // El contenido se preserva
 
 ## Resumen y Estadísticas
 
-Con `summary: true`, aparece un botón (☰) en la toolbar:
+Con `summary: true` (activo por defecto), aparece un botón (☰) en la toolbar:
 
 - **Hover**: Tooltip con índice rápido de encabezados (H1, H2, H3)
-- **Click**: Modal completo con:
+- **Click**: Abre un **panel de esquema lateral** (vista tipo Word) anclado a la derecha del editor, que empuja el contenido y muestra:
   - **Estadísticas**: Palabras, caracteres, párrafos, tiempo de lectura (~200 palabras/min)
   - **Índice de navegación**: Click en cualquier heading para ir directamente
+  - Se refresca en vivo mientras editas. Sin toolbar/wrapper, cae a un modal clásico.
 
 ```javascript
 var editor = new meWYSE({
@@ -614,9 +679,13 @@ var editor = new meWYSE({
 | `modals` | Textos de modales (imagen, enlace, resumen) |
 | `summary` | Modal de resumen del documento |
 | `colors` | Selector de colores |
-| `placeholders` | Placeholders de campos |
+| `placeholders` | Placeholders de campos y bloques |
 | `alerts` | Mensajes de alerta |
-| `misc` | Textos varios |
+| `misc` | Textos varios (media, etiquetas de export) |
+| `aria` | Etiquetas ARIA de los menús (menciones, emoji, etiquetas) |
+| `findReplace` | Diálogo de buscar y reemplazar |
+| `counter` | Barra del contador de palabras/caracteres |
+| `tableProperties` | Modal de propiedades de la tabla |
 
 ## Herramientas Avanzadas
 
@@ -699,7 +768,7 @@ meWYSE limpia automáticamente el HTML pegado desde aplicaciones Office:
 
 ### Propiedades de la tabla
 
-Al hacer click en el handle lateral de un bloque de tipo tabla, aparece una nueva opción **"Propiedades de la tabla"** que abre un modal con los siguientes ajustes:
+Cuando el cursor está dentro de una tabla aparece una **toolbar contextual flotante** encima de ella (con las operaciones de fila/columna, combinar/descombinar, color de celda, etc.). Su botón **"Propiedades de la tabla"** abre un modal con los siguientes ajustes:
 
 | Propiedad | Tipo | Descripción |
 |-----------|------|-------------|
@@ -876,8 +945,8 @@ meWYSE sanitiza **automáticamente** todo el contenido que entra al modelo de bl
 
 - Tags peligrosos: `<script>`, `<iframe>`, `<object>`, `<embed>`, `<form>`, `<input>`, `<button>`, `<style>`, `<link>`, `<meta>`, `<base>`, `<svg>`, `<math>`, `<video>`, `<audio>`
 - Event handlers: `onclick`, `onerror`, `onload`, `onmouseover`, etc. — **cualquier atributo `on*`**
-- URLs peligrosas en `href`/`src`: `javascript:`, `vbscript:`, `data:text/html`, `data:application`, `file:` (incluye ataques con tabs, newlines o mayúsculas)
-- CSS peligroso: `expression()`, `url(...)`, `@import`, `javascript:` en style
+- URLs peligrosas en `href`: `javascript:`, `vbscript:`, `livescript:`, cualquier `data:` y `file:` (incluye ataques con tabs, newlines o mayúsculas). En `src` de imagen solo se permiten `http(s)`, rutas relativas y `data:image/*` (excepto SVG)
+- CSS peligroso: `expression()`, `url(...)`, `@import`, `javascript:`, comillas, comentarios y escapes con backslash en style
 - `<a target="_blank">` se fuerza a tener `rel="noopener noreferrer"`
 - Clases CSS en `<span>`: solo se permiten `mewyse-mention`, `mewyse-emoji`, `mewyse-search-highlight`
 

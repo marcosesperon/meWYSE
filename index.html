@@ -377,25 +377,23 @@
 
     /* ── Footer ───────────────────────────────────── */
 
+    /* La página del demo es de tema claro (no hay toggle). Los colores del footer
+       se fijan para ese fondo claro: antes el borde (blanco translúcido) y el
+       hover (#e4e4e7) eran invisibles, y sus correcciones colgaban de una clase
+       body.light-mode que nunca se aplicaba. */
     .page-footer {
       text-align: center;
       padding: 32px 24px 48px;
-      border-top: 1px solid rgba(255, 255, 255, 0.04);
+      border-top: 1px solid rgba(0, 0, 0, 0.06);
       color: #3f3f46;
       font-size: 13px;
-    }
-
-    body.light-mode .page-footer {
-      border-top-color: rgba(0, 0, 0, 0.06);
-      color: #a1a1aa;
     }
 
     .page-footer a {
       color: #71717a;
       transition: color 0.2s;
     }
-    .page-footer a:hover { color: #e4e4e7; }
-    body.light-mode .page-footer a:hover { color: #18181b; }
+    .page-footer a:hover { color: #18181b; }
 
     /* ===== Responsive ===== */
     @media (max-width: 768px) {
@@ -404,13 +402,13 @@
       .container { padding: 0 16px 40px; }
       .demo-section { padding: 20px; }
       .feature-list { grid-template-columns: 1fr; }
-      .header-links .gh-link { display: none; }
+      .header-links .github-link { display: none; }
     }
   </style>
 
   <!-- Analítica de visitas (GoatCounter) -->
   <script data-goatcounter="https://mewyse.goatcounter.com/count"
-          async src="//gc.zaraz.io/count.js"></script>
+          async src="//gc.zgo.at/count.js"></script>
 </head>
 <body>
   <!-- Header -->
@@ -447,9 +445,9 @@
       <ul class="feature-list">
         <li><strong>Funciona con cualquier elemento:</strong> textarea, div, span o cualquier HTML</li>
         <li><strong>Sistema de bloques:</strong> Inspirado en Notion, cada linea es un bloque independiente</li>
-        <li><strong>12 tipos de bloques:</strong> Parrafo, titulos, citas, codigo, listas, checklists, tablas, imagenes, separadores</li>
+        <li><strong>14 tipos de bloques:</strong> Parrafo, titulos, citas, codigo, listas, checklists, tablas, imagenes, video, audio, separadores</li>
         <li><strong>Formato enriquecido:</strong> Menu flotante con negrita, cursiva, colores, enlaces y mas</li>
-        <li><strong>Menciones (@):</strong> Escribe @ para mencionar usuarios con autocompletado</li>
+        <li><strong>Menciones (@) y etiquetas (#):</strong> Escribe @ o # para insertar con autocompletado</li>
         <li><strong>Resumen y estadisticas:</strong> Indice de navegacion, conteo de palabras y tiempo de lectura</li>
         <li><strong>Menu slash (/):</strong> Menu contextual al estilo Notion para cambiar tipos de bloque</li>
         <li><strong>Atajos de teclado:</strong> Ctrl+B/I/U/Z/Y/K para formato rapido y undo/redo; Ctrl+A selecciona todo el contenido</li>
@@ -480,7 +478,7 @@ editor.focus(blockId); // bloque especifico
 
 // Para auto-foco al inicializar:
 // new meWYSE({ target: '#editor', autoFocus: true });</code></pre>
-      <textarea id="basicEditor" placeholder="Escribe aqui..."></textarea>
+      <textarea id="basicEditor" placeholder="Escribe aqui..." aria-label="Editor basico"></textarea>
       <div class="controls">
         <h3>Controles</h3>
         <div class="button-group">
@@ -505,7 +503,7 @@ editor.focus(blockId); // bloque especifico
     console.log('Contenido:', data.plainText);
   }
 });</code></pre>
-      <textarea id="toolbarEditor" placeholder="Editor con toolbar..."></textarea>
+      <textarea id="toolbarEditor" placeholder="Editor con toolbar..." aria-label="Editor con barra de herramientas"></textarea>
       <div class="controls">
         <h3>Controles</h3>
         <div class="button-group">
@@ -775,7 +773,7 @@ var editor = new meWYSE({
   toolbar: true,
   rtl: true
 });</code></pre>
-      <div id="rtlEditor"></div>
+      <div id="rtlEditor" lang="ar"></div>
     </div>
 
     <!-- Demo: styleFormats custom -->

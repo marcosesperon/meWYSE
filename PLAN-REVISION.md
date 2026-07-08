@@ -256,24 +256,27 @@ template literals reales; los backticks encontrados están en comentarios) — e
 
 ---
 
-## Fase 9 — Documentación y demo 🔵
+## Fase 9 — Documentación y demo ✅
 
-- [ ] **9.1 README**: corregir default de `summary` (es `true`, no `false`) [README.md:138];
-  documentar las 7 opciones faltantes (`readOnly`, `toolbarOverflow`, `wordWrap`, `wordWrapToggle`,
-  `escapeHtmlEntities`, `htmlNumericEntities`, `tags`) y el sistema de tags `#`; actualizar secciones
-  obsoletas (handle por foco no hover, propiedades de tabla en toolbar contextual, summary = panel lateral,
-  ya no hay inyección de estilos con ID único); documentar métodos públicos faltantes
-  (`loadFromText`, `getHTMLSource`, `removeFormat`, `applyCaseTransform`, `indentBlock`, fullscreen,
-  `toggleWordWrap`, `toggleOutlinePanel`, `showFindReplace`, stats).
-- [ ] **9.2 CLAUDE.md**: actualizar tamaños de fichero (17.490 / 2.958 líneas), la tabla de organización
-  por líneas (corrida ~2.000–3.900), y la instrucción "añade métodos antes de `escapeHtml()` ~línea 10449"
-  (real: ~17.464). Documentar features recientes ausentes (readOnly, toolbarOverflow, tags, escapeHtmlEntities).
-- [ ] **9.3 Demo `index.html`**:
-  - [ ] Analítica GoatCounter rota: host `//gc.zaraz.io/count.js` (TLS falla) → usar `gc.zgo.at`. → [index.html:412](index.html:412).
-  - [ ] Clase CSS huérfana `.gh-link` (el enlace real es `.github-link`). → [index.html:407](index.html:407).
-  - [ ] Footer depende de `body.light-mode` que nunca se aplica (contraste roto). → [index.html:380](index.html:380).
-  - [ ] "12 tipos de bloques" → son 14 (faltan video/audio); añadir sección de demo de media.
-  - [ ] Textareas sin `label`/`aria-label`; contenido árabe/inglés sin atributo `lang`.
+- [x] **9.1 README. RESUELTO.** Default de `summary` corregido a `true`; documentadas las 7 opciones
+  faltantes (`readOnly`, `toolbarOverflow`, `wordWrap`, `wordWrapToggle`, `escapeHtmlEntities`,
+  `htmlNumericEntities`, `tags`) y añadida sección de etiquetas `#` + trigger en la tabla de atajos;
+  secciones obsoletas actualizadas (handle por foco, propiedades de tabla en toolbar contextual, summary =
+  panel de esquema lateral, estilos vía `mewyse-editor-styled` en vez de inyección con ID único);
+  documentados los métodos faltantes (`loadFromText`, `getHTMLSource`, `removeFormat`,
+  `applyCaseTransform`, `indentBlock`, fullscreen, `toggleWordWrap`/`toggleShowBlocks`/`toggleOutlinePanel`,
+  `showFindReplace`, stats); tabla i18n y sección de seguridad puestas al día (incl. `data:` en href).
+- [x] **9.2 CLAUDE.md (gitignored). RESUELTO.** Tamaños de fichero actualizados (~17.450 / ~2.890);
+  instrucción "añade métodos antes de `escapeHtml()`" corregida a ~línea 17425 + nota para usar búsqueda
+  por símbolo; aviso de desfase añadido a la tabla de File Organization (el orden sigue válido, los números
+  no). Las features recientes quedan documentadas en el README (committeado).
+- [x] **9.3 Demo `index.html`. RESUELTO.**
+  - GoatCounter: host `gc.zaraz.io` → `gc.zgo.at` (VERIFICADO: `count.js → 200`).
+  - Clase huérfana `.gh-link` → `.github-link` en la media query.
+  - Footer: colores fijados para el fondo claro (borde y hover eran invisibles); eliminadas las reglas
+    muertas `body.light-mode`.
+  - "12 tipos de bloques" → "14" (incluye vídeo/audio); mención de etiquetas `#` añadida.
+  - Textareas con `aria-label`; contenedor RTL con `lang="ar"`.
 
 ---
 
@@ -281,4 +284,16 @@ template literals reales; los backticks encontrados están en comentarios) — e
 
 - Sin dependencias ni build: probar abriendo `index.html` (o `.claude/serve.js` en :8765).
 - Verificación en vivo posible con las herramientas de preview del editor.
-- Este plan es **solo diagnóstico**; no se ha modificado código de producción.
+
+## Estado
+
+Fases 1–9 **completadas y verificadas** (commits `620daff`, `2e7e202`, `4d79187`, `05c5211`, `feb5d38`,
+`3fcf5d6`, `59902e9` + Fase 9). Quedan pendientes explícitos, de bajo riesgo/valor, para abordar por
+separado con verificación dedicada:
+
+- **6.2** Extracciones DRY (modales de imagen, `getHTML`/`getHTMLSource`, `_positionMenuAtCaret`,
+  `_findCursorPosition`, snapshot).
+- **6.3** Render incremental en `duplicateBlock`/`moveBlock`/`deleteBlock`.
+- **6.1b** Retirar el no-op `updateConsecutiveNumberLists` y su trabajo asociado (7 call sites).
+- **3.3 (parcial)** Escape de metacaracteres Markdown y dimensiones de imagen en el round-trip.
+- **1.3 (nota)** — resuelto; sin pendientes.
