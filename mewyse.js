@@ -85,6 +85,8 @@
         alignCenter: 'Alinear centro',
         alignRight: 'Alinear derecha',
         justify: 'Justificar',
+        indent: 'Aumentar sangría (Tab)',
+        outdent: 'Reducir sangría (Mayús+Tab)',
         editDimensions: 'Editar dimensiones',
         dragToResize: 'Arrastrar para redimensionar',
         summary: 'Resumen',
@@ -353,6 +355,8 @@
         alignCenter: 'Align center',
         alignRight: 'Align right',
         justify: 'Justify',
+        indent: 'Increase indent (Tab)',
+        outdent: 'Decrease indent (Shift+Tab)',
         editDimensions: 'Edit dimensions',
         dragToResize: 'Drag to resize',
         summary: 'Summary',
@@ -781,6 +785,8 @@
     alignCenter: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" xmlns="http://www.w3.org/2000/svg"><line x1="2" y1="3" x2="14" y2="3"/><line x1="4" y1="6.5" x2="12" y2="6.5"/><line x1="2" y1="10" x2="14" y2="10"/><line x1="4" y1="13.5" x2="12" y2="13.5"/></svg>',
     alignRight: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" xmlns="http://www.w3.org/2000/svg"><line x1="2" y1="3" x2="14" y2="3"/><line x1="6" y1="6.5" x2="14" y2="6.5"/><line x1="2" y1="10" x2="14" y2="10"/><line x1="6" y1="13.5" x2="14" y2="13.5"/></svg>',
     alignJustify: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" xmlns="http://www.w3.org/2000/svg"><line x1="2" y1="3" x2="14" y2="3"/><line x1="2" y1="6.5" x2="14" y2="6.5"/><line x1="2" y1="10" x2="14" y2="10"/><line x1="2" y1="13.5" x2="14" y2="13.5"/></svg>',
+    indent: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><line x1="7" y1="3" x2="14" y2="3"/><line x1="7" y1="8" x2="14" y2="8"/><line x1="7" y1="13" x2="14" y2="13"/><polyline points="2,5 4.5,8 2,11"/></svg>',
+    outdent: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><line x1="7" y1="3" x2="14" y2="3"/><line x1="7" y1="8" x2="14" y2="8"/><line x1="7" y1="13" x2="14" y2="13"/><polyline points="4.5,5 2,8 4.5,11"/></svg>',
     table: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="12" height="12" rx="1"/><line x1="2" y1="6" x2="14" y2="6"/><line x1="2" y1="10" x2="14" y2="10"/><line x1="6" y1="2" x2="6" y2="14"/><line x1="10" y1="2" x2="10" y2="14"/></svg>',
     image: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="12" height="12" rx="1"/><circle cx="5.5" cy="5.5" r="1.5"/><path d="M14 10.5l-3-3L4 14"/></svg>',
     quote: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M5 3C2.8 4.2 2 6.2 2 8.5c0 2.5 1.5 4.5 3.5 4.5 1.4 0 2.5-1.1 2.5-2.5S6.9 8 5.5 8c-.3 0-.6 0-.9.1C4.9 6 6 4.6 7 4L5 3zm7 0c-2.2 1.2-3 3.2-3 5.5 0 2.5 1.5 4.5 3.5 4.5 1.4 0 2.5-1.1 2.5-2.5S14.9 8 13.5 8c-.3 0-.6 0-.9.1C12.9 6 14 4.6 15 4l-2-1z"/></svg>',
@@ -1064,6 +1070,8 @@
     this.redoButton = null;
     this.moveUpButton = null;
     this.moveDownButton = null;
+    this.indentButton = null;
+    this.outdentButton = null;
 
     // Handlers almacenados para cleanup en destroy()
     this._handleDocMouseUp = null;
@@ -2305,6 +2313,45 @@
     });
 
     host.appendChild(alignGroup);
+
+    // Grupo de sangría (indentar/desindentar ítems de lista). Los botones se
+    // habilitan/deshabilitan según el bloque con foco (_updateIndentButtons).
+    var indentGroup = document.createElement('div');
+    indentGroup.className = 'mewyse-toolbar-group';
+
+    var outdentBtn = document.createElement('button');
+    outdentBtn.className = 'mewyse-toolbar-button';
+    outdentBtn.innerHTML = WYSIWYG_ICONS.outdent;
+    outdentBtn.title = this.t('tooltips.outdent');
+    outdentBtn.setAttribute('aria-label', this.t('tooltips.outdent'));
+    outdentBtn.disabled = true;
+    // mousedown+preventDefault: no quitar el foco del ítem al clicar (conserva la
+    // referencia del bloque activo para indentBlock).
+    outdentBtn.onmousedown = function(e) { e.preventDefault(); };
+    outdentBtn.onclick = function(e) {
+      e.preventDefault();
+      var v_id = self._getFocusedBlockId();
+      if (v_id !== null) self.indentBlock(v_id, -1);
+    };
+    this.outdentButton = outdentBtn;
+    indentGroup.appendChild(outdentBtn);
+
+    var indentBtn = document.createElement('button');
+    indentBtn.className = 'mewyse-toolbar-button';
+    indentBtn.innerHTML = WYSIWYG_ICONS.indent;
+    indentBtn.title = this.t('tooltips.indent');
+    indentBtn.setAttribute('aria-label', this.t('tooltips.indent'));
+    indentBtn.disabled = true;
+    indentBtn.onmousedown = function(e) { e.preventDefault(); };
+    indentBtn.onclick = function(e) {
+      e.preventDefault();
+      var v_id = self._getFocusedBlockId();
+      if (v_id !== null) self.indentBlock(v_id, 1);
+    };
+    this.indentButton = indentBtn;
+    indentGroup.appendChild(indentBtn);
+
+    host.appendChild(indentGroup);
 
     // Separador
     var separator4 = document.createElement('div');
@@ -3756,43 +3803,79 @@
   };
 
   /**
+   * ¿El tipo de bloque admite indentación (es un ítem de lista)?
+   * @param {string} type
+   * @returns {boolean}
+   */
+  meWYSE.prototype._isListBlockType = function(type) {
+    return type === 'bulletList' || type === 'numberList' || type === 'checklist';
+  };
+
+  /**
+   * ¿El bloque puede AUMENTAR su indentación? Un ítem solo puede anidarse como
+   * mucho un nivel más adentro que el ítem anterior del mismo grupo, no puede ser
+   * el primero del grupo, ni pasar de 5.
+   * @param {number} blockId
+   * @returns {boolean}
+   */
+  meWYSE.prototype._canIndent = function(blockId) {
+    var block = this.getBlock(blockId);
+    if (!block || !this._isListBlockType(block.type)) return false;
+    var currentLevel = block.indentLevel || 0;
+    if (currentLevel >= 5) return false;
+    var index = this.getBlockIndex(blockId);
+    if (index <= 0) return false; // primer bloque del editor
+    var prevBlock = this.blocks[index - 1];
+    if (prevBlock.type !== block.type) return false; // no hay padre del mismo tipo
+    var prevLevel = prevBlock.indentLevel || 0;
+    return (currentLevel + 1) <= (prevLevel + 1); // no saltar niveles
+  };
+
+  /**
+   * ¿El bloque puede REDUCIR su indentación? (nivel actual > 0)
+   * @param {number} blockId
+   * @returns {boolean}
+   */
+  meWYSE.prototype._canOutdent = function(blockId) {
+    var block = this.getBlock(blockId);
+    if (!block || !this._isListBlockType(block.type)) return false;
+    return (block.indentLevel || 0) > 0;
+  };
+
+  /**
    * Cambia el nivel de indentación de un bloque de lista.
    * @param {number} blockId
    * @param {number} delta - +1 para indent, -1 para outdent
    */
   meWYSE.prototype.indentBlock = function(blockId, delta) {
     var block = this.getBlock(blockId);
-    if (!block) return;
-    if (block.type !== 'bulletList' && block.type !== 'numberList' && block.type !== 'checklist') return;
+    if (!block || !this._isListBlockType(block.type)) return;
+
+    // Validar según la dirección usando los mismos criterios que la toolbar.
+    if (delta > 0 && !this._canIndent(blockId)) return;
+    if (delta < 0 && !this._canOutdent(blockId)) return;
 
     var currentLevel = block.indentLevel || 0;
     var newLevel = Math.max(0, Math.min(5, currentLevel + delta));
     if (newLevel === currentLevel) return;
-
-    // Validación: no se puede indent si no hay un item anterior en el mismo grupo
-    // con nivel >= al nuevo que sería nuestro padre.
-    if (delta > 0) {
-      var index = this.getBlockIndex(blockId);
-      if (index <= 0) return; // primer bloque del editor no puede anidar
-      var prevBlock = this.blocks[index - 1];
-      if (prevBlock.type !== block.type) return; // no hay padre del mismo tipo
-      var prevLevel = prevBlock.indentLevel || 0;
-      if (newLevel > prevLevel + 1) return; // no se puede saltar niveles
-    }
 
     this.pushHistory(true);
     block.indentLevel = newLevel;
     this.render();
     this.triggerChange();
 
-    // Restaurar foco al bloque
+    // Restaurar foco al bloque. IMPORTANTE: enfocar el editable PROPIO del bloque
+    // (para un <li> de lista es el propio <li>), no un descendiente — si el ítem
+    // tiene hijos anidados, querySelector devolvería el editable de un hijo.
     var self = this;
     setTimeout(function() {
       var el = self.container.querySelector('[data-block-id="' + blockId + '"]');
       if (el) {
-        var editable = el.querySelector('[contenteditable="true"]') || el;
+        var editable = (el.getAttribute('contenteditable') === 'true')
+          ? el : el.querySelector('[contenteditable="true"]');
         if (editable) editable.focus();
       }
+      self._updateIndentButtons();
     }, 0);
   };
 
@@ -15722,9 +15805,23 @@
    * @returns {number|null}
    */
   meWYSE.prototype._getFocusedBlockId = function() {
+    // 1) Preferir la posición del CARET (selección). En listas anidadas, los <li>
+    //    son contenteditable dentro de otro contenteditable, así que activeElement
+    //    apunta al <li> padre (editing host), pero el caret está en el ítem real.
+    //    La selección da el bloque correcto.
+    var sel = window.getSelection ? window.getSelection() : null;
+    if (sel && sel.rangeCount > 0) {
+      var node = sel.anchorNode;
+      var selEl = (node && node.nodeType === 3) ? node.parentElement : node;
+      if (selEl && selEl.closest && this.container && this.container.contains(selEl)) {
+        var selBlock = selEl.closest('[data-block-id]');
+        if (selBlock) return parseInt(selBlock.getAttribute('data-block-id'));
+      }
+    }
+    // 2) Fallback: último editable enfocado / activeElement
     var el = this.lastFocusedElement || document.activeElement;
-    if (!el) return null;
-    var blockEl = el.closest ? el.closest('[data-block-id]') : null;
+    if (!el || !el.closest) return null;
+    var blockEl = el.closest('[data-block-id]');
     if (!blockEl) return null;
     return parseInt(blockEl.getAttribute('data-block-id'));
   };
@@ -15781,6 +15878,8 @@
    * Actualiza el estado enabled/disabled de los botones de mover
    */
   meWYSE.prototype._updateMoveButtons = function() {
+    // Actualizar también los botones de sangría (comparten disparadores de foco).
+    this._updateIndentButtons();
     if (!this.moveUpButton || !this.moveDownButton) return;
     var blockId = this._getFocusedBlockId();
     if (blockId === null) {
@@ -15791,6 +15890,22 @@
     var index = this.getBlockIndex(blockId);
     this.moveUpButton.disabled = (index <= 0);
     this.moveDownButton.disabled = (index === -1 || index >= this.blocks.length - 1);
+  };
+
+  /**
+   * Actualiza el estado enabled/disabled de los botones de sangría según el
+   * bloque con foco (solo activos en ítems de lista que pueden indentar/desindentar).
+   */
+  meWYSE.prototype._updateIndentButtons = function() {
+    if (!this.indentButton || !this.outdentButton) return;
+    var blockId = this._getFocusedBlockId();
+    if (blockId === null) {
+      this.indentButton.disabled = true;
+      this.outdentButton.disabled = true;
+      return;
+    }
+    this.indentButton.disabled = !this._canIndent(blockId);
+    this.outdentButton.disabled = !this._canOutdent(blockId);
   };
 
   // =========================================================================
