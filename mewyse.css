@@ -431,18 +431,24 @@
   margin: 0 0 0.5em 0;
   padding: 0;
 }
-/* Títulos: margen superior e inferior (relativos a su propio tamaño). */
+/* Títulos: margen superior e inferior (relativos a su propio tamaño).
+   El `color` se fija explícitamente (no solo por herencia del container): así una
+   regla de la página anfitriona sobre el elemento (p.ej. `.seccion h2 {color:#000}`)
+   no pisa el color del tema y deja los títulos invisibles en modo oscuro. */
 .mewyse-editor-styled h1.mewyse-block {
   margin: 2em 0 .75em;
   padding: 0;
+  color: var(--mewyse-text-primary);
 }
 .mewyse-editor-styled h2.mewyse-block {
   margin: 2em 0 .75em;
   padding: 0;
+  color: var(--mewyse-text-primary);
 }
 .mewyse-editor-styled h3.mewyse-block {
   margin: 1.5em 0 .5em;
   padding: 0;
+  color: var(--mewyse-text-primary);
 }
 /* El primer bloque del editor nunca lleva margen superior. */
 .mewyse-editor-styled .mewyse-block:first-child {
