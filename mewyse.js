@@ -11212,6 +11212,12 @@
       // hijo huérfano con un salto de nivel; lo corregimos en el modelo.
       this._normalizeListModel();
 
+      // El re-render destruye el editable que tenía el foco (p. ej. la celda de
+      // la tabla que se borra). Sin reenfocar, el focusout dejaría el foco en
+      // <body> y dispararía un onBlur espurio. Suprimimos el blur durante la
+      // transición y reenfocamos un bloque vecino tras el render.
+      this._suppressBlurUntil = Date.now() + 300;
+
       this.render();
 
       // Actualizar las listas numeradas si es necesario
@@ -11219,8 +11225,48 @@
         this.updateConsecutiveNumberLists(index);
       }
 
+      // Mantener el foco dentro del editor: enfocar el bloque que ocupa ahora la
+      // posición borrada (o el anterior si era el último). Se hace SÍNCRONO tras
+      // el render (el DOM ya está reconstruido) para no depender de rAF/timers
+      // que pueden retrasarse; así el focusout ya encuentra el foco dentro del
+      // editor y no dispara onBlur.
+      this._focusBlockNear(Math.min(index, this.blocks.length - 1));
+
       this.triggerChange();
     }
+  };
+
+  /**
+   * Enfoca el editable más cercano a una posición del array de bloques. Busca
+   * desde `index` hacia delante y, si no encuentra editable (p. ej. divider,
+   * tabla, imagen), hacia atrás. Sirve para mantener el foco dentro del editor
+   * tras borrar un bloque (evita el onBlur espurio del focusout a <body>).
+   * @param {number} index
+   * @returns {boolean} true si enfocó algún editable
+   */
+  meWYSE.prototype._focusBlockNear = function(index) {
+    if (this._destroyed || !this.container || !this.blocks.length) return false;
+    if (index < 0) index = 0;
+    if (index > this.blocks.length - 1) index = this.blocks.length - 1;
+
+    // Orden de búsqueda: desde index hacia delante, luego hacia atrás.
+    var order = [];
+    var i;
+    for (i = index; i < this.blocks.length; i++) order.push(i);
+    for (i = index - 1; i >= 0; i--) order.push(i);
+
+    for (var k = 0; k < order.length; k++) {
+      var block = this.blocks[order[k]];
+      var el = this.container.querySelector('[data-block-id="' + block.id + '"]');
+      if (!el) continue;
+      var editable = (el.getAttribute('contenteditable') === 'true')
+        ? el : el.querySelector('[contenteditable="true"]');
+      if (editable) {
+        editable.focus();
+        return true;
+      }
+    }
+    return false;
   };
 
   /**
