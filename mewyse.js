@@ -871,6 +871,16 @@
     this.enableWordWrapToggle = this.options.wordWrapToggle !== false; // Botón de ajuste de texto en toolbar (default: true)
     this.rtl = this.options.rtl === true; // Dirección derecha-a-izquierda
     this.wordWrap = this.options.wordWrap !== false; // Ajuste de texto: envolver dentro del bloque (default: true)
+
+    // Control de la altura del área de edición (opcional). Sobrescriben los
+    // valores por defecto del CSS (min 200 / max 500) mediante estilos inline en
+    // el container. Aceptan número (se interpreta como px) o string CSS
+    // ('200px', '30vh', '10em', 'none'). `autoExpand` hace que el editor crezca
+    // con el contenido: sin `maxHeight` no tiene tope (scrollea la página); con
+    // `maxHeight` crece hasta ese límite y luego hace scroll interno.
+    this.minHeight = this._normalizeCssSize(this.options.minHeight);
+    this.maxHeight = this._normalizeCssSize(this.options.maxHeight);
+    this.autoExpand = this.options.autoExpand === true;
     // readOnly: el editor se monta para visualización. Ningún bloque es
     // editable, no se generan toolbar, floating handle, drag&drop de imágenes
     // ni format menu. Selección nativa funciona — el usuario puede copiar
@@ -1585,6 +1595,46 @@
   };
 
   /**
+   * Normaliza un valor de tamaño CSS para las opciones de altura.
+   *   - número finito  → 'Npx'
+   *   - string no vacío → tal cual (permite '30vh', '10em', 'none', '400px'...)
+   *   - cualquier otra cosa → null (no aplicar)
+   * La asignación posterior via element.style es segura: un valor inválido lo
+   * ignora el navegador (no hay riesgo de inyección, no es innerHTML).
+   * @param {*} v
+   * @returns {string|null}
+   */
+  meWYSE.prototype._normalizeCssSize = function(v) {
+    if (typeof v === 'number' && isFinite(v)) return v + 'px';
+    if (typeof v === 'string' && v.trim() !== '') return v.trim();
+    return null;
+  };
+
+  /**
+   * Aplica las opciones de altura (minHeight/maxHeight/autoExpand) como estilos
+   * inline en el container. Los estilos inline ganan a los defaults del CSS.
+   * Solo escribe las propiedades cuyas opciones se hayan definido, para no pisar
+   * el comportamiento por defecto cuando el consumidor no configura nada.
+   */
+  meWYSE.prototype._applyHeightStyles = function() {
+    if (!this.container) return;
+    var s = this.container.style;
+
+    if (this.minHeight) s.minHeight = this.minHeight;
+
+    if (this.autoExpand) {
+      // Crecer con el contenido: sin maxHeight no hay tope (scrollea la página);
+      // con maxHeight, crece hasta ese límite y luego scroll interno.
+      s.maxHeight = this.maxHeight || 'none';
+      s.overflowY = this.maxHeight ? 'auto' : 'visible';
+    } else if (this.maxHeight) {
+      // Techo personalizado con scroll interno (sin autoExpand).
+      s.maxHeight = this.maxHeight;
+      s.overflowY = 'auto';
+    }
+  };
+
+  /**
    * Inicializa el DOM para el editor
    */
   meWYSE.prototype.initDomEditor = function() {
@@ -1714,6 +1764,10 @@
     if (this.wordWrap && this.container) {
       this.container.classList.add('mewyse-word-wrap');
     }
+
+    // Altura configurable (minHeight/maxHeight/autoExpand): estilos inline que
+    // ganan a los defaults del CSS. Independiente de contentStyles.
+    this._applyHeightStyles();
 
     // Cargar contenido inicial.
     //  - Prioridad 1: HTML original del target (cuando NO era textarea) →

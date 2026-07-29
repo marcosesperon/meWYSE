@@ -166,6 +166,9 @@ new meWYSE(options)
 | `styleFormats` | Array | `[]` | Estilos custom para el dropdown de tipos de bloque. Cada item: `{ title, block, className }` |
 | `theme` | string | auto | Tema: `'dark'`, `'compact'`, o cualquier nombre custom. Sin tema, auto-detecta `prefers-color-scheme` del OS |
 | `contentStyles` | boolean | `true` | Inyectar estilos de contenido. Con `false`, la página define sus propios estilos |
+| `minHeight` | number/string | — | Alto mínimo del área de edición. Número = px; string = valor CSS (`'200px'`, `'30vh'`, `'10em'`). Sin definir, usa el default del CSS |
+| `maxHeight` | number/string | — | Alto máximo antes de scroll interno. Número = px o string CSS. Sin definir, usa el default del CSS |
+| `autoExpand` | boolean | `false` | El editor crece con el contenido. Sin `maxHeight`, sin tope (scrollea la página); con `maxHeight`, crece hasta ese límite y luego hace scroll interno |
 | `lang` | string/object | `'es'` | Idioma (`'es'`, `'en'`) o objeto de traducciones personalizadas |
 | `mentions` | Array | `[]` | Lista de usuarios para menciones `@` |
 | `autoFocus` | boolean | `false` | Enfocar automáticamente el primer bloque al inicializar |

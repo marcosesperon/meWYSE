@@ -1027,6 +1027,22 @@ editor.loadFromMarkdown(editor.getMarkdown());</code></pre>
       <div id="sprint4Editor"></div>
     </div>
 
+    <!-- Demo: Altura configurable -->
+    <div class="demo-section">
+      <h2>Altura configurable</h2>
+      <p>Controla la altura por opciones: <code>minHeight</code>, <code>maxHeight</code> y <code>autoExpand</code> (crece con el contenido).</p>
+      <pre class="docs-code"><code>// Crece con el contenido, hasta 320px y luego scroll interno
+new meWYSE({ target: '#autoHeightEditor', toolbar: true,
+             autoExpand: true, minHeight: 100, maxHeight: 320 });
+
+// Sin tope: crece indefinidamente (scrollea la p&aacute;gina)
+new meWYSE({ target: '#growEditor', autoExpand: true, minHeight: 80 });</code></pre>
+      <h3>autoExpand + minHeight 100 / maxHeight 320</h3>
+      <div id="autoHeightEditor"></div>
+      <h3 style="margin-top:16px;">autoExpand sin tope (minHeight 80)</h3>
+      <div id="growEditor"></div>
+    </div>
+
   </div>
 
   <!-- ── Footer ──────────────────────────────────── -->
@@ -1756,6 +1772,25 @@ editor.loadFromMarkdown(editor.getMarkdown());</code></pre>
       });
     }
 
+    // ===== Demo altura configurable =====
+    var autoHeightEditor, growEditor;
+    function initHeightEditors() {
+      autoHeightEditor = new meWYSE({
+        target: '#autoHeightEditor', toolbar: true,
+        autoExpand: true, minHeight: 100, maxHeight: 320,
+        blocks: [
+          { id: 1, type: 'heading3', content: 'Crece con el contenido' },
+          { id: 2, type: 'paragraph', content: 'Escribe varias lineas: el editor crece hasta 320px y luego hace scroll interno.' }
+        ]
+      });
+      growEditor = new meWYSE({
+        target: '#growEditor', autoExpand: true, minHeight: 80,
+        blocks: [
+          { id: 1, type: 'paragraph', content: 'Sin maxHeight: crece indefinidamente con el contenido (scrollea la pagina, no el editor).' }
+        ]
+      });
+    }
+
     // ===== Configurador de opciones =====
     // Especificacion de las opciones. `def` = default REAL de la librería (se usa
     // para omitir del config lo que no cambia). `init` = estado inicial del control
@@ -1919,6 +1954,7 @@ editor.loadFromMarkdown(editor.getMarkdown());</code></pre>
       initNovedadesEditor();
       initConfigurator();
       initSprint4Editor();
+      initHeightEditors();
     };
   </script>
 </body>

@@ -2707,14 +2707,19 @@
 
 .mewyse-editor-wrapper.mewyse-fullscreen > .mewyse-editor {
   flex: 1;
-  max-height: none;
+  max-height: none !important;
   height: auto;
-  min-height: 0;
+  min-height: 0 !important;
 }
 
+/* En fullscreen mandan estas reglas por encima de los estilos INLINE que pueda
+   haber puesto la opción de altura (minHeight/maxHeight/autoExpand) en el
+   container: si no, un max-height/overflow inline dejaría contenido oculto o
+   sin scroll dentro del viewport fijo. */
 .mewyse-editor.mewyse-fullscreen {
   max-height: 100vh !important;
-  overflow-y: auto;
+  min-height: 0 !important;
+  overflow-y: auto !important;
   padding: var(--mewyse-padding-handle);
 }
 
