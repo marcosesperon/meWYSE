@@ -1031,16 +1031,31 @@ editor.loadFromMarkdown(editor.getMarkdown());</code></pre>
     <div class="demo-section">
       <h2>Altura configurable</h2>
       <p>Controla la altura por opciones: <code>minHeight</code>, <code>maxHeight</code> y <code>autoExpand</code> (crece con el contenido).</p>
-      <pre class="docs-code"><code>// Crece con el contenido, hasta 320px y luego scroll interno
+      <pre class="docs-code"><code>// 1) Crece con el contenido, hasta 320px y luego scroll interno
 new meWYSE({ target: '#autoHeightEditor', toolbar: true,
              autoExpand: true, minHeight: 100, maxHeight: 320 });
 
-// Sin tope: crece indefinidamente (scrollea la p&aacute;gina)
-new meWYSE({ target: '#growEditor', autoExpand: true, minHeight: 80 });</code></pre>
-      <h3>autoExpand + minHeight 100 / maxHeight 320</h3>
+// 2) Sin tope: crece indefinidamente (scrollea la p&aacute;gina)
+new meWYSE({ target: '#growEditor', autoExpand: true, minHeight: 80 });
+
+// 3) Caja fija: alto tope 180px con scroll interno (sin autoExpand)
+new meWYSE({ target: '#fixedHeightEditor', toolbar: true, maxHeight: 180 });
+
+// 4) Solo suelo: alto minimo 260px (crece si hay mas contenido)
+new meWYSE({ target: '#minHeightEditor', toolbar: true, minHeight: 260 });
+
+// 5) Valores CSS en string (vh/em) tambien valen
+new meWYSE({ target: '#vhHeightEditor', minHeight: '10em', maxHeight: '35vh' });</code></pre>
+      <h3>1) autoExpand + minHeight 100 / maxHeight 320</h3>
       <div id="autoHeightEditor"></div>
-      <h3 style="margin-top:16px;">autoExpand sin tope (minHeight 80)</h3>
+      <h3 style="margin-top:16px;">2) autoExpand sin tope (minHeight 80)</h3>
       <div id="growEditor"></div>
+      <h3 style="margin-top:16px;">3) maxHeight 180 (caja fija con scroll)</h3>
+      <div id="fixedHeightEditor"></div>
+      <h3 style="margin-top:16px;">4) minHeight 260 (solo suelo)</h3>
+      <div id="minHeightEditor"></div>
+      <h3 style="margin-top:16px;">5) string CSS: minHeight '10em' / maxHeight '35vh'</h3>
+      <div id="vhHeightEditor"></div>
     </div>
 
   </div>
@@ -1773,7 +1788,13 @@ new meWYSE({ target: '#growEditor', autoExpand: true, minHeight: 80 });</code></
     }
 
     // ===== Demo altura configurable =====
-    var autoHeightEditor, growEditor;
+    var autoHeightEditor, growEditor, fixedHeightEditor, minHeightEditor, vhHeightEditor;
+    // Genera n parrafos de relleno para ver el comportamiento de scroll/crecimiento
+    function fillerBlocks(n) {
+      var a = [];
+      for (var i = 1; i <= n; i++) a.push({ id: i, type: 'paragraph', content: 'Linea de ejemplo numero ' + i + ' para ver la altura del editor.' });
+      return a;
+    }
     function initHeightEditors() {
       autoHeightEditor = new meWYSE({
         target: '#autoHeightEditor', toolbar: true,
@@ -1788,6 +1809,21 @@ new meWYSE({ target: '#growEditor', autoExpand: true, minHeight: 80 });</code></
         blocks: [
           { id: 1, type: 'paragraph', content: 'Sin maxHeight: crece indefinidamente con el contenido (scrollea la pagina, no el editor).' }
         ]
+      });
+      // 3) Caja fija con scroll: mucho contenido para que se vea el scroll a 180px
+      fixedHeightEditor = new meWYSE({
+        target: '#fixedHeightEditor', toolbar: true, maxHeight: 180,
+        blocks: fillerBlocks(12)
+      });
+      // 4) Solo suelo: poco contenido, pero mantiene 260px de alto minimo
+      minHeightEditor = new meWYSE({
+        target: '#minHeightEditor', toolbar: true, minHeight: 260,
+        blocks: [ { id: 1, type: 'paragraph', content: 'Poco contenido, pero el editor mantiene 260px de alto minimo.' } ]
+      });
+      // 5) Valores en string CSS (em / vh)
+      vhHeightEditor = new meWYSE({
+        target: '#vhHeightEditor', minHeight: '10em', maxHeight: '35vh',
+        blocks: fillerBlocks(15)
       });
     }
 
