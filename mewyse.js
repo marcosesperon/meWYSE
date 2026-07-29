@@ -11201,7 +11201,11 @@
       if (this.blocks.length === 1) {
         var v_id = this.blocks[0].id;
         this.blocks[0] = { id: v_id, type: 'paragraph', content: '' };
+        // Suprimir el blur durante el re-render y reenfocar el párrafo resultante
+        // (evita el onBlur espurio al borrar el único bloque, p. ej. una tabla).
+        this._suppressBlurUntil = Date.now() + 300;
         this.render(v_id);
+        this._focusBlockNear(0);
         this.triggerChange();
         return;
       }
@@ -11265,6 +11269,16 @@
         editable.focus();
         return true;
       }
+    }
+
+    // No hay ningún bloque editable (p. ej. la tabla estaba entre separadores /
+    // imágenes). Enfocar el propio container para que el foco permanezca dentro
+    // del editor (`_isPartOfEditorUI` lo reconoce) y NO se dispare onBlur.
+    if (this.container) {
+      if (!this.container.hasAttribute('tabindex')) {
+        this.container.setAttribute('tabindex', '-1');
+      }
+      try { this.container.focus(); } catch (e) {}
     }
     return false;
   };
