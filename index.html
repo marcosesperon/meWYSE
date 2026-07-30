@@ -489,7 +489,7 @@
       <ul class="feature-list">
         <li><strong>Funciona con cualquier elemento:</strong> textarea, div, span o cualquier HTML</li>
         <li><strong>Sistema de bloques:</strong> Inspirado en Notion, cada linea es un bloque independiente</li>
-        <li><strong>14 tipos de bloques:</strong> Parrafo, titulos, citas, codigo, listas, checklists, tablas, imagenes, video, audio, separadores</li>
+        <li><strong>18 tipos de bloques:</strong> Parrafo, titulos, citas, codigo, listas, checklists, tablas, imagenes, video, audio, separadores, salto de pagina, aviso, desplegable, indice</li>
         <li><strong>Formato enriquecido:</strong> Menu flotante con negrita, cursiva, colores, enlaces y mas</li>
         <li><strong>Menciones (@) y etiquetas (#):</strong> Escribe @ o # para insertar con autocompletado</li>
         <li><strong>Resumen y estadisticas:</strong> Indice de navegacion, conteo de palabras y tiempo de lectura</li>
@@ -1283,7 +1283,7 @@ new meWYSE({ target: '#vhHeightEditor', minHeight: '10em', maxHeight: '35vh' });
     }
 
     function clearBasicEditor() {
-      if (confirm('Limpiar editor?')) {
+      { /* demo: limpiar directamente (sin confirm, que algunos navegadores suprimen) */
         basicEditor.loadFromJSON([]);
         basicEditor.addBlock('paragraph');
       }
@@ -1306,7 +1306,7 @@ new meWYSE({ target: '#vhHeightEditor', minHeight: '10em', maxHeight: '35vh' });
     }
 
     function clearToolbarEditor() {
-      if (confirm('Limpiar editor?')) {
+      { /* demo: limpiar directamente (sin confirm, que algunos navegadores suprimen) */
         toolbarEditor.loadFromJSON([]);
         toolbarEditor.addBlock('paragraph');
       }
@@ -1353,7 +1353,7 @@ new meWYSE({ target: '#vhHeightEditor', minHeight: '10em', maxHeight: '35vh' });
     }
 
     function clearSummaryEditor() {
-      if (confirm('Limpiar editor?')) {
+      { /* demo: limpiar directamente (sin confirm, que algunos navegadores suprimen) */
         summaryEditor.loadFromJSON([]);
         summaryEditor.addBlock('paragraph');
       }
@@ -1366,7 +1366,7 @@ new meWYSE({ target: '#vhHeightEditor', minHeight: '10em', maxHeight: '35vh' });
     }
 
     function clearMentionsEditor() {
-      if (confirm('Limpiar editor?')) {
+      { /* demo: limpiar directamente (sin confirm, que algunos navegadores suprimen) */
         mentionsEditor.loadFromJSON([]);
         mentionsEditor.addBlock('paragraph');
       }
@@ -1378,7 +1378,7 @@ new meWYSE({ target: '#vhHeightEditor', minHeight: '10em', maxHeight: '35vh' });
       showOutput('tagsOutput', 'tagsOutputContent', html);
     }
     function clearTagsEditor() {
-      if (confirm('Limpiar editor?')) {
+      { /* demo: limpiar directamente (sin confirm, que algunos navegadores suprimen) */
         tagsEditor.loadFromJSON([]);
         tagsEditor.addBlock('paragraph');
       }
@@ -1396,7 +1396,7 @@ new meWYSE({ target: '#vhHeightEditor', minHeight: '10em', maxHeight: '35vh' });
     }
 
     function clearDivEditor() {
-      if (confirm('Limpiar editor?')) {
+      { /* demo: limpiar directamente (sin confirm, que algunos navegadores suprimen) */
         divEditor.loadFromJSON([]);
         divEditor.addBlock('paragraph');
       }
@@ -1409,7 +1409,7 @@ new meWYSE({ target: '#vhHeightEditor', minHeight: '10em', maxHeight: '35vh' });
     }
 
     function clearDarkEditor() {
-      if (confirm('Limpiar editor?')) {
+      { /* demo: limpiar directamente (sin confirm, que algunos navegadores suprimen) */
         darkEditor.loadFromJSON([]);
         darkEditor.addBlock('paragraph');
       }
@@ -1422,7 +1422,7 @@ new meWYSE({ target: '#vhHeightEditor', minHeight: '10em', maxHeight: '35vh' });
     }
 
     function clearCompactEditor() {
-      if (confirm('Limpiar editor?')) {
+      { /* demo: limpiar directamente (sin confirm, que algunos navegadores suprimen) */
         compactEditor.loadFromJSON([]);
         compactEditor.addBlock('paragraph');
       }
@@ -1440,7 +1440,7 @@ new meWYSE({ target: '#vhHeightEditor', minHeight: '10em', maxHeight: '35vh' });
     }
 
     function clearI18nEditor() {
-      if (confirm('Limpiar editor?')) {
+      { /* demo: limpiar directamente (sin confirm, que algunos navegadores suprimen) */
         i18nEditor.loadFromJSON([]);
         i18nEditor.addBlock('paragraph');
       }
@@ -1473,7 +1473,7 @@ new meWYSE({ target: '#vhHeightEditor', minHeight: '10em', maxHeight: '35vh' });
     }
 
     function clearNoStylesEditor() {
-      if (confirm('Limpiar editor?')) {
+      { /* demo: limpiar directamente (sin confirm, que algunos navegadores suprimen) */
         noStylesEditor.loadFromJSON([]);
         noStylesEditor.addBlock('paragraph');
       }
@@ -1722,7 +1722,7 @@ new meWYSE({ target: '#vhHeightEditor', minHeight: '10em', maxHeight: '35vh' });
     }
 
     function clearMarkdownEditor() {
-      if (confirm('Limpiar editor?')) {
+      { /* demo: limpiar directamente (sin confirm, que algunos navegadores suprimen) */
         markdownEditor.loadFromJSON([]);
         markdownEditor.addBlock('paragraph');
       }
