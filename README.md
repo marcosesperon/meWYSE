@@ -322,7 +322,7 @@ var editor = new meWYSE({
 | `checklist` | Lista de tareas | `/checklist` |
 | `table` | Tabla (3x3 inicial) | `/tabla` |
 | `image` | Imagen desde archivo | `/imagen` |
-| `video` | Vídeo (YouTube/Vimeo/.mp4) | `/video` |
+| `video` | Vídeo (YouTube/Vimeo/.mp4). Content = **solo la URL**; previsualización con play (el iframe se carga al pulsar); seleccionable y redimensionable como una imagen | `/video` |
 | `audio` | Audio (.mp3/.ogg/.wav) | `/audio` |
 | `divider` | Separador horizontal | `/separador` |
 | `pageBreak` | Salto de página (impresión/export) | `/salto` |

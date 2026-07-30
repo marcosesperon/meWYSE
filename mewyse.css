@@ -3122,21 +3122,29 @@ th.mewyse-image-drop-target-cell {
 /* ============================================
    BLOQUE VIDEO — responsive 16:9
    ============================================ */
-/* Ratio 16:9 vía padding-bottom + height:0 (hijo posicionado absoluto).
+/* Wrapper de vídeo: dimensiones fijas (inline width/height) para poder
+   redimensionar como una imagen. El facade/iframe/vídeo lo rellenan (absolutos).
    La especificidad compuesta (`.mewyse-editor ... .mewyse-block`, 0,3,0) gana al
-   reset `.mewyse-editor-styled .mewyse-block { padding: 0 }` (0,2,0), que si no
-   dejaba `padding-bottom: 0` → wrapper de altura 0 → vídeo invisible. */
+   reset `.mewyse-editor-styled .mewyse-block { padding: 0 }`. */
 .mewyse-editor .mewyse-video-wrapper.mewyse-block {
   position: relative;
-  padding-bottom: 56.25%;
-  height: 0;
+  display: block;
   max-width: 100%;
   margin: 8px 0;
+  padding: 0;
   border-radius: var(--mewyse-radius-md);
   overflow: hidden;
   background-color: #000;
+  outline: 2px solid transparent; /* borde de selección (no ocupa espacio) */
+  cursor: pointer;
+}
+.mewyse-video-wrapper.selected {
+  outline-color: #4a9eff;
 }
 
+/* Previsualización, media real y placeholder rellenan el wrapper */
+.mewyse-video-wrapper .mewyse-video-facade,
+.mewyse-video-wrapper .mewyse-video-media,
 .mewyse-video-wrapper iframe,
 .mewyse-video-wrapper video {
   position: absolute;
@@ -3145,6 +3153,92 @@ th.mewyse-image-drop-target-cell {
   width: 100%;
   height: 100%;
   border: 0;
+}
+
+/* Facade (previsualización): fondo (miniatura o degradado) + botón play centrado */
+.mewyse-video-facade {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-size: cover;
+  background-position: center;
+  background-color: #000;
+}
+.mewyse-video-facade-vimeo,
+.mewyse-video-facade-file,
+.mewyse-video-facade-generic {
+  background-image: linear-gradient(135deg, #2b2b2b, #101010);
+}
+.mewyse-video-facade-label {
+  position: absolute;
+  left: 10px;
+  bottom: 8px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.3px;
+}
+.mewyse-video-play {
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  line-height: 0;
+  transition: transform 0.12s ease;
+}
+.mewyse-video-play:hover {
+  transform: scale(1.08);
+}
+.mewyse-video-play:focus-visible {
+  outline: 2px solid #4a9eff;
+  outline-offset: 3px;
+  border-radius: 50%;
+}
+
+/* Controles del bloque (editar, resize, volver a preview): por encima del iframe */
+.mewyse-video-edit-btn,
+.mewyse-video-restore,
+.mewyse-video-resize-handle {
+  position: absolute;
+  z-index: 3;
+}
+.mewyse-video-edit-btn,
+.mewyse-video-restore {
+  top: 6px;
+  right: 6px;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--mewyse-radius-sm);
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+.mewyse-video-restore {
+  opacity: 1; /* siempre visible cuando el iframe está cargado */
+}
+.mewyse-video-wrapper.selected .mewyse-video-edit-btn,
+.mewyse-video-wrapper:hover .mewyse-video-edit-btn {
+  opacity: 1;
+}
+.mewyse-video-resize-handle {
+  bottom: 0;
+  right: 0;
+  width: 16px;
+  height: 16px;
+  background: #4a9eff;
+  border-top-left-radius: 4px;
+  cursor: nwse-resize;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+.mewyse-video-wrapper.selected .mewyse-video-resize-handle,
+.mewyse-video-wrapper:hover .mewyse-video-resize-handle {
+  opacity: 1;
 }
 
 .mewyse-video-placeholder,

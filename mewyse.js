@@ -225,7 +225,9 @@
         videoUnavailable: '(vídeo no disponible)',
         audioUnavailable: '(audio no disponible)',
         markdownVideo: 'Vídeo',
-        markdownAudio: 'Audio'
+        markdownAudio: 'Audio',
+        playVideo: 'Reproducir vídeo',
+        closeVideo: 'Volver a la previsualización'
       },
       aria: {
         mentions: 'Menciones',
@@ -495,7 +497,9 @@
         videoUnavailable: '(video not available)',
         audioUnavailable: '(audio not available)',
         markdownVideo: 'Video',
-        markdownAudio: 'Audio'
+        markdownAudio: 'Audio',
+        playVideo: 'Play video',
+        closeVideo: 'Back to preview'
       },
       aria: {
         mentions: 'Mentions',
@@ -817,6 +821,7 @@
     trash: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><polyline points="3,4 13,4"/><path d="M6 4V2.5h4V4"/><path d="M4 4l.8 9.5a1 1 0 001 .9h4.4a1 1 0 001-.9L12 4"/><line x1="6.5" y1="7" x2="6.5" y2="11.5"/><line x1="9.5" y1="7" x2="9.5" y2="11.5"/></svg>',
     palette: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M8 1.5a6.5 6.5 0 00-1 12.9c1 .2 1.5-.5 1.5-1.2v-.8c0-1 .7-1.4 1.5-1.4h1.5a2.5 2.5 0 002.5-2.5A6.5 6.5 0 008 1.5z"/><circle cx="5" cy="6.5" r="1" fill="currentColor" stroke="none"/><circle cx="8" cy="4.5" r="1" fill="currentColor" stroke="none"/><circle cx="11" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>',
     close: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" xmlns="http://www.w3.org/2000/svg"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg>',
+    play: '<svg width="28" height="28" viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg"><circle cx="14" cy="14" r="14" fill="rgba(0,0,0,0.6)"/><polygon points="11,8.5 20,14 11,19.5" fill="#fff"/></svg>',
     hamburger: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" xmlns="http://www.w3.org/2000/svg"><line x1="2" y1="4" x2="14" y2="4"/><line x1="2" y1="8" x2="14" y2="8"/><line x1="2" y1="12" x2="14" y2="12"/></svg>',
     mergeCells: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="12" height="12" rx="1"/><line x1="8" y1="2" x2="8" y2="5"/><line x1="8" y1="11" x2="8" y2="14"/><polyline points="5,7 8,5 11,7"/><polyline points="5,9 8,11 11,9"/></svg>',
     unmergeCells: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="12" height="12" rx="1"/><line x1="8" y1="2" x2="8" y2="14"/><polyline points="5,6 8,3 11,6"/><polyline points="5,10 8,13 11,10"/></svg>',
@@ -1459,11 +1464,15 @@
     };
     this.container.addEventListener('scroll', this._handleScrollReposition);
 
-    // Añadir listener para deseleccionar imagen al hacer clic fuera
+    // Añadir listener para deseleccionar imagen/vídeo al hacer clic fuera
     this.container.addEventListener('click', function(e) {
       // Si se hace clic fuera de una imagen seleccionada, deseleccionarla
       if (self.selectedImage && !e.target.classList.contains('mewyse-image')) {
         self.deselectImage();
+      }
+      // Igual para el vídeo: deseleccionar si el clic no fue dentro de su wrapper
+      if (self.selectedVideo && (!e.target.closest || !e.target.closest('.mewyse-video-wrapper'))) {
+        self.deselectVideo();
       }
     });
 
@@ -6341,13 +6350,9 @@
           var h = parseInt(node.getAttribute('height'), 10);
           blocksToInsert.push({
             type: 'video',
-            content: {
-              provider: info.provider,
-              videoId: info.videoId,
-              url: info.url,
-              width: (isNaN(w) || w < 1) ? 640 : w,
-              height: (isNaN(h) || h < 1) ? 360 : h
-            }
+            content: info.url,   // modelo nuevo: solo la URL
+            width: (isNaN(w) || w < 1) ? 640 : w,
+            height: (isNaN(h) || h < 1) ? 360 : h
           });
         }
         // iframes de otros dominios se descartan (Sprint 2 para iframe genérico)
@@ -6366,13 +6371,9 @@
           var vh = parseInt(node.getAttribute('height'), 10);
           blocksToInsert.push({
             type: 'video',
-            content: {
-              provider: 'file',
-              videoId: null,
-              url: vsrc,
-              width: (isNaN(vw) || vw < 1) ? 640 : vw,
-              height: (isNaN(vh) || vh < 1) ? 360 : vh
-            }
+            content: vsrc,   // modelo nuevo: solo la URL
+            width: (isNaN(vw) || vw < 1) ? 640 : vw,
+            height: (isNaN(vh) || vh < 1) ? 360 : vh
           });
         }
         return;
@@ -11778,7 +11779,7 @@
         return (c && typeof c === 'object') ? (c.fileName || c.alt || '') : '';
       }
       if (block.type === 'video') {
-        return (c && typeof c === 'object') ? (c.url || '') : '';
+        return (typeof c === 'string') ? c : ((c && typeof c === 'object') ? (c.url || '') : '');
       }
       if (block.type === 'audio') {
         return (c && typeof c === 'object') ? (c.title || c.url || '') : '';
@@ -11915,16 +11916,16 @@
             }
             break;
           case 'video':
-            if (typeof block.content === 'object') {
-              var vc = block.content;
-              if (vc.provider === 'youtube' && vc.videoId) {
-                html += '<iframe src="https://www.youtube-nocookie.com/embed/' + encodeURIComponent(vc.videoId) +
-                        '" frameborder="0" allowfullscreen width="' + (vc.width || 640) + '" height="' + (vc.height || 360) + '"></iframe>';
-              } else if (vc.provider === 'vimeo' && vc.videoId) {
-                html += '<iframe src="https://player.vimeo.com/video/' + encodeURIComponent(vc.videoId) +
-                        '" frameborder="0" allowfullscreen width="' + (vc.width || 640) + '" height="' + (vc.height || 360) + '"></iframe>';
-              } else if (vc.provider === 'file' && vc.url) {
-                html += '<video controls src="' + escape_attr(vc.url) + '" width="' + (vc.width || 640) + '" height="' + (vc.height || 360) + '"></video>';
+            var vInfoH = self._videoInfoFromBlock(block);
+            if (vInfoH) {
+              if (vInfoH.provider === 'youtube' && vInfoH.videoId) {
+                html += '<iframe src="https://www.youtube-nocookie.com/embed/' + encodeURIComponent(vInfoH.videoId) +
+                        '" frameborder="0" allowfullscreen width="' + vInfoH.width + '" height="' + vInfoH.height + '"></iframe>';
+              } else if (vInfoH.provider === 'vimeo' && vInfoH.videoId) {
+                html += '<iframe src="https://player.vimeo.com/video/' + encodeURIComponent(vInfoH.videoId) +
+                        '" frameborder="0" allowfullscreen width="' + vInfoH.width + '" height="' + vInfoH.height + '"></iframe>';
+              } else if (vInfoH.provider === 'file' && self._isSafeMediaUrl(vInfoH.url)) {
+                html += '<video controls src="' + escape_attr(vInfoH.url) + '" width="' + vInfoH.width + '" height="' + vInfoH.height + '"></video>';
               }
             }
             break;
@@ -12066,16 +12067,16 @@
             }
             break;
           case 'video':
-            if (typeof block.content === 'object') {
-              var vc = block.content;
-              if (vc.provider === 'youtube' && vc.videoId) {
-                html += '<iframe src="https://www.youtube-nocookie.com/embed/' + encodeURIComponent(vc.videoId) +
-                        '" frameborder="0" allowfullscreen width="' + (vc.width || 640) + '" height="' + (vc.height || 360) + '"></iframe>';
-              } else if (vc.provider === 'vimeo' && vc.videoId) {
-                html += '<iframe src="https://player.vimeo.com/video/' + encodeURIComponent(vc.videoId) +
-                        '" frameborder="0" allowfullscreen width="' + (vc.width || 640) + '" height="' + (vc.height || 360) + '"></iframe>';
-              } else if (vc.provider === 'file' && vc.url) {
-                html += '<video controls src="' + escape_attr(vc.url) + '" width="' + (vc.width || 640) + '" height="' + (vc.height || 360) + '"></video>';
+            var vInfoH = self._videoInfoFromBlock(block);
+            if (vInfoH) {
+              if (vInfoH.provider === 'youtube' && vInfoH.videoId) {
+                html += '<iframe src="https://www.youtube-nocookie.com/embed/' + encodeURIComponent(vInfoH.videoId) +
+                        '" frameborder="0" allowfullscreen width="' + vInfoH.width + '" height="' + vInfoH.height + '"></iframe>';
+              } else if (vInfoH.provider === 'vimeo' && vInfoH.videoId) {
+                html += '<iframe src="https://player.vimeo.com/video/' + encodeURIComponent(vInfoH.videoId) +
+                        '" frameborder="0" allowfullscreen width="' + vInfoH.width + '" height="' + vInfoH.height + '"></iframe>';
+              } else if (vInfoH.provider === 'file' && self._isSafeMediaUrl(vInfoH.url)) {
+                html += '<video controls src="' + escape_attr(vInfoH.url) + '" width="' + vInfoH.width + '" height="' + vInfoH.height + '"></video>';
               }
             }
             break;
@@ -12341,8 +12342,9 @@
             }
             break;
           case 'video':
-            if (typeof content === 'object' && content.url) {
-              lines.push('[' + self.t('misc.markdownVideo') + '](' + content.url + ')');
+            var vUrlMd = (typeof content === 'string') ? content : ((content && content.url) || '');
+            if (vUrlMd) {
+              lines.push('[' + self.t('misc.markdownVideo') + '](' + vUrlMd + ')');
             }
             break;
           case 'audio':
@@ -13002,6 +13004,9 @@
     }
     if (this.imageKeydownHandler) {
       document.removeEventListener('keydown', this.imageKeydownHandler);
+    }
+    if (this.videoKeydownHandler) {
+      document.removeEventListener('keydown', this.videoKeydownHandler);
     }
     if (this.closeToolbarMenuHandler) {
       document.removeEventListener('click', this.closeToolbarMenuHandler);
@@ -16989,6 +16994,39 @@
   };
 
   /**
+   * Deriva la info de un bloque de vídeo de forma uniforme, aceptando el modelo
+   * NUEVO (content = URL string; dimensiones en block.width/height) y el LEGACY
+   * (content = { provider, videoId, url, width, height }). El provider/videoId se
+   * calculan siempre desde la URL con `_detectVideoProvider`.
+   * @param {Object} block
+   * @returns {Object|null} { url, provider, videoId, width, height } o null si la
+   *   URL no es un vídeo reconocible.
+   */
+  meWYSE.prototype._videoInfoFromBlock = function(block) {
+    if (!block) return null;
+    var c = block.content;
+    var url = '', srcW, srcH;
+    if (typeof c === 'string') {
+      url = c;
+      srcW = block.width; srcH = block.height;
+    } else if (c && typeof c === 'object') {
+      // Legacy: la URL y dimensiones venían en el objeto (block.width/height ganan si existen)
+      url = (typeof c.url === 'string') ? c.url : '';
+      srcW = (typeof block.width !== 'undefined') ? block.width : c.width;
+      srcH = (typeof block.height !== 'undefined') ? block.height : c.height;
+    }
+    var info = this._detectVideoProvider(url);
+    if (!info) return null;
+    var width = parseInt(srcW, 10);
+    if (isNaN(width) || width < 50) width = 640;
+    width = Math.min(width, 10000);
+    var height = parseInt(srcH, 10);
+    if (isNaN(height) || height < 30) height = Math.round(width * 9 / 16);
+    height = Math.min(height, 10000);
+    return { url: url, provider: info.provider, videoId: info.videoId, width: width, height: height };
+  };
+
+  /**
    * Valida URL de iframe embed: debe ser https y host whitelisted.
    */
   meWYSE.prototype._isSafeEmbedUrl = function(url) {
@@ -17113,16 +17151,13 @@
     var insertIndex = this._getInsertIndexForNewBlock();
     this.showMediaUrlModal('video', function(info) {
       self.pushHistory(true);
+      // Modelo nuevo: content = SOLO la URL; dimensiones como props de bloque.
       var block = {
         id: ++self.currentBlockId,
         type: 'video',
-        content: {
-          provider: info.provider,
-          videoId: info.videoId,
-          url: info.url,
-          width: 640,
-          height: 360
-        }
+        content: info.url,
+        width: 640,
+        height: 360
       };
       self.blocks.splice(insertIndex, 0, block);
       self.render();
@@ -17168,40 +17203,359 @@
   };
 
   /**
-   * Crea el elemento DOM para un bloque de video.
+   * Crea el elemento DOM para un bloque de video. Muestra una PREVISUALIZACIÓN
+   * (facade) — el iframe/vídeo real solo se carga al pulsar el botón de play
+   * (_loadVideoIframe). El bloque es seleccionable (handle + resize) como una
+   * imagen. Dimensiones en block.width/height.
    */
   meWYSE.prototype.createVideoElement = function(block) {
+    var self = this;
     var wrapper = document.createElement('div');
     wrapper.className = 'mewyse-video-wrapper';
     wrapper.contentEditable = 'false';
+    wrapper.setAttribute('data-block-id', block.id);
+    wrapper.setAttribute('tabindex', '0');
 
-    var c = block.content || {};
+    var info = this._videoInfoFromBlock(block);
+    if (!info) {
+      var ph = document.createElement('div');
+      ph.className = 'mewyse-video-placeholder';
+      ph.textContent = this.t('misc.videoUnavailable');
+      wrapper.appendChild(ph);
+      return wrapper;
+    }
+
+    // Dimensiones fijas (px) para poder redimensionar como una imagen.
+    wrapper.style.width = info.width + 'px';
+    wrapper.style.height = info.height + 'px';
+
+    // Previsualización (sin cargar el iframe todavía)
+    wrapper.appendChild(this._buildVideoFacade(info, block.id));
+
+    // Botón de editar dimensiones (visible al seleccionar, vía CSS)
+    var editBtn = document.createElement('button');
+    editBtn.className = 'mewyse-video-edit-btn';
+    editBtn.type = 'button';
+    editBtn.innerHTML = WYSIWYG_ICONS.gear;
+    editBtn.title = self.t('tooltips.editDimensions');
+    editBtn.onmousedown = function(e) { e.preventDefault(); };
+    editBtn.onclick = function(e) {
+      e.preventDefault(); e.stopPropagation();
+      self.editVideoDimensions(block.id);
+    };
+    wrapper.appendChild(editBtn);
+
+    // Handle de redimensionamiento (esquina) — funciona con facade o iframe
+    this._attachVideoResize(wrapper, block.id);
+
+    // Click en el bloque → seleccionar (handle + resize + borde), como imagen
+    wrapper.addEventListener('click', function(e) {
+      // El play/edit/resize gestionan su propio click (stopPropagation)
+      self.selectVideo(wrapper, block.id);
+    });
+
+    return wrapper;
+  };
+
+  /**
+   * Construye la previsualización (facade) de un vídeo: miniatura de YouTube o
+   * caja genérica, con un botón de play que carga el iframe al pulsarlo.
+   * @param {Object} info - { provider, videoId, url, width, height }
+   * @param {number} blockId
+   * @returns {HTMLElement}
+   */
+  meWYSE.prototype._buildVideoFacade = function(info, blockId) {
+    var self = this;
+    var facade = document.createElement('div');
+    facade.className = 'mewyse-video-facade mewyse-video-facade-' + info.provider;
+
+    if (info.provider === 'youtube' && info.videoId) {
+      // Miniatura ligera (imagen, sin iframe ni tracking). hqdefault siempre existe.
+      facade.style.backgroundImage = "url('https://i.ytimg.com/vi/" +
+        encodeURIComponent(info.videoId) + "/hqdefault.jpg')";
+    } else {
+      // Genérico: etiqueta con el nombre del proveedor
+      var label = document.createElement('span');
+      label.className = 'mewyse-video-facade-label';
+      label.textContent = info.provider === 'vimeo' ? 'Vimeo' : this.t('blockTypes.video');
+      facade.appendChild(label);
+    }
+
+    var play = document.createElement('button');
+    play.type = 'button';
+    play.className = 'mewyse-video-play';
+    play.setAttribute('aria-label', self.t('misc.playVideo'));
+    play.title = self.t('misc.playVideo');
+    play.innerHTML = WYSIWYG_ICONS.play;
+    play.onmousedown = function(e) { e.preventDefault(); };
+    play.onclick = function(e) {
+      e.preventDefault(); e.stopPropagation();
+      self._loadVideoIframe(blockId);
+    };
+    facade.appendChild(play);
+    return facade;
+  };
+
+  /**
+   * Construye el media real (iframe YouTube/Vimeo o <video> archivo) de un vídeo.
+   * @param {Object} info
+   * @returns {HTMLElement}
+   */
+  meWYSE.prototype._buildVideoMedia = function(info) {
     var media;
-
-    if (c.provider === 'youtube' && c.videoId) {
+    if (info.provider === 'youtube' && info.videoId) {
       media = document.createElement('iframe');
-      media.src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(c.videoId);
+      media.src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(info.videoId) + '?autoplay=1';
       media.setAttribute('frameborder', '0');
       media.setAttribute('allowfullscreen', 'true');
       media.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
-    } else if (c.provider === 'vimeo' && c.videoId) {
+    } else if (info.provider === 'vimeo' && info.videoId) {
       media = document.createElement('iframe');
-      media.src = 'https://player.vimeo.com/video/' + encodeURIComponent(c.videoId);
+      media.src = 'https://player.vimeo.com/video/' + encodeURIComponent(info.videoId) + '?autoplay=1';
       media.setAttribute('frameborder', '0');
       media.setAttribute('allowfullscreen', 'true');
-    } else if (c.provider === 'file' && this._isSafeMediaUrl(c.url)) {
+    } else if (info.provider === 'file' && this._isSafeMediaUrl(info.url)) {
       media = document.createElement('video');
       media.controls = true;
-      media.src = c.url;
+      media.autoplay = true;
+      media.src = info.url;
     } else {
-      // fallback: placeholder si los datos no son válidos
       media = document.createElement('div');
       media.className = 'mewyse-video-placeholder';
       media.textContent = this.t('misc.videoUnavailable');
     }
+    media.className = (media.className ? media.className + ' ' : '') + 'mewyse-video-media';
+    return media;
+  };
 
-    wrapper.appendChild(media);
-    return wrapper;
+  /**
+   * Carga el iframe/vídeo real reemplazando la previsualización. Añade un botón
+   * para volver a la previsualización (descarga el iframe).
+   * @param {number} blockId
+   */
+  meWYSE.prototype._loadVideoIframe = function(blockId) {
+    var self = this;
+    var wrapper = this.container.querySelector('.mewyse-video-wrapper[data-block-id="' + blockId + '"]');
+    if (!wrapper) return;
+    var block = this.getBlock(blockId);
+    var info = this._videoInfoFromBlock(block);
+    if (!info) return;
+
+    var facade = wrapper.querySelector('.mewyse-video-facade');
+    if (facade) wrapper.removeChild(facade);
+
+    wrapper.appendChild(this._buildVideoMedia(info));
+
+    // Botón para volver a la previsualización (descarga el iframe)
+    if (!wrapper.querySelector('.mewyse-video-restore')) {
+      var restore = document.createElement('button');
+      restore.type = 'button';
+      restore.className = 'mewyse-video-restore';
+      restore.title = self.t('misc.closeVideo');
+      restore.setAttribute('aria-label', self.t('misc.closeVideo'));
+      restore.innerHTML = WYSIWYG_ICONS.close;
+      restore.onmousedown = function(e) { e.preventDefault(); };
+      restore.onclick = function(e) {
+        e.preventDefault(); e.stopPropagation();
+        self._showVideoFacade(blockId);
+      };
+      wrapper.appendChild(restore);
+    }
+  };
+
+  /**
+   * Vuelve a la previsualización de un vídeo (descarga el iframe/vídeo).
+   * @param {number} blockId
+   */
+  meWYSE.prototype._showVideoFacade = function(blockId) {
+    var wrapper = this.container.querySelector('.mewyse-video-wrapper[data-block-id="' + blockId + '"]');
+    if (!wrapper) return;
+    var block = this.getBlock(blockId);
+    var info = this._videoInfoFromBlock(block);
+    if (!info) return;
+    var media = wrapper.querySelector('.mewyse-video-media');
+    if (media) wrapper.removeChild(media);
+    var restore = wrapper.querySelector('.mewyse-video-restore');
+    if (restore) wrapper.removeChild(restore);
+    if (!wrapper.querySelector('.mewyse-video-facade')) {
+      wrapper.insertBefore(this._buildVideoFacade(info, blockId), wrapper.firstChild);
+    }
+  };
+
+  /**
+   * Engancha el handle de redimensionamiento de un vídeo (drag en la esquina).
+   * Mantiene el ratio y persiste en block.width/height. Espejo del de imágenes.
+   * @param {HTMLElement} wrapper
+   * @param {number} blockId
+   */
+  meWYSE.prototype._attachVideoResize = function(wrapper, blockId) {
+    var self = this;
+    var handle = document.createElement('div');
+    handle.className = 'mewyse-video-resize-handle';
+    handle.title = self.t('tooltips.dragToResize');
+
+    var isResizing = false, startX, startY, startWidth, ratio;
+
+    var onMove = function(e) {
+      if (!isResizing) return;
+      var dx = e.clientX - startX, dy = e.clientY - startY;
+      var delta = Math.abs(dx) > Math.abs(dy) ? dx : dy;
+      var newW = startWidth + delta;
+      if (newW < 120) newW = 120;
+      var newH = Math.round(newW / ratio);
+      wrapper.style.width = newW + 'px';
+      wrapper.style.height = newH + 'px';
+    };
+    var onUp = function() {
+      if (!isResizing) return;
+      isResizing = false;
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+      var block = self.getBlock(blockId);
+      if (block) {
+        block.width = parseInt(wrapper.style.width, 10);
+        block.height = parseInt(wrapper.style.height, 10);
+        self.triggerChange();
+      }
+    };
+    handle.onmousedown = function(e) {
+      e.preventDefault(); e.stopPropagation();
+      isResizing = true;
+      startX = e.clientX; startY = e.clientY;
+      startWidth = parseInt(wrapper.style.width, 10) || 640;
+      var curH = parseInt(wrapper.style.height, 10) || Math.round(startWidth * 9 / 16);
+      ratio = startWidth / curH;
+      document.body.style.cursor = 'nwse-resize';
+      document.body.style.userSelect = 'none';
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+      self.selectVideo(wrapper, blockId);
+    };
+    wrapper.appendChild(handle);
+  };
+
+  /**
+   * Selecciona un bloque de vídeo: borde, handle flotante y teclado
+   * (Delete/Escape/Enter). Espejo simplificado de selectImage.
+   * @param {HTMLElement} wrapper
+   * @param {number} blockId
+   */
+  meWYSE.prototype.selectVideo = function(wrapper, blockId) {
+    var self = this;
+    if (this.selectedImage) this.deselectImage();
+    var prev = this.container.querySelector('.mewyse-video-wrapper.selected');
+    if (prev && prev !== wrapper) prev.classList.remove('selected');
+
+    wrapper.classList.add('selected');
+    try { wrapper.focus(); } catch (e) {}
+    this.selectedVideo = { element: wrapper, blockId: blockId };
+
+    if (this.floatingHandle) {
+      var el = this.getBlockElementById(blockId);
+      if (el) this.positionFloatingHandle(el, blockId);
+    }
+
+    if (!this.videoKeydownHandler) {
+      this.videoKeydownHandler = function(e) {
+        if (!self.selectedVideo) return;
+        if (e.key === 'Delete' || e.key === 'Backspace') {
+          e.preventDefault();
+          var id = self.selectedVideo.blockId;
+          self.deselectVideo();
+          self.deleteBlock(id);
+        } else if (e.key === 'Escape') {
+          self.deselectVideo();
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          var idx = self.getBlockIndex(self.selectedVideo.blockId);
+          self.deselectVideo();
+          self.addBlock('paragraph', idx + 1);
+        }
+      };
+      document.addEventListener('keydown', this.videoKeydownHandler);
+    }
+  };
+
+  /**
+   * Deselecciona el vídeo actual.
+   */
+  meWYSE.prototype.deselectVideo = function() {
+    if (!this.selectedVideo) return;
+    if (this.selectedVideo.element) this.selectedVideo.element.classList.remove('selected');
+    this.selectedVideo = null;
+    // Ocultado diferido: solo esconde el handle si el foco quedó fuera del editor
+    // (si pasó a un bloque de texto, ese focusin lo mantiene visible).
+    this._scheduleHandleHideCheck();
+  };
+
+  /**
+   * Modal para editar las dimensiones (ancho) de un vídeo. El alto sigue el ratio.
+   * @param {number} blockId
+   */
+  meWYSE.prototype.editVideoDimensions = function(blockId) {
+    var self = this;
+    var block = this.getBlock(blockId);
+    var info = this._videoInfoFromBlock(block);
+    if (!info) return;
+
+    var overlay = document.createElement('div');
+    overlay.className = 'mewyse-modal-overlay';
+    var modal = document.createElement('div');
+    modal.className = 'mewyse-modal-container';
+    self._applyMenuTheme(modal);
+
+    var title = document.createElement('h3');
+    title.className = 'mewyse-modal-title';
+    title.textContent = self.t('tooltips.editDimensions');
+    modal.appendChild(title);
+
+    var inputs = document.createElement('div');
+    inputs.className = 'mewyse-modal-inputs';
+    var mkField = function(labelText, value) {
+      var g = document.createElement('div');
+      g.className = 'mewyse-modal-input-group';
+      var l = document.createElement('label'); l.textContent = labelText;
+      var i = document.createElement('input'); i.type = 'number'; i.min = '120';
+      i.className = 'mewyse-modal-input'; i.value = value;
+      g.appendChild(l); g.appendChild(i); inputs.appendChild(g);
+      return i;
+    };
+    var wInput = mkField(self.t('modals.width') || 'Ancho', info.width);
+    var hInput = mkField(self.t('modals.height') || 'Alto', info.height);
+    var ratio = info.width / info.height;
+    // Mantener ratio al cambiar el ancho
+    wInput.oninput = function() {
+      var v = parseInt(wInput.value, 10);
+      if (!isNaN(v) && v > 0) hInput.value = Math.round(v / ratio);
+    };
+    modal.appendChild(inputs);
+
+    var buttons = document.createElement('div');
+    buttons.className = 'mewyse-modal-buttons';
+    var cancel = document.createElement('button');
+    cancel.type = 'button'; cancel.className = 'mewyse-modal-button mewyse-modal-button-cancel';
+    cancel.textContent = self.t('modals.cancel');
+    cancel.onclick = function() { document.body.removeChild(overlay); };
+    var ok = document.createElement('button');
+    ok.type = 'button'; ok.className = 'mewyse-modal-button mewyse-modal-button-primary';
+    ok.textContent = self.t('modals.save');
+    ok.onclick = function() {
+      var nw = parseInt(wInput.value, 10), nh = parseInt(hInput.value, 10);
+      if (isNaN(nw) || nw < 120) nw = 120;
+      if (isNaN(nh) || nh < 30) nh = Math.round(nw * 9 / 16);
+      var b = self.getBlock(blockId);
+      if (b) { b.width = Math.min(nw, 10000); b.height = Math.min(nh, 10000); }
+      document.body.removeChild(overlay);
+      self.render();
+      self.triggerChange();
+    };
+    buttons.appendChild(cancel); buttons.appendChild(ok);
+    modal.appendChild(buttons);
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+    setTimeout(function() { wInput.focus(); }, 10);
   };
 
   /**
@@ -17787,31 +18141,17 @@
         typeof block.toggleTitle === 'string' ? block.toggleTitle : ''
       );
     } else if (type === 'video') {
-      // content: { provider, videoId, url, width, height }
-      var vc = block.content;
-      if (!vc || typeof vc !== 'object') return null;
-      var provider = (vc.provider === 'youtube' || vc.provider === 'vimeo' || vc.provider === 'file')
-        ? vc.provider : null;
-      if (!provider) return null;
-
-      var videoId = null;
-      if (provider === 'youtube' || provider === 'vimeo') {
-        if (typeof vc.videoId !== 'string' || !/^[a-zA-Z0-9_-]{1,20}$/.test(vc.videoId)) return null;
-        videoId = vc.videoId;
-      }
-
-      var url = (typeof vc.url === 'string') ? vc.url : '';
-      if (provider === 'file' && !this._isSafeMediaUrl(url)) return null;
-
-      var w = parseInt(vc.width, 10);
-      var h = parseInt(vc.height, 10);
-      clean.content = {
-        provider: provider,
-        videoId: videoId,
-        url: url,
-        width: (isNaN(w) || w < 1) ? 640 : Math.min(w, 10000),
-        height: (isNaN(h) || h < 1) ? 360 : Math.min(h, 10000)
-      };
+      // NUEVO modelo: content = URL (string); dimensiones en block.width/height.
+      // Se acepta también el LEGACY (content objeto) migrándolo. `_videoInfoFromBlock`
+      // deriva provider/videoId de la URL y valida que sea un vídeo reconocible.
+      var vInfo = this._videoInfoFromBlock(block);
+      if (!vInfo) return null;
+      if (vInfo.provider === 'file' && !this._isSafeMediaUrl(vInfo.url)) return null;
+      // content queda SOLO con la URL
+      clean.content = vInfo.url;
+      // Dimensiones como propiedades de bloque (whitelist)
+      clean.width = vInfo.width;
+      clean.height = vInfo.height;
     } else if (type === 'audio') {
       // content: { url, title }
       var ac = block.content;

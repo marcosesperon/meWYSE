@@ -1058,6 +1058,17 @@ new meWYSE({ target: '#vhHeightEditor', minHeight: '10em', maxHeight: '35vh' });
       <div id="vhHeightEditor"></div>
     </div>
 
+    <!-- Demo: Vídeo con previsualización -->
+    <div class="demo-section">
+      <h2>V&iacute;deo con previsualizaci&oacute;n</h2>
+      <p>El bloque de v&iacute;deo guarda <strong>solo la URL</strong>. Se muestra una previsualizaci&oacute;n (miniatura + play) y el iframe se carga <strong>solo al pulsar play</strong>. Como una imagen: selecci&oacute;nalo para ver el <em>handle</em> y ajustar dimensiones.</p>
+      <div class="config-hint">
+        Inserta un v&iacute;deo con el bot&oacute;n de la toolbar (o <code>/video</code>) y pega una URL de
+        YouTube/Vimeo. En el modelo, el contenido es solo la URL: <code>{ type:'video', content:'https://...', width, height }</code>.
+      </div>
+      <div id="videoEditor"></div>
+    </div>
+
   </div>
 
   <!-- ── Footer ──────────────────────────────────── -->
@@ -1827,6 +1838,19 @@ new meWYSE({ target: '#vhHeightEditor', minHeight: '10em', maxHeight: '35vh' });
       });
     }
 
+    // ===== Demo vídeo con previsualización =====
+    var videoEditor;
+    function initVideoEditor() {
+      videoEditor = new meWYSE({
+        target: '#videoEditor', toolbar: true,
+        blocks: [
+          { id: 1, type: 'paragraph', content: 'Ejemplo: el iframe no se carga hasta pulsar play.' },
+          // Modelo nuevo: content = solo la URL; dimensiones como props de bloque
+          { id: 2, type: 'video', content: 'https://www.youtube.com/watch?v=_iRof5et0JA', width: 480, height: 270 }
+        ]
+      });
+    }
+
     // ===== Configurador de opciones =====
     // Especificacion de las opciones. `def` = default REAL de la librería (se usa
     // para omitir del config lo que no cambia). `init` = estado inicial del control
@@ -1991,6 +2015,7 @@ new meWYSE({ target: '#vhHeightEditor', minHeight: '10em', maxHeight: '35vh' });
       initConfigurator();
       initSprint4Editor();
       initHeightEditors();
+      initVideoEditor();
     };
   </script>
 </body>
