@@ -1690,6 +1690,19 @@
       // estructura original (párrafos, listas, tags/menciones, etc.).
       this._initialHTML = (this.originalTarget.innerHTML || '').trim();
 
+      // Guarda anti auto-ingesta: si el host ya contiene el DOM renderizado por
+      // una instancia previa de meWYSE (p. ej. doble montaje de React StrictMode
+      // que re-ejecuta el constructor sobre el mismo nodo), su innerHTML serían
+      // nuestros propios bloques (div[contenteditable][data-block-id], sin tags de
+      // bloque reconocibles). Reingerirlos los aplanaría a un único párrafo y
+      // dispararía un onChange espurio. Detectamos marcadores EXCLUSIVOS del chrome
+      // del editor (nunca presentes en HTML de usuario ni en la salida de getHTML)
+      // y lo ignoramos.
+      if (this._initialHTML && this.originalTarget.querySelector(
+            '[data-block-id], .mewyse-editor, .mewyse-editor-wrapper')) {
+        this._initialHTML = '';
+      }
+
       // Crear textarea interno oculto
       var internalTextarea = document.createElement('textarea');
       internalTextarea.style.display = 'none';
