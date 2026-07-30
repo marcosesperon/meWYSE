@@ -54,6 +54,9 @@ export interface MeWyseOptions {
   minHeight?: number | string;
   maxHeight?: number | string;
   autoExpand?: boolean;
+  /** Tipos de bloque que NO se pueden insertar desde la UI (toolbar, slash, paste
+   *  HTML). No afecta a contenido programático (blocks/loadFromJSON). */
+  disabledBlocks?: string[];
   charCounter?: boolean;
   findReplace?: boolean;
   fullscreen?: boolean;

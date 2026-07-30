@@ -886,6 +886,19 @@
     this.minHeight = this._normalizeCssSize(this.options.minHeight);
     this.maxHeight = this._normalizeCssSize(this.options.maxHeight);
     this.autoExpand = this.options.autoExpand === true;
+
+    // disabledBlocks: lista de tipos de bloque que NO se pueden INSERTAR desde la
+    // UI (se ocultan sus botones de toolbar, se filtran del menú slash y no se
+    // crean al pegar HTML). No afecta a contenido programático (blocks/loadFromJSON)
+    // ni a las APIs públicas insertVideoBlock/insertAudioBlock. Se guarda como
+    // mapa para lookup O(1).
+    this._disabledBlocks = {};
+    if (Array.isArray(this.options.disabledBlocks)) {
+      for (var vdb = 0; vdb < this.options.disabledBlocks.length; vdb++) {
+        var vdbType = this.options.disabledBlocks[vdb];
+        if (typeof vdbType === 'string' && vdbType) this._disabledBlocks[vdbType] = true;
+      }
+    }
     // readOnly: el editor se monta para visualización. Ningún bloque es
     // editable, no se generan toolbar, floating handle, drag&drop de imágenes
     // ni format menu. Selección nativa funciona — el usuario puede copiar
@@ -1625,6 +1638,16 @@
   };
 
   /**
+   * ¿El tipo de bloque está desactivado para la INSERCIÓN desde la UI?
+   * (opción `disabledBlocks`). No afecta a contenido programático.
+   * @param {string} type
+   * @returns {boolean}
+   */
+  meWYSE.prototype._isBlockDisabled = function(type) {
+    return !!(this._disabledBlocks && this._disabledBlocks[type]);
+  };
+
+  /**
    * Aplica las opciones de altura (minHeight/maxHeight/autoExpand) como estilos
    * inline en el container. Los estilos inline ganan a los defaults del CSS.
    * Solo escribe las propiedades cuyas opciones se hayan definido, para no pisar
@@ -1898,6 +1921,7 @@
       }
 
       // Caso 2: archivos OS (comportamiento existente)
+      if (self._isBlockDisabled('image')) return; // inserción de imagen desactivada
       if (!hasImageFile(e.dataTransfer)) return;
 
       // Es un drop de ficheros: prevenir SIEMPRE la acción por defecto del
@@ -2431,43 +2455,50 @@
     insertGroup.className = 'mewyse-toolbar-group';
 
     // Botón de tabla
-    var tableButton = document.createElement('button');
-    tableButton.className = 'mewyse-toolbar-button';
-    tableButton.innerHTML = WYSIWYG_ICONS.table;
-    tableButton.title = self.t('tooltips.insertTable');
-    tableButton.onclick = function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      self.insertTableBlock();
-    };
-    insertGroup.appendChild(tableButton);
+    if (!this._isBlockDisabled('table')) {
+      var tableButton = document.createElement('button');
+      tableButton.className = 'mewyse-toolbar-button';
+      tableButton.innerHTML = WYSIWYG_ICONS.table;
+      tableButton.title = self.t('tooltips.insertTable');
+      tableButton.onclick = function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        self.insertTableBlock();
+      };
+      insertGroup.appendChild(tableButton);
+    }
 
     // Botón de imagen
-    var imageButton = document.createElement('button');
-    imageButton.className = 'mewyse-toolbar-button';
-    imageButton.innerHTML = WYSIWYG_ICONS.image;
-    imageButton.title = self.t('tooltips.insertImage');
-    imageButton.onclick = function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      self.insertImageBlock();
-    };
-    insertGroup.appendChild(imageButton);
+    if (!this._isBlockDisabled('image')) {
+      var imageButton = document.createElement('button');
+      imageButton.className = 'mewyse-toolbar-button';
+      imageButton.innerHTML = WYSIWYG_ICONS.image;
+      imageButton.title = self.t('tooltips.insertImage');
+      imageButton.onclick = function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        self.insertImageBlock();
+      };
+      insertGroup.appendChild(imageButton);
+    }
 
     // Botón de vídeo (YouTube, Vimeo, archivo .mp4)
-    var videoButton = document.createElement('button');
-    videoButton.className = 'mewyse-toolbar-button';
-    videoButton.innerHTML = WYSIWYG_ICONS.video;
-    videoButton.title = self.t('tooltips.insertVideo');
-    videoButton.setAttribute('aria-label', self.t('tooltips.insertVideo'));
-    videoButton.onclick = function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      self.insertVideoBlock();
-    };
-    insertGroup.appendChild(videoButton);
+    if (!this._isBlockDisabled('video')) {
+      var videoButton = document.createElement('button');
+      videoButton.className = 'mewyse-toolbar-button';
+      videoButton.innerHTML = WYSIWYG_ICONS.video;
+      videoButton.title = self.t('tooltips.insertVideo');
+      videoButton.setAttribute('aria-label', self.t('tooltips.insertVideo'));
+      videoButton.onclick = function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        self.insertVideoBlock();
+      };
+      insertGroup.appendChild(videoButton);
+    }
 
     // Botón de audio
+    if (!this._isBlockDisabled('audio')) {
     var audioButton = document.createElement('button');
     audioButton.className = 'mewyse-toolbar-button';
     audioButton.innerHTML = WYSIWYG_ICONS.audio;
@@ -2479,6 +2510,7 @@
       self.insertAudioBlock();
     };
     insertGroup.appendChild(audioButton);
+    }
 
     // Botón de variables / merge tags (solo si hay mergeTags configuradas).
     if (this.mergeTags && this.mergeTags.length > 0) {
@@ -6065,7 +6097,8 @@
 
     // Detectar imagen en el clipboard (Ctrl+V tras copiar imagen)
     // Iterar items y si hay un image/*, procesarlo e insertar un bloque imagen.
-    if (clipboardData.items && clipboardData.items.length > 0) {
+    // (omitido si la imagen está desactivada por disabledBlocks)
+    if (!this._isBlockDisabled('image') && clipboardData.items && clipboardData.items.length > 0) {
       for (var i = 0; i < clipboardData.items.length; i++) {
         var item = clipboardData.items[i];
         if (item.kind === 'file' && item.type && item.type.indexOf('image/') === 0) {
@@ -6348,6 +6381,7 @@
 
       // Iframe: detectar YouTube/Vimeo → bloque video
       if (tagName === 'IFRAME') {
+        if (self._isBlockDisabled('video')) return; // vídeo desactivado: descartar
         var src = node.getAttribute('src') || '';
         var info = self._detectVideoProvider(src);
         if (info && (info.provider === 'youtube' || info.provider === 'vimeo')) {
@@ -6366,6 +6400,7 @@
 
       // Video nativo → bloque video (provider file)
       if (tagName === 'VIDEO') {
+        if (self._isBlockDisabled('video')) return; // vídeo desactivado: descartar
         var vsrc = node.getAttribute('src');
         if (!vsrc) {
           var sourceEl = node.querySelector('source');
@@ -6386,6 +6421,7 @@
 
       // Audio nativo → bloque audio
       if (tagName === 'AUDIO') {
+        if (self._isBlockDisabled('audio')) return; // audio desactivado: descartar
         var asrc = node.getAttribute('src');
         if (!asrc) {
           var asource = node.querySelector('source');
@@ -6402,6 +6438,7 @@
 
       // IMG suelto (no dentro de un bloque) → bloque image
       if (tagName === 'IMG') {
+        if (self._isBlockDisabled('image')) return; // imagen desactivada: descartar
         var imgSrc = node.getAttribute('src');
         if (imgSrc && self._isSafeImageUrl(imgSrc)) {
           var imgW = parseInt(node.getAttribute('width'), 10);
@@ -8654,6 +8691,10 @@
       { type: 'toggle', icon: WYSIWYG_ICONS.toggle },
       { type: 'toc', icon: WYSIWYG_ICONS.toc }
     ];
+
+    // Filtrar los tipos desactivados por opción (disabledBlocks)
+    var self_sm = this;
+    types = types.filter(function(t) { return !self_sm._isBlockDisabled(t.type); });
 
     this.slashMenuTypes = types;
 

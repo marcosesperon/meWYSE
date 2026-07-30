@@ -180,6 +180,7 @@ new meWYSE(options)
 | `pdfLib` | string | `''` | URL (lazy) de una librería tipo html2pdf.js para `exportPdf()` con fidelidad. Sin ella, `exportPdf()` cae a `print()` |
 | `codeHighlight` | boolean | `false` | Resaltado de sintaxis en los bloques de código (dep opcional lazy). El modelo se mantiene en texto plano; añade un selector de lenguaje por bloque |
 | `codeHighlightUrl` | string | `''` | URL (lazy) de highlight.js. Si no se define o falla la carga, el código cae a texto plano escapado (fallback) |
+| `disabledBlocks` | string[] | `[]` | Tipos de bloque que NO se pueden insertar desde la UI (ocultan su botón de toolbar, se filtran del menú slash y no se crean al pegar HTML). Ej: `['video', 'audio']`. No afecta a `blocks`/`loadFromJSON` ni a las APIs `insertVideoBlock()`/`insertAudioBlock()` |
 | `imageMaxSize` | number | `0` | Tamaño máximo permitido al insertar imagen, en bytes. `0` = sin límite |
 | `imageMaxSizeError` | string | auto | Mensaje de alerta cuando la imagen excede `imageMaxSize` |
 | `onImageUpload` | Function | — | Hook para subir imágenes al servidor. Recibe `(file, callback)`. El callback espera `{ url, fileName?, width?, height? }` |
