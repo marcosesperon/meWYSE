@@ -3122,7 +3122,11 @@ th.mewyse-image-drop-target-cell {
 /* ============================================
    BLOQUE VIDEO — responsive 16:9
    ============================================ */
-.mewyse-video-wrapper {
+/* Ratio 16:9 vía padding-bottom + height:0 (hijo posicionado absoluto).
+   La especificidad compuesta (`.mewyse-editor ... .mewyse-block`, 0,3,0) gana al
+   reset `.mewyse-editor-styled .mewyse-block { padding: 0 }` (0,2,0), que si no
+   dejaba `padding-bottom: 0` → wrapper de altura 0 → vídeo invisible. */
+.mewyse-editor .mewyse-video-wrapper.mewyse-block {
   position: relative;
   padding-bottom: 56.25%;
   height: 0;
