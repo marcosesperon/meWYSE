@@ -1,0 +1,60 @@
+{
+  "name": "mewyse",
+  "version": "1.0.0",
+  "description": "Editor WYSIWYG de bloques al estilo Notion en ECMAScript 5 puro, sin dependencias. Incluye wrapper de React opcional.",
+  "keywords": [
+    "wysiwyg",
+    "editor",
+    "rich-text",
+    "block-editor",
+    "notion",
+    "react",
+    "es5",
+    "zero-dependencies"
+  ],
+  "license": "MIT",
+  "author": "Marcos Esperón",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/marcosesperon/meWYSE.git"
+  },
+  "main": "mewyse.js",
+  "module": "mewyse.js",
+  "types": "mewyse.d.ts",
+  "exports": {
+    ".": {
+      "types": "./mewyse.d.ts",
+      "default": "./mewyse.js"
+    },
+    "./react": {
+      "types": "./react/index.d.ts",
+      "import": "./react/MeWyse.mjs",
+      "default": "./react/MeWyse.mjs"
+    },
+    "./style.css": "./mewyse.css",
+    "./mewyse.css": "./mewyse.css"
+  },
+  "files": [
+    "mewyse.js",
+    "mewyse.css",
+    "mewyse.d.ts",
+    "react/MeWyse.mjs",
+    "react/index.d.ts",
+    "react/README.md"
+  ],
+  "sideEffects": [
+    "*.css"
+  ],
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
+  }
+}

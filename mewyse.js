@@ -973,7 +973,12 @@
     this.findReplaceDialog = null;
     this.findReplaceState = null;
     this.charCounterBar = null;
-    this.target = document.querySelector(this.options.target);
+    // `target` admite un SELECTOR CSS (string) o directamente un ELEMENTO del DOM
+    // (útil para integraciones como React, donde se pasa un ref.current).
+    var v_target = this.options.target;
+    this.target = (v_target && v_target.nodeType === 1)
+      ? v_target
+      : document.querySelector(v_target);
     this.onChange = this.options.onChange || function() {};
     this.onFocus = this.options.onFocus || function() {};
     this.onBlur = this.options.onBlur || function() {};
@@ -19734,7 +19739,14 @@
       .replace(/'/g, '&#39;');
   }
 
-  // Exportar el constructor
-  window.meWYSE = meWYSE;
+  // Exportar el constructor. UMD-lite + SSR-safe:
+  //  - CommonJS/bundlers (React, Next, Vite, webpack): module.exports
+  //  - Navegador clásico (<script>): global window.meWYSE
+  // En SSR (import en servidor) no hay window; no debe petar en tiempo de import.
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = meWYSE;
+  } else if (typeof window !== 'undefined') {
+    window.meWYSE = meWYSE;
+  }
 
-})(window);
+})(typeof window !== 'undefined' ? window : (typeof globalThis !== 'undefined' ? globalThis : this));

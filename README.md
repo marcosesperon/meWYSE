@@ -50,8 +50,28 @@ Si este proyecto te resulta util, puedes apoyar su desarrollo:
 - **Content Styles**: Opción para heredar estilos CSS de la página
 - **Accesibilidad**: ARIA attributes, focus-visible, navegación por teclado
 - **Código ES5 sin dependencias**: Funciona en todos los navegadores modernos (Chrome, Firefox, Safari, Edge) sin build tools
+- **Componente React opcional**: wrapper `mewyse/react` (`<MeWyse>`), no controlado, SSR-safe, con types — ver [react/README.md](react/README.md)
 
 ## Inicio Rápido
+
+### Como componente React
+
+```bash
+npm install mewyse react react-dom
+```
+
+```jsx
+import { MeWyse } from 'mewyse/react';
+import 'mewyse/style.css';
+
+<MeWyse toolbar theme="dark" defaultValue={blocks} onChange={d => console.log(d.json)} />
+```
+
+`target` acepta un selector CSS **o** un elemento del DOM (el wrapper usa el
+segundo). El núcleo se exporta como CommonJS (`require('mewyse')`) y como global
+(`window.meWYSE`) para `<script>`. Detalles en [react/README.md](react/README.md).
+
+## Uso con `<script>` (sin build)
 
 ### 1. Incluir archivos
 
