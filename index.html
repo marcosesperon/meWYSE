@@ -1069,6 +1069,22 @@ new meWYSE({ target: '#vhHeightEditor', minHeight: '10em', maxHeight: '35vh' });
       <div id="videoEditor"></div>
     </div>
 
+    <!-- Demo: Bloques desactivados (disabledBlocks) -->
+    <div class="demo-section">
+      <h2>Bloques desactivados (<code>disabledBlocks</code>)</h2>
+      <p>Desactiva tipos de bloque en la UI: no aparece su bot&oacute;n en la toolbar, se filtran del men&uacute; slash y no se crean al pegar HTML. En este editor est&aacute;n desactivados <strong>v&iacute;deo, audio y tabla</strong>.</p>
+      <div class="config-hint">
+        Abre el men&uacute; slash con <code>/</code> o mira la toolbar: no ver&aacute;s v&iacute;deo, audio ni tabla.
+        No afecta al contenido cargado por <code>blocks</code>/<code>loadFromJSON</code>.
+      </div>
+      <pre class="docs-code"><code>new meWYSE({
+  target: '#disabledEditor',
+  toolbar: true,
+  disabledBlocks: ['video', 'audio', 'table']
+});</code></pre>
+      <div id="disabledEditor"></div>
+    </div>
+
   </div>
 
   <!-- ── Footer ──────────────────────────────────── -->
@@ -1851,6 +1867,19 @@ new meWYSE({ target: '#vhHeightEditor', minHeight: '10em', maxHeight: '35vh' });
       });
     }
 
+    // ===== Demo bloques desactivados (disabledBlocks) =====
+    var disabledEditor;
+    function initDisabledEditor() {
+      disabledEditor = new meWYSE({
+        target: '#disabledEditor', toolbar: true,
+        disabledBlocks: ['video', 'audio', 'table'],
+        blocks: [
+          { id: 1, type: 'heading2', content: 'Vídeo, audio y tabla desactivados' },
+          { id: 2, type: 'paragraph', content: 'Escribe "/" para comprobar que esos tipos no están en el menú.' }
+        ]
+      });
+    }
+
     // ===== Configurador de opciones =====
     // Especificacion de las opciones. `def` = default REAL de la librería (se usa
     // para omitir del config lo que no cambia). `init` = estado inicial del control
@@ -2016,6 +2045,7 @@ new meWYSE({ target: '#vhHeightEditor', minHeight: '10em', maxHeight: '35vh' });
       initSprint4Editor();
       initHeightEditors();
       initVideoEditor();
+      initDisabledEditor();
     };
   </script>
 </body>
