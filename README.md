@@ -480,6 +480,9 @@ derivado (no se almacena) y se **actualiza solo** a medida que editas los títul
 | `:` | Abrir selector de emojis |
 | `Escape` | Cerrar menú abierto |
 
+La toolbar incluye además **botones de sangría** (indentar/desindentar) que se habilitan/
+deshabilitan según el ítem de lista con foco (mismo efecto que `Tab`/`Shift+Tab`).
+
 ## Formato de Texto
 
 Al seleccionar texto aparece un menú flotante con:
@@ -533,6 +536,44 @@ Las imágenes se insertan desde el menú slash (`/imagen`) o el botón de la too
 5. El botón de edición permite cambiar las dimensiones
 
 Las imágenes también se pueden insertar dentro de celdas de tabla.
+
+## Vídeo (previsualización + carga perezosa)
+
+Se insertan desde `/video` o el botón de la toolbar (URL de YouTube/Vimeo/`.mp4`).
+El bloque **guarda solo la URL** en `content`; las dimensiones van en `width`/`height`:
+
+```javascript
+{ id: 2, type: 'video', content: 'https://www.youtube.com/watch?v=...', width: 640, height: 360 }
+```
+
+- El `provider`/`videoId` se **derivan** de la URL (nunca se almacenan). Se reconocen
+  YouTube (`watch`, `youtu.be`, `embed`, `shorts`, `live`, `m.`…), Vimeo (incl. URLs de
+  canal/hash) y archivos (`.mp4/.webm/.ogg`).
+- **Previsualización**: se muestra una miniatura (YouTube) o una caja con botón de play.
+  El **iframe/`<video>` solo se carga al pulsar play** (mejor rendimiento y privacidad);
+  un botón permite volver a la previsualización.
+- Es un **bloque como una imagen**: selecciónalo (click) para ver el handle flotante,
+  el borde de selección, **redimensionar por drag** (mantiene el ratio) y el botón de
+  editar dimensiones. Teclado con el vídeo seleccionado: `Delete` borra, `Escape`
+  deselecciona, `Enter` crea un párrafo debajo.
+- Compat: el formato antiguo (`content` como objeto `{provider,videoId,url,width,height}`)
+  se **migra** automáticamente a `content` = URL + `width`/`height` al sanitizar.
+
+`getHTML()`/`getHTMLSource()` emiten el `<iframe>`/`<video>` con las dimensiones;
+`getMarkdown()` degrada a `[Vídeo](url)`.
+
+## Altura del editor
+
+Por defecto el editor crece con el contenido entre un mínimo y un máximo (con scroll
+interno). Se puede configurar con opciones (número = px, o string CSS como `'30vh'`):
+
+```javascript
+new meWYSE({ target: '#ed', autoExpand: true, minHeight: 100, maxHeight: 320 });
+```
+
+- `minHeight` / `maxHeight`: suelo / techo del área de edición.
+- `autoExpand: true` **sin** `maxHeight` → crece sin tope (scrollea la página); **con**
+  `maxHeight` → crece hasta el límite y luego scroll interno.
 
 ## Drag & Drop
 
@@ -1045,7 +1086,7 @@ El método `loadFromHTML(html)` permite migrar contenido HTML generado por otros
 | `plugins: 'imagetools'` | ❌ (Sprint 3 — rotar/cropear no implementado) |
 | `toolbar: 'undo redo styleselect ...'` | `toolbar: true` |
 | `toolbar: '... removeformat ...'` | Botón incluido en grupo de formato |
-| `toolbar: '... outdent indent ...'` | ⚠️ Parcial (Sprint 2 — listas anidadas) |
+| `toolbar: '... outdent indent ...'` | Botones de sangría en la toolbar + `Tab`/`Shift+Tab` (listas anidadas) |
 | `paste_as_text: true` | `pasteAsText: true` |
 | `paste_data_images: true` | Drag & drop + paste clipboard de imagen funcionan por defecto |
 | `file_picker_callback` con validación 1MB | `imageMaxSize: 1024000` + opcional `onImageUpload` |
