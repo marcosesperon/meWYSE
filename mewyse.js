@@ -16969,12 +16969,15 @@
     var trimmed = url.trim();
     if (!trimmed) return null;
 
-    // YouTube: youtube.com/watch?v=ID, youtu.be/ID, youtube.com/embed/ID, youtube-nocookie.com/embed/ID
-    var ytMatch = trimmed.match(/(?:(?:www\.)?youtube(?:-nocookie)?\.com\/(?:watch\?(?:.*&)?v=|embed\/|v\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    // YouTube: watch?v=ID, youtu.be/ID, embed/ID, v/ID, shorts/ID, live/ID
+    // (acepta www./m./sin subdominio y youtube-nocookie.com).
+    var ytMatch = trimmed.match(/(?:youtube(?:-nocookie)?\.com\/(?:watch\?(?:.*&)?v=|embed\/|v\/|shorts\/|live\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
     if (ytMatch) return { provider: 'youtube', videoId: ytMatch[1], url: trimmed };
 
-    // Vimeo: vimeo.com/ID, player.vimeo.com/video/ID
-    var vmMatch = trimmed.match(/(?:player\.)?vimeo\.com\/(?:video\/)?(\d+)/);
+    // Vimeo: vimeo.com/ID, player.vimeo.com/video/ID y URLs con ruta
+    // (vimeo.com/channels/staffpicks/ID, vimeo.com/ID/hash...). Se captura el
+    // último id numérico tras cualquier número de segmentos de ruta.
+    var vmMatch = trimmed.match(/(?:player\.)?vimeo\.com\/(?:[^\/\s?#]+\/)*(\d+)/);
     if (vmMatch) return { provider: 'vimeo', videoId: vmMatch[1], url: trimmed };
 
     // Archivo de vídeo: extensiones comunes
@@ -17078,7 +17081,10 @@
       }
       // video
       var info = self._detectVideoProvider(url);
-      if (!info) {
+      // Para archivos, además de la extensión, exigir un esquema seguro
+      // (http/https/data:video) — evita insertar un placeholder "no disponible"
+      // con esquemas como ftp:/javascript:.
+      if (!info || (info.provider === 'file' && !self._isSafeMediaUrl(info.url))) {
         try { window.alert(t('alerts.invalidVideoUrl')); } catch (e) {}
         return;
       }
