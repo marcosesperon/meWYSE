@@ -43,7 +43,9 @@ export interface MeWyseOptions {
   blocks?: MeWyseBlock[];
   toolbar?: boolean;
   summary?: boolean;
-  theme?: 'dark' | 'compact' | string;
+  /** Tema: 'dark' (oscuro), 'auto' (sigue prefers-color-scheme del OS en vivo),
+   *  'compact', o custom. Sin especificar → claro (no auto-detecta). */
+  theme?: 'dark' | 'auto' | 'compact' | string;
   readOnly?: boolean;
   rtl?: boolean;
   wordWrap?: boolean;

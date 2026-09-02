@@ -1111,20 +1111,21 @@
     this._handleDocMouseUp = null;
     this._handleDocMouseDown = null;
 
-    // ¿El usuario fijó un theme explícito? Guardarlo ANTES de auto-detectar,
-    // porque la auto-detección muta this.options.theme y, si no, la comprobación
-    // posterior para instalar el listener quedaría contaminada (bug: al arrancar
-    // el sistema en oscuro no se registraba el listener y cambiar a claro no surtía efecto).
-    var v_theme_explicito = !!this.options.theme;
-
-    // Auto-detectar dark mode del sistema si no hay theme explícito
-    if (!v_theme_explicito && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      this.options.theme = 'dark';
+    // Tema por defecto: CLARO. Solo se aplica oscuro si se pide explícitamente
+    // (`theme: 'dark'`) o si se pide seguir al sistema (`theme: 'auto'`). Sin
+    // `theme`, el editor NO auto-detecta el `prefers-color-scheme`: se queda claro.
+    var v_auto_theme = this.options.theme === 'auto';
+    if (v_auto_theme) {
+      // Resolver 'auto' a un valor real de clase (nunca dejar 'auto', que
+      // generaría una clase inexistente `mewyse-editor-auto`). Si el sistema está
+      // en oscuro → 'dark'; si no → null (claro).
+      var v_sys_dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      this.options.theme = v_sys_dark ? 'dark' : null;
     }
 
-    // Escuchar cambios en la preferencia del sistema (solo si no hubo theme explícito)
+    // Escuchar cambios en la preferencia del sistema SOLO en modo 'auto'.
     this._darkModeMediaQuery = null;
-    if (!v_theme_explicito && window.matchMedia) {
+    if (v_auto_theme && window.matchMedia) {
       this._darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
       var self = this;
       this._handleDarkModeChange = function(e) {

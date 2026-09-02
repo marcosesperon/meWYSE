@@ -185,7 +185,7 @@ new meWYSE(options)
 | `imageMaxSizeError` | string | auto | Mensaje de alerta cuando la imagen excede `imageMaxSize` |
 | `onImageUpload` | Function | — | Hook para subir imágenes al servidor. Recibe `(file, callback)`. El callback espera `{ url, fileName?, width?, height? }` |
 | `styleFormats` | Array | `[]` | Estilos custom para el dropdown de tipos de bloque. Cada item: `{ title, block, className }` |
-| `theme` | string | auto | Tema: `'dark'`, `'compact'`, o cualquier nombre custom. Sin tema, auto-detecta `prefers-color-scheme` del OS |
+| `theme` | string | claro | Tema: `'dark'` (oscuro), `'auto'` (sigue `prefers-color-scheme` del OS en vivo), `'compact'`, o cualquier nombre custom. Sin tema → **claro** (no auto-detecta) |
 | `contentStyles` | boolean | `true` | Inyectar estilos de contenido. Con `false`, la página define sus propios estilos |
 | `minHeight` | number/string | — | Alto mínimo del área de edición. Número = px; string = valor CSS (`'200px'`, `'30vh'`, `'10em'`). Sin definir, usa el default del CSS |
 | `maxHeight` | number/string | — | Alto máximo antes de scroll interno. Número = px o string CSS. Sin definir, usa el default del CSS |
@@ -626,11 +626,14 @@ Permite seleccionar y operar sobre múltiples bloques simultáneamente:
 ### Dark Mode
 
 ```javascript
+// Por defecto: tema CLARO (sin especificar theme)
+var editor = new meWYSE({ target: '#editor' });
+
 // Forzar dark mode
 var editor = new meWYSE({ target: '#editor', theme: 'dark' });
 
-// Auto-detección (por defecto, sin especificar theme)
-var editor = new meWYSE({ target: '#editor' });
+// Seguir al sistema
+var editor = new meWYSE({ target: '#editor', theme: 'auto' });
 // → Detecta prefers-color-scheme del OS
 // → Escucha cambios en tiempo real
 ```
