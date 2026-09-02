@@ -905,10 +905,11 @@
     // texto al portapapeles igual que en cualquier elemento estático.
     this.readOnly = this.options.readOnly === true;
     // Comportamiento de la toolbar cuando los botones no caben en una fila.
-    // 'wrap' (default) = saltan a la siguiente fila como hasta ahora.
-    // 'scroll' = todos en una sola fila con scroll horizontal, gradientes en los bordes,
-    // flechas de navegación, y los botones de mover bloque anclados a la derecha.
-    this.toolbarOverflow = (this.options.toolbarOverflow === 'scroll') ? 'scroll' : 'wrap';
+    // 'scroll' (default) = todos en una sola fila con scroll horizontal, gradientes
+    // en los bordes, flechas de navegación, y los botones de mover bloque anclados
+    // a la derecha.
+    // 'wrap' = saltan a la siguiente fila.
+    this.toolbarOverflow = (this.options.toolbarOverflow === 'wrap') ? 'wrap' : 'scroll';
     this.pasteAsText = this.options.pasteAsText === true; // Forzar paste solo como texto plano
     // Por defecto, getHTML() escapa los 5 caracteres de entidad HTML (& < > " ')
     // en los nodos de TEXTO del contenido inline (heading, quote, paragraph,

@@ -166,7 +166,7 @@ new meWYSE(options)
 | `showBlocksToggle` | boolean | `true` | Mostrar botón de "mostrar bloques" (modo debug) en toolbar |
 | `wordWrap` | boolean | `true` | Ajuste de texto: el contenido largo salta de línea dentro del bloque |
 | `wordWrapToggle` | boolean | `true` | Mostrar botón de ajuste de texto en la toolbar |
-| `toolbarOverflow` | string | `'wrap'` | Comportamiento de la toolbar sin espacio: `'wrap'` (salto de línea) o `'scroll'` (scroll horizontal con flechas) |
+| `toolbarOverflow` | string | `'scroll'` | Comportamiento de la toolbar sin espacio: `'scroll'` (scroll horizontal con flechas, por defecto) o `'wrap'` (salto de línea) |
 | `rtl` | boolean | `false` | Activar dirección derecha-a-izquierda (árabe, hebreo) |
 | `pasteAsText` | boolean | `false` | Forzar que todo paste entre como texto plano (sin preservar formato) |
 | `escapeHtmlEntities` | boolean | `true` | Escapar entidades HTML en el HTML exportado por `getHTML()` |
