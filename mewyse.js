@@ -2226,6 +2226,9 @@
     undoBtn.innerHTML = WYSIWYG_ICONS.undo;
     undoBtn.title = this.t('tooltips.undo');
     undoBtn.disabled = true;
+    // mousedown+preventDefault: no robar el foco/caret del bloque al pulsar, así
+    // undo() puede capturar dónde estaba el caret para restaurarlo tras el render.
+    undoBtn.onmousedown = function(e) { e.preventDefault(); };
     undoBtn.onclick = function(e) {
       e.preventDefault();
       self.undo();
@@ -2238,6 +2241,7 @@
     redoBtn.innerHTML = WYSIWYG_ICONS.redo;
     redoBtn.title = this.t('tooltips.redo');
     redoBtn.disabled = true;
+    redoBtn.onmousedown = function(e) { e.preventDefault(); };
     redoBtn.onclick = function(e) {
       e.preventDefault();
       self.redo();
@@ -11403,6 +11407,138 @@
   };
 
   /**
+   * Captura el contexto de foco actual (bloque + offset de caret en caracteres)
+   * para poder restaurarlo tras un re-render (undo/redo). Devuelve null si no hay
+   * caret dentro del editor.
+   * @returns {?{blockId:number, offset:?number}}
+   */
+  meWYSE.prototype._captureCaretContext = function() {
+    var v_id = this._getFocusedBlockId();
+    if (v_id === null) return null;
+    var v_ctx = { blockId: v_id, offset: null };
+    var sel = window.getSelection ? window.getSelection() : null;
+    if (sel && sel.rangeCount > 0 && this.container) {
+      var v_el = this.container.querySelector('[data-block-id="' + v_id + '"]');
+      var v_editable = v_el && (v_el.getAttribute('contenteditable') === 'true'
+        ? v_el : v_el.querySelector('[contenteditable="true"]'));
+      if (v_editable && v_editable.contains(sel.anchorNode)) {
+        try {
+          // Offset del caret medido en caracteres de texto desde el inicio del
+          // editable (robusto frente a la reconstrucción del DOM en el render).
+          var v_range = sel.getRangeAt(0);
+          var v_pre = document.createRange();
+          v_pre.selectNodeContents(v_editable);
+          v_pre.setEnd(v_range.endContainer, v_range.endOffset);
+          v_ctx.offset = v_pre.toString().length;
+        } catch (e) { v_ctx.offset = null; }
+      }
+    }
+    return v_ctx;
+  };
+
+  /**
+   * Coloca el caret en un editable a `offset` caracteres del inicio. Si `offset`
+   * es null o excede el texto, lo coloca al FINAL.
+   * @param {HTMLElement} editable
+   * @param {?number} offset
+   */
+  meWYSE.prototype._setCaretAtOffset = function(editable, offset) {
+    var sel = window.getSelection ? window.getSelection() : null;
+    if (!sel || !editable) return;
+    var v_range = document.createRange();
+    var v_placed = false;
+    if (offset != null && offset >= 0) {
+      var v_walker = document.createTreeWalker(editable, NodeFilter.SHOW_TEXT, null, false);
+      var v_remaining = offset;
+      var v_node;
+      while ((v_node = v_walker.nextNode())) {
+        var v_len = v_node.textContent.length;
+        if (v_remaining <= v_len) {
+          v_range.setStart(v_node, v_remaining);
+          v_range.collapse(true);
+          v_placed = true;
+          break;
+        }
+        v_remaining -= v_len;
+      }
+    }
+    if (!v_placed) {
+      // offset null o mayor que el texto disponible → al final.
+      v_range.selectNodeContents(editable);
+      v_range.collapse(false);
+    }
+    sel.removeAllRanges();
+    sel.addRange(v_range);
+  };
+
+  /**
+   * Devuelve el índice del primer bloque VISIBLE en el viewport del editor (o del
+   * de la ventana si el editor no scrollea internamente). Fallback: 0.
+   * @returns {number}
+   */
+  meWYSE.prototype._getVisibleBlockIndex = function() {
+    if (!this.container || !this.blocks.length) return 0;
+    var v_crect = this.container.getBoundingClientRect();
+    var v_win_h = window.innerHeight || document.documentElement.clientHeight;
+    var v_top = Math.max(v_crect.top, 0);
+    var v_bottom = Math.min(v_crect.bottom, v_win_h);
+    for (var i = 0; i < this.blocks.length; i++) {
+      var el = this.container.querySelector('[data-block-id="' + this.blocks[i].id + '"]');
+      if (!el) continue;
+      var r = el.getBoundingClientRect();
+      if (r.bottom > v_top && r.top < v_bottom) return i; // primero que intersecta
+    }
+    return 0;
+  };
+
+  /**
+   * Restaura el foco tras un re-render (undo/redo): al mismo bloque en el offset
+   * guardado si sigue existiendo; si no, al FINAL del bloque visible en ese
+   * momento; último recurso, el primer bloque editable.
+   * @param {?{blockId:number, offset:?number}} ctx
+   */
+  meWYSE.prototype._restoreCaretContext = function(ctx) {
+    if (this._destroyed || !this.container) return;
+    this._suppressBlurUntil = Date.now() + 300;
+
+    // 1) Mismo bloque en el offset guardado (si sobrevivió al undo/redo).
+    if (ctx && ctx.blockId != null) {
+      var v_el = this.container.querySelector('[data-block-id="' + ctx.blockId + '"]');
+      if (v_el) {
+        var v_editable = (v_el.getAttribute('contenteditable') === 'true')
+          ? v_el : v_el.querySelector('[contenteditable="true"]');
+        if (v_editable) {
+          try { v_editable.focus({ preventScroll: true }); } catch (e) { v_editable.focus(); }
+          this._setCaretAtOffset(v_editable, ctx.offset);
+          return;
+        }
+      }
+    }
+
+    // 2) Fallback: final del bloque visible. Buscar desde el visible hacia delante
+    //    y luego hacia atrás el primer bloque editable.
+    var v_start = this._getVisibleBlockIndex();
+    var order = [];
+    var i;
+    for (i = v_start; i < this.blocks.length; i++) order.push(i);
+    for (i = v_start - 1; i >= 0; i--) order.push(i);
+    for (var k = 0; k < order.length; k++) {
+      var el2 = this.container.querySelector('[data-block-id="' + this.blocks[order[k]].id + '"]');
+      if (!el2) continue;
+      var ed2 = (el2.getAttribute('contenteditable') === 'true')
+        ? el2 : el2.querySelector('[contenteditable="true"]');
+      if (ed2) {
+        try { ed2.focus({ preventScroll: true }); } catch (e) { ed2.focus(); }
+        this._setCaretAtOffset(ed2, null); // al final
+        return;
+      }
+    }
+
+    // 3) Último recurso (no hay editables): container, para no disparar onBlur.
+    this._focusBlockNear(0);
+  };
+
+  /**
    * Mueve un bloque a la posición de otro bloque
    * @param {number} draggedBlockId - ID del bloque arrastrado
    * @param {number} targetBlockId - ID del bloque destino
@@ -16297,6 +16433,11 @@
    * Deshace el último cambio
    */
   meWYSE.prototype.undo = function() {
+    // Capturar dónde está el caret ANTES de reconstruir el DOM, para devolver el
+    // foco al editor después (a la misma posición si sobrevive; si no, al final
+    // del bloque visible).
+    var v_caret_ctx = this._captureCaretContext();
+
     // Flush debounce pendiente
     if (this.historyDebounceTimer) {
       clearTimeout(this.historyDebounceTimer);
@@ -16338,6 +16479,7 @@
     this.triggerChange();
     this.isUndoRedo = false;
     this.updateUndoRedoButtons();
+    this._restoreCaretContext(v_caret_ctx);
   };
 
   /**
@@ -16345,6 +16487,9 @@
    */
   meWYSE.prototype.redo = function() {
     if (this.historyIndex >= this.history.length - 1) return;
+
+    // Capturar el caret antes del render para devolver el foco después.
+    var v_caret_ctx = this._captureCaretContext();
 
     this.historyIndex++;
     this.isUndoRedo = true;
@@ -16364,6 +16509,7 @@
     this.triggerChange();
     this.isUndoRedo = false;
     this.updateUndoRedoButtons();
+    this._restoreCaretContext(v_caret_ctx);
   };
 
   /**
