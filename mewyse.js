@@ -178,7 +178,8 @@
         insertAudioTitle: 'Insertar audio',
         advancedOptions: 'Opciones avanzadas',
         imageBorder: 'Borde',
-        imageMargin: 'Márgenes',
+        imageMarginVertical: 'Espacio vertical',
+        imageMarginHorizontal: 'Espacio horizontal',
         imageAlignment: 'Alineación'
       },
       summary: {
@@ -450,7 +451,8 @@
         insertAudioTitle: 'Insert audio',
         advancedOptions: 'Advanced options',
         imageBorder: 'Border',
-        imageMargin: 'Margin',
+        imageMarginVertical: 'Vertical space',
+        imageMarginHorizontal: 'Horizontal space',
         imageAlignment: 'Alignment'
       },
       summary: {
@@ -4076,6 +4078,22 @@
   };
 
   /**
+   * Resuelve el objeto margin de imagen a píxeles verticales/horizontales.
+   * Soporta el formato nuevo `{ vertical, horizontal }` y el legacy `{ all }`
+   * (que aplica a ambos ejes). Devuelve null si no hay ningún valor.
+   * @param {Object} margin
+   * @returns {?{v:number, h:number}}
+   */
+  meWYSE.prototype._resolveImageMargin = function(margin) {
+    if (!margin || typeof margin !== 'object') return null;
+    var v_all = (typeof margin.all === 'number') ? margin.all : null;
+    var v = (typeof margin.vertical === 'number') ? margin.vertical : v_all;
+    var h = (typeof margin.horizontal === 'number') ? margin.horizontal : v_all;
+    if (v == null && h == null) return null;
+    return { v: v || 0, h: h || 0 };
+  };
+
+  /**
    * Aplica estilos avanzados (border/margin/alignment) al <img> y wrapper.
    * @param {HTMLImageElement} img
    * @param {HTMLElement} wrapper - .mewyse-image-wrapper
@@ -4087,8 +4105,10 @@
       var b = advanced.border;
       img.style.border = b.width + 'px ' + (b.style || 'solid') + ' ' + (b.color || '#000000');
     }
-    if (advanced.margin && typeof advanced.margin.all === 'number') {
-      img.style.margin = advanced.margin.all + 'px';
+    var v_m = this._resolveImageMargin(advanced.margin);
+    if (v_m) {
+      // CSS shorthand: margin: <vertical> <horizontal>.
+      img.style.margin = v_m.v + 'px ' + v_m.h + 'px';
     }
     if (advanced.alignment) {
       // Alineación: left/right usan float; center usa margin auto + display block
@@ -4167,20 +4187,41 @@
     borderGroup.appendChild(borderRow);
     panel.appendChild(borderGroup);
 
-    // --- Margin (shorthand: un número aplicado a los 4 lados) ---
+    // --- Espaciado: vertical (top/bottom) y horizontal (left/right) separados ---
+    // Prefill retrocompatible: si el dato antiguo trae `all`, se usa para ambos.
+    var v_margin_v = (typeof iMargin.vertical === 'number') ? iMargin.vertical
+      : (typeof iMargin.all === 'number' ? iMargin.all : '');
+    var v_margin_h = (typeof iMargin.horizontal === 'number') ? iMargin.horizontal
+      : (typeof iMargin.all === 'number' ? iMargin.all : '');
+
     var marginGroup = document.createElement('div');
     marginGroup.className = 'mewyse-modal-advanced-row';
     var marginLabel = document.createElement('label');
-    marginLabel.textContent = self.t('modals.imageMargin');
-    var marginInput = document.createElement('input');
-    marginInput.type = 'number';
-    marginInput.min = '0';
-    marginInput.className = 'mewyse-modal-input';
-    marginInput.placeholder = '0';
-    marginInput.value = (typeof iMargin.all === 'number' ? iMargin.all : '');
-    marginInput.style.width = '70px';
+    marginLabel.textContent = self.t('modals.imageMarginVertical');
+    var marginVInput = document.createElement('input');
+    marginVInput.type = 'number';
+    marginVInput.min = '0';
+    marginVInput.className = 'mewyse-modal-input';
+    marginVInput.placeholder = '0';
+    marginVInput.value = v_margin_v;
+    marginVInput.style.width = '70px';
+    var marginHLabel = document.createElement('label');
+    marginHLabel.textContent = self.t('modals.imageMarginHorizontal');
+    marginHLabel.style.marginLeft = '8px';
+    var marginHInput = document.createElement('input');
+    marginHInput.type = 'number';
+    marginHInput.min = '0';
+    marginHInput.className = 'mewyse-modal-input';
+    marginHInput.placeholder = '0';
+    marginHInput.value = v_margin_h;
+    marginHInput.style.width = '70px';
+    var marginRow = document.createElement('div');
+    marginRow.className = 'mewyse-modal-advanced-inline';
+    marginRow.appendChild(marginVInput);
+    marginRow.appendChild(marginHLabel);
+    marginRow.appendChild(marginHInput);
     marginGroup.appendChild(marginLabel);
-    marginGroup.appendChild(marginInput);
+    marginGroup.appendChild(marginRow);
     panel.appendChild(marginGroup);
 
     // --- Alineación ---
@@ -4222,9 +4263,13 @@
             color: borderColorInput.dataset.userSet === 'true' ? borderColorInput.value : '#000000'
           };
         }
-        var m = parseInt(marginInput.value, 10);
-        if (!isNaN(m) && m >= 0 && marginInput.value !== '') {
-          result.margin = { all: m };
+        var mv = parseInt(marginVInput.value, 10);
+        var mh = parseInt(marginHInput.value, 10);
+        var v_margin_out = {};
+        if (!isNaN(mv) && mv >= 0 && marginVInput.value !== '') v_margin_out.vertical = mv;
+        if (!isNaN(mh) && mh >= 0 && marginHInput.value !== '') v_margin_out.horizontal = mh;
+        if (v_margin_out.vertical != null || v_margin_out.horizontal != null) {
+          result.margin = v_margin_out;
         }
         if (alignSelect.value) {
           result.alignment = alignSelect.value;
@@ -12100,8 +12145,9 @@
                 if (adv.border && adv.border.width) {
                   parts.push('border: ' + adv.border.width + 'px ' + (adv.border.style || 'solid') + ' ' + (adv.border.color || '#000000'));
                 }
-                if (adv.margin && typeof adv.margin.all === 'number') {
-                  parts.push('margin: ' + adv.margin.all + 'px');
+                var v_m_out = self._resolveImageMargin(adv.margin);
+                if (v_m_out) {
+                  parts.push('margin: ' + v_m_out.v + 'px ' + v_m_out.h + 'px');
                 }
                 if (adv.alignment === 'center') {
                   parts.push('display: block');
@@ -12251,8 +12297,9 @@
                 if (adv.border && adv.border.width) {
                   parts.push('border: ' + adv.border.width + 'px ' + (adv.border.style || 'solid') + ' ' + (adv.border.color || '#000000'));
                 }
-                if (adv.margin && typeof adv.margin.all === 'number') {
-                  parts.push('margin: ' + adv.margin.all + 'px');
+                var v_m_out = self._resolveImageMargin(adv.margin);
+                if (v_m_out) {
+                  parts.push('margin: ' + v_m_out.v + 'px ' + v_m_out.h + 'px');
                 }
                 if (adv.alignment === 'center') {
                   parts.push('display: block');
@@ -18763,9 +18810,19 @@
           }
         }
         if (c.advanced.margin && typeof c.advanced.margin === 'object') {
-          var m = parseInt(c.advanced.margin.all, 10);
-          if (!isNaN(m) && m >= 0 && m <= 200) {
-            adv.margin = { all: m };
+          // Formato nuevo (vertical/horizontal) + legacy (all), cada uno 0-200.
+          var v_mgn = {};
+          var mv = parseInt(c.advanced.margin.vertical, 10);
+          var mh = parseInt(c.advanced.margin.horizontal, 10);
+          var ma = parseInt(c.advanced.margin.all, 10);
+          if (!isNaN(mv) && mv >= 0 && mv <= 200) v_mgn.vertical = mv;
+          if (!isNaN(mh) && mh >= 0 && mh <= 200) v_mgn.horizontal = mh;
+          // 'all' solo se conserva si no vino ningún eje explícito (dato antiguo).
+          if (v_mgn.vertical == null && v_mgn.horizontal == null && !isNaN(ma) && ma >= 0 && ma <= 200) {
+            v_mgn.all = ma;
+          }
+          if (v_mgn.vertical != null || v_mgn.horizontal != null || v_mgn.all != null) {
+            adv.margin = v_mgn;
           }
         }
         if (typeof c.advanced.alignment === 'string') {
