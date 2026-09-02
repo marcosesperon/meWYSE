@@ -3632,6 +3632,11 @@
       tableCell: tableCell
     };
 
+    // Refrescar el botón de alineación: ahora refleja la alineación de la imagen
+    // (la selección de imagen no dispara los eventos de foco de texto de forma
+    // fiable, así que se actualiza explícitamente).
+    this._updateAlignButton();
+
     // Mostrar el handle del bloque para imágenes sueltas (las de dentro de una
     // tabla no tienen handle de bloque propio).
     if (!isInTable && blockId != null && this.floatingHandle) {
@@ -3674,6 +3679,8 @@
       this.selectedImage = null;
       // Ocultar el handle si se mostró por la imagen suelta y no hay foco activo
       if (wasStandalone) this.hideFloatingHandle();
+      // Reevaluar el botón de alineación (ya no hay imagen seleccionada).
+      this._updateAlignButton();
     }
   };
 
@@ -14678,11 +14685,31 @@
    * 'left' es el valor por defecto (no se almacena en el modelo).
    * @returns {?string}
    */
+  /**
+   * Bloque objetivo de la alineación. Una imagen suelta seleccionada tiene
+   * prioridad (no genera caret de texto, así que _getFocusedBlockId podría
+   * devolver el bloque de texto previo).
+   * @returns {?number}
+   */
+  meWYSE.prototype._getAlignTargetBlockId = function() {
+    if (this.selectedImage && this.selectedImage.blockId != null && !this.selectedImage.isInTable) {
+      return this.selectedImage.blockId;
+    }
+    return this._getFocusedBlockId();
+  };
+
   meWYSE.prototype._getCurrentAlignment = function() {
-    var v_block_id = this._getFocusedBlockId();
+    var v_block_id = this._getAlignTargetBlockId();
     if (v_block_id === null) return null;
     var v_block = this.getBlock(v_block_id);
-    if (!v_block || !TEXT_ALIGN_BLOCK_TYPES[v_block.type]) return null;
+    if (!v_block) return null;
+    // Imagen: la alineación vive en block.content.advanced.alignment (left/center/
+    // right, sin justify). Default = left.
+    if (v_block.type === 'image') {
+      var v_adv = v_block.content && v_block.content.advanced;
+      return (v_adv && typeof v_adv.alignment === 'string' && v_adv.alignment) ? v_adv.alignment : 'left';
+    }
+    if (!TEXT_ALIGN_BLOCK_TYPES[v_block.type]) return null;
     return (typeof v_block.alignment === 'string' && v_block.alignment) ? v_block.alignment : 'left';
   };
 
@@ -14731,11 +14758,39 @@
       return;
     }
 
-    // 2) Bloque con foco: set/delete block.alignment + render + refoco.
-    var v_block_id = this._getFocusedBlockId();
+    // 2) Bloque objetivo (imagen suelta seleccionada o bloque con foco).
+    var v_block_id = this._getAlignTargetBlockId();
     if (v_block_id === null) return;
     var v_block = this.getBlock(v_block_id);
-    if (!v_block || !TEXT_ALIGN_BLOCK_TYPES[v_block.type]) return;
+    if (!v_block) return;
+
+    // 2a) Imagen: la alineación va en block.content.advanced.alignment (left/
+    // center/right; 'justify' no aplica → se trata como left). Tras el render la
+    // imagen se vuelve a seleccionar para conservar selección + handle.
+    if (v_block.type === 'image') {
+      if (!v_block.content || typeof v_block.content !== 'object') return;
+      this._suppressBlurUntil = Date.now() + 300;
+      this.pushHistory(true);
+      var v_align_img = (align === 'justify') ? 'left' : align;
+      if (v_align_img === 'left') {
+        if (v_block.content.advanced) delete v_block.content.advanced.alignment;
+      } else {
+        if (!v_block.content.advanced) v_block.content.advanced = {};
+        v_block.content.advanced.alignment = v_align_img;
+      }
+      if (this.formatMenu) this.closeFormatMenu();
+      this.render();
+      this.triggerChange();
+      var self_img = this;
+      setTimeout(function() {
+        var v_img = self_img.container.querySelector('[data-block-id="' + v_block_id + '"] .mewyse-image');
+        if (v_img) self_img.selectImage(v_img, v_block_id);
+        self_img._updateAlignButton();
+      }, 0);
+      return;
+    }
+
+    if (!TEXT_ALIGN_BLOCK_TYPES[v_block.type]) return;
 
     // Evitar onBlur espurio durante el render/refoco.
     this._suppressBlurUntil = Date.now() + 300;
@@ -14786,12 +14841,20 @@
 
     var v_current = this._getCurrentAlignment(); // puede ser null
 
+    // ¿El bloque objetivo es una imagen? En ese caso no se ofrece "Justificar"
+    // (no tiene sentido para una imagen).
+    var v_target_id = this._getAlignTargetBlockId();
+    var v_target_block = (v_target_id !== null) ? this.getBlock(v_target_id) : null;
+    var v_is_image = !!(v_target_block && v_target_block.type === 'image');
+
     var options = [
       { align: 'left',    label: this.t('tooltips.alignLeft'),   icon: WYSIWYG_ICONS.alignLeft },
       { align: 'center',  label: this.t('tooltips.alignCenter'), icon: WYSIWYG_ICONS.alignCenter },
-      { align: 'right',   label: this.t('tooltips.alignRight'),  icon: WYSIWYG_ICONS.alignRight },
-      { align: 'justify', label: this.t('tooltips.justify'),     icon: WYSIWYG_ICONS.alignJustify }
+      { align: 'right',   label: this.t('tooltips.alignRight'),  icon: WYSIWYG_ICONS.alignRight }
     ];
+    if (!v_is_image) {
+      options.push({ align: 'justify', label: this.t('tooltips.justify'), icon: WYSIWYG_ICONS.alignJustify });
+    }
 
     var v_align_click_handler = null;
     var closeAlignMenu = function() {
