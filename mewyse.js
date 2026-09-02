@@ -15399,17 +15399,46 @@
    * Navega a un encabezado específico
    */
   meWYSE.prototype.navigateToHeading = function(blockId) {
-    var blockElement = this.container.querySelector('[data-block-id="' + blockId + '"]');
-    if (blockElement) {
-      blockElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    var v_block_el = this.container.querySelector('[data-block-id="' + blockId + '"]');
+    if (!v_block_el) return;
 
-      // Enfocar el bloque
-      var contentEditable = blockElement.querySelector('[contenteditable="true"]');
-      if (contentEditable) {
-        setTimeout(function() {
-          contentEditable.focus();
-        }, 500);
+    var v_container = this.container;
+    var v_offset = 8; // pequeño margen superior para que no quede pegado al borde
+    // ¿El editor scrollea internamente (min/maxHeight) o es la página?
+    var v_internal_scroll = v_container.scrollHeight > v_container.clientHeight + 2;
+
+    if (v_internal_scroll) {
+      // Scroll DENTRO del editor: mover solo su scroll, NUNCA la ventana (antes,
+      // scrollIntoView movía también la página aunque el título ya se viera).
+      var v_cont_rect = v_container.getBoundingClientRect();
+      var v_el_rect = v_block_el.getBoundingClientRect();
+      var v_target = v_container.scrollTop + (v_el_rect.top - v_cont_rect.top) - v_offset;
+      v_target = Math.max(0, v_target);
+      if (typeof v_container.scrollTo === 'function') {
+        v_container.scrollTo({ top: v_target, behavior: 'smooth' });
+      } else {
+        v_container.scrollTop = v_target;
       }
+    } else {
+      // El editor no scrollea internamente (la página es el scroller). Solo mover
+      // la ventana si el título NO está ya completamente visible (evita el salto
+      // innecesario cuando ya se ve).
+      var v_vp_h = window.innerHeight || document.documentElement.clientHeight;
+      var v_r = v_block_el.getBoundingClientRect();
+      var v_fully_visible = v_r.top >= 0 && v_r.bottom <= v_vp_h;
+      if (!v_fully_visible) {
+        v_block_el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    // Enfocar el bloque SIN re-scrollear (preventScroll evita que el navegador
+    // vuelva a mover el scroll al enfocar el contenteditable, que causaba saltos).
+    var v_editable = v_block_el.querySelector('[contenteditable="true"]');
+    if (v_editable) {
+      setTimeout(function() {
+        try { v_editable.focus({ preventScroll: true }); }
+        catch (e) { v_editable.focus(); }
+      }, 400);
     }
   };
 
