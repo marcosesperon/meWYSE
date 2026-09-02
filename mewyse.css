@@ -2115,7 +2115,9 @@
    sombra) e icono atenuado; al pasar el cursor aparece un fondo sutil. */
 .mewyse-summary-button {
   position: sticky;
-  top: 10px;
+  /* top:0 lo alinea con el primer bloque (el padding del editor ya da el aire
+     superior). Con un top>0, el sticky lo empujaría por debajo del título. */
+  top: 0;
   float: right;
   width: 30px;
   height: 30px;
