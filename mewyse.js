@@ -2394,28 +2394,24 @@
     var alignGroup = document.createElement('div');
     alignGroup.className = 'mewyse-toolbar-group';
 
-    var alignTools = [
-      { action: 'alignLeft', labelKey: 'tooltips.alignLeft', icon: WYSIWYG_ICONS.alignLeft, command: 'justifyLeft', align: 'left' },
-      { action: 'alignCenter', labelKey: 'tooltips.alignCenter', icon: WYSIWYG_ICONS.alignCenter, command: 'justifyCenter', align: 'center' },
-      { action: 'alignRight', labelKey: 'tooltips.alignRight', icon: WYSIWYG_ICONS.alignRight, command: 'justifyRight', align: 'right' },
-      { action: 'alignJustify', labelKey: 'tooltips.justify', icon: WYSIWYG_ICONS.alignJustify, command: 'justifyFull', align: 'justify' }
-    ];
-
-    alignTools.forEach(function(tool) {
-      var button = document.createElement('button');
-      button.className = 'mewyse-toolbar-button';
-      button.innerHTML = tool.icon;
-      button.title = self.t(tool.labelKey);
-      button.onclick = function(e) {
-        e.preventDefault();
-        // Multi-selección: alineación por modelo a todos los bloques. Si no hay
-        // multi-selección, comportamiento actual (execCommand sobre el bloque).
-        if (self.applyAlignmentToSelection(tool.align)) return;
-        document.execCommand(tool.command, false, null);
-        self.triggerChange();
-      };
-      alignGroup.appendChild(button);
-    });
+    // Botón ÚNICO de alineación (dropdown). El icono refleja la alineación del
+    // bloque con foco (_updateAlignButton, disparado por los eventos de foco).
+    var alignBtn = document.createElement('button');
+    alignBtn.className = 'mewyse-toolbar-button mewyse-toolbar-dropdown';
+    alignBtn.innerHTML = this._alignButtonInnerHTML('left');
+    alignBtn.title = self.t('tooltips.alignLeft');
+    alignBtn.setAttribute('aria-label', self.t('tooltips.alignLeft'));
+    alignBtn.setAttribute('aria-haspopup', 'true');
+    // mousedown+preventDefault: no perder el caret/foco del bloque al abrir el
+    // menú (así _getFocusedBlockId resuelve el bloque correcto al aplicar).
+    alignBtn.onmousedown = function(e) { e.preventDefault(); };
+    alignBtn.onclick = function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      self.showAlignMenu(alignBtn);
+    };
+    this.alignButton = alignBtn;
+    alignGroup.appendChild(alignBtn);
 
     host.appendChild(alignGroup);
 
@@ -13254,10 +13250,7 @@
       { action: 'separator', type: 'separator' },
       { action: 'color', label: 'A', titleKey: 'tooltips.color', type: 'colorPicker' },
       { action: 'separator', type: 'separator' },
-      { action: 'alignLeft', label: WYSIWYG_ICONS.alignLeft, titleKey: 'tooltips.alignLeft', command: 'justifyLeft' },
-      { action: 'alignCenter', label: WYSIWYG_ICONS.alignCenter, titleKey: 'tooltips.alignCenter', command: 'justifyCenter' },
-      { action: 'alignRight', label: WYSIWYG_ICONS.alignRight, titleKey: 'tooltips.alignRight', command: 'justifyRight' },
-      { action: 'alignJustify', label: WYSIWYG_ICONS.alignJustify, titleKey: 'tooltips.justify', command: 'justifyFull' }
+      { action: 'alignMenu', label: WYSIWYG_ICONS.alignLeft, titleKey: 'tooltips.alignLeft', type: 'alignMenu' }
     ];
 
     tools.forEach(function(tool) {
@@ -13275,6 +13268,13 @@
       button.setAttribute('aria-label', self.t(tool.titleKey));
       button.setAttribute('data-action', tool.action);
 
+      // Botón único de alineación (dropdown): icono del valor actual + chevron.
+      if (tool.type === 'alignMenu') {
+        button.className += ' mewyse-toolbar-dropdown';
+        button.innerHTML = self._alignButtonInnerHTML(self._getCurrentAlignment() || 'left');
+        button.setAttribute('aria-haspopup', 'true');
+      }
+
       // Aplicar estilos especiales según el botón
       if (tool.action === 'bold') button.style.fontWeight = 'bold';
       if (tool.action === 'italic') button.style.fontStyle = 'italic';
@@ -13288,7 +13288,9 @@
 
         if (self.crossBlockSelection) {
           // Cross-block: delegar al sistema cross-block
-          if (tool.type === 'caseMenu') {
+          if (tool.type === 'alignMenu') {
+            self.showAlignMenu(button);
+          } else if (tool.type === 'caseMenu') {
             self.showCaseMenu(button);
           } else if (tool.type === 'removeFormat') {
             self.removeFormat();
@@ -13305,7 +13307,9 @@
           }
         } else {
           // Normal single-block
-          if (tool.type === 'caseMenu') {
+          if (tool.type === 'alignMenu') {
+            self.showAlignMenu(button);
+          } else if (tool.type === 'caseMenu') {
             self.showCaseMenu(button);
           } else if (tool.type === 'removeFormat') {
             self.removeFormat();
@@ -14049,6 +14053,13 @@
     code: 1, bulletList: 1, numberList: 1, checklist: 1
   };
 
+  // Nombre del icono (en WYSIWYG_ICONS) por valor de alineación. Lo usa el botón
+  // único de alineación (dropdown) para pintar el icono del valor ACTUAL del
+  // bloque, de modo que se identifique de un vistazo.
+  var ALIGN_ICONS = {
+    left: 'alignLeft', center: 'alignCenter', right: 'alignRight', justify: 'alignJustify'
+  };
+
   var CASE_TRANSFORMERS = {
     'upper': function(s) { return s.toUpperCase(); },
     'lower': function(s) { return s.toLowerCase(); },
@@ -14323,6 +14334,176 @@
     }, 0);
 
     this._showBackdrop('caseMenu', closeCaseMenu);
+  };
+
+  // =========================================================================
+  // ALINEACIÓN (botón único con menú desplegable)
+  // =========================================================================
+
+  /**
+   * Devuelve la alineación EFECTIVA del bloque con foco: 'left'|'center'|'right'|
+   * 'justify', o null si no hay bloque con foco o su tipo no admite alineación.
+   * 'left' es el valor por defecto (no se almacena en el modelo).
+   * @returns {?string}
+   */
+  meWYSE.prototype._getCurrentAlignment = function() {
+    var v_block_id = this._getFocusedBlockId();
+    if (v_block_id === null) return null;
+    var v_block = this.getBlock(v_block_id);
+    if (!v_block || !TEXT_ALIGN_BLOCK_TYPES[v_block.type]) return null;
+    return (typeof v_block.alignment === 'string' && v_block.alignment) ? v_block.alignment : 'left';
+  };
+
+  /**
+   * innerHTML del botón-dropdown de alineación: icono del valor dado + chevron.
+   * @param {string} align - 'left'|'center'|'right'|'justify'
+   * @returns {string}
+   */
+  meWYSE.prototype._alignButtonInnerHTML = function(align) {
+    var v_icon = WYSIWYG_ICONS[ALIGN_ICONS[align]] || WYSIWYG_ICONS.alignLeft;
+    return v_icon + ' <span class="dropdown-arrow">' + WYSIWYG_ICONS.chevronDown + '</span>';
+  };
+
+  /**
+   * Refresca el botón de alineación de la toolbar: pinta el icono del valor
+   * actual del bloque con foco y lo deshabilita si el tipo no admite alineación.
+   * Se invoca desde _updateMoveButtons (mismos disparadores de foco).
+   */
+  meWYSE.prototype._updateAlignButton = function() {
+    if (!this.alignButton) return;
+    var v_align = this._getCurrentAlignment(); // null si no soportado
+    this.alignButton.disabled = (v_align === null);
+    var v_effective = v_align || 'left';
+    this.alignButton.innerHTML = this._alignButtonInnerHTML(v_effective);
+    // El title informa del valor actual (el botón abre el menú de opciones).
+    var v_label_key = (v_effective === 'justify') ? 'tooltips.justify'
+      : (v_effective === 'center') ? 'tooltips.alignCenter'
+      : (v_effective === 'right') ? 'tooltips.alignRight'
+      : 'tooltips.alignLeft';
+    var v_label = this.t(v_label_key);
+    this.alignButton.title = v_label;
+    this.alignButton.setAttribute('aria-label', v_label);
+  };
+
+  /**
+   * Aplica una alineación al bloque con foco o a la selección múltiple, SIEMPRE
+   * por el modelo (block.alignment) para que persista al re-render y el icono del
+   * botón pueda reflejarla con fiabilidad.
+   * @param {string} align - 'left'|'center'|'right'|'justify'
+   */
+  meWYSE.prototype._applyAlignment = function(align) {
+    // 1) Multi-selección (bloques o cross-block): ya aplica por modelo.
+    if (this.applyAlignmentToSelection(align)) {
+      this._updateAlignButton();
+      return;
+    }
+
+    // 2) Bloque con foco: set/delete block.alignment + render + refoco.
+    var v_block_id = this._getFocusedBlockId();
+    if (v_block_id === null) return;
+    var v_block = this.getBlock(v_block_id);
+    if (!v_block || !TEXT_ALIGN_BLOCK_TYPES[v_block.type]) return;
+
+    // Evitar onBlur espurio durante el render/refoco.
+    this._suppressBlurUntil = Date.now() + 300;
+    this.pushHistory(true);
+    if (align === 'left') delete v_block.alignment; // 'left' = default, no ensuciar
+    else v_block.alignment = align;
+
+    // El menú flotante de formato (si estaba abierto) queda obsoleto tras el
+    // render porque su selección de referencia desaparece.
+    if (this.formatMenu) this.closeFormatMenu();
+
+    this.render();
+    this.triggerChange();
+
+    // Refocar el editable PROPIO del bloque (patrón de indentBlock) y refrescar
+    // el icono del botón.
+    var self = this;
+    setTimeout(function() {
+      var el = self.container.querySelector('[data-block-id="' + v_block_id + '"]');
+      if (el) {
+        var editable = (el.getAttribute('contenteditable') === 'true')
+          ? el : el.querySelector('[contenteditable="true"]');
+        if (editable) editable.focus();
+      }
+      self._updateAlignButton();
+    }, 0);
+  };
+
+  /**
+   * Muestra el menú desplegable de alineación (izquierda/centro/derecha/justificado)
+   * anclado al botón. Marca el valor actual del bloque. Espeja showCaseMenu.
+   * @param {HTMLElement} button - botón que ancla el menú
+   */
+  meWYSE.prototype.showAlignMenu = function(button) {
+    var self = this;
+    // Toggle: si ya está abierto, cerrar.
+    if (this._alignMenu && this._alignMenu.parentNode) {
+      this._alignMenu.remove();
+      this._alignMenu = null;
+      return;
+    }
+
+    var menu = document.createElement('div');
+    menu.className = 'mewyse-options-menu';
+    menu.setAttribute('role', 'menu');
+    // No perder el caret/foco del bloque al clicar en el menú.
+    menu.addEventListener('mousedown', function(e) { e.preventDefault(); });
+
+    var v_current = this._getCurrentAlignment(); // puede ser null
+
+    var options = [
+      { align: 'left',    label: this.t('tooltips.alignLeft'),   icon: WYSIWYG_ICONS.alignLeft },
+      { align: 'center',  label: this.t('tooltips.alignCenter'), icon: WYSIWYG_ICONS.alignCenter },
+      { align: 'right',   label: this.t('tooltips.alignRight'),  icon: WYSIWYG_ICONS.alignRight },
+      { align: 'justify', label: this.t('tooltips.justify'),     icon: WYSIWYG_ICONS.alignJustify }
+    ];
+
+    var v_align_click_handler = null;
+    var closeAlignMenu = function() {
+      if (self._alignMenu && self._alignMenu.parentNode) {
+        self._alignMenu.remove();
+      }
+      self._alignMenu = null;
+      if (v_align_click_handler) {
+        self._remove_doc_click(v_align_click_handler);
+        v_align_click_handler = null;
+      }
+      self._hideBackdrop('alignMenu');
+    };
+
+    options.forEach(function(opt) {
+      var item = document.createElement('div');
+      item.className = 'mewyse-options-menu-item';
+      item.setAttribute('role', 'menuitemradio');
+      if (opt.align === v_current) item.classList.add('active');
+      item.setAttribute('aria-checked', opt.align === v_current ? 'true' : 'false');
+      item.innerHTML = '<span class="icon">' + opt.icon + '</span> ' + opt.label;
+      item.onclick = function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        self._applyAlignment(opt.align);
+        closeAlignMenu();
+      };
+      menu.appendChild(item);
+    });
+
+    self._applyMenuTheme(menu);
+    document.body.appendChild(menu);
+    this._alignMenu = menu;
+    this.anchorMenu(menu, button, { offsetY: 5 });
+
+    setTimeout(function() {
+      v_align_click_handler = function(e) {
+        if (!menu.contains(e.target) && !button.contains(e.target)) {
+          closeAlignMenu();
+        }
+      };
+      self._add_doc_click(v_align_click_handler);
+    }, 0);
+
+    this._showBackdrop('alignMenu', closeAlignMenu);
   };
 
   /**
@@ -16056,8 +16237,10 @@
    * Actualiza el estado enabled/disabled de los botones de mover
    */
   meWYSE.prototype._updateMoveButtons = function() {
-    // Actualizar también los botones de sangría (comparten disparadores de foco).
+    // Actualizar también los botones de sangría y de alineación (comparten los
+    // disparadores de foco).
     this._updateIndentButtons();
+    this._updateAlignButton();
     if (!this.moveUpButton || !this.moveDownButton) return;
     var blockId = this._getFocusedBlockId();
     if (blockId === null) {
