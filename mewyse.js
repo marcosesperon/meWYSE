@@ -2733,6 +2733,10 @@
       }
     }
 
+    // Tooltips propios (sustituyen al tooltip nativo del navegador) por
+    // delegación sobre la toolbar.
+    this._initToolbarTooltips(toolbar);
+
     return toolbar;
   };
 
@@ -13096,6 +13100,21 @@
     if (this.formatMenuTimeout) { clearTimeout(this.formatMenuTimeout); this.formatMenuTimeout = null; }
     if (this.historyDebounceTimer) { clearTimeout(this.historyDebounceTimer); this.historyDebounceTimer = null; }
     if (this.summaryTooltipTimeout) { clearTimeout(this.summaryTooltipTimeout); this.summaryTooltipTimeout = null; }
+    // Tooltips de la toolbar: timer, listeners y elemento flotante.
+    if (this._toolbarTooltipTimer) { clearTimeout(this._toolbarTooltipTimer); this._toolbarTooltipTimer = null; }
+    if (this._toolbarTooltipEl) {
+      if (this._toolbarTooltipMouseOver) this._toolbarTooltipEl.removeEventListener('mouseover', this._toolbarTooltipMouseOver);
+      if (this._toolbarTooltipMouseOut) this._toolbarTooltipEl.removeEventListener('mouseout', this._toolbarTooltipMouseOut);
+      if (this._toolbarTooltipHide) {
+        this._toolbarTooltipEl.removeEventListener('mousedown', this._toolbarTooltipHide, true);
+        this._toolbarTooltipEl.removeEventListener('scroll', this._toolbarTooltipHide, true);
+      }
+      this._toolbarTooltipEl = null;
+    }
+    if (this._toolbarTooltip && this._toolbarTooltip.parentNode) {
+      this._toolbarTooltip.parentNode.removeChild(this._toolbarTooltip);
+      this._toolbarTooltip = null;
+    }
     if (this.floatingHandleHideTimeout) { clearTimeout(this.floatingHandleHideTimeout); this.floatingHandleHideTimeout = null; }
     if (this._handleHideTimer) { clearTimeout(this._handleHideTimer); this._handleHideTimer = null; }
     if (this._autosaveTimer) { clearTimeout(this._autosaveTimer); this._autosaveTimer = null; }
@@ -14333,6 +14352,142 @@
     }, 0);
 
     this._showBackdrop('caseMenu', closeCaseMenu);
+  };
+
+  // =========================================================================
+  // TOOLTIPS DE LA TOOLBAR (propios, sustituyen al nativo del navegador)
+  // =========================================================================
+
+  /**
+   * Inicializa el sistema de tooltips de la toolbar por DELEGACIÓN: un único
+   * elemento flotante reutilizable + listeners en la toolbar. Al posicionar el
+   * cursor sobre un botón/select, se muestra su texto (title/aria-label) tras un
+   * retardo. Migra `title` -> `data-mewyse-tip` en el primer hover para suprimir
+   * el tooltip nativo del navegador (el aria-label se conserva para a11y).
+   * @param {HTMLElement} toolbarEl
+   */
+  meWYSE.prototype._initToolbarTooltips = function(toolbarEl) {
+    var self = this;
+    if (!toolbarEl) return;
+
+    // Devuelve el elemento "tooltipeable" (botón/select) bajo el evento, o null.
+    var v_resolve_target = function(e) {
+      var el = e.target;
+      if (!el || !el.closest) return null;
+      var v_btn = el.closest('button, select');
+      return (v_btn && toolbarEl.contains(v_btn)) ? v_btn : null;
+    };
+
+    this._toolbarTooltipMouseOver = function(e) {
+      var v_target = v_resolve_target(e);
+      if (!v_target) return;
+      // Ya mostrándose sobre el mismo elemento: no reprogramar.
+      if (self._toolbarTooltipTarget === v_target && self._toolbarTooltip &&
+          self._toolbarTooltip.classList.contains('mewyse-tooltip-visible')) {
+        return;
+      }
+      // Migrar title -> data-mewyse-tip (suprime el nativo). Si el title cambió
+      // (botones con texto dinámico, p. ej. alineación), re-migrar.
+      var v_title = v_target.getAttribute('title');
+      if (v_title) {
+        v_target.setAttribute('data-mewyse-tip', v_title);
+        v_target.removeAttribute('title');
+      }
+      var v_text = v_target.getAttribute('data-mewyse-tip') || v_target.getAttribute('aria-label');
+      if (!v_text) return;
+
+      self._toolbarTooltipTarget = v_target;
+      if (self._toolbarTooltipTimer) clearTimeout(self._toolbarTooltipTimer);
+      self._toolbarTooltipTimer = setTimeout(function() {
+        self._showToolbarTooltip(v_target, v_text);
+      }, 350);
+    };
+
+    this._toolbarTooltipMouseOut = function(e) {
+      var v_target = v_resolve_target(e);
+      if (!v_target) return;
+      // Si el cursor pasa a un elemento hijo del mismo botón, no ocultar.
+      var v_to = e.relatedTarget;
+      if (v_to && v_target.contains(v_to)) return;
+      self._hideToolbarTooltip();
+    };
+
+    // Ocultar de inmediato al pulsar (se va a ejecutar una acción / abrir menú)
+    // o al desplazar la toolbar.
+    this._toolbarTooltipHide = function() { self._hideToolbarTooltip(); };
+
+    toolbarEl.addEventListener('mouseover', this._toolbarTooltipMouseOver);
+    toolbarEl.addEventListener('mouseout', this._toolbarTooltipMouseOut);
+    toolbarEl.addEventListener('mousedown', this._toolbarTooltipHide, true);
+    toolbarEl.addEventListener('scroll', this._toolbarTooltipHide, true);
+    this._toolbarTooltipEl = toolbarEl; // para limpiar listeners en destroy
+  };
+
+  /**
+   * Muestra el tooltip de la toolbar anclado al elemento con el texto dado.
+   * @param {HTMLElement} target
+   * @param {string} text
+   */
+  meWYSE.prototype._showToolbarTooltip = function(target, text) {
+    if (!target || !document.body.contains(target)) return;
+    // Crear el elemento una sola vez (reutilizable).
+    if (!this._toolbarTooltip) {
+      this._toolbarTooltip = document.createElement('div');
+      this._toolbarTooltip.className = 'mewyse-toolbar-tooltip';
+      this._toolbarTooltip.setAttribute('role', 'tooltip');
+      document.body.appendChild(this._toolbarTooltip);
+    }
+    this._toolbarTooltip.textContent = text;
+    // Tema (claro/oscuro) coherente con los menús flotantes.
+    this._applyMenuTheme(this._toolbarTooltip);
+    this._positionToolbarTooltip(target);
+    this._toolbarTooltip.classList.add('mewyse-tooltip-visible');
+  };
+
+  /**
+   * Posiciona el tooltip debajo del elemento (centrado), volteándolo encima si no
+   * cabe, y ajustándolo a los límites del viewport.
+   * @param {HTMLElement} target
+   */
+  meWYSE.prototype._positionToolbarTooltip = function(target) {
+    var tip = this._toolbarTooltip;
+    if (!tip) return;
+    var v_rect = target.getBoundingClientRect();
+    // Medir el tooltip (visibility hidden para no parpadear antes de colocarlo).
+    tip.style.left = '0px';
+    tip.style.top = '0px';
+    var v_tw = tip.offsetWidth;
+    var v_th = tip.offsetHeight;
+    var v_gap = 8;
+    var v_margin = 4;
+
+    // Horizontal: centrado sobre el botón, clamp al viewport.
+    var v_left = v_rect.left + (v_rect.width / 2) - (v_tw / 2);
+    v_left = Math.max(v_margin, Math.min(v_left, window.innerWidth - v_tw - v_margin));
+
+    // Vertical: debajo por defecto; encima si no cabe.
+    var v_top = v_rect.bottom + v_gap;
+    if (v_top + v_th > window.innerHeight - v_margin) {
+      var v_above = v_rect.top - v_gap - v_th;
+      if (v_above >= v_margin) v_top = v_above;
+    }
+
+    tip.style.left = Math.round(v_left) + 'px';
+    tip.style.top = Math.round(v_top) + 'px';
+  };
+
+  /**
+   * Oculta el tooltip de la toolbar y cancela el temporizador pendiente.
+   */
+  meWYSE.prototype._hideToolbarTooltip = function() {
+    if (this._toolbarTooltipTimer) {
+      clearTimeout(this._toolbarTooltipTimer);
+      this._toolbarTooltipTimer = null;
+    }
+    this._toolbarTooltipTarget = null;
+    if (this._toolbarTooltip) {
+      this._toolbarTooltip.classList.remove('mewyse-tooltip-visible');
+    }
   };
 
   // =========================================================================

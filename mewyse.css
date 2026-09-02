@@ -2137,6 +2137,39 @@
 }
 
 /* Tooltip de resumen */
+/* Tooltip propio de la toolbar (sustituye al nativo del navegador). Se adapta al
+   tema de forma inversa (alto contraste): en claro es un tooltip oscuro; en oscuro,
+   claro. Sin puntero (no intercepta el ratón) y con fade de aparición. */
+.mewyse-toolbar-tooltip {
+  position: fixed;
+  z-index: 10001;
+  max-width: 260px;
+  padding: 6px 10px;
+  border-radius: var(--mewyse-radius-md, 6px);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.35;
+  white-space: nowrap;
+  background: #2d333b;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-2px);
+  transition: opacity 0.12s ease, transform 0.12s ease;
+}
+
+.mewyse-toolbar-tooltip.mewyse-tooltip-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.mewyse-toolbar-tooltip.mewyse-dark {
+  background: #ececec;
+  color: #1a1a1a;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
 .mewyse-summary-tooltip {
   position: fixed;
   background: var(--mewyse-bg-primary);
