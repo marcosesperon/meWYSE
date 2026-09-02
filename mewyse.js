@@ -2735,7 +2735,7 @@
 
     // Tooltips propios (sustituyen al tooltip nativo del navegador) por
     // delegación sobre la toolbar.
-    this._initToolbarTooltips(toolbar);
+    this._attachTooltips(toolbar);
 
     return toolbar;
   };
@@ -13100,16 +13100,20 @@
     if (this.formatMenuTimeout) { clearTimeout(this.formatMenuTimeout); this.formatMenuTimeout = null; }
     if (this.historyDebounceTimer) { clearTimeout(this.historyDebounceTimer); this.historyDebounceTimer = null; }
     if (this.summaryTooltipTimeout) { clearTimeout(this.summaryTooltipTimeout); this.summaryTooltipTimeout = null; }
-    // Tooltips de la toolbar: timer, listeners y elemento flotante.
+    // Tooltips (toolbar + menú de formato): timer, listeners de cada contenedor
+    // y elemento flotante.
     if (this._toolbarTooltipTimer) { clearTimeout(this._toolbarTooltipTimer); this._toolbarTooltipTimer = null; }
-    if (this._toolbarTooltipEl) {
-      if (this._toolbarTooltipMouseOver) this._toolbarTooltipEl.removeEventListener('mouseover', this._toolbarTooltipMouseOver);
-      if (this._toolbarTooltipMouseOut) this._toolbarTooltipEl.removeEventListener('mouseout', this._toolbarTooltipMouseOut);
-      if (this._toolbarTooltipHide) {
-        this._toolbarTooltipEl.removeEventListener('mousedown', this._toolbarTooltipHide, true);
-        this._toolbarTooltipEl.removeEventListener('scroll', this._toolbarTooltipHide, true);
+    if (this._tooltipContainers) {
+      for (var tc = this._tooltipContainers.length - 1; tc >= 0; tc--) {
+        var v_cont = this._tooltipContainers[tc];
+        if (this._tooltipMouseOver) v_cont.removeEventListener('mouseover', this._tooltipMouseOver);
+        if (this._tooltipMouseOut) v_cont.removeEventListener('mouseout', this._tooltipMouseOut);
+        if (this._tooltipHide) {
+          v_cont.removeEventListener('mousedown', this._tooltipHide, true);
+          v_cont.removeEventListener('scroll', this._tooltipHide, true);
+        }
       }
-      this._toolbarTooltipEl = null;
+      this._tooltipContainers = null;
     }
     if (this._toolbarTooltip && this._toolbarTooltip.parentNode) {
       this._toolbarTooltip.parentNode.removeChild(this._toolbarTooltip);
@@ -13351,6 +13355,10 @@
 
     self._applyMenuTheme(menu);
     document.body.appendChild(menu);
+
+    // Tooltips propios también en el menú flotante de formato (se desadjunta en
+    // closeFormatMenu, ya que el menú se recrea en cada selección).
+    this._attachTooltips(menu);
 
     // Guardar el range para poder calcular su posición dinámicamente
     this.formatMenuRange = range;
@@ -14359,68 +14367,96 @@
   // =========================================================================
 
   /**
-   * Inicializa el sistema de tooltips de la toolbar por DELEGACIÓN: un único
-   * elemento flotante reutilizable + listeners en la toolbar. Al posicionar el
-   * cursor sobre un botón/select, se muestra su texto (title/aria-label) tras un
-   * retardo. Migra `title` -> `data-mewyse-tip` en el primer hover para suprimir
-   * el tooltip nativo del navegador (el aria-label se conserva para a11y).
-   * @param {HTMLElement} toolbarEl
+   * Adjunta el sistema de tooltips a un contenedor por DELEGACIÓN (toolbar y/o
+   * menú flotante de formato). Los handlers son COMPARTIDOS entre contenedores
+   * (se crean una sola vez) y usan `e.currentTarget` como contenedor de
+   * referencia. Al posicionar el cursor sobre un botón/select se muestra su texto
+   * (title/aria-label) tras 350 ms; migra `title` -> `data-mewyse-tip` en el
+   * primer hover para suprimir el tooltip nativo (el aria-label se conserva).
+   * @param {HTMLElement} containerEl
    */
-  meWYSE.prototype._initToolbarTooltips = function(toolbarEl) {
+  meWYSE.prototype._attachTooltips = function(containerEl) {
     var self = this;
-    if (!toolbarEl) return;
+    if (!containerEl) return;
+    if (!this._tooltipContainers) this._tooltipContainers = [];
+    if (this._tooltipContainers.indexOf(containerEl) !== -1) return; // ya adjunto
 
-    // Devuelve el elemento "tooltipeable" (botón/select) bajo el evento, o null.
-    var v_resolve_target = function(e) {
-      var el = e.target;
-      if (!el || !el.closest) return null;
-      var v_btn = el.closest('button, select');
-      return (v_btn && toolbarEl.contains(v_btn)) ? v_btn : null;
-    };
+    // Crear los handlers UNA sola vez; se reutilizan para todos los contenedores.
+    if (!this._tooltipMouseOver) {
+      // Elemento "tooltipeable" (botón/select) del evento, dentro del contenedor
+      // que disparó el listener (e.currentTarget).
+      var v_resolve = function(e) {
+        var el = e.target;
+        if (!el || !el.closest) return null;
+        var v_btn = el.closest('button, select');
+        return (v_btn && e.currentTarget.contains(v_btn)) ? v_btn : null;
+      };
 
-    this._toolbarTooltipMouseOver = function(e) {
-      var v_target = v_resolve_target(e);
-      if (!v_target) return;
-      // Ya mostrándose sobre el mismo elemento: no reprogramar.
-      if (self._toolbarTooltipTarget === v_target && self._toolbarTooltip &&
-          self._toolbarTooltip.classList.contains('mewyse-tooltip-visible')) {
-        return;
-      }
-      // Migrar title -> data-mewyse-tip (suprime el nativo). Si el title cambió
-      // (botones con texto dinámico, p. ej. alineación), re-migrar.
-      var v_title = v_target.getAttribute('title');
-      if (v_title) {
-        v_target.setAttribute('data-mewyse-tip', v_title);
-        v_target.removeAttribute('title');
-      }
-      var v_text = v_target.getAttribute('data-mewyse-tip') || v_target.getAttribute('aria-label');
-      if (!v_text) return;
+      this._tooltipMouseOver = function(e) {
+        var v_target = v_resolve(e);
+        if (!v_target) return;
+        // Ya mostrándose sobre el mismo elemento: no reprogramar.
+        if (self._toolbarTooltipTarget === v_target && self._toolbarTooltip &&
+            self._toolbarTooltip.classList.contains('mewyse-tooltip-visible')) {
+          return;
+        }
+        // Migrar title -> data-mewyse-tip (suprime el nativo). Si el title cambió
+        // (botones con texto dinámico, p. ej. alineación), re-migrar.
+        var v_title = v_target.getAttribute('title');
+        if (v_title) {
+          v_target.setAttribute('data-mewyse-tip', v_title);
+          v_target.removeAttribute('title');
+        }
+        var v_text = v_target.getAttribute('data-mewyse-tip') || v_target.getAttribute('aria-label');
+        if (!v_text) return;
 
-      self._toolbarTooltipTarget = v_target;
-      if (self._toolbarTooltipTimer) clearTimeout(self._toolbarTooltipTimer);
-      self._toolbarTooltipTimer = setTimeout(function() {
-        self._showToolbarTooltip(v_target, v_text);
-      }, 350);
-    };
+        self._toolbarTooltipTarget = v_target;
+        if (self._toolbarTooltipTimer) clearTimeout(self._toolbarTooltipTimer);
+        self._toolbarTooltipTimer = setTimeout(function() {
+          self._showToolbarTooltip(v_target, v_text);
+        }, 350);
+      };
 
-    this._toolbarTooltipMouseOut = function(e) {
-      var v_target = v_resolve_target(e);
-      if (!v_target) return;
-      // Si el cursor pasa a un elemento hijo del mismo botón, no ocultar.
-      var v_to = e.relatedTarget;
-      if (v_to && v_target.contains(v_to)) return;
-      self._hideToolbarTooltip();
-    };
+      this._tooltipMouseOut = function(e) {
+        var el = e.target;
+        var v_btn = (el && el.closest) ? el.closest('button, select') : null;
+        if (!v_btn) return;
+        // Si el cursor pasa a un elemento hijo del mismo botón, no ocultar.
+        var v_to = e.relatedTarget;
+        if (v_to && v_btn.contains(v_to)) return;
+        self._hideToolbarTooltip();
+      };
 
-    // Ocultar de inmediato al pulsar (se va a ejecutar una acción / abrir menú)
-    // o al desplazar la toolbar.
-    this._toolbarTooltipHide = function() { self._hideToolbarTooltip(); };
+      // Ocultar de inmediato al pulsar (se va a ejecutar una acción / abrir menú)
+      // o al desplazar el contenedor.
+      this._tooltipHide = function() { self._hideToolbarTooltip(); };
+    }
 
-    toolbarEl.addEventListener('mouseover', this._toolbarTooltipMouseOver);
-    toolbarEl.addEventListener('mouseout', this._toolbarTooltipMouseOut);
-    toolbarEl.addEventListener('mousedown', this._toolbarTooltipHide, true);
-    toolbarEl.addEventListener('scroll', this._toolbarTooltipHide, true);
-    this._toolbarTooltipEl = toolbarEl; // para limpiar listeners en destroy
+    containerEl.addEventListener('mouseover', this._tooltipMouseOver);
+    containerEl.addEventListener('mouseout', this._tooltipMouseOut);
+    containerEl.addEventListener('mousedown', this._tooltipHide, true);
+    containerEl.addEventListener('scroll', this._tooltipHide, true);
+    this._tooltipContainers.push(containerEl);
+  };
+
+  /**
+   * Desadjunta los tooltips de un contenedor (usado con el menú flotante de
+   * formato, que se recrea en cada selección). Retira sus listeners y lo saca de
+   * la lista; si el tooltip visible pertenecía a él, lo oculta.
+   * @param {HTMLElement} containerEl
+   */
+  meWYSE.prototype._detachTooltips = function(containerEl) {
+    if (!containerEl || !this._tooltipContainers) return;
+    var v_idx = this._tooltipContainers.indexOf(containerEl);
+    if (v_idx === -1) return;
+    containerEl.removeEventListener('mouseover', this._tooltipMouseOver);
+    containerEl.removeEventListener('mouseout', this._tooltipMouseOut);
+    containerEl.removeEventListener('mousedown', this._tooltipHide, true);
+    containerEl.removeEventListener('scroll', this._tooltipHide, true);
+    this._tooltipContainers.splice(v_idx, 1);
+    if (this._toolbarTooltipTarget && containerEl.contains(this._toolbarTooltipTarget)) {
+      this._hideToolbarTooltip();
+    }
   };
 
   /**
@@ -14923,6 +14959,8 @@
       if (this.formatMenu._cancelAnchor) {
         this.formatMenu._cancelAnchor();
       }
+      // Retirar los listeners de tooltip de este menú (se recrea en cada selección)
+      this._detachTooltips(this.formatMenu);
       this.formatMenu.remove();
       this.formatMenu = null;
     }
