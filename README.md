@@ -500,6 +500,24 @@ Al seleccionar texto aparece un menú flotante con:
 Con la toolbar, además: **fuente / tamaño / interlineado** (opción `fontControls`) y un picker de
 **caracteres especiales** (©, →, €, ½…).
 
+### Editor sin toolbar (menú flotante)
+
+`toolbar: false` es el **modo por defecto**: un editor minimalista sin barra superior. Todo el
+formato se aplica desde el **menú flotante** que aparece al seleccionar texto, y los bloques se
+insertan escribiendo `/` (menú slash). Ideal para formularios, comentarios o campos embebidos
+donde una toolbar fija ocuparía demasiado.
+
+```javascript
+var editor = new meWYSE({
+  target: '#miEditor',
+  toolbar: false
+});
+```
+
+El botón de resumen/esquema aparece como un icono discreto en la esquina superior derecha (en vez
+de en la toolbar). Los botones del menú flotante muestran su descripción en un tooltip al pasar el
+cursor.
+
 ## Tablas
 
 Las tablas se crean desde el menú slash (`/tabla`) o el botón de la toolbar. Al situar el cursor en una celda aparece una **toolbar contextual flotante** encima de la tabla, con todas las operaciones (los índices de fila/columna se refieren a la celda con foco). Características:
