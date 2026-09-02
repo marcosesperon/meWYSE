@@ -4099,6 +4099,62 @@
   };
 
   /**
+   * Extrae las opciones avanzadas (border/margin/alignment) del `style` inline y
+   * atributos legacy de un `<img>` cargado desde HTML. Usa el CSSOM del nodo
+   * (`node.style.*`, que ya expande los shorthands) para robustez. Devuelve un
+   * objeto `advanced` o null. El sanitizer valida después los rangos/enums.
+   * @param {HTMLImageElement} node
+   * @returns {?Object}
+   */
+  meWYSE.prototype._imageAdvancedFromNode = function(node) {
+    if (!node || !node.style) return null;
+    var s = node.style;
+    var adv = {};
+
+    // --- Borde: longhand (el CSSOM expande `border: 2px solid red`) ---
+    var v_bw = parseInt(s.borderTopWidth || s.borderWidth, 10);
+    var v_bstyle = (s.borderTopStyle || s.borderStyle || '').toLowerCase();
+    if (!isNaN(v_bw) && v_bw > 0 && v_bstyle && v_bstyle !== 'none') {
+      adv.border = {
+        width: v_bw,
+        style: v_bstyle,
+        color: this._colorToHex(s.borderTopColor || s.borderColor || '') || '#000000'
+      };
+    }
+
+    // --- Margen: vertical = top, horizontal = right (modelo vspace/hspace) ---
+    // 'auto' → parseInt NaN → se ignora (lo maneja la alineación). Fallback a los
+    // atributos legacy vspace/hspace.
+    var v_margin = {};
+    var v_mt = parseInt(s.marginTop, 10);
+    var v_mr = parseInt(s.marginRight, 10);
+    var v_vspace = parseInt(node.getAttribute('vspace'), 10);
+    var v_hspace = parseInt(node.getAttribute('hspace'), 10);
+    if (!isNaN(v_mt)) v_margin.vertical = v_mt;
+    else if (!isNaN(v_vspace)) v_margin.vertical = v_vspace;
+    if (!isNaN(v_mr)) v_margin.horizontal = v_mr;
+    else if (!isNaN(v_hspace)) v_margin.horizontal = v_hspace;
+
+    // --- Alineación: float / margin auto (center) / atributo align legacy ---
+    var v_float = (s.cssFloat || s.styleFloat || s.float || '').toLowerCase();
+    var v_align_attr = (node.getAttribute('align') || '').toLowerCase();
+    if (v_float === 'left' || v_align_attr === 'left') {
+      adv.alignment = 'left';
+    } else if (v_float === 'right' || v_align_attr === 'right') {
+      adv.alignment = 'right';
+    } else if ((s.marginLeft === 'auto' && s.marginRight === 'auto') ||
+               v_align_attr === 'middle' || v_align_attr === 'center') {
+      adv.alignment = 'center';
+    }
+
+    // Center usa margin:auto en horizontal → no tiene sentido un margen horizontal.
+    if (adv.alignment === 'center') delete v_margin.horizontal;
+    if (v_margin.vertical != null || v_margin.horizontal != null) adv.margin = v_margin;
+
+    return (adv.border || adv.margin || adv.alignment) ? adv : null;
+  };
+
+  /**
    * Aplica estilos avanzados (border/margin/alignment) al <img> y wrapper.
    * @param {HTMLImageElement} img
    * @param {HTMLElement} wrapper - .mewyse-image-wrapper
@@ -6420,6 +6476,21 @@
       return text ? [{ type: 'paragraph', content: escapeHtml(text) }] : [];
     }
 
+    // Extraer las opciones avanzadas (border/margin/alignment) y las dimensiones
+    // definidas por `style` de las imágenes ANTES de limpiar: cleanPastedDocument
+    // elimina el atributo `style` de las imágenes. Se guardan en el propio nodo
+    // (propiedades JS, que sobreviven a la limpieza de atributos) para leerlas
+    // después en la rama IMG.
+    var v_pre_imgs = doc.querySelectorAll('img');
+    for (var vpi = 0; vpi < v_pre_imgs.length; vpi++) {
+      var v_pimg = v_pre_imgs[vpi];
+      v_pimg.__mewyse_adv = this._imageAdvancedFromNode(v_pimg);
+      var v_psw = parseInt(v_pimg.style.width, 10);
+      var v_psh = parseInt(v_pimg.style.height, 10);
+      if (!isNaN(v_psw) && v_psw > 0) v_pimg.__mewyse_sw = v_psw;
+      if (!isNaN(v_psh) && v_psh > 0) v_pimg.__mewyse_sh = v_psh;
+    }
+
     // Preprocesar: limpiar elementos de Word/Google Docs
     this.cleanPastedDocument(doc);
 
@@ -6541,17 +6612,23 @@
         if (self._isBlockDisabled('image')) return; // imagen desactivada: descartar
         var imgSrc = node.getAttribute('src');
         if (imgSrc && self._isSafeImageUrl(imgSrc)) {
+          // Dimensiones: atributo width/height y, como fallback, del `style`
+          // inline (leído antes de la limpieza, en node.__mewyse_sw/sh). TinyMCE y
+          // otros suelen fijar el tamaño con style:width/height.
           var imgW = parseInt(node.getAttribute('width'), 10);
           var imgH = parseInt(node.getAttribute('height'), 10);
-          blocksToInsert.push({
-            type: 'image',
-            content: {
-              blob: imgSrc,
-              fileName: node.getAttribute('alt') || 'image',
-              width: (isNaN(imgW) || imgW < 1) ? 300 : imgW,
-              height: (isNaN(imgH) || imgH < 1) ? 200 : imgH
-            }
-          });
+          if ((isNaN(imgW) || imgW < 1) && node.__mewyse_sw) imgW = node.__mewyse_sw;
+          if ((isNaN(imgH) || imgH < 1) && node.__mewyse_sh) imgH = node.__mewyse_sh;
+          var v_img_content = {
+            blob: imgSrc,
+            fileName: node.getAttribute('alt') || 'image',
+            width: (isNaN(imgW) || imgW < 1) ? 300 : imgW,
+            height: (isNaN(imgH) || imgH < 1) ? 200 : imgH
+          };
+          // Opciones avanzadas (border/margin/alignment) del style inline, leídas
+          // antes de la limpieza (node.__mewyse_adv).
+          if (node.__mewyse_adv) v_img_content.advanced = node.__mewyse_adv;
+          blocksToInsert.push({ type: 'image', content: v_img_content });
         }
         return;
       }
