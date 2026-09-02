@@ -823,6 +823,9 @@
     close: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" xmlns="http://www.w3.org/2000/svg"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg>',
     play: '<svg width="28" height="28" viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg"><circle cx="14" cy="14" r="14" fill="rgba(0,0,0,0.6)"/><polygon points="11,8.5 20,14 11,19.5" fill="#fff"/></svg>',
     hamburger: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" xmlns="http://www.w3.org/2000/svg"><line x1="2" y1="4" x2="14" y2="4"/><line x1="2" y1="8" x2="14" y2="8"/><line x1="2" y1="12" x2="14" y2="12"/></svg>',
+    // Icono del botón de resumen/esquema: panel lateral (marco + columna derecha)
+    // con líneas de índice a la izquierda. Distintivo del icono de alineación.
+    summaryPanel: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2.5" width="12" height="11" rx="1.5"/><line x1="9.5" y1="2.5" x2="9.5" y2="13.5"/><line x1="4.3" y1="6" x2="7.2" y2="6"/><line x1="4.3" y1="8.5" x2="7.2" y2="8.5"/><line x1="4.3" y1="11" x2="7.2" y2="11"/></svg>',
     mergeCells: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="12" height="12" rx="1"/><line x1="8" y1="2" x2="8" y2="5"/><line x1="8" y1="11" x2="8" y2="14"/><polyline points="5,7 8,5 11,7"/><polyline points="5,9 8,11 11,9"/></svg>',
     unmergeCells: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="12" height="12" rx="1"/><line x1="8" y1="2" x2="8" y2="14"/><polyline points="5,6 8,3 11,6"/><polyline points="5,10 8,13 11,10"/></svg>',
     plus: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" xmlns="http://www.w3.org/2000/svg"><line x1="8" y1="3" x2="8" y2="13"/><line x1="3" y1="8" x2="13" y2="8"/></svg>',
@@ -2596,7 +2599,7 @@
     if (this.showSummary) {
       var summaryBtn = document.createElement('button');
       summaryBtn.className = 'mewyse-toolbar-button';
-      summaryBtn.innerHTML = WYSIWYG_ICONS.hamburger;
+      summaryBtn.innerHTML = WYSIWYG_ICONS.summaryPanel;
       summaryBtn.title = this.t('tooltips.summary');
       summaryBtn.setAttribute('aria-label', this.t('tooltips.summary'));
       summaryBtn.setAttribute('aria-pressed', this.outlinePanel ? 'true' : 'false');
@@ -14997,7 +15000,7 @@
     // Crear el botón
     this.summaryButton = document.createElement('button');
     this.summaryButton.className = 'mewyse-summary-button';
-    this.summaryButton.innerHTML = WYSIWYG_ICONS.hamburger;
+    this.summaryButton.innerHTML = WYSIWYG_ICONS.summaryPanel;
     this.summaryButton.title = this.t('tooltips.summary');
 
     // Evento hover para mostrar tooltip con índice rápido
