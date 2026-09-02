@@ -2149,37 +2149,43 @@
   opacity: 1;
 }
 
-/* Tooltip de resumen */
 /* Tooltip propio de la toolbar (sustituye al nativo del navegador). Se adapta al
    tema de forma inversa (alto contraste): en claro es un tooltip oscuro; en oscuro,
-   claro. Sin puntero (no intercepta el ratón) y con fade de aparición. */
+   claro. Sin puntero (no intercepta el ratón) y con fade de aparición.
+   Las propiedades críticas van con !important: el editor se embebe en apps con su
+   propio CSS (p. ej. reglas sobre [role="tooltip"], resets de div, display/opacity/
+   visibility) que no deben poder ocultar ni descolocar el tooltip. */
 .mewyse-toolbar-tooltip {
-  position: fixed;
-  z-index: 10001;
+  position: fixed !important;
+  z-index: 2147483000 !important;
+  display: block !important;
+  visibility: visible !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
   max-width: 260px;
-  padding: 6px 10px;
+  padding: 6px 10px !important;
   border-radius: var(--mewyse-radius-md, 6px);
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 1.35;
-  white-space: nowrap;
-  background: #2d333b;
-  color: #ffffff;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  line-height: 1.35 !important;
+  white-space: nowrap !important;
+  background: #2d333b !important;
+  color: #ffffff !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-  pointer-events: none;
+  pointer-events: none !important;
   opacity: 0;
   transform: translateY(-2px);
   transition: opacity 0.12s ease, transform 0.12s ease;
 }
 
 .mewyse-toolbar-tooltip.mewyse-tooltip-visible {
-  opacity: 1;
+  opacity: 1 !important;
   transform: translateY(0);
 }
 
 .mewyse-toolbar-tooltip.mewyse-dark {
-  background: #ececec;
-  color: #1a1a1a;
+  background: #ececec !important;
+  color: #1a1a1a !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
