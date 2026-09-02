@@ -561,6 +561,20 @@ editor.focus(blockId); // bloque especifico
       </div>
     </div>
 
+    <!-- Demo: Editor sin toolbar (menu flotante) -->
+    <div class="demo-section">
+      <h2>Editor sin toolbar (men&uacute; flotante)</h2>
+      <p>Sin barra de herramientas (<code>toolbar: false</code>, el modo por defecto). Al <strong>seleccionar texto</strong> aparece un <strong>men&uacute; flotante de formato</strong> (negrita, cursiva, color, alineaci&oacute;n&hellip;). Escribe <code>/</code> para insertar bloques.</p>
+      <div class="config-hint">
+        Selecciona una palabra del editor para ver el men&uacute; flotante; sus botones muestran tooltip al pasar el cursor.
+      </div>
+      <pre class="docs-code"><code>var editor = new meWYSE({
+  target: '#noToolbarEditor',
+  toolbar: false
+});</code></pre>
+      <div id="noToolbarEditor"></div>
+    </div>
+
     <!-- Demo: Editor con Summary -->
     <div class="demo-section">
       <h2>Editor con Summary</h2>
@@ -1097,6 +1111,7 @@ new meWYSE({ target: '#vhHeightEditor', minHeight: '10em', maxHeight: '35vh' });
     // Variables globales para los editores
     var basicEditor;
     var toolbarEditor;
+    var noToolbarEditor;
     var summaryEditor;
     var mentionsEditor;
     var tagsEditor;
@@ -1131,6 +1146,21 @@ new meWYSE({ target: '#vhHeightEditor', minHeight: '10em', maxHeight: '35vh' });
         toolbar: true,
         onChange: function(data) {
           console.log('Editor con toolbar - Contenido:', data.plainText);
+        }
+      });
+    }
+
+    // Inicializar editor sin toolbar (menu flotante de formato al seleccionar texto)
+    function initNoToolbarEditor() {
+      noToolbarEditor = new meWYSE({
+        target: '#noToolbarEditor',
+        toolbar: false,
+        blocks: [
+          { id: 1, type: 'heading2', content: 'Editor sin barra de herramientas' },
+          { id: 2, type: 'paragraph', content: 'Selecciona cualquier parte de este texto y aparecera un menu flotante con las opciones de formato. Tambien puedes escribir / para insertar otros tipos de bloque.' }
+        ],
+        onChange: function(data) {
+          console.log('Editor sin toolbar - Contenido:', data.plainText);
         }
       });
     }
@@ -2023,6 +2053,7 @@ new meWYSE({ target: '#vhHeightEditor', minHeight: '10em', maxHeight: '35vh' });
     window.onload = function() {
       initBasicEditor();
       initToolbarEditor();
+      initNoToolbarEditor();
       initSummaryEditor();
       initMentionsEditor();
       initReadOnlyEditor();
