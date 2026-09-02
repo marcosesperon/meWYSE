@@ -561,6 +561,18 @@ editor.focus(blockId); // bloque especifico
       </div>
     </div>
 
+    <!-- Demo: Toolbar en modo wrap (multifila) -->
+    <div class="demo-section">
+      <h2>Toolbar en modo wrap (multifila)</h2>
+      <p>Por defecto la toolbar va en <strong>una sola fila con scroll horizontal</strong> (<code>toolbarOverflow: 'scroll'</code>). Con <code>toolbarOverflow: 'wrap'</code> los botones que no caben <strong>saltan a la siguiente fila</strong>.</p>
+      <pre class="docs-code"><code>var editor = new meWYSE({
+  target: '#wrapEditor',
+  toolbar: true,
+  toolbarOverflow: 'wrap'
+});</code></pre>
+      <textarea id="wrapEditor" placeholder="Toolbar en varias filas..." aria-label="Editor con toolbar en modo wrap"></textarea>
+    </div>
+
     <!-- Demo: Editor sin toolbar (menu flotante) -->
     <div class="demo-section">
       <h2>Editor sin toolbar (men&uacute; flotante)</h2>
@@ -1111,6 +1123,7 @@ new meWYSE({ target: '#vhHeightEditor', minHeight: '10em', maxHeight: '35vh' });
     // Variables globales para los editores
     var basicEditor;
     var toolbarEditor;
+    var wrapEditor;
     var noToolbarEditor;
     var summaryEditor;
     var mentionsEditor;
@@ -1146,6 +1159,18 @@ new meWYSE({ target: '#vhHeightEditor', minHeight: '10em', maxHeight: '35vh' });
         toolbar: true,
         onChange: function(data) {
           console.log('Editor con toolbar - Contenido:', data.plainText);
+        }
+      });
+    }
+
+    // Inicializar editor con toolbar en modo wrap (multifila)
+    function initWrapEditor() {
+      wrapEditor = new meWYSE({
+        target: '#wrapEditor',
+        toolbar: true,
+        toolbarOverflow: 'wrap',
+        onChange: function(data) {
+          console.log('Editor toolbar wrap - Contenido:', data.plainText);
         }
       });
     }
@@ -2053,6 +2078,7 @@ new meWYSE({ target: '#vhHeightEditor', minHeight: '10em', maxHeight: '35vh' });
     window.onload = function() {
       initBasicEditor();
       initToolbarEditor();
+      initWrapEditor();
       initNoToolbarEditor();
       initSummaryEditor();
       initMentionsEditor();
