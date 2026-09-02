@@ -2397,7 +2397,7 @@
     // Botón ÚNICO de alineación (dropdown). El icono refleja la alineación del
     // bloque con foco (_updateAlignButton, disparado por los eventos de foco).
     var alignBtn = document.createElement('button');
-    alignBtn.className = 'mewyse-toolbar-button mewyse-toolbar-dropdown';
+    alignBtn.className = 'mewyse-toolbar-button';
     alignBtn.innerHTML = this._alignButtonInnerHTML('left');
     alignBtn.title = self.t('tooltips.alignLeft');
     alignBtn.setAttribute('aria-label', self.t('tooltips.alignLeft'));
@@ -13268,9 +13268,8 @@
       button.setAttribute('aria-label', self.t(tool.titleKey));
       button.setAttribute('data-action', tool.action);
 
-      // Botón único de alineación (dropdown): icono del valor actual + chevron.
+      // Botón único de alineación: icono del valor actual (sin flecha lateral).
       if (tool.type === 'alignMenu') {
-        button.className += ' mewyse-toolbar-dropdown';
         button.innerHTML = self._alignButtonInnerHTML(self._getCurrentAlignment() || 'left');
         button.setAttribute('aria-haspopup', 'true');
       }
@@ -14360,8 +14359,9 @@
    * @returns {string}
    */
   meWYSE.prototype._alignButtonInnerHTML = function(align) {
-    var v_icon = WYSIWYG_ICONS[ALIGN_ICONS[align]] || WYSIWYG_ICONS.alignLeft;
-    return v_icon + ' <span class="dropdown-arrow">' + WYSIWYG_ICONS.chevronDown + '</span>';
+    // Solo el icono del valor actual (sin flecha lateral): el botón ocupa el
+    // ancho de un botón normal. Que abre un menú se indica vía aria-haspopup.
+    return WYSIWYG_ICONS[ALIGN_ICONS[align]] || WYSIWYG_ICONS.alignLeft;
   };
 
   /**
