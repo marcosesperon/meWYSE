@@ -3618,12 +3618,16 @@
     var previousSelected = this.container.querySelector('.mewyse-image.selected');
     if (previousSelected) {
       previousSelected.classList.remove('selected');
-      previousSelected.style.border = '2px solid transparent';
+      previousSelected.style.outline = '';
+      previousSelected.style.outlineOffset = '';
     }
 
-    // Seleccionar la nueva imagen
+    // Seleccionar la nueva imagen. El indicador de selección usa `outline` (no
+    // `border`): así NO pisa el borde avanzado del usuario (advanced.border) y
+    // funciona igual con o sin contentStyles.
     imgElement.classList.add('selected');
-    imgElement.style.border = '2px solid #4a9eff';
+    imgElement.style.outline = '2px solid #4a9eff';
+    imgElement.style.outlineOffset = '2px';
     imgElement.focus();
 
     // Guardar referencia a la imagen seleccionada
@@ -3676,7 +3680,8 @@
   meWYSE.prototype.deselectImage = function() {
     if (this.selectedImage) {
       this.selectedImage.element.classList.remove('selected');
-      this.selectedImage.element.style.border = '2px solid transparent';
+      this.selectedImage.element.style.outline = '';
+      this.selectedImage.element.style.outlineOffset = '';
       var wasStandalone = (!this.selectedImage.isInTable && this.selectedImage.blockId != null);
       this.selectedImage = null;
       // Ocultar el handle si se mostró por la imagen suelta y no hay foco activo
@@ -4598,6 +4603,12 @@
     proportionsContainer.appendChild(proportionsLabel);
     modalContainer.appendChild(proportionsContainer);
 
+    // Panel de opciones avanzadas (borde / espaciado / alineación), precargado
+    // con los valores actuales de la imagen.
+    var advancedPanel = self._createImageAdvancedPanel(block.content.advanced || {});
+    modalContainer.appendChild(advancedPanel.toggle);
+    modalContainer.appendChild(advancedPanel.panel);
+
     // Event listeners para mantener proporciones
     widthInput.oninput = function() {
       if (proportionsCheckbox.checked) {
@@ -4642,12 +4653,26 @@
       block.content.width = width;
       block.content.height = height;
 
-      // Actualizar las dimensiones de la imagen
-      imgElement.style.width = width + 'px';
-      imgElement.style.height = height + 'px';
+      // Persistir las opciones avanzadas (borde/espaciado/alineación) en el modelo.
+      var v_adv = advancedPanel.getValues();
+      if (v_adv.border || v_adv.margin || v_adv.alignment) {
+        block.content.advanced = v_adv;
+      } else if (block.content.advanced) {
+        delete block.content.advanced;
+      }
 
       self.triggerChange();
-      closeAndReselect();
+
+      // Re-render para que los estilos avanzados se apliquen al <img> (antes solo
+      // se mutaba width/height inline y los avanzados no se reflejaban). Se
+      // re-selecciona la imagen recreada para conservar selección + handle.
+      if (modalOverlay.parentNode) document.body.removeChild(modalOverlay);
+      self._suppressBlurUntil = Date.now() + 300;
+      self.render();
+      setTimeout(function() {
+        var v_new_img = self.container.querySelector('[data-block-id="' + blockId + '"] .mewyse-image');
+        if (v_new_img) self.selectImage(v_new_img, v_cell ? null : blockId, !!v_cell, v_cell || null);
+      }, 0);
     };
 
     buttonsContainer.appendChild(cancelButton);
