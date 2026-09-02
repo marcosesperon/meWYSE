@@ -466,6 +466,13 @@
 .mewyse-editor-styled .mewyse-block:first-child {
   margin-top: 0;
 }
+/* En editores SIN toolbar, el botón de resumen flotante es el primer hijo del
+   container, así que el primer bloque real deja de ser :first-child y recuperaría
+   su margen superior (hueco excesivo arriba). Anularlo también en ese caso. */
+.mewyse-editor-styled .mewyse-summary-button + .mewyse-block,
+.mewyse-editor-styled .mewyse-summary-button + .mewyse-list-group {
+  margin-top: 0;
+}
 .mewyse-editor-styled blockquote.mewyse-block {
   margin: 0 0 0.5em 0;
   padding: 0.5em 1em;
