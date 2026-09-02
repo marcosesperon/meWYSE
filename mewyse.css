@@ -2103,37 +2103,41 @@
 }
 
 /* Botón de resumen */
+/* Botón de resumen flotante (solo en editores SIN toolbar): minimalista para no
+   competir con el contenido. Por defecto sin caja (transparente, sin borde ni
+   sombra) e icono atenuado; al pasar el cursor aparece un fondo sutil. */
 .mewyse-summary-button {
   position: sticky;
   top: 10px;
   float: right;
-  width: 36px;
-  height: 36px;
-  background: var(--mewyse-bg-primary);
-  border: 1px solid var(--mewyse-border-medium);
-  border-radius: var(--mewyse-radius-lg);
+  width: 30px;
+  height: 30px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--mewyse-radius-md, 6px);
   cursor: pointer;
-  color: var(--mewyse-text-secondary);
+  color: var(--mewyse-text-muted);
+  opacity: 0.6;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  transition: background 0.15s ease, color 0.15s ease, opacity 0.15s ease, border-color 0.15s ease;
   z-index: 100;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: none;
   margin-left: auto;
   margin-bottom: 8px;
 }
 
 .mewyse-summary-button svg {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
 }
 
 .mewyse-summary-button:hover {
-  background: var(--mewyse-bg-secondary);
-  border-color: var(--mewyse-text-muted);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
-  transform: translateY(-1px);
+  background: var(--mewyse-bg-hover);
+  border-color: var(--mewyse-border-light);
+  color: var(--mewyse-text-secondary);
+  opacity: 1;
 }
 
 /* Tooltip de resumen */
