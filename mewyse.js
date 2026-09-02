@@ -4710,6 +4710,10 @@
     menu.className = 'mewyse-type-menu mewyse-toolbar-menu';
     menu.setAttribute('role', 'listbox');
 
+    // Solo tipos de TEXTO convertibles entre sí. Tabla/imagen/separador (y demás
+    // bloques no-texto) NO son destinos de conversión válidos —perderían el
+    // contenido o crearían un bloque roto— y se insertan con su propio flujo
+    // (botones de la toolbar / menú slash).
     var blockTypes = [
       { type: 'paragraph', icon: WYSIWYG_ICONS.paragraph },
       { type: 'heading1', icon: WYSIWYG_ICONS.heading1 },
@@ -4719,10 +4723,7 @@
       { type: 'code', icon: WYSIWYG_ICONS.code },
       { type: 'bulletList', icon: WYSIWYG_ICONS.bulletList },
       { type: 'numberList', icon: WYSIWYG_ICONS.numberList },
-      { type: 'checklist', icon: WYSIWYG_ICONS.checklist },
-      { type: 'table', icon: WYSIWYG_ICONS.table },
-      { type: 'image', icon: WYSIWYG_ICONS.image },
-      { type: 'divider', icon: WYSIWYG_ICONS.divider }
+      { type: 'checklist', icon: WYSIWYG_ICONS.checklist }
     ];
 
     blockTypes.forEach(function(blockType) {
