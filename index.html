@@ -587,6 +587,28 @@ editor.focus(blockId); // bloque especifico
       <div id="noToolbarEditor"></div>
     </div>
 
+    <!-- Demo: Salto de página -->
+    <div class="demo-section">
+      <h2>Salto de p&aacute;gina</h2>
+      <p>El bot&oacute;n de <strong>salto de p&aacute;gina</strong> de la toolbar inserta un corte que fuerza el inicio de una nueva p&aacute;gina al <strong>imprimir o exportar a PDF</strong> (<code>print()</code> / <code>exportPdf()</code>). En pantalla se muestra como una l&iacute;nea discontinua.</p>
+      <div class="config-hint">
+        Coloca el cursor donde quieras cortar y pulsa el bot&oacute;n de salto de p&aacute;gina de la toolbar (o <code>/salto</code>). Al imprimir, el contenido tras el corte empieza en una p&aacute;gina nueva.
+      </div>
+      <pre class="docs-code"><code>var editor = new meWYSE({ target: '#pageBreakEditor', toolbar: true });
+// El bloque se exporta como: &lt;div class="mewyse-page-break"&gt;&lt;/div&gt;
+// (CSS: break-after: page; page-break-after: always)</code></pre>
+      <div id="pageBreakEditor"></div>
+      <div class="controls">
+        <div class="button-group">
+          <button class="btn" onclick="pageBreakEditor.print()">Imprimir</button>
+          <button class="btn btn-secondary" onclick="showOutput('pageBreakOutput','pageBreakOutputContent', pageBreakEditor.getHTML())">Ver HTML</button>
+        </div>
+        <div id="pageBreakOutput" class="output" style="display:none;">
+          <pre id="pageBreakOutputContent"></pre>
+        </div>
+      </div>
+    </div>
+
     <!-- Demo: Editor con Summary -->
     <div class="demo-section">
       <h2>Editor con Summary</h2>
@@ -1124,6 +1146,7 @@ new meWYSE({ target: '#vhHeightEditor', minHeight: '10em', maxHeight: '35vh' });
     var toolbarEditor;
     var wrapEditor;
     var noToolbarEditor;
+    var pageBreakEditor;
     var summaryEditor;
     var mentionsEditor;
     var tagsEditor;
@@ -1186,6 +1209,21 @@ new meWYSE({ target: '#vhHeightEditor', minHeight: '10em', maxHeight: '35vh' });
         onChange: function(data) {
           console.log('Editor sin toolbar - Contenido:', data.plainText);
         }
+      });
+    }
+
+    // Inicializar editor con salto de pagina
+    function initPageBreakEditor() {
+      pageBreakEditor = new meWYSE({
+        target: '#pageBreakEditor',
+        toolbar: true,
+        blocks: [
+          { id: 1, type: 'heading2', content: 'Pagina 1' },
+          { id: 2, type: 'paragraph', content: 'Contenido de la primera pagina. El salto de pagina de abajo fuerza que lo siguiente empiece en una pagina nueva al imprimir o exportar a PDF.' },
+          { id: 3, type: 'pageBreak', content: '' },
+          { id: 4, type: 'heading2', content: 'Pagina 2' },
+          { id: 5, type: 'paragraph', content: 'Este contenido empieza en una pagina nueva. Pulsa "Imprimir" para comprobarlo.' }
+        ]
       });
     }
 
@@ -2070,6 +2108,7 @@ new meWYSE({ target: '#vhHeightEditor', minHeight: '10em', maxHeight: '35vh' });
       initToolbarEditor();
       initWrapEditor();
       initNoToolbarEditor();
+      initPageBreakEditor();
       initSummaryEditor();
       initMentionsEditor();
       initReadOnlyEditor();
