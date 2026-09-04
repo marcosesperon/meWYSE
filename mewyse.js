@@ -19439,27 +19439,124 @@
   };
 
   /**
-   * Imprime SOLO el documento (sin toolbar/handles/menús): abre una ventana con
-   * el HTML saneado + la hoja de estilos de documento y lanza print().
+   * Imprime SOLO el documento (sin toolbar/handles/menús): el HTML fiel del
+   * modelo + la hoja de estilos de documento.
+   *
+   * Método principal = IFRAME OCULTO en la misma página (como TinyMCE): un
+   * iframe NO es un popup, así que no lo bloquea el navegador ni depende de
+   * permisos, y no abre pestaña/ventana nueva. Fallback = window.open (por si
+   * el contentDocument no estuviera disponible en algún sandbox/navegador
+   * antiguo). Si ambos fallan, avisa en consola en vez de fallar en silencio.
+   *
+   * getHTML (no getSafeHTML): el modelo ya está saneado en su frontera de
+   * confianza (constructor/loadFromJSON/loadFromHTML/paste), y getSafeHTML
+   * aplanaría los wrappers de bloque (salto de pagina, callout, toc) y el
+   * divider al re-sanear el documento completo.
    */
   meWYSE.prototype.print = function() {
-    // getHTML (no getSafeHTML): el modelo ya está saneado en su frontera de
-    // confianza (constructor/loadFromJSON/loadFromHTML/paste), y getSafeHTML
-    // aplanaría los wrappers de bloque (salto de pagina, callout, toc) y el
-    // divider al re-sanear el documento completo. Aqui imprimimos el documento
-    // FIEL en una ventana independiente.
-    var v_html = this.getHTML();
-    var v_win = window.open('', '_blank');
-    if (!v_win) return; // popup bloqueado
-    var v_doc = v_win.document;
-    v_doc.open();
-    v_doc.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>' +
+    var v_doc_html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>' +
       escapeHtml(document.title || 'Documento') + '</title><style>' +
-      this._documentStyles() + '</style></head><body>' + v_html + '</body></html>');
-    v_doc.close();
-    v_win.focus();
-    // Dar un margen a que el layout/imágenes carguen antes de imprimir.
-    setTimeout(function() { try { v_win.print(); } catch (e) {} }, 300);
+      this._documentStyles() + '</style></head><body>' + this.getHTML() +
+      '</body></html>';
+
+    // 1) Intento principal: iframe oculto (sin popups).
+    if (this._printWithIframe(v_doc_html)) return;
+
+    // 2) Fallback: ventana nueva (puede requerir permitir popups).
+    if (this._printWithWindow(v_doc_html)) return;
+
+    // 3) Ninguna vía disponible: avisar (no fallar en silencio).
+    if (window.console && console.warn) {
+      console.warn('meWYSE: no se pudo imprimir (iframe y ventana bloqueados).');
+    }
+  };
+
+  /**
+   * Imprime el documento con un iframe oculto inyectado en la misma página.
+   * Limpia el iframe tras imprimir (onafterprint) con un timeout de respaldo.
+   * @param {string} v_doc_html - documento HTML completo a imprimir
+   * @returns {boolean} true si pudo lanzar la impresión; false si no fue viable
+   */
+  meWYSE.prototype._printWithIframe = function(v_doc_html) {
+    try {
+      var v_iframe = document.createElement('iframe');
+      // Fuera de pantalla, sin ocupar layout ni ser visible.
+      v_iframe.setAttribute('aria-hidden', 'true');
+      v_iframe.style.cssText =
+        'position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden;';
+      document.body.appendChild(v_iframe);
+
+      var v_win = v_iframe.contentWindow;
+      var v_idoc = v_iframe.contentDocument ||
+        (v_win && v_win.document);
+      if (!v_idoc || !v_win) {
+        // No hay acceso al documento del iframe: no viable.
+        if (v_iframe.parentNode) v_iframe.parentNode.removeChild(v_iframe);
+        return false;
+      }
+
+      // Limpieza idempotente del iframe (una sola vez).
+      var v_cleaned = false;
+      var v_cleanup = function() {
+        if (v_cleaned) return;
+        v_cleaned = true;
+        if (v_iframe.parentNode) v_iframe.parentNode.removeChild(v_iframe);
+      };
+
+      // Lanza la impresión cuando el contenido está listo.
+      var v_do_print = function() {
+        try {
+          v_win.focus();
+          // Al terminar (o cancelar) el diálogo, retirar el iframe.
+          v_win.onafterprint = v_cleanup;
+          v_win.print();
+        } catch (e) {
+          v_cleanup();
+          return;
+        }
+        // Respaldo: si onafterprint no dispara (algunos navegadores), limpiar
+        // igualmente pasado un margen amplio.
+        setTimeout(v_cleanup, 60000);
+      };
+
+      v_idoc.open();
+      v_idoc.write(v_doc_html);
+      v_idoc.close();
+
+      // Dar margen a que el layout/imágenes carguen antes de imprimir.
+      if (v_idoc.readyState === 'complete') {
+        setTimeout(v_do_print, 300);
+      } else {
+        v_iframe.onload = function() { setTimeout(v_do_print, 300); };
+        // Respaldo por si onload no llega (documento ya escrito inline).
+        setTimeout(v_do_print, 500);
+      }
+      return true;
+    } catch (e) {
+      return false;
+    }
+  };
+
+  /**
+   * Fallback de impresión con ventana/pestaña nueva (puede requerir permitir
+   * popups). Solo se usa si el iframe no fue viable.
+   * @param {string} v_doc_html - documento HTML completo a imprimir
+   * @returns {boolean} true si pudo abrir la ventana y lanzar print
+   */
+  meWYSE.prototype._printWithWindow = function(v_doc_html) {
+    try {
+      var v_win = window.open('', '_blank');
+      if (!v_win) return false; // popup bloqueado
+      var v_doc = v_win.document;
+      v_doc.open();
+      v_doc.write(v_doc_html);
+      v_doc.close();
+      v_win.focus();
+      setTimeout(function() { try { v_win.print(); } catch (e) {} }, 300);
+      return true;
+    } catch (e) {
+      return false;
+    }
   };
 
   /**
