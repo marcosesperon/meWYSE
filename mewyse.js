@@ -111,7 +111,8 @@
         caseTitle: 'Tipo Título',
         caseSentence: 'Tipo oración',
         caseToggle: 'Invertir tipo',
-        font: 'Fuente y tamaño',
+        font: 'Familia de fuente',
+        lineHeight: 'Interlineado',
         fontSizeDecrease: 'Reducir tamaño de fuente',
         fontSizeIncrease: 'Aumentar tamaño de fuente',
         specialChars: 'Caracteres especiales',
@@ -386,7 +387,8 @@
         caseTitle: 'Title Case',
         caseSentence: 'Sentence case',
         caseToggle: 'tOGGLE cASE',
-        font: 'Font and size',
+        font: 'Font family',
+        lineHeight: 'Line height',
         fontSizeDecrease: 'Decrease font size',
         fontSizeIncrease: 'Increase font size',
         specialChars: 'Special characters',
@@ -860,6 +862,7 @@
     wordWrap: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><line x1="2" y1="3.5" x2="14" y2="3.5"/><path d="M2 8h9a2.5 2.5 0 0 1 0 5h-3"/><polyline points="9.5,11 7.5,13 9.5,15"/><line x1="2" y1="12.5" x2="5" y2="12.5"/></svg>',
     removeFormat: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M3 3h9M6 3v10M5 13h4"/><line x1="11" y1="10" x2="15" y2="14"/><line x1="15" y1="10" x2="11" y2="14"/></svg>',
     font: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M3 13l3.5-9 3.5 9"/><line x1="4.2" y1="10" x2="8.8" y2="10"/><path d="M12 8.5c1.5 0 2.5 1 2.5 2.3S13.5 13 12 13s-2-.7-2-1.5c0-1 1-1.4 2.5-1.4h2"/></svg>',
+    lineHeight: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><line x1="7" y1="3.5" x2="14" y2="3.5"/><line x1="7" y1="8" x2="14" y2="8"/><line x1="7" y1="12.5" x2="14" y2="12.5"/><path d="M3 2.5v11"/><polyline points="1.3,4.3 3,2.5 4.7,4.3"/><polyline points="1.3,11.7 3,13.5 4.7,11.7"/></svg>',
     specialChars: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M8 2.5a3.5 3.5 0 0 0-2.6 5.8c.6.7 1.1 1.3 1.1 2.2H4v1.5h3v-1c0-.9.4-1.5 1-2.2A3.5 3.5 0 0 0 8 2.5z"/><line x1="9" y1="12" x2="12" y2="12"/></svg>',
     subscript: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M2 3l6 8M8 3l-6 8"/><path d="M11.5 14.5h3M11.5 14.5c0-1.2 3-1.6 3-3 0-.8-.7-1.3-1.5-1.3s-1.5.5-1.5 1.2"/></svg>',
     superscript: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M2 5l6 8M8 5l-6 8"/><path d="M11.5 5.5h3M11.5 5.5c0-1.2 3-1.6 3-3C14.5 1.7 13.8 1.2 13 1.2s-1.5.5-1.5 1.2"/></svg>',
@@ -2308,6 +2311,14 @@
           onclick: function(e) { e.preventDefault(); e.stopPropagation(); self.showFontMenu(v_font); }
         });
         return v_font;
+      case 'lineheight':
+        var v_lh = this._makeToolbarButton({
+          icon: WYSIWYG_ICONS.lineHeight + ' <span class="dropdown-arrow">' + WYSIWYG_ICONS.chevronDown + '</span>',
+          title: this.t('tooltips.lineHeight'), dropdown: true,
+          onmousedown: function(e) { e.preventDefault(); },
+          onclick: function(e) { e.preventDefault(); e.stopPropagation(); self.showLineHeightMenu(v_lh); }
+        });
+        return v_lh;
       case 'specialchars':
         var v_chars = this._makeToolbarButton({
           icon: WYSIWYG_ICONS.specialChars, title: this.t('tooltips.specialChars'),
@@ -14295,7 +14306,7 @@
   var DEFAULT_TOOLBAR =
     'undo redo | blocktype fontsize | ' +
     'bold italic underline strikethrough subscript superscript case removeformat | ' +
-    'link forecolor font specialchars mergetags | ' +
+    'link forecolor font lineheight specialchars mergetags | ' +
     'align outdent indent | table image video audio | ' +
     'find wordwrap summary showblocks fullscreen | moveup movedown';
 
@@ -15085,13 +15096,6 @@
       { label: 'Verdana', value: 'Verdana, sans-serif' },
       { label: 'Tahoma', value: 'Tahoma, sans-serif' }
     ];
-    var sizes = ['12px', '14px', '16px', '18px', '24px', '32px'];
-    var lineHeights = [
-      { label: this.t('font.lhTight'), value: '1' },
-      { label: this.t('font.lhNormal'), value: '1.5' },
-      { label: this.t('font.lhLoose'), value: '2' }
-    ];
-
     var menu = document.createElement('div');
     menu.className = 'mewyse-options-menu mewyse-font-menu';
     menu.setAttribute('role', 'menu');
@@ -15131,25 +15135,6 @@
       addItem(f.label, function() { self._applyFontStyle('fontFamily', f.value, false); },
         f.value === 'inherit' ? null : 'font-family:' + f.value);
     });
-    addLabel(this.t('font.size'));
-    var sizeRow = document.createElement('div');
-    sizeRow.className = 'mewyse-font-size-row';
-    sizes.forEach(function(s) {
-      var b = document.createElement('button');
-      b.className = 'mewyse-font-size-btn';
-      b.textContent = parseInt(s, 10);
-      b.onclick = function(e) {
-        e.preventDefault(); e.stopPropagation();
-        self._applyFontStyle('fontSize', s, false);
-        closeMenu();
-      };
-      sizeRow.appendChild(b);
-    });
-    menu.appendChild(sizeRow);
-    addLabel(this.t('font.lineHeight'));
-    lineHeights.forEach(function(lh) {
-      addItem(lh.label, function() { self._applyFontStyle('lineHeight', lh.value, true); });
-    });
 
     self._applyMenuTheme(menu);
     document.body.appendChild(menu);
@@ -15163,6 +15148,133 @@
       self._add_doc_click(v_click_handler);
     }, 0);
     this._showBackdrop('fontMenu', closeMenu);
+  };
+
+  // Valores de interlineado del menú (ratios).
+  var LINE_HEIGHT_VALUES = ['1', '1.1', '1.2', '1.3', '1.4', '1.5', '2'];
+
+  /**
+   * Quita el `line-height` inline de los spans de un editable (para no anidar
+   * spans al re-aplicar). Desenvuelve el span si queda sin estilo ni clase.
+   * @param {HTMLElement} editable
+   */
+  meWYSE.prototype._clearBlockLineHeight = function(editable) {
+    if (!editable) return;
+    var v_spans = editable.querySelectorAll('[style*="line-height"]');
+    for (var i = 0; i < v_spans.length; i++) {
+      var s = v_spans[i];
+      s.style.lineHeight = '';
+      if (s.tagName === 'SPAN' && !s.getAttribute('style') && !s.className && s.parentNode) {
+        while (s.firstChild) s.parentNode.insertBefore(s.firstChild, s);
+        s.parentNode.removeChild(s);
+      }
+    }
+  };
+
+  /**
+   * Interlineado (line-height inline) EFECTIVO en el caret/selección: recorre
+   * hacia arriba dentro del container buscando un `style.lineHeight` explícito.
+   * @returns {?string} p. ej. '1.5', o null si no hay uno explícito.
+   */
+  meWYSE.prototype._getCurrentLineHeight = function() {
+    if (!this.container) return null;
+    var v_node = null;
+    var sel = window.getSelection ? window.getSelection() : null;
+    if (sel && sel.rangeCount) {
+      v_node = sel.anchorNode;
+      if (v_node && v_node.nodeType === 3) v_node = v_node.parentElement;
+    }
+    if (!v_node || !this.container.contains(v_node)) {
+      var v_bid = this._getFocusedBlockId();
+      if (v_bid !== null) {
+        var v_el = this.container.querySelector('[data-block-id="' + v_bid + '"]');
+        v_node = v_el ? (this.getEditableElement(v_el) || v_el) : null;
+      }
+    }
+    // 1) Hacia arriba desde el caret (span con line-height que contiene el caret).
+    var v_up = v_node;
+    while (v_up && v_up !== this.container && v_up.nodeType === 1) {
+      if (v_up.style && v_up.style.lineHeight) return v_up.style.lineHeight;
+      v_up = v_up.parentElement;
+    }
+    // 2) Fallback: el line-height se aplica a TODO el bloque (wholeBlock), así que
+    //    el span envolvente es un DESCENDIENTE del editable (no un ancestro del
+    //    caret cuando la selección abarca todo). Buscarlo dentro del bloque.
+    var v_bid = this._getFocusedBlockId();
+    if (v_bid !== null) {
+      var v_bel = this.container.querySelector('[data-block-id="' + v_bid + '"]');
+      var v_ed = v_bel ? (this.getEditableElement(v_bel) || v_bel) : null;
+      if (v_ed) {
+        var v_styled = v_ed.querySelector('[style*="line-height"]');
+        if (v_styled && v_styled.style && v_styled.style.lineHeight) return v_styled.style.lineHeight;
+      }
+    }
+    return null;
+  };
+
+  /**
+   * Menú desplegable de interlineado (ítem `lineheight`). Marca el valor actual
+   * con un check y aplica el line-height a todo el bloque. Espeja showAlignMenu.
+   * @param {HTMLElement} button
+   */
+  meWYSE.prototype.showLineHeightMenu = function(button) {
+    var self = this;
+    if (this._lineHeightMenu && this._lineHeightMenu.parentNode) {
+      this._lineHeightMenu.remove(); this._lineHeightMenu = null; return;
+    }
+
+    var menu = document.createElement('div');
+    menu.className = 'mewyse-options-menu';
+    menu.setAttribute('role', 'menu');
+    // No perder el caret/foco del bloque al clicar en el menú.
+    menu.addEventListener('mousedown', function(e) { e.preventDefault(); });
+
+    var v_current = this._getCurrentLineHeight(); // puede ser null
+
+    var v_click_handler = null;
+    var closeMenu = function() {
+      if (self._lineHeightMenu && self._lineHeightMenu.parentNode) self._lineHeightMenu.remove();
+      self._lineHeightMenu = null;
+      if (v_click_handler) { self._remove_doc_click(v_click_handler); v_click_handler = null; }
+      self._hideBackdrop('lineHeightMenu');
+    };
+
+    LINE_HEIGHT_VALUES.forEach(function(v) {
+      var item = document.createElement('div');
+      item.className = 'mewyse-options-menu-item';
+      item.setAttribute('role', 'menuitemradio');
+      var v_active = (v === v_current);
+      if (v_active) item.classList.add('active');
+      item.setAttribute('aria-checked', v_active ? 'true' : 'false');
+      // Etiqueta + check a la derecha para el valor activo.
+      item.innerHTML = '<span>' + v + '</span>' +
+        (v_active ? '<span class="mewyse-menu-check">' + (WYSIWYG_ICONS.check || '✓') + '</span>' : '');
+      item.onclick = function(e) {
+        e.preventDefault(); e.stopPropagation();
+        // Quitar el line-height previo del bloque para no anidar spans.
+        var v_bid = self._getFocusedBlockId();
+        if (v_bid !== null) {
+          var v_bel = self.container.querySelector('[data-block-id="' + v_bid + '"]');
+          self._clearBlockLineHeight(v_bel ? (self.getEditableElement(v_bel) || v_bel) : null);
+        }
+        self._applyFontStyle('lineHeight', v, true);
+        closeMenu();
+      };
+      menu.appendChild(item);
+    });
+
+    self._applyMenuTheme(menu);
+    document.body.appendChild(menu);
+    this._lineHeightMenu = menu;
+    this.anchorMenu(menu, button, { offsetY: 5 });
+
+    setTimeout(function() {
+      v_click_handler = function(e) {
+        if (!menu.contains(e.target) && !button.contains(e.target)) closeMenu();
+      };
+      self._add_doc_click(v_click_handler);
+    }, 0);
+    this._showBackdrop('lineHeightMenu', closeMenu);
   };
 
   /**

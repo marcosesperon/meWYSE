@@ -1240,6 +1240,18 @@
   background-color: var(--mewyse-bg-hover);
 }
 
+/* Ítem activo (valor actual, p. ej. interlineado seleccionado) + check a la derecha. */
+.mewyse-options-menu-item.active {
+  color: var(--mewyse-accent);
+  font-weight: 600;
+}
+.mewyse-menu-check {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  color: var(--mewyse-accent);
+}
+
 .mewyse-options-menu-item.danger:hover {
   background-color: var(--mewyse-danger-bg);
   color: var(--mewyse-danger);
