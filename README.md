@@ -222,7 +222,7 @@ new meWYSE({ target: '#ed', toolbar: false });
 | Formato | `bold` `italic` `underline` `strikethrough` `subscript` `superscript` `case` `removeformat` |
 | Inserción inline | `link` `forecolor` (color) `specialchars` `mergetags` |
 | Alineación / sangría | `align` `outdent` `indent` |
-| Bloques | `table` `image` `video` `audio` |
+| Bloques | `table` `image` `video` `audio` `pagebreak` |
 | Vistas / herramientas | `find` `wordwrap` `summary` `showblocks` `sourcecode` (ver/editar HTML) `markdown` (ver/editar Markdown) `fullscreen` |
 | Exportar | `print` `exportword` `exportpdf` |
 | Mover bloque | `moveup` `movedown` |

@@ -112,6 +112,7 @@
         codeLanguage: 'Lenguaje del código',
         insertVideo: 'Insertar vídeo',
         insertAudio: 'Insertar audio',
+        pageBreak: 'Salto de página',
         caseUpper: 'MAYÚSCULAS',
         caseLower: 'minúsculas',
         caseTitle: 'Tipo Título',
@@ -397,6 +398,7 @@
         codeLanguage: 'Code language',
         insertVideo: 'Insert video',
         insertAudio: 'Insert audio',
+        pageBreak: 'Page break',
         caseUpper: 'UPPERCASE',
         caseLower: 'lowercase',
         caseTitle: 'Title Case',
@@ -2409,6 +2411,12 @@
           icon: WYSIWYG_ICONS.audio, title: this.t('tooltips.insertAudio'),
           onclick: function(e) { e.preventDefault(); e.stopPropagation(); self.insertAudioBlock(); }
         });
+      case 'pagebreak':
+        if (this._isBlockDisabled('pageBreak')) return null;
+        return this._makeToolbarButton({
+          icon: WYSIWYG_ICONS.pageBreak, title: this.t('tooltips.pageBreak'),
+          onclick: function(e) { e.preventDefault(); e.stopPropagation(); self.insertPageBreak(); }
+        });
       case 'find':
         return this._makeToolbarButton({
           icon: WYSIWYG_ICONS.search, title: this.t('tooltips.findReplace') + ' (Ctrl+F)',
@@ -2683,6 +2691,23 @@
 
     // Añadir el nuevo bloque de tabla
     this.addBlock('table', insertIndex);
+  };
+
+  /**
+   * Inserta un bloque de salto de página tras el bloque con foco (o al final).
+   */
+  meWYSE.prototype.insertPageBreak = function() {
+    var v_active = this.lastFocusedElement || document.activeElement;
+    var v_blockEl = v_active;
+    while (v_blockEl && (!v_blockEl.hasAttribute || !v_blockEl.hasAttribute('data-block-id'))) {
+      v_blockEl = v_blockEl.parentElement;
+    }
+    var v_index = this.blocks.length;
+    if (v_blockEl && v_blockEl.hasAttribute && v_blockEl.hasAttribute('data-block-id')) {
+      var v_id = parseInt(v_blockEl.getAttribute('data-block-id'), 10);
+      if (!isNaN(v_id)) v_index = this.getBlockIndex(v_id) + 1;
+    }
+    this.addBlock('pageBreak', v_index);
   };
 
   /**
@@ -14338,7 +14363,7 @@
     'undo redo | blocktype fontsize | ' +
     'bold italic underline strikethrough subscript superscript case removeformat | ' +
     'link forecolor font lineheight specialchars mergetags | ' +
-    'align outdent indent | table image video audio | ' +
+    'align outdent indent | table image video audio pagebreak | ' +
     'find wordwrap summary showblocks sourcecode markdown fullscreen | moveup movedown';
 
   // Config de los botones de formato inline (comando execCommand o wrap de tag).

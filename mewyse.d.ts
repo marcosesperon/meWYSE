@@ -48,7 +48,7 @@ export interface MeWyseOptions {
    *  - `false`/ausente → sin toolbar
    *  Ítems: undo redo blocktype fontsize bold italic underline strikethrough
    *  subscript superscript case removeformat link forecolor font specialchars
-   *  mergetags align outdent indent table image video audio find wordwrap summary
+   *  mergetags align outdent indent table image video audio pagebreak find wordwrap summary
    *  showblocks sourcecode markdown fullscreen print exportword exportpdf moveup movedown. */
   toolbar?: boolean | string | string[];
   summary?: boolean;
