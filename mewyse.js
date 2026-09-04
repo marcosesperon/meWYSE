@@ -2290,6 +2290,46 @@
 
     host.appendChild(blockTypeButton);
 
+    // Stepper de tamaño de fuente [−] [valor] [+] — justo tras el selector de tipo
+    // de bloque (opt-in con `fontControls`). Refleja el tamaño del caret/selección
+    // y aplica un font-size inline recorriendo FONT_SIZE_SCALE.
+    if (this.fontControls) {
+      var v_fs_sep = document.createElement('div');
+      v_fs_sep.className = 'mewyse-toolbar-separator';
+      host.appendChild(v_fs_sep);
+
+      var v_fs_stepper = document.createElement('div');
+      v_fs_stepper.className = 'mewyse-font-size-stepper';
+
+      var v_fs_dec = document.createElement('button');
+      v_fs_dec.type = 'button';
+      v_fs_dec.className = 'mewyse-toolbar-button mewyse-font-size-step';
+      v_fs_dec.innerHTML = WYSIWYG_ICONS.minus;
+      v_fs_dec.title = this.t('tooltips.fontSizeDecrease');
+      v_fs_dec.setAttribute('aria-label', this.t('tooltips.fontSizeDecrease'));
+      v_fs_dec.onmousedown = function(e) { e.preventDefault(); };
+      v_fs_dec.onclick = function(e) { e.preventDefault(); self._stepFontSize(-1); };
+
+      var v_fs_val = document.createElement('span');
+      v_fs_val.className = 'mewyse-font-size-value';
+      v_fs_val.textContent = '—';
+      this._fontSizeDisplay = v_fs_val;
+
+      var v_fs_inc = document.createElement('button');
+      v_fs_inc.type = 'button';
+      v_fs_inc.className = 'mewyse-toolbar-button mewyse-font-size-step';
+      v_fs_inc.innerHTML = WYSIWYG_ICONS.plus;
+      v_fs_inc.title = this.t('tooltips.fontSizeIncrease');
+      v_fs_inc.setAttribute('aria-label', this.t('tooltips.fontSizeIncrease'));
+      v_fs_inc.onmousedown = function(e) { e.preventDefault(); };
+      v_fs_inc.onclick = function(e) { e.preventDefault(); self._stepFontSize(1); };
+
+      v_fs_stepper.appendChild(v_fs_dec);
+      v_fs_stepper.appendChild(v_fs_val);
+      v_fs_stepper.appendChild(v_fs_inc);
+      host.appendChild(v_fs_stepper);
+    }
+
     // Separador
     var separator1b = document.createElement('div');
     separator1b.className = 'mewyse-toolbar-separator';
@@ -2384,40 +2424,8 @@
     extrasGroup.appendChild(colorButton);
 
     // Botón de fuente (familia/tamaño/interlineado) — opt-in con `fontControls`.
+    // El stepper de tamaño va junto al selector de tipo de bloque (arriba).
     if (this.fontControls) {
-      // Stepper de tamaño de fuente: [−] [valor] [+]. Refleja el tamaño de la
-      // selección/caret y aplica un font-size inline recorriendo FONT_SIZE_SCALE.
-      var v_fs_stepper = document.createElement('div');
-      v_fs_stepper.className = 'mewyse-font-size-stepper';
-
-      var v_fs_dec = document.createElement('button');
-      v_fs_dec.type = 'button';
-      v_fs_dec.className = 'mewyse-toolbar-button mewyse-font-size-step';
-      v_fs_dec.innerHTML = WYSIWYG_ICONS.minus;
-      v_fs_dec.title = this.t('tooltips.fontSizeDecrease');
-      v_fs_dec.setAttribute('aria-label', this.t('tooltips.fontSizeDecrease'));
-      v_fs_dec.onmousedown = function(e) { e.preventDefault(); };
-      v_fs_dec.onclick = function(e) { e.preventDefault(); self._stepFontSize(-1); };
-
-      var v_fs_val = document.createElement('span');
-      v_fs_val.className = 'mewyse-font-size-value';
-      v_fs_val.textContent = '—';
-      this._fontSizeDisplay = v_fs_val;
-
-      var v_fs_inc = document.createElement('button');
-      v_fs_inc.type = 'button';
-      v_fs_inc.className = 'mewyse-toolbar-button mewyse-font-size-step';
-      v_fs_inc.innerHTML = WYSIWYG_ICONS.plus;
-      v_fs_inc.title = this.t('tooltips.fontSizeIncrease');
-      v_fs_inc.setAttribute('aria-label', this.t('tooltips.fontSizeIncrease'));
-      v_fs_inc.onmousedown = function(e) { e.preventDefault(); };
-      v_fs_inc.onclick = function(e) { e.preventDefault(); self._stepFontSize(1); };
-
-      v_fs_stepper.appendChild(v_fs_dec);
-      v_fs_stepper.appendChild(v_fs_val);
-      v_fs_stepper.appendChild(v_fs_inc);
-      extrasGroup.appendChild(v_fs_stepper);
-
       var fontButton = document.createElement('button');
       fontButton.className = 'mewyse-toolbar-button mewyse-toolbar-dropdown';
       fontButton.innerHTML = WYSIWYG_ICONS.font + ' <span class="dropdown-arrow">' + WYSIWYG_ICONS.chevronDown + '</span>';
