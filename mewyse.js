@@ -103,6 +103,10 @@
         showBlocks: 'Mostrar bloques',
         sourceCode: 'Código fuente (HTML)',
         markdown: 'Markdown',
+        codeTheme: 'Modo claro/oscuro',
+        codeFontInc: 'Aumentar fuente',
+        codeFontDec: 'Reducir fuente',
+        codeWrap: 'Ajuste de línea',
         wordWrap: 'Ajuste de texto',
         removeFormat: 'Limpiar formato',
         codeLanguage: 'Lenguaje del código',
@@ -384,6 +388,10 @@
         showBlocks: 'Show blocks',
         sourceCode: 'Source code (HTML)',
         markdown: 'Markdown',
+        codeTheme: 'Light/dark mode',
+        codeFontInc: 'Increase font',
+        codeFontDec: 'Decrease font',
+        codeWrap: 'Word wrap',
         wordWrap: 'Word wrap',
         removeFormat: 'Clear formatting',
         codeLanguage: 'Code language',
@@ -871,6 +879,7 @@
     showBlocks: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="12" height="3" rx="0.5"/><rect x="2" y="6.5" width="12" height="3" rx="0.5"/><rect x="2" y="11" width="12" height="3" rx="0.5"/></svg>',
     sourceCode: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><polyline points="5,4 1.5,8 5,12"/><polyline points="11,4 14.5,8 11,12"/><line x1="9" y1="3" x2="7" y2="13"/></svg>',
     markdown: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="1" y="3.5" width="14" height="9" rx="1.5"/><path d="M3.5 10.5V6l2 2 2-2v4.5"/><path d="M10.5 6v3.2M9.2 8.2l1.3 1.3 1.3-1.3"/></svg>',
+    contrast: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="6"/><path d="M8 2a6 6 0 0 0 0 12z" fill="currentColor" stroke="none"/></svg>',
     wordWrap: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><line x1="2" y1="3.5" x2="14" y2="3.5"/><path d="M2 8h9a2.5 2.5 0 0 1 0 5h-3"/><polyline points="9.5,11 7.5,13 9.5,15"/><line x1="2" y1="12.5" x2="5" y2="12.5"/></svg>',
     removeFormat: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M3 3h9M6 3v10M5 13h4"/><line x1="11" y1="10" x2="15" y2="14"/><line x1="15" y1="10" x2="11" y2="14"/></svg>',
     font: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M3 13l3.5-9 3.5 9"/><line x1="4.2" y1="10" x2="8.8" y2="10"/><path d="M12 8.5c1.5 0 2.5 1 2.5 2.3S13.5 13 12 13s-2-.7-2-1.5c0-1 1-1.4 2.5-1.4h2"/></svg>',
@@ -15311,6 +15320,11 @@
     var v_is_md = mode === 'markdown';
     var v_code = v_is_md ? this.getMarkdown() : this.getHTMLSource();
 
+    // Estado del editor de código (independiente del tema del editor).
+    var v_font = 13;          // px
+    var v_wrap = false;       // salto de línea automático
+    var v_dark = self._isDark();
+
     var overlay = document.createElement('div');
     overlay.className = 'mewyse-modal-overlay';
 
@@ -15318,10 +15332,20 @@
     container.className = 'mewyse-modal-container mewyse-code-modal';
     self._applyMenuTheme(container);
 
+    // --- Cabecera: título + cerrar (×) ---
+    var header = document.createElement('div');
+    header.className = 'mewyse-code-header';
     var title = document.createElement('h3');
     title.className = 'mewyse-modal-title';
     title.textContent = self.t(v_is_md ? 'modals.markdownTitle' : 'modals.sourceCodeTitle');
-    container.appendChild(title);
+    var closeX = document.createElement('button');
+    closeX.type = 'button';
+    closeX.className = 'mewyse-code-close';
+    closeX.innerHTML = WYSIWYG_ICONS.close || '×';
+    closeX.setAttribute('aria-label', self.t('modals.cancel'));
+    header.appendChild(title);
+    header.appendChild(closeX);
+    container.appendChild(header);
 
     if (v_is_md) {
       var note = document.createElement('p');
@@ -15330,17 +15354,108 @@
       container.appendChild(note);
     }
 
+    // --- Área de edición: gutter de números + textarea (+ mirror oculto) ---
+    var editorWrap = document.createElement('div');
+    editorWrap.className = 'mewyse-code-editor';
+
+    var gutter = document.createElement('div');
+    gutter.className = 'mewyse-code-gutter';
+    gutter.setAttribute('aria-hidden', 'true');
+
     var textarea = document.createElement('textarea');
     textarea.className = 'mewyse-code-textarea';
     textarea.value = v_code;
     textarea.spellcheck = false;
+    textarea.wrap = 'off';
     textarea.setAttribute('aria-label', title.textContent);
-    container.appendChild(textarea);
+
+    // Espejo oculto para medir la altura real de cada línea (respeta wrap/fuente),
+    // así los números se alinean incluso con salto de línea automático.
+    var mirror = document.createElement('div');
+    mirror.className = 'mewyse-code-mirror';
+    mirror.setAttribute('aria-hidden', 'true');
+
+    editorWrap.appendChild(gutter);
+    editorWrap.appendChild(textarea);
+    editorWrap.appendChild(mirror);
+    container.appendChild(editorWrap);
+
+    var rebuildGutter = function() {
+      var v_lines = textarea.value.split('\n');
+      mirror.style.whiteSpace = v_wrap ? 'pre-wrap' : 'pre';
+      mirror.style.width = textarea.clientWidth + 'px';
+      var v_html = '';
+      for (var i = 0; i < v_lines.length; i++) {
+        mirror.textContent = v_lines[i].length ? v_lines[i] : ' ';
+        v_html += '<div style="height:' + mirror.offsetHeight + 'px">' + (i + 1) + '</div>';
+      }
+      gutter.innerHTML = v_html;
+      gutter.scrollTop = textarea.scrollTop;
+    };
+    var applyFont = function() {
+      var v_lh = Math.round(v_font * 1.55) + 'px';
+      textarea.style.fontSize = v_font + 'px'; textarea.style.lineHeight = v_lh;
+      gutter.style.fontSize = v_font + 'px'; gutter.style.lineHeight = v_lh;
+      mirror.style.fontSize = v_font + 'px'; mirror.style.lineHeight = v_lh;
+      rebuildGutter();
+    };
+    var applyWrap = function() {
+      textarea.style.whiteSpace = v_wrap ? 'pre-wrap' : 'pre';
+      textarea.wrap = v_wrap ? 'soft' : 'off';
+      wrapBtn.classList.toggle('active', v_wrap);
+      wrapBtn.setAttribute('aria-pressed', v_wrap ? 'true' : 'false');
+      rebuildGutter();
+    };
+    var applyDark = function() {
+      container.classList.toggle('mewyse-code-dark', v_dark);
+    };
+
+    // Sincronizar el scroll del gutter con el textarea; recalcular al editar.
+    var v_rebuild_timer = null;
+    textarea.addEventListener('scroll', function() { gutter.scrollTop = textarea.scrollTop; });
+    textarea.addEventListener('input', function() {
+      if (v_rebuild_timer) clearTimeout(v_rebuild_timer);
+      v_rebuild_timer = setTimeout(rebuildGutter, 60);
+    });
+
+    // --- Pie: herramientas (izq) + Cancelar/Guardar (der) ---
+    var footer = document.createElement('div');
+    footer.className = 'mewyse-code-footer';
+
+    var tools = document.createElement('div');
+    tools.className = 'mewyse-code-tools';
+
+    var mkTool = function(html, titleKey, onClick) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'mewyse-code-tool-btn';
+      b.innerHTML = html;
+      b.title = self.t(titleKey);
+      b.setAttribute('aria-label', self.t(titleKey));
+      b.onclick = onClick;
+      return b;
+    };
+    var themeBtn = mkTool(WYSIWYG_ICONS.contrast, 'tooltips.codeTheme', function() { v_dark = !v_dark; applyDark(); });
+    var fontDecBtn = mkTool('A<span class="mewyse-code-sub">−</span>', 'tooltips.codeFontDec', function() { v_font = Math.max(10, v_font - 1); applyFont(); });
+    var fontIncBtn = mkTool('A<span class="mewyse-code-sup">+</span>', 'tooltips.codeFontInc', function() { v_font = Math.min(24, v_font + 1); applyFont(); });
+    var wrapBtn = mkTool(WYSIWYG_ICONS.wordWrap, 'tooltips.codeWrap', function() { v_wrap = !v_wrap; applyWrap(); });
+
+    tools.appendChild(themeBtn);
+    tools.appendChild(fontDecBtn);
+    tools.appendChild(fontIncBtn);
+    tools.appendChild(wrapBtn);
 
     var buttons = document.createElement('div');
     buttons.className = 'mewyse-modal-buttons';
 
-    var close = function() { if (overlay.parentNode) document.body.removeChild(overlay); };
+    // Bloqueo de scroll de la página mientras el modal está abierto.
+    document.body.classList.add('mewyse-scroll-lock');
+    var close = function() {
+      if (v_rebuild_timer) clearTimeout(v_rebuild_timer);
+      document.body.classList.remove('mewyse-scroll-lock');
+      if (overlay.parentNode) document.body.removeChild(overlay);
+    };
+    closeX.onclick = close;
 
     var cancelBtn = document.createElement('button');
     cancelBtn.type = 'button';
@@ -15361,12 +15476,19 @@
 
     buttons.appendChild(cancelBtn);
     buttons.appendChild(saveBtn);
-    container.appendChild(buttons);
+    footer.appendChild(tools);
+    footer.appendChild(buttons);
+    container.appendChild(footer);
 
     overlay.appendChild(container);
     document.body.appendChild(overlay);
     overlay.onclick = function(e) { if (e.target === overlay) close(); };
-    setTimeout(function() { textarea.focus(); }, 0);
+
+    // Estado inicial (el textarea ya está en el DOM → clientWidth disponible).
+    applyDark();
+    applyWrap();
+    applyFont();
+    setTimeout(function() { textarea.focus(); rebuildGutter(); }, 0);
   };
 
   /**

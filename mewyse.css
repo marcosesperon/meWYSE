@@ -2015,42 +2015,131 @@
   animation: slideUp 0.2s ease;
 }
 
-/* Modal de código fuente / Markdown: más ancho, con textarea monoespaciado alto. */
+/* Bloqueo de scroll de la página cuando hay un modal de código abierto. */
+body.mewyse-scroll-lock { overflow: hidden !important; }
+
+/* Modal de código fuente / Markdown: más ancho, mini editor con gutter de líneas. */
 .mewyse-code-modal {
-  max-width: 820px;
+  max-width: 920px;
   display: flex;
   flex-direction: column;
 }
+.mewyse-code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.mewyse-code-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--mewyse-text-secondary);
+  padding: 4px;
+  border-radius: var(--mewyse-radius-md);
+  display: inline-flex;
+  line-height: 0;
+  font-size: 20px;
+}
+.mewyse-code-close:hover { background: var(--mewyse-bg-hover); color: var(--mewyse-text-primary); }
 .mewyse-modal-note {
-  margin: 0 0 10px;
+  margin: 8px 0 0;
   font-size: 0.8125rem;
   color: var(--mewyse-text-muted);
 }
-.mewyse-code-textarea {
-  width: 100%;
-  box-sizing: border-box;
-  min-height: 320px;
+
+/* Área de edición: gutter (números) + textarea, en una caja con borde común. */
+.mewyse-code-editor {
+  position: relative;
+  display: flex;
+  margin-top: 12px;
+  min-height: 340px;
   max-height: 60vh;
-  resize: vertical;
-  padding: 12px;
   border: 1px solid var(--mewyse-border-medium);
   border-radius: var(--mewyse-radius-md);
+  overflow: hidden;
   background: var(--mewyse-bg-code);
+}
+.mewyse-code-editor:focus-within { border-color: var(--mewyse-accent); }
+
+.mewyse-code-gutter {
+  flex: 0 0 auto;
+  min-width: 3ch;
+  padding: 12px 8px 12px 12px;
+  text-align: right;
+  color: var(--mewyse-text-muted);
+  background: var(--mewyse-bg-secondary);
+  border-right: 1px solid var(--mewyse-border-light);
+  font-family: var(--mewyse-font-mono, Consolas, Monaco, monospace);
+  overflow: hidden;
+  user-select: none;
+  white-space: pre;
+}
+
+.mewyse-code-textarea {
+  flex: 1 1 auto;
+  box-sizing: border-box;
+  resize: none;
+  padding: 12px;
+  border: none;
+  background: transparent;
   color: var(--mewyse-text-primary);
   font-family: var(--mewyse-font-mono, Consolas, Monaco, monospace);
   font-size: 13px;
-  line-height: 1.5;
+  line-height: 1.55;
   white-space: pre;
   overflow: auto;
   tab-size: 2;
 }
-.mewyse-code-textarea:focus {
-  outline: none;
-  border-color: var(--mewyse-accent);
+.mewyse-code-textarea:focus { outline: none; }
+
+/* Espejo oculto para medir la altura de cada línea (alinear los números con wrap). */
+.mewyse-code-mirror {
+  position: absolute;
+  visibility: hidden;
+  pointer-events: none;
+  top: 0; left: -9999px;
+  box-sizing: content-box;
+  padding: 0;
+  font-family: var(--mewyse-font-mono, Consolas, Monaco, monospace);
+  overflow-wrap: break-word;
 }
-.mewyse-code-modal .mewyse-modal-buttons {
-  margin-top: 16px;
+
+/* Modo oscuro del editor de código (independiente del tema del editor). */
+.mewyse-code-modal.mewyse-code-dark .mewyse-code-editor { background: #1e1e1e; border-color: #333; }
+.mewyse-code-modal.mewyse-code-dark .mewyse-code-gutter { background: #252526; color: #858585; border-right-color: #333; }
+.mewyse-code-modal.mewyse-code-dark .mewyse-code-textarea { color: #d4d4d4; }
+
+/* Pie: herramientas (izq) + Cancelar/Guardar (der). */
+.mewyse-code-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
 }
+.mewyse-code-tools { display: flex; gap: 4px; }
+.mewyse-code-tool-btn {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid var(--mewyse-border-light);
+  border-radius: var(--mewyse-radius-md);
+  background: var(--mewyse-bg-primary);
+  color: var(--mewyse-text-primary);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.mewyse-code-tool-btn:hover { background: var(--mewyse-bg-hover); border-color: var(--mewyse-text-muted); }
+.mewyse-code-tool-btn.active { background: var(--mewyse-bg-active); border-color: var(--mewyse-accent); }
+.mewyse-code-tool-btn svg { width: 16px; height: 16px; }
+.mewyse-code-sup { font-size: 0.7em; vertical-align: super; margin-left: 1px; }
+.mewyse-code-sub { font-size: 0.7em; vertical-align: sub; margin-left: 1px; }
+.mewyse-code-modal .mewyse-modal-buttons { margin: 0; }
 
 @keyframes slideUp {
   from {
