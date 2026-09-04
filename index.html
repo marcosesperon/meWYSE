@@ -813,12 +813,10 @@ var editor = new meWYSE({
       <p>Atajo <code>Ctrl+F</code> / <code>Cmd+F</code> para abrir el panel de busqueda. El boton &quot;pantalla completa&quot; expande el editor sobre toda la ventana. El boton &quot;ajuste de texto&quot; activa/desactiva el salto de linea automatico del contenido dentro del bloque (opcion <code>wordWrap</code>, activa por defecto; desactivable con <code>wordWrap: false</code> o el boton <code>wordWrapToggle: false</code>). &quot;Mostrar bloques&quot; muestra los limites de cada bloque y su tipo para debugging. La barra inferior muestra el contador de palabras, caracteres y tiempo de lectura en tiempo real.</p>
       <pre class="docs-code"><code>var editor = new meWYSE({
   target: '#toolsEditor',
-  toolbar: true,
-  charCounter: true,     // barra inferior con palabras/caracteres/tiempo
-  findReplace: true,     // Ctrl+F abre buscar y reemplazar (default true)
-  fullscreen: true,      // muestra boton de pantalla completa (default true)
-  showBlocksToggle: true // muestra boton de &quot;mostrar bloques&quot; (default true)
-});</code></pre>
+  toolbar: true,         // todos los items (find, fullscreen, showblocks... ya incluidos)
+  charCounter: true      // barra inferior con palabras/caracteres/tiempo
+});
+// Ctrl+F abre buscar/reemplazar. Para elegir/ordenar items: toolbar: 'undo redo | ...'</code></pre>
       <div id="toolsEditor"></div>
     </div>
 
@@ -1007,9 +1005,10 @@ editor.loadFromMarkdown(editor.getMarkdown());</code></pre>
       </div>
       <pre class="docs-code"><code>var editor = new meWYSE({
   target: '#novedadesEditor',
-  toolbar: true,
-  fontControls: true,   // botón de fuente/tamaño/interlineado
-  exportTools: true,    // botones de imprimir y Word
+  // Toolbar declarativa: fontsize/font ya van en el default; anadimos exportar
+  toolbar: 'undo redo | blocktype fontsize font | bold italic underline | ' +
+           'link forecolor specialchars mergetags | align | table image | ' +
+           'print exportword exportpdf | moveup movedown',
   autosave: true,       // guarda el borrador en localStorage
   autosaveKey: 'mewyse-demo-novedades'
 });</code></pre>
@@ -1554,11 +1553,8 @@ new meWYSE({ target: '#vhHeightEditor', minHeight: '10em', maxHeight: '35vh' });
     function initToolsEditor() {
       toolsEditor = new meWYSE({
         target: '#toolsEditor',
-        toolbar: true,
+        toolbar: true, // find/fullscreen/showblocks ya van en el default
         charCounter: true,
-        findReplace: true,
-        fullscreen: true,
-        showBlocksToggle: true,
         blocks: [
           { id: 1, type: 'heading1', content: 'Herramientas avanzadas' },
           { id: 2, type: 'paragraph', content: 'Este editor incluye <b>buscar y reemplazar</b> (Ctrl+F), <b>pantalla completa</b>, <b>mostrar bloques</b> y un <b>contador de palabras</b> persistente en la parte inferior.' },
@@ -1812,9 +1808,9 @@ new meWYSE({ target: '#vhHeightEditor', minHeight: '10em', maxHeight: '35vh' });
     function initNovedadesEditor() {
       novedadesEditor = new meWYSE({
         target: '#novedadesEditor',
-        toolbar: true,
-        fontControls: true,
-        exportTools: true,
+        // Toolbar declarativa: todos los ítems + exportar (print/word/pdf), que no
+        // van en el default.
+        toolbar: 'undo redo | blocktype fontsize font | bold italic underline strikethrough subscript superscript case removeformat | link forecolor specialchars mergetags | align outdent indent | table image video audio | find wordwrap summary showblocks fullscreen | print exportword exportpdf | moveup movedown',
         autosave: true,
         autosaveKey: 'mewyse-demo-novedades',
         mergeTags: [
@@ -1943,13 +1939,7 @@ new meWYSE({ target: '#vhHeightEditor', minHeight: '10em', maxHeight: '35vh' });
       { key: 'toolbar', label: 'toolbar', type: 'bool', def: false, init: true },
       { key: 'summary', label: 'summary', type: 'bool', def: true },
       { key: 'charCounter', label: 'charCounter', type: 'bool', def: false },
-      { key: 'findReplace', label: 'findReplace', type: 'bool', def: true },
-      { key: 'fullscreen', label: 'fullscreen', type: 'bool', def: true },
-      { key: 'showBlocksToggle', label: 'showBlocksToggle', type: 'bool', def: true },
-      { key: 'wordWrapToggle', label: 'wordWrapToggle', type: 'bool', def: true },
       { key: 'wordWrap', label: 'wordWrap', type: 'bool', def: true },
-      { key: 'fontControls', label: 'fontControls', type: 'bool', def: false },
-      { key: 'exportTools', label: 'exportTools', type: 'bool', def: false },
       { key: 'autosave', label: 'autosave', type: 'bool', def: false },
       { key: 'rtl', label: 'rtl', type: 'bool', def: false },
       { key: 'readOnly', label: 'readOnly', type: 'bool', def: false },
@@ -1958,11 +1948,11 @@ new meWYSE({ target: '#vhHeightEditor', minHeight: '10em', maxHeight: '35vh' });
       { key: 'escapeHtmlEntities', label: 'escapeHtmlEntities', type: 'bool', def: true },
       { key: 'htmlNumericEntities', label: 'htmlNumericEntities', type: 'bool', def: true },
       { key: 'theme', label: 'theme', type: 'select', def: '', options: [
-          { value: '', label: 'auto' }, { value: 'dark', label: 'dark' }, { value: 'compact', label: 'compact' } ] },
+          { value: '', label: 'claro' }, { value: 'dark', label: 'dark' }, { value: 'auto', label: 'auto' }, { value: 'compact', label: 'compact' } ] },
       { key: 'lang', label: 'lang', type: 'select', def: 'es', options: [
           { value: 'es', label: 'es' }, { value: 'en', label: 'en' } ] },
-      { key: 'toolbarOverflow', label: 'toolbarOverflow', type: 'select', def: 'wrap', options: [
-          { value: 'wrap', label: 'wrap' }, { value: 'scroll', label: 'scroll' } ] }
+      { key: 'toolbarOverflow', label: 'toolbarOverflow', type: 'select', def: 'scroll', options: [
+          { value: 'scroll', label: 'scroll' }, { value: 'wrap', label: 'wrap' } ] }
     ];
 
     function buildConfigurator() {

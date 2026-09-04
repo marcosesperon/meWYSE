@@ -41,7 +41,16 @@ export interface MeWyseOptions {
   /** Selector CSS o elemento del DOM donde montar el editor. */
   target: string | HTMLElement;
   blocks?: MeWyseBlock[];
-  toolbar?: boolean;
+  /** Toolbar declarativa (estilo TinyMCE):
+   *  - `true` → todos los ítems por defecto
+   *  - string → ítems separados por espacios, `|` crea grupos (ej. 'undo redo | bold italic | link')
+   *  - string[] → una fila por string (con toolbarOverflow:'wrap')
+   *  - `false`/ausente → sin toolbar
+   *  Ítems: undo redo blocktype fontsize bold italic underline strikethrough
+   *  subscript superscript case removeformat link forecolor font specialchars
+   *  mergetags align outdent indent table image video audio find wordwrap summary
+   *  showblocks fullscreen print exportword exportpdf moveup movedown. */
+  toolbar?: boolean | string | string[];
   summary?: boolean;
   /** Tema: 'dark' (oscuro), 'auto' (sigue prefers-color-scheme del OS en vivo),
    *  'compact', o custom. Sin especificar → claro (no auto-detecta). */
@@ -49,7 +58,6 @@ export interface MeWyseOptions {
   readOnly?: boolean;
   rtl?: boolean;
   wordWrap?: boolean;
-  wordWrapToggle?: boolean;
   contentStyles?: boolean;
   lang?: 'es' | 'en' | Record<string, any>;
   autoFocus?: boolean;
@@ -60,15 +68,10 @@ export interface MeWyseOptions {
    *  HTML). No afecta a contenido programático (blocks/loadFromJSON). */
   disabledBlocks?: string[];
   charCounter?: boolean;
-  findReplace?: boolean;
-  fullscreen?: boolean;
-  showBlocksToggle?: boolean;
   mentions?: MeWyseMention[];
   tags?: any[];
   mergeTags?: Array<{ id: string; name: string; label?: string }>;
   styleFormats?: Array<{ title: string; block: string; className: string }>;
-  fontControls?: boolean;
-  exportTools?: boolean;
   pdfLib?: string;
   autosave?: boolean;
   autosaveKey?: string;

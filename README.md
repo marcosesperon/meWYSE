@@ -157,15 +157,11 @@ new meWYSE(options)
 | Opción | Tipo | Default | Descripción |
 |--------|------|---------|-------------|
 | `target` | string | *requerido* | Selector CSS del elemento (`'#miEditor'`, `'.editor'`) |
-| `toolbar` | boolean | `false` | Mostrar barra de herramientas superior |
+| `toolbar` | boolean \| string \| string[] | `false` | Barra de herramientas **declarativa** (estilo TinyMCE). Ver ["Toolbar configurable"](#toolbar-configurable). `true` = todos los ítems; `false`/ausente = sin toolbar; string = ítems por espacios con `\|` para grupos; array = una fila por string |
 | `summary` | boolean | `true` | Mostrar botón de resumen con estadísticas e índice (abre el panel de esquema lateral) |
 | `readOnly` | boolean | `false` | Modo solo lectura: sin toolbar ni handle, `contenteditable="false"`, callbacks inertes |
 | `charCounter` | boolean | `false` | Mostrar barra inferior con contador de palabras, caracteres y tiempo de lectura |
-| `findReplace` | boolean | `true` | Habilitar buscar/reemplazar con atajo `Ctrl/Cmd+F` y botón en toolbar |
-| `fullscreen` | boolean | `true` | Mostrar botón de pantalla completa en toolbar |
-| `showBlocksToggle` | boolean | `true` | Mostrar botón de "mostrar bloques" (modo debug) en toolbar |
 | `wordWrap` | boolean | `true` | Ajuste de texto: el contenido largo salta de línea dentro del bloque |
-| `wordWrapToggle` | boolean | `true` | Mostrar botón de ajuste de texto en la toolbar |
 | `toolbarOverflow` | string | `'scroll'` | Comportamiento de la toolbar sin espacio: `'scroll'` (scroll horizontal con flechas, por defecto) o `'wrap'` (salto de línea) |
 | `rtl` | boolean | `false` | Activar dirección derecha-a-izquierda (árabe, hebreo) |
 | `pasteAsText` | boolean | `false` | Forzar que todo paste entre como texto plano (sin preservar formato) |
@@ -175,8 +171,6 @@ new meWYSE(options)
 | `mergeTags` | Array | `[]` | Lista de variables `{{campo}}` (trigger `{{` y botón de toolbar). Cada item: `{ id, name, label? }` |
 | `autosave` | boolean | `false` | Guarda el contenido (JSON) en `localStorage` con debounce en cada cambio. No auto-restaura (usa `restoreDraft()`) |
 | `autosaveKey` | string | `'mewyse-draft'` | Clave de `localStorage` para el borrador de autosave |
-| `fontControls` | boolean | `false` | Añade a la toolbar un botón de fuente (familia / tamaño / interlineado) |
-| `exportTools` | boolean | `false` | Añade a la toolbar los botones de imprimir, exportar a Word y a PDF (los métodos `print()`/`exportWord()`/`exportPdf()` están siempre disponibles) |
 | `pdfLib` | string | `''` | URL (lazy) de una librería tipo html2pdf.js para `exportPdf()` con fidelidad. Sin ella, `exportPdf()` cae a `print()` |
 | `codeHighlight` | boolean | `false` | Resaltado de sintaxis en los bloques de código (dep opcional lazy). El modelo se mantiene en texto plano; añade un selector de lenguaje por bloque |
 | `codeHighlightUrl` | string | `''` | URL (lazy) de highlight.js. Si no se define o falla la carga, el código cae a texto plano escapado (fallback) |
@@ -197,6 +191,43 @@ new meWYSE(options)
 | `onChange` | Function | `function(){}` | Callback cuando cambia el contenido |
 | `onFocus` | Function | `function(){}` | Callback cuando el editor gana foco (entrar al editor desde fuera). No se dispara al moverse entre bloques internamente |
 | `onBlur` | Function | `function(){}` | Callback cuando el editor pierde foco. No se dispara al hacer click en toolbar/menús/modales/pickers del editor |
+
+### Toolbar configurable
+
+La opción `toolbar` es **declarativa** (estilo TinyMCE). Por defecto (`toolbar: true`) se muestran **todas** las opciones, pero puedes elegir cuáles y en qué orden/grupos:
+
+```javascript
+// Todas las opciones (default)
+new meWYSE({ target: '#ed', toolbar: true });
+
+// Personalizada: los ítems se separan por espacios; `|` crea grupos (separadores)
+new meWYSE({ target: '#ed', toolbar: 'undo redo | blocktype | bold italic underline | link forecolor | align' });
+
+// Varias filas (con toolbarOverflow: 'wrap')
+new meWYSE({ target: '#ed', toolbarOverflow: 'wrap', toolbar: [
+  'undo redo | blocktype fontsize',
+  'bold italic underline strikethrough | link forecolor | align'
+] });
+
+// Sin toolbar (menú flotante al seleccionar texto)
+new meWYSE({ target: '#ed', toolbar: false });
+```
+
+**Ítems disponibles** (los nombres desconocidos se ignoran; los grupos que queden vacíos se omiten):
+
+| Grupo | Ítems |
+|---|---|
+| Historial | `undo` `redo` |
+| Bloque / fuente | `blocktype` (selector de tipo) · `fontsize` (stepper `−`/`+`) · `font` (familia/interlineado) |
+| Formato | `bold` `italic` `underline` `strikethrough` `subscript` `superscript` `case` `removeformat` |
+| Inserción inline | `link` `forecolor` (color) `specialchars` `mergetags` |
+| Alineación / sangría | `align` `outdent` `indent` |
+| Bloques | `table` `image` `video` `audio` |
+| Vistas / herramientas | `find` `wordwrap` `summary` `showblocks` `fullscreen` |
+| Exportar | `print` `exportword` `exportpdf` |
+| Mover bloque | `moveup` `movedown` |
+
+> `mergetags` solo aparece si pasas `mergeTags`; `table`/`image`/`video`/`audio` respetan `disabledBlocks`. Los ítems de exportar no están en el default: añádelos a la spec si los quieres.
 
 ### Métodos
 

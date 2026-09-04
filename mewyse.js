@@ -877,13 +877,14 @@
    */
   function meWYSE(options) {
     this.options = options || {};
-    this.showToolbar = this.options.toolbar === true; // Nueva opción para toolbar en modo minimal
+    // Toolbar: true (todos los ítems), string/array (config declarativa estilo
+    // TinyMCE) o false/ausente (sin toolbar). Ver DEFAULT_TOOLBAR / _buildToolbarItem.
+    var v_tb = this.options.toolbar;
+    this.showToolbar = v_tb === true ||
+      (typeof v_tb === 'string' && v_tb.trim() !== '') ||
+      (Array.isArray(v_tb) && v_tb.length > 0);
     this.showSummary = this.options.summary !== false; // Resumen/esquema activo por defecto (desactivar con summary:false)
     this.showCharCounter = this.options.charCounter === true; // Barra inferior con contador de palabras/caracteres
-    this.enableFullscreen = this.options.fullscreen !== false; // Habilitar botón fullscreen (default: true)
-    this.enableFindReplace = this.options.findReplace !== false; // Habilitar Ctrl+F para buscar (default: true)
-    this.enableShowBlocks = this.options.showBlocksToggle !== false; // Habilitar toggle de bloques (default: true)
-    this.enableWordWrapToggle = this.options.wordWrapToggle !== false; // Botón de ajuste de texto en toolbar (default: true)
     this.rtl = this.options.rtl === true; // Dirección derecha-a-izquierda
     this.wordWrap = this.options.wordWrap !== false; // Ajuste de texto: envolver dentro del bloque (default: true)
 
@@ -937,13 +938,9 @@
     this.imageMaxSize = (typeof this.options.imageMaxSize === 'number' && this.options.imageMaxSize > 0)
       ? this.options.imageMaxSize : 0; // Tamaño máx. de imagen en bytes (0 = sin límite)
 
-    // fontControls: añade a la toolbar un botón de fuente (familia/tamaño/
-    // interlineado). Opt-in (default false) para no recargar la toolbar por defecto.
-    this.fontControls = this.options.fontControls === true;
-
-    // exportTools: añade a la toolbar los botones de imprimir y exportar a Word.
-    // Opt-in (default false). Los métodos print()/exportWord() están siempre disponibles.
-    this.exportTools = this.options.exportTools === true;
+    // Los botones de fuente (fontsize/font), export (print/exportword/exportpdf),
+    // fullscreen, showblocks, wordwrap, find, etc. ya no son booleanos: se declaran
+    // como ítems en la opción `toolbar`. Ver DEFAULT_TOOLBAR / _buildToolbarItem.
     // pdfLib: URL (lazy) de una librería tipo html2pdf.js para exportar a PDF con
     // fidelidad. Si no se define, exportPdf() cae a print() ("Guardar como PDF").
     this.pdfLib = (typeof this.options.pdfLib === 'string') ? this.options.pdfLib : '';
@@ -2175,6 +2172,319 @@
   };
 
   /**
+   * Normaliza la opción `toolbar` a filas de grupos de nombres de ítem.
+   * @param {boolean|string|Array} spec
+   * @returns {Array<Array<Array<string>>>} filas → grupos → nombres
+   */
+  meWYSE.prototype._normalizeToolbarSpec = function(spec) {
+    var v_src;
+    if (spec === true || spec == null) v_src = [DEFAULT_TOOLBAR];
+    else if (typeof spec === 'string') v_src = [spec];
+    else if (Array.isArray(spec)) v_src = spec.slice();
+    else v_src = [DEFAULT_TOOLBAR];
+
+    var v_rows = [];
+    for (var i = 0; i < v_src.length; i++) {
+      var v_groups_str = String(v_src[i] || '').split('|');
+      var v_groups = [];
+      for (var g = 0; g < v_groups_str.length; g++) {
+        var v_names = v_groups_str[g].trim().split(/\s+/).filter(function(n) { return n !== ''; });
+        if (v_names.length) v_groups.push(v_names);
+      }
+      if (v_groups.length) v_rows.push(v_groups);
+    }
+    if (!v_rows.length) v_rows = [[['undo', 'redo']]];
+    return v_rows;
+  };
+
+  /**
+   * Crea un botón de toolbar con el patrón común.
+   * @param {Object} o - { icon, title, className, dropdown, disabled, onmousedown, onclick }
+   * @returns {HTMLButtonElement}
+   */
+  meWYSE.prototype._makeToolbarButton = function(o) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'mewyse-toolbar-button' +
+      (o.dropdown ? ' mewyse-toolbar-dropdown' : '') +
+      (o.className ? ' ' + o.className : '');
+    btn.innerHTML = o.icon;
+    if (o.title) { btn.title = o.title; btn.setAttribute('aria-label', o.title); }
+    if (o.disabled) btn.disabled = true;
+    if (o.onmousedown) btn.onmousedown = o.onmousedown;
+    if (o.onclick) btn.onclick = o.onclick;
+    return btn;
+  };
+
+  /**
+   * Construye un botón de formato inline (bold/italic/.../subscript/superscript)
+   * a partir de TOOLBAR_FORMAT_TOOLS.
+   */
+  meWYSE.prototype._buildFormatButton = function(name) {
+    var self = this;
+    var cfg = TOOLBAR_FORMAT_TOOLS[name];
+    if (!cfg) return null;
+    var v_icon = cfg.icon || (cfg.iconName ? WYSIWYG_ICONS[cfg.iconName] : '');
+    return this._makeToolbarButton({
+      icon: v_icon,
+      title: self.t(cfg.labelKey),
+      onclick: function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (cfg.type === 'wrapTag') {
+          var v_wrapped = self._applyInlineAcrossSelection(function() { self._wrapSelectionInTag(cfg.tag); });
+          if (!v_wrapped) { self._wrapSelectionInTag(cfg.tag); self._persistActiveBlockContent(); }
+        } else {
+          var v_applied = self._applyInlineAcrossSelection(function() { document.execCommand(cfg.command, false, null); });
+          if (!v_applied) { document.execCommand(cfg.command, false, null); self.triggerChange(); }
+        }
+      }
+    });
+  };
+
+  /**
+   * Construye el ELEMENTO de un ítem de toolbar por nombre, o null si no aplica
+   * (p. ej. `mergetags` sin datos, o un bloque de inserción desactivado).
+   * @param {string} name
+   * @returns {?HTMLElement}
+   */
+  meWYSE.prototype._buildToolbarItem = function(name) {
+    var self = this;
+    switch (name) {
+      case 'undo':
+        return (this.undoButton = this._makeToolbarButton({
+          icon: WYSIWYG_ICONS.undo, title: this.t('tooltips.undo'), disabled: true,
+          onmousedown: function(e) { e.preventDefault(); },
+          onclick: function(e) { e.preventDefault(); self.undo(); }
+        }));
+      case 'redo':
+        return (this.redoButton = this._makeToolbarButton({
+          icon: WYSIWYG_ICONS.redo, title: this.t('tooltips.redo'), disabled: true,
+          onmousedown: function(e) { e.preventDefault(); },
+          onclick: function(e) { e.preventDefault(); self.redo(); }
+        }));
+      case 'blocktype':
+        var v_bt = this._makeToolbarButton({
+          icon: this.t('misc.text') + ' <span class="dropdown-arrow">' + WYSIWYG_ICONS.chevronDown + '</span>',
+          title: this.t('tooltips.changeBlockType'), dropdown: true,
+          onclick: function(e) { e.preventDefault(); e.stopPropagation(); self.showToolbarBlockTypeMenu(v_bt); }
+        });
+        v_bt.setAttribute('aria-expanded', 'false');
+        v_bt.setAttribute('aria-haspopup', 'listbox');
+        this._blockTypeButton = v_bt;
+        return v_bt;
+      case 'fontsize':
+        return this._buildFontSizeStepper();
+      case 'bold': case 'italic': case 'underline': case 'strikethrough':
+      case 'subscript': case 'superscript':
+        return this._buildFormatButton(name);
+      case 'case':
+        var v_case = this._makeToolbarButton({
+          icon: '<span style="font-size:13px;font-weight:600">Aa</span> <span class="dropdown-arrow">' + WYSIWYG_ICONS.chevronDown + '</span>',
+          title: this.t('tooltips.toggleCase'), dropdown: true,
+          onclick: function(e) { e.preventDefault(); e.stopPropagation(); self.showCaseMenu(v_case); }
+        });
+        return v_case;
+      case 'removeformat':
+        return this._makeToolbarButton({
+          icon: WYSIWYG_ICONS.removeFormat, title: this.t('tooltips.removeFormat'),
+          onclick: function(e) { e.preventDefault(); e.stopPropagation(); self.removeFormat(); }
+        });
+      case 'link':
+        return this._makeToolbarButton({
+          icon: WYSIWYG_ICONS.link, title: this.t('tooltips.insertLink'),
+          onclick: function(e) { e.preventDefault(); self.createLink(); }
+        });
+      case 'forecolor':
+        var v_color = this._makeToolbarButton({
+          icon: 'A', title: this.t('tooltips.color'),
+          onclick: function(e) { e.preventDefault(); self.showUnifiedColorPicker(v_color); }
+        });
+        return v_color;
+      case 'font':
+        var v_font = this._makeToolbarButton({
+          icon: WYSIWYG_ICONS.font + ' <span class="dropdown-arrow">' + WYSIWYG_ICONS.chevronDown + '</span>',
+          title: this.t('tooltips.font'), dropdown: true,
+          onclick: function(e) { e.preventDefault(); e.stopPropagation(); self.showFontMenu(v_font); }
+        });
+        return v_font;
+      case 'specialchars':
+        var v_chars = this._makeToolbarButton({
+          icon: WYSIWYG_ICONS.specialChars, title: this.t('tooltips.specialChars'),
+          onclick: function(e) { e.preventDefault(); e.stopPropagation(); self.showSpecialCharsMenu(v_chars); }
+        });
+        return v_chars;
+      case 'mergetags':
+        if (!this.mergeTags || this.mergeTags.length === 0) return null;
+        return this._makeToolbarButton({
+          icon: WYSIWYG_ICONS.mergeTag, title: this.t('tooltips.mergeTag'),
+          onmousedown: function(e) { e.preventDefault(); },
+          onclick: function(e) {
+            e.preventDefault();
+            var sel = window.getSelection();
+            if (!sel || !sel.rangeCount) return;
+            var node = sel.getRangeAt(0).commonAncestorContainer;
+            var elx = (node.nodeType === 1) ? node : node.parentElement;
+            var blockEl = (elx && elx.closest) ? elx.closest('.mewyse-block[data-block-id]') : null;
+            if (!blockEl) return;
+            var editable = self.getEditableElement(blockEl);
+            var bId = parseInt(blockEl.getAttribute('data-block-id'), 10);
+            if (editable) self.showMergeTagMenu(bId, editable);
+          }
+        });
+      case 'align':
+        var v_align = this._makeToolbarButton({
+          icon: this._alignButtonInnerHTML('left'), title: this.t('tooltips.alignLeft'),
+          onmousedown: function(e) { e.preventDefault(); },
+          onclick: function(e) { e.preventDefault(); e.stopPropagation(); self.showAlignMenu(v_align); }
+        });
+        v_align.setAttribute('aria-haspopup', 'true');
+        this.alignButton = v_align;
+        return v_align;
+      case 'outdent':
+        return (this.outdentButton = this._makeToolbarButton({
+          icon: WYSIWYG_ICONS.outdent, title: this.t('tooltips.outdent'), disabled: true,
+          onmousedown: function(e) { e.preventDefault(); },
+          onclick: function(e) { e.preventDefault(); var v_id = self._getFocusedBlockId(); if (v_id !== null) self.indentBlock(v_id, -1); }
+        }));
+      case 'indent':
+        return (this.indentButton = this._makeToolbarButton({
+          icon: WYSIWYG_ICONS.indent, title: this.t('tooltips.indent'), disabled: true,
+          onmousedown: function(e) { e.preventDefault(); },
+          onclick: function(e) { e.preventDefault(); var v_id = self._getFocusedBlockId(); if (v_id !== null) self.indentBlock(v_id, 1); }
+        }));
+      case 'table':
+        if (this._isBlockDisabled('table')) return null;
+        return this._makeToolbarButton({
+          icon: WYSIWYG_ICONS.table, title: this.t('tooltips.insertTable'),
+          onclick: function(e) { e.preventDefault(); e.stopPropagation(); self.insertTableBlock(); }
+        });
+      case 'image':
+        if (this._isBlockDisabled('image')) return null;
+        return this._makeToolbarButton({
+          icon: WYSIWYG_ICONS.image, title: this.t('tooltips.insertImage'),
+          onclick: function(e) { e.preventDefault(); e.stopPropagation(); self.insertImageBlock(); }
+        });
+      case 'video':
+        if (this._isBlockDisabled('video')) return null;
+        return this._makeToolbarButton({
+          icon: WYSIWYG_ICONS.video, title: this.t('tooltips.insertVideo'),
+          onclick: function(e) { e.preventDefault(); e.stopPropagation(); self.insertVideoBlock(); }
+        });
+      case 'audio':
+        if (this._isBlockDisabled('audio')) return null;
+        return this._makeToolbarButton({
+          icon: WYSIWYG_ICONS.audio, title: this.t('tooltips.insertAudio'),
+          onclick: function(e) { e.preventDefault(); e.stopPropagation(); self.insertAudioBlock(); }
+        });
+      case 'find':
+        return this._makeToolbarButton({
+          icon: WYSIWYG_ICONS.search, title: this.t('tooltips.findReplace') + ' (Ctrl+F)',
+          onclick: function(e) { e.preventDefault(); self.showFindReplace(); }
+        });
+      case 'wordwrap':
+        var v_ww = this._makeToolbarButton({
+          icon: WYSIWYG_ICONS.wordWrap, title: this.t('tooltips.wordWrap'),
+          onclick: function(e) {
+            e.preventDefault(); self.toggleWordWrap();
+            v_ww.setAttribute('aria-pressed', self.wordWrap ? 'true' : 'false');
+            v_ww.classList.toggle('active', self.wordWrap);
+          }
+        });
+        v_ww.setAttribute('aria-pressed', this.wordWrap ? 'true' : 'false');
+        if (this.wordWrap) v_ww.classList.add('active');
+        this.wordWrapButton = v_ww;
+        return v_ww;
+      case 'summary':
+        var v_sum = this._makeToolbarButton({
+          icon: WYSIWYG_ICONS.summaryPanel, title: this.t('tooltips.summary'),
+          onclick: function(e) { e.preventDefault(); self.toggleOutlinePanel(); }
+        });
+        v_sum.setAttribute('aria-pressed', this.outlinePanel ? 'true' : 'false');
+        if (this.outlinePanel) v_sum.classList.add('active');
+        this.toolbarSummaryButton = v_sum;
+        return v_sum;
+      case 'showblocks':
+        var v_sb = this._makeToolbarButton({
+          icon: WYSIWYG_ICONS.showBlocks, title: this.t('tooltips.showBlocks'),
+          onclick: function(e) {
+            e.preventDefault(); self.toggleShowBlocks();
+            v_sb.setAttribute('aria-pressed', self.showingBlocks ? 'true' : 'false');
+            v_sb.classList.toggle('active', self.showingBlocks);
+          }
+        });
+        v_sb.setAttribute('aria-pressed', 'false');
+        this.showBlocksButton = v_sb;
+        return v_sb;
+      case 'fullscreen':
+        var v_fsn = this._makeToolbarButton({
+          icon: WYSIWYG_ICONS.fullscreen, title: this.t('tooltips.fullscreen'),
+          onclick: function(e) { e.preventDefault(); self.toggleFullscreen(); }
+        });
+        v_fsn.setAttribute('aria-pressed', 'false');
+        this.fullscreenButton = v_fsn;
+        return v_fsn;
+      case 'print':
+        return this._makeToolbarButton({
+          icon: WYSIWYG_ICONS.print, title: this.t('tooltips.print'),
+          onclick: function(e) { e.preventDefault(); self.print(); }
+        });
+      case 'exportword':
+        return this._makeToolbarButton({
+          icon: WYSIWYG_ICONS.exportWord, title: this.t('tooltips.exportWord'),
+          onclick: function(e) { e.preventDefault(); self.exportWord(); }
+        });
+      case 'exportpdf':
+        return this._makeToolbarButton({
+          icon: WYSIWYG_ICONS.exportPdf, title: this.t('tooltips.exportPdf'),
+          onclick: function(e) { e.preventDefault(); self.exportPdf(); }
+        });
+      case 'moveup':
+        return (this.moveUpButton = this._makeToolbarButton({
+          icon: WYSIWYG_ICONS.arrowUp, title: this.t('tooltips.moveBlockUp'), disabled: true,
+          onclick: function(e) { e.preventDefault(); self.moveBlockUp(); }
+        }));
+      case 'movedown':
+        return (this.moveDownButton = this._makeToolbarButton({
+          icon: WYSIWYG_ICONS.arrowDown, title: this.t('tooltips.moveBlockDown'), disabled: true,
+          onclick: function(e) { e.preventDefault(); self.moveBlockDown(); }
+        }));
+      default:
+        return null; // nombre desconocido → se ignora
+    }
+  };
+
+  /**
+   * Construye el stepper de tamaño de fuente [−] [valor] [+] (ítem `fontsize`).
+   * @returns {HTMLElement}
+   */
+  meWYSE.prototype._buildFontSizeStepper = function() {
+    var self = this;
+    var v_stepper = document.createElement('div');
+    v_stepper.className = 'mewyse-font-size-stepper';
+
+    var v_dec = this._makeToolbarButton({
+      icon: WYSIWYG_ICONS.minus, title: this.t('tooltips.fontSizeDecrease'), className: 'mewyse-font-size-step',
+      onmousedown: function(e) { e.preventDefault(); },
+      onclick: function(e) { e.preventDefault(); self._stepFontSize(-1); }
+    });
+    var v_val = document.createElement('span');
+    v_val.className = 'mewyse-font-size-value';
+    v_val.textContent = '—';
+    this._fontSizeDisplay = v_val;
+    var v_inc = this._makeToolbarButton({
+      icon: WYSIWYG_ICONS.plus, title: this.t('tooltips.fontSizeIncrease'), className: 'mewyse-font-size-step',
+      onmousedown: function(e) { e.preventDefault(); },
+      onclick: function(e) { e.preventDefault(); self._stepFontSize(1); }
+    });
+
+    v_stepper.appendChild(v_dec);
+    v_stepper.appendChild(v_val);
+    v_stepper.appendChild(v_inc);
+    return v_stepper;
+  };
+
+  /**
    * Crea la barra de herramientas
    */
   meWYSE.prototype.createToolbar = function() {
@@ -2234,559 +2544,44 @@
       host = scrollTrack;
     }
 
-    // Grupo de undo/redo (al principio de la toolbar)
-    var undoRedoGroup = document.createElement('div');
-    undoRedoGroup.className = 'mewyse-toolbar-group';
-
-    var undoBtn = document.createElement('button');
-    undoBtn.className = 'mewyse-toolbar-button';
-    undoBtn.innerHTML = WYSIWYG_ICONS.undo;
-    undoBtn.title = this.t('tooltips.undo');
-    undoBtn.disabled = true;
-    // mousedown+preventDefault: no robar el foco/caret del bloque al pulsar, así
-    // undo() puede capturar dónde estaba el caret para restaurarlo tras el render.
-    undoBtn.onmousedown = function(e) { e.preventDefault(); };
-    undoBtn.onclick = function(e) {
-      e.preventDefault();
-      self.undo();
-    };
-    this.undoButton = undoBtn;
-    undoRedoGroup.appendChild(undoBtn);
-
-    var redoBtn = document.createElement('button');
-    redoBtn.className = 'mewyse-toolbar-button';
-    redoBtn.innerHTML = WYSIWYG_ICONS.redo;
-    redoBtn.title = this.t('tooltips.redo');
-    redoBtn.disabled = true;
-    redoBtn.onmousedown = function(e) { e.preventDefault(); };
-    redoBtn.onclick = function(e) {
-      e.preventDefault();
-      self.redo();
-    };
-    this.redoButton = redoBtn;
-    undoRedoGroup.appendChild(redoBtn);
-
-    host.appendChild(undoRedoGroup);
-
-    // Separador
-    var separator1 = document.createElement('div');
-    separator1.className = 'mewyse-toolbar-separator';
-    host.appendChild(separator1);
-
-    // Botón desplegable para tipos de bloque
-    var blockTypeButton = document.createElement('button');
-    blockTypeButton.className = 'mewyse-toolbar-button mewyse-toolbar-dropdown';
-    blockTypeButton.innerHTML = this.t('misc.text') + ' <span class="dropdown-arrow">' + WYSIWYG_ICONS.chevronDown + '</span>';
-    blockTypeButton.title = this.t('tooltips.changeBlockType');
-    blockTypeButton.setAttribute('aria-expanded', 'false');
-    blockTypeButton.setAttribute('aria-haspopup', 'listbox');
-    blockTypeButton.onclick = function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      self.showToolbarBlockTypeMenu(blockTypeButton);
-    };
-    // Referencia para actualizar su etiqueta según el bloque enfocado
-    this._blockTypeButton = blockTypeButton;
-
-    host.appendChild(blockTypeButton);
-
-    // Stepper de tamaño de fuente [−] [valor] [+] — justo tras el selector de tipo
-    // de bloque (opt-in con `fontControls`). Refleja el tamaño del caret/selección
-    // y aplica un font-size inline recorriendo FONT_SIZE_SCALE.
-    if (this.fontControls) {
-      var v_fs_sep = document.createElement('div');
-      v_fs_sep.className = 'mewyse-toolbar-separator';
-      host.appendChild(v_fs_sep);
-
-      var v_fs_stepper = document.createElement('div');
-      v_fs_stepper.className = 'mewyse-font-size-stepper';
-
-      var v_fs_dec = document.createElement('button');
-      v_fs_dec.type = 'button';
-      v_fs_dec.className = 'mewyse-toolbar-button mewyse-font-size-step';
-      v_fs_dec.innerHTML = WYSIWYG_ICONS.minus;
-      v_fs_dec.title = this.t('tooltips.fontSizeDecrease');
-      v_fs_dec.setAttribute('aria-label', this.t('tooltips.fontSizeDecrease'));
-      v_fs_dec.onmousedown = function(e) { e.preventDefault(); };
-      v_fs_dec.onclick = function(e) { e.preventDefault(); self._stepFontSize(-1); };
-
-      var v_fs_val = document.createElement('span');
-      v_fs_val.className = 'mewyse-font-size-value';
-      v_fs_val.textContent = '—';
-      this._fontSizeDisplay = v_fs_val;
-
-      var v_fs_inc = document.createElement('button');
-      v_fs_inc.type = 'button';
-      v_fs_inc.className = 'mewyse-toolbar-button mewyse-font-size-step';
-      v_fs_inc.innerHTML = WYSIWYG_ICONS.plus;
-      v_fs_inc.title = this.t('tooltips.fontSizeIncrease');
-      v_fs_inc.setAttribute('aria-label', this.t('tooltips.fontSizeIncrease'));
-      v_fs_inc.onmousedown = function(e) { e.preventDefault(); };
-      v_fs_inc.onclick = function(e) { e.preventDefault(); self._stepFontSize(1); };
-
-      v_fs_stepper.appendChild(v_fs_dec);
-      v_fs_stepper.appendChild(v_fs_val);
-      v_fs_stepper.appendChild(v_fs_inc);
-      host.appendChild(v_fs_stepper);
-    }
-
-    // Separador
-    var separator1b = document.createElement('div');
-    separator1b.className = 'mewyse-toolbar-separator';
-    host.appendChild(separator1b);
-
-    // Grupo de formato de texto
-    var formatGroup = document.createElement('div');
-    formatGroup.className = 'mewyse-toolbar-group';
-
-    var formatTools = [
-      { action: 'bold', labelKey: 'tooltips.bold', icon: '<strong>B</strong>', command: 'bold' },
-      { action: 'italic', labelKey: 'tooltips.italic', icon: '<em>I</em>', command: 'italic' },
-      { action: 'underline', labelKey: 'tooltips.underline', icon: '<u>U</u>', command: 'underline' },
-      { action: 'strikethrough', labelKey: 'tooltips.strikethrough', icon: '<s>S</s>', command: 'strikeThrough' },
-      { action: 'subscript', labelKey: 'tooltips.subscript', icon: WYSIWYG_ICONS.subscript, type: 'wrapTag', tag: 'sub' },
-      { action: 'superscript', labelKey: 'tooltips.superscript', icon: WYSIWYG_ICONS.superscript, type: 'wrapTag', tag: 'sup' },
-      { action: 'caseMenu', labelKey: 'tooltips.toggleCase', icon: '<span style="font-size:13px;font-weight:600">Aa</span> <span class="dropdown-arrow">' + WYSIWYG_ICONS.chevronDown + '</span>', type: 'caseMenu' },
-      { action: 'removeFormat', labelKey: 'tooltips.removeFormat', icon: WYSIWYG_ICONS.removeFormat, type: 'removeFormat' }
-    ];
-
-    formatTools.forEach(function(tool) {
-      var button = document.createElement('button');
-      button.className = 'mewyse-toolbar-button';
-      if (tool.type === 'caseMenu') button.className += ' mewyse-toolbar-dropdown';
-      button.innerHTML = tool.icon;
-      button.title = self.t(tool.labelKey);
-      button.onclick = function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        if (tool.type === 'caseMenu') {
-          self.showCaseMenu(button);
-        } else if (tool.type === 'removeFormat') {
-          self.removeFormat();
-        } else if (tool.type === 'wrapTag') {
-          // Sub/superíndice: envolver en <sub>/<sup> (toggle fiable). No usa
-          // execCommand porque su markup es inconsistente entre navegadores.
-          var v_tag = tool.tag;
-          var v_wrapped = self._applyInlineAcrossSelection(function() {
-            self._wrapSelectionInTag(v_tag);
-          });
-          if (!v_wrapped) {
-            self._wrapSelectionInTag(v_tag);
-            // _wrapSelectionInTag muta el DOM sin disparar input: persistir.
-            self._persistActiveBlockContent();
-          }
-        } else {
-          var v_command = tool.command;
-          // Si hay varios bloques seleccionados, aplicar a todos; si no, normal.
-          var v_applied = self._applyInlineAcrossSelection(function() {
-            document.execCommand(v_command, false, null);
-          });
-          if (!v_applied) {
-            document.execCommand(v_command, false, null);
-            self.triggerChange();
-          }
+    // Construir la toolbar declarativamente desde la opción `toolbar`.
+    // Filas → grupos (separados por `|`) → ítems. Cada nombre lo construye
+    // _buildToolbarItem(); los grupos vacíos (p. ej. inserción desactivada) se omiten.
+    var v_rows = this._normalizeToolbarSpec(this.options.toolbar);
+    for (var r = 0; r < v_rows.length; r++) {
+      if (r > 0 && !scrollMode) {
+        // Salto de fila (solo en modo wrap; en scroll todo va en una sola fila).
+        var v_break = document.createElement('div');
+        v_break.className = 'mewyse-toolbar-row-break';
+        host.appendChild(v_break);
+      }
+      var v_groups = v_rows[r];
+      var v_first_in_row = true;
+      for (var gi = 0; gi < v_groups.length; gi++) {
+        var v_group_el = document.createElement('div');
+        v_group_el.className = 'mewyse-toolbar-group';
+        var v_names = v_groups[gi];
+        for (var ni = 0; ni < v_names.length; ni++) {
+          var v_item_el = this._buildToolbarItem(v_names[ni]);
+          if (v_item_el) v_group_el.appendChild(v_item_el);
         }
-      };
-      formatGroup.appendChild(button);
-    });
-
-    host.appendChild(formatGroup);
-
-    // Separador
-    var separator2 = document.createElement('div');
-    separator2.className = 'mewyse-toolbar-separator';
-    host.appendChild(separator2);
-
-    // Grupo de enlaces y colores
-    var extrasGroup = document.createElement('div');
-    extrasGroup.className = 'mewyse-toolbar-group';
-
-    // Botón de enlace
-    var linkButton = document.createElement('button');
-    linkButton.className = 'mewyse-toolbar-button';
-    linkButton.innerHTML = WYSIWYG_ICONS.link;
-    linkButton.title = this.t('tooltips.insertLink');
-    linkButton.onclick = function(e) {
-      e.preventDefault();
-      self.createLink();
-    };
-    extrasGroup.appendChild(linkButton);
-
-    // Botón unificado de color
-    var colorButton = document.createElement('button');
-    colorButton.className = 'mewyse-toolbar-button';
-    colorButton.innerHTML = 'A';
-    colorButton.title = this.t('tooltips.color');
-    colorButton.onclick = function(e) {
-      e.preventDefault();
-      self.showUnifiedColorPicker(colorButton);
-    };
-    extrasGroup.appendChild(colorButton);
-
-    // Botón de fuente (familia/tamaño/interlineado) — opt-in con `fontControls`.
-    // El stepper de tamaño va junto al selector de tipo de bloque (arriba).
-    if (this.fontControls) {
-      var fontButton = document.createElement('button');
-      fontButton.className = 'mewyse-toolbar-button mewyse-toolbar-dropdown';
-      fontButton.innerHTML = WYSIWYG_ICONS.font + ' <span class="dropdown-arrow">' + WYSIWYG_ICONS.chevronDown + '</span>';
-      fontButton.title = this.t('tooltips.font');
-      fontButton.onclick = function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        self.showFontMenu(fontButton);
-      };
-      extrasGroup.appendChild(fontButton);
+        if (v_group_el.children.length > 0) {
+          if (!v_first_in_row) {
+            var v_sep = document.createElement('div');
+            v_sep.className = 'mewyse-toolbar-separator';
+            host.appendChild(v_sep);
+          }
+          host.appendChild(v_group_el);
+          v_first_in_row = false;
+        }
+      }
     }
 
-    // Botón de caracteres especiales (siempre disponible en la toolbar).
-    var charsButton = document.createElement('button');
-    charsButton.className = 'mewyse-toolbar-button';
-    charsButton.innerHTML = WYSIWYG_ICONS.specialChars;
-    charsButton.title = this.t('tooltips.specialChars');
-    charsButton.onclick = function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      self.showSpecialCharsMenu(charsButton);
-    };
-    extrasGroup.appendChild(charsButton);
-
-    host.appendChild(extrasGroup);
-
-    // Separador
-    var separator3 = document.createElement('div');
-    separator3.className = 'mewyse-toolbar-separator';
-    host.appendChild(separator3);
-
-    // Grupo de alineación
-    var alignGroup = document.createElement('div');
-    alignGroup.className = 'mewyse-toolbar-group';
-
-    // Botón ÚNICO de alineación (dropdown). El icono refleja la alineación del
-    // bloque con foco (_updateAlignButton, disparado por los eventos de foco).
-    var alignBtn = document.createElement('button');
-    alignBtn.className = 'mewyse-toolbar-button';
-    alignBtn.innerHTML = this._alignButtonInnerHTML('left');
-    alignBtn.title = self.t('tooltips.alignLeft');
-    alignBtn.setAttribute('aria-label', self.t('tooltips.alignLeft'));
-    alignBtn.setAttribute('aria-haspopup', 'true');
-    // mousedown+preventDefault: no perder el caret/foco del bloque al abrir el
-    // menú (así _getFocusedBlockId resuelve el bloque correcto al aplicar).
-    alignBtn.onmousedown = function(e) { e.preventDefault(); };
-    alignBtn.onclick = function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      self.showAlignMenu(alignBtn);
-    };
-    this.alignButton = alignBtn;
-    alignGroup.appendChild(alignBtn);
-
-    host.appendChild(alignGroup);
-
-    // Grupo de sangría (indentar/desindentar ítems de lista). Los botones se
-    // habilitan/deshabilitan según el bloque con foco (_updateIndentButtons).
-    var indentGroup = document.createElement('div');
-    indentGroup.className = 'mewyse-toolbar-group';
-
-    var outdentBtn = document.createElement('button');
-    outdentBtn.className = 'mewyse-toolbar-button';
-    outdentBtn.innerHTML = WYSIWYG_ICONS.outdent;
-    outdentBtn.title = this.t('tooltips.outdent');
-    outdentBtn.setAttribute('aria-label', this.t('tooltips.outdent'));
-    outdentBtn.disabled = true;
-    // mousedown+preventDefault: no quitar el foco del ítem al clicar (conserva la
-    // referencia del bloque activo para indentBlock).
-    outdentBtn.onmousedown = function(e) { e.preventDefault(); };
-    outdentBtn.onclick = function(e) {
-      e.preventDefault();
-      var v_id = self._getFocusedBlockId();
-      if (v_id !== null) self.indentBlock(v_id, -1);
-    };
-    this.outdentButton = outdentBtn;
-    indentGroup.appendChild(outdentBtn);
-
-    var indentBtn = document.createElement('button');
-    indentBtn.className = 'mewyse-toolbar-button';
-    indentBtn.innerHTML = WYSIWYG_ICONS.indent;
-    indentBtn.title = this.t('tooltips.indent');
-    indentBtn.setAttribute('aria-label', this.t('tooltips.indent'));
-    indentBtn.disabled = true;
-    indentBtn.onmousedown = function(e) { e.preventDefault(); };
-    indentBtn.onclick = function(e) {
-      e.preventDefault();
-      var v_id = self._getFocusedBlockId();
-      if (v_id !== null) self.indentBlock(v_id, 1);
-    };
-    this.indentButton = indentBtn;
-    indentGroup.appendChild(indentBtn);
-
-    host.appendChild(indentGroup);
-
-    // Separador
-    var separator4 = document.createElement('div');
-    separator4.className = 'mewyse-toolbar-separator';
-    host.appendChild(separator4);
-
-    // Grupo de inserción de elementos
-    var insertGroup = document.createElement('div');
-    insertGroup.className = 'mewyse-toolbar-group';
-
-    // Botón de tabla
-    if (!this._isBlockDisabled('table')) {
-      var tableButton = document.createElement('button');
-      tableButton.className = 'mewyse-toolbar-button';
-      tableButton.innerHTML = WYSIWYG_ICONS.table;
-      tableButton.title = self.t('tooltips.insertTable');
-      tableButton.onclick = function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        self.insertTableBlock();
-      };
-      insertGroup.appendChild(tableButton);
-    }
-
-    // Botón de imagen
-    if (!this._isBlockDisabled('image')) {
-      var imageButton = document.createElement('button');
-      imageButton.className = 'mewyse-toolbar-button';
-      imageButton.innerHTML = WYSIWYG_ICONS.image;
-      imageButton.title = self.t('tooltips.insertImage');
-      imageButton.onclick = function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        self.insertImageBlock();
-      };
-      insertGroup.appendChild(imageButton);
-    }
-
-    // Botón de vídeo (YouTube, Vimeo, archivo .mp4)
-    if (!this._isBlockDisabled('video')) {
-      var videoButton = document.createElement('button');
-      videoButton.className = 'mewyse-toolbar-button';
-      videoButton.innerHTML = WYSIWYG_ICONS.video;
-      videoButton.title = self.t('tooltips.insertVideo');
-      videoButton.setAttribute('aria-label', self.t('tooltips.insertVideo'));
-      videoButton.onclick = function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        self.insertVideoBlock();
-      };
-      insertGroup.appendChild(videoButton);
-    }
-
-    // Botón de audio
-    if (!this._isBlockDisabled('audio')) {
-    var audioButton = document.createElement('button');
-    audioButton.className = 'mewyse-toolbar-button';
-    audioButton.innerHTML = WYSIWYG_ICONS.audio;
-    audioButton.title = self.t('tooltips.insertAudio');
-    audioButton.setAttribute('aria-label', self.t('tooltips.insertAudio'));
-    audioButton.onclick = function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      self.insertAudioBlock();
-    };
-    insertGroup.appendChild(audioButton);
-    }
-
-    // Botón de variables / merge tags (solo si hay mergeTags configuradas).
-    if (this.mergeTags && this.mergeTags.length > 0) {
-      var mergeBtn = document.createElement('button');
-      mergeBtn.className = 'mewyse-toolbar-button';
-      mergeBtn.innerHTML = WYSIWYG_ICONS.mergeTag;
-      mergeBtn.title = this.t('tooltips.mergeTag');
-      mergeBtn.setAttribute('aria-label', this.t('tooltips.mergeTag'));
-      // mousedown+preventDefault: conservar el caret del editor al pulsar.
-      mergeBtn.onmousedown = function(e) { e.preventDefault(); };
-      mergeBtn.onclick = function(e) {
-        e.preventDefault();
-        var sel = window.getSelection();
-        if (!sel || !sel.rangeCount) return;
-        var node = sel.getRangeAt(0).commonAncestorContainer;
-        var elx = (node.nodeType === 1) ? node : node.parentElement;
-        var blockEl = (elx && elx.closest) ? elx.closest('.mewyse-block[data-block-id]') : null;
-        if (!blockEl) return;
-        var editable = self.getEditableElement(blockEl);
-        var bId = parseInt(blockEl.getAttribute('data-block-id'), 10);
-        if (editable) self.showMergeTagMenu(bId, editable);
-      };
-      insertGroup.appendChild(mergeBtn);
-    }
-
-    host.appendChild(insertGroup);
-
-    // Separador antes del grupo de vistas
-    var separatorView = document.createElement('div');
-    separatorView.className = 'mewyse-toolbar-separator';
-    host.appendChild(separatorView);
-
-    // Grupo de vistas/herramientas (find, showBlocks, fullscreen)
-    var viewGroup = document.createElement('div');
-    viewGroup.className = 'mewyse-toolbar-group';
-
-    // Botón de Buscar y reemplazar
-    if (this.enableFindReplace) {
-      var findBtn = document.createElement('button');
-      findBtn.className = 'mewyse-toolbar-button';
-      findBtn.innerHTML = WYSIWYG_ICONS.search;
-      findBtn.title = this.t('tooltips.findReplace') + ' (Ctrl+F)';
-      findBtn.setAttribute('aria-label', this.t('tooltips.findReplace'));
-      findBtn.onclick = function(e) {
-        e.preventDefault();
-        self.showFindReplace();
-      };
-      viewGroup.appendChild(findBtn);
-    }
-
-    // Botón de Ajuste de texto (word wrap)
-    if (this.enableWordWrapToggle) {
-      var wordWrapBtn = document.createElement('button');
-      wordWrapBtn.className = 'mewyse-toolbar-button';
-      wordWrapBtn.innerHTML = WYSIWYG_ICONS.wordWrap;
-      wordWrapBtn.title = this.t('tooltips.wordWrap');
-      wordWrapBtn.setAttribute('aria-label', this.t('tooltips.wordWrap'));
-      wordWrapBtn.setAttribute('aria-pressed', this.wordWrap ? 'true' : 'false');
-      if (this.wordWrap) wordWrapBtn.classList.add('active');
-      wordWrapBtn.onclick = function(e) {
-        e.preventDefault();
-        self.toggleWordWrap();
-        wordWrapBtn.setAttribute('aria-pressed', self.wordWrap ? 'true' : 'false');
-        wordWrapBtn.classList.toggle('active', self.wordWrap);
-      };
-      this.wordWrapButton = wordWrapBtn;
-      viewGroup.appendChild(wordWrapBtn);
-    }
-
-    // Botón de Resumen / esquema (abre el panel lateral). En modo con toolbar
-    // se usa este botón en lugar del flotante (mewyse-summary-button).
-    if (this.showSummary) {
-      var summaryBtn = document.createElement('button');
-      summaryBtn.className = 'mewyse-toolbar-button';
-      summaryBtn.innerHTML = WYSIWYG_ICONS.summaryPanel;
-      summaryBtn.title = this.t('tooltips.summary');
-      summaryBtn.setAttribute('aria-label', this.t('tooltips.summary'));
-      summaryBtn.setAttribute('aria-pressed', this.outlinePanel ? 'true' : 'false');
-      if (this.outlinePanel) summaryBtn.classList.add('active');
-      summaryBtn.onclick = function(e) {
-        e.preventDefault();
-        self.toggleOutlinePanel();
-      };
-      this.toolbarSummaryButton = summaryBtn;
-      viewGroup.appendChild(summaryBtn);
-    }
-
-    // Botón de Mostrar bloques (show blocks)
-    if (this.enableShowBlocks) {
-      var showBlocksBtn = document.createElement('button');
-      showBlocksBtn.className = 'mewyse-toolbar-button';
-      showBlocksBtn.innerHTML = WYSIWYG_ICONS.showBlocks;
-      showBlocksBtn.title = this.t('tooltips.showBlocks');
-      showBlocksBtn.setAttribute('aria-label', this.t('tooltips.showBlocks'));
-      showBlocksBtn.setAttribute('aria-pressed', 'false');
-      showBlocksBtn.onclick = function(e) {
-        e.preventDefault();
-        self.toggleShowBlocks();
-        showBlocksBtn.setAttribute('aria-pressed', self.showingBlocks ? 'true' : 'false');
-        showBlocksBtn.classList.toggle('active', self.showingBlocks);
-      };
-      this.showBlocksButton = showBlocksBtn;
-      viewGroup.appendChild(showBlocksBtn);
-    }
-
-    // Botón de Pantalla completa (fullscreen)
-    if (this.enableFullscreen) {
-      var fullscreenBtn = document.createElement('button');
-      fullscreenBtn.className = 'mewyse-toolbar-button';
-      fullscreenBtn.innerHTML = WYSIWYG_ICONS.fullscreen;
-      fullscreenBtn.title = this.t('tooltips.fullscreen');
-      fullscreenBtn.setAttribute('aria-label', this.t('tooltips.fullscreen'));
-      fullscreenBtn.setAttribute('aria-pressed', 'false');
-      fullscreenBtn.onclick = function(e) {
-        e.preventDefault();
-        self.toggleFullscreen();
-      };
-      this.fullscreenButton = fullscreenBtn;
-      viewGroup.appendChild(fullscreenBtn);
-    }
-
-    // Botones de imprimir y exportar a Word (opt-in con `exportTools`).
-    if (this.exportTools) {
-      var printBtn = document.createElement('button');
-      printBtn.className = 'mewyse-toolbar-button';
-      printBtn.innerHTML = WYSIWYG_ICONS.print;
-      printBtn.title = this.t('tooltips.print');
-      printBtn.onclick = function(e) { e.preventDefault(); self.print(); };
-      viewGroup.appendChild(printBtn);
-
-      var wordBtn = document.createElement('button');
-      wordBtn.className = 'mewyse-toolbar-button';
-      wordBtn.innerHTML = WYSIWYG_ICONS.exportWord;
-      wordBtn.title = this.t('tooltips.exportWord');
-      wordBtn.onclick = function(e) { e.preventDefault(); self.exportWord(); };
-      viewGroup.appendChild(wordBtn);
-
-      var pdfBtn = document.createElement('button');
-      pdfBtn.className = 'mewyse-toolbar-button';
-      pdfBtn.innerHTML = WYSIWYG_ICONS.exportPdf;
-      pdfBtn.title = this.t('tooltips.exportPdf');
-      pdfBtn.onclick = function(e) { e.preventDefault(); self.exportPdf(); };
-      viewGroup.appendChild(pdfBtn);
-    }
-
-    if (viewGroup.children.length > 0) {
-      host.appendChild(viewGroup);
-    }
-
-    // Grupo de mover bloque arriba/abajo (alineado a la derecha)
-    var moveGroup = document.createElement('div');
-    moveGroup.className = 'mewyse-toolbar-group';
-
-    var moveUpBtn = document.createElement('button');
-    moveUpBtn.className = 'mewyse-toolbar-button';
-    moveUpBtn.innerHTML = WYSIWYG_ICONS.arrowUp;
-    moveUpBtn.title = this.t('tooltips.moveBlockUp');
-    moveUpBtn.setAttribute('aria-label', this.t('tooltips.moveBlockUp'));
-    moveUpBtn.disabled = true;
-    moveUpBtn.onclick = function(e) {
-      e.preventDefault();
-      self.moveBlockUp();
-    };
-    this.moveUpButton = moveUpBtn;
-    moveGroup.appendChild(moveUpBtn);
-
-    var moveDownBtn = document.createElement('button');
-    moveDownBtn.className = 'mewyse-toolbar-button';
-    moveDownBtn.innerHTML = WYSIWYG_ICONS.arrowDown;
-    moveDownBtn.title = this.t('tooltips.moveBlockDown');
-    moveDownBtn.setAttribute('aria-label', this.t('tooltips.moveBlockDown'));
-    moveDownBtn.disabled = true;
-    moveDownBtn.onclick = function(e) {
-      e.preventDefault();
-      self.moveBlockDown();
-    };
-    this.moveDownButton = moveDownBtn;
-    moveGroup.appendChild(moveDownBtn);
-
+    // Cablear el scroll/overflow (modo scroll): flechas prev/next y gradientes.
+    // Los ítems (incluidos mover bloque) van en el track scrollable.
     if (scrollMode) {
-      // Zona fija a la derecha (no scrollea); contiene el grupo de mover bloque.
-      var fixedEnd = document.createElement('div');
-      fixedEnd.className = 'mewyse-toolbar-fixed-end';
-      fixedEnd.appendChild(moveGroup);
-      toolbar.appendChild(fixedEnd);
-
-      // Guardar referencias y cablear lógica de scroll/overflow
-      this._toolbarScroll = {
-        area: scrollArea,
-        track: scrollTrack,
-        prev: scrollPrev,
-        next: scrollNext
-      };
+      this._toolbarScroll = { area: scrollArea, track: scrollTrack, prev: scrollPrev, next: scrollNext };
       this._setupToolbarScroll();
-    } else {
-      // Modo wrap (default): spacer empuja el moveGroup al extremo derecho
-      var spacer = document.createElement('div');
-      spacer.style.flex = '1';
-      toolbar.appendChild(spacer);
-      toolbar.appendChild(moveGroup);
     }
 
     // Accesibilidad: los botones icon-only solo tienen `title`. Copiar el title
@@ -10745,7 +10540,7 @@
         this.createLink();
         return;
       }
-      if (this.enableFindReplace && (e.key === 'f' || e.key === 'F')) {
+      if (e.key === 'f' || e.key === 'F') {
         e.preventDefault();
         this.showFindReplace();
         return;
@@ -14490,6 +14285,29 @@
 
   // Escala de tamaños de fuente (px) que recorre el stepper [−]/[+].
   var FONT_SIZE_SCALE = [8, 9, 10, 11, 12, 13, 14, 16, 18, 20, 24, 28, 32, 36, 42, 48, 56, 64, 72, 96];
+
+  // Toolbar declarativa (estilo TinyMCE). La opción `toolbar` acepta:
+  //   true            → esta lista por defecto (todos los ítems)
+  //   'a b | c d'     → string: ítems por espacios, `|` separa grupos
+  //   ['fila1','fila2'] → array de strings: una fila cada uno
+  //   false           → sin toolbar
+  // Los nombres de ítem los construye _buildToolbarItem().
+  var DEFAULT_TOOLBAR =
+    'undo redo | blocktype fontsize | ' +
+    'bold italic underline strikethrough subscript superscript case removeformat | ' +
+    'link forecolor font specialchars mergetags | ' +
+    'align outdent indent | table image video audio | ' +
+    'find wordwrap summary showblocks fullscreen | moveup movedown';
+
+  // Config de los botones de formato inline (comando execCommand o wrap de tag).
+  var TOOLBAR_FORMAT_TOOLS = {
+    bold:          { labelKey: 'tooltips.bold',          icon: '<strong>B</strong>', command: 'bold' },
+    italic:        { labelKey: 'tooltips.italic',        icon: '<em>I</em>',         command: 'italic' },
+    underline:     { labelKey: 'tooltips.underline',     icon: '<u>U</u>',           command: 'underline' },
+    strikethrough: { labelKey: 'tooltips.strikethrough', icon: '<s>S</s>',           command: 'strikeThrough' },
+    subscript:     { labelKey: 'tooltips.subscript',     iconName: 'subscript',      type: 'wrapTag', tag: 'sub' },
+    superscript:   { labelKey: 'tooltips.superscript',   iconName: 'superscript',    type: 'wrapTag', tag: 'sup' }
+  };
 
   var CASE_TRANSFORMERS = {
     'upper': function(s) { return s.toUpperCase(); },

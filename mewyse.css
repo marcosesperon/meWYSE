@@ -109,6 +109,14 @@
   gap: 4px;
 }
 
+/* Salto de fila de la toolbar declarativa (array de filas, solo en modo wrap):
+   fuerza que los grupos siguientes bajen a una nueva línea. */
+.mewyse-toolbar-row-break {
+  flex-basis: 100%;
+  width: 100%;
+  height: 0;
+}
+
 .mewyse-toolbar-button {
   background: var(--mewyse-bg-primary);
   color: var(--mewyse-text-primary);
