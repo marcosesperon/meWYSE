@@ -161,7 +161,16 @@
   font-weight: 600;
 }
 
+/* Dropdown icon-only (Aa, fuente, interlineado...): ancho de botón normal + lo
+   justo para la flecha; no crece más. */
 .mewyse-toolbar-dropdown {
+  justify-content: center;
+  gap: 4px;
+}
+
+/* Dropdown ANCHO (selector de tipo de bloque "Texto"): reserva ancho para el
+   nombre del tipo y separa la flecha a la derecha. */
+.mewyse-toolbar-dropdown-wide {
   min-width: 100px;
   justify-content: space-between;
   gap: 8px;

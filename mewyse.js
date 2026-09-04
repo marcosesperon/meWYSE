@@ -2269,7 +2269,7 @@
       case 'blocktype':
         var v_bt = this._makeToolbarButton({
           icon: this.t('misc.text') + ' <span class="dropdown-arrow">' + WYSIWYG_ICONS.chevronDown + '</span>',
-          title: this.t('tooltips.changeBlockType'), dropdown: true,
+          title: this.t('tooltips.changeBlockType'), dropdown: true, className: 'mewyse-toolbar-dropdown-wide',
           onclick: function(e) { e.preventDefault(); e.stopPropagation(); self.showToolbarBlockTypeMenu(v_bt); }
         });
         v_bt.setAttribute('aria-expanded', 'false');
