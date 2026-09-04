@@ -6601,6 +6601,59 @@
         return;
       }
 
+      // Bloques estructurales propios de meWYSE (los emite getHTML como
+      // div/nav/details). Se detectan AQUI, antes del manejo genérico de DIV
+      // (que los aplanaría a un párrafo vacío y perdería el bloque). Es lo que
+      // permite el round-trip por el modal de Código fuente / loadFromHTML.
+      if (tagName === 'DIV') {
+        var v_div_cls = ' ' + (node.className || '') + ' ';
+        // Salto de página → bloque pageBreak (contenido derivado, vacío)
+        if (v_div_cls.indexOf(' mewyse-page-break ') !== -1) {
+          blocksToInsert.push({ type: 'pageBreak', content: '' });
+          return;
+        }
+        // Callout (aviso) → variante + contenido inline
+        if (v_div_cls.indexOf(' mewyse-callout ') !== -1) {
+          var v_variant = 'info';
+          var v_variant_match = (node.className || '')
+            .match(/mewyse-callout-(info|warning|success|danger)/);
+          if (v_variant_match) v_variant = v_variant_match[1];
+          // Contenido: el .mewyse-callout-content si viene del DOM del editor
+          // (evita arrastrar el botón de variante); si no (export), el div.
+          var v_callout_node = node.querySelector('.mewyse-callout-content') || node;
+          blocksToInsert.push({
+            type: 'callout',
+            content: self.sanitizeHTML(v_callout_node).trim(),
+            calloutVariant: v_variant
+          });
+          return;
+        }
+      }
+
+      // Índice (tabla de contenidos) → bloque toc (contenido derivado, vacío)
+      if (tagName === 'NAV' &&
+          (' ' + (node.className || '') + ' ').indexOf(' mewyse-toc ') !== -1) {
+        blocksToInsert.push({ type: 'toc', content: '' });
+        return;
+      }
+
+      // Desplegable (details/summary) → bloque toggle
+      if (tagName === 'DETAILS') {
+        var v_summary_el = node.querySelector('summary');
+        var v_toggle_title = v_summary_el ? self.sanitizeHTML(v_summary_el).trim() : '';
+        // Cuerpo = todo el <details> menos el <summary>.
+        var v_details_clone = node.cloneNode(true);
+        var v_clone_summary = v_details_clone.querySelector('summary');
+        if (v_clone_summary) v_clone_summary.parentNode.removeChild(v_clone_summary);
+        blocksToInsert.push({
+          type: 'toggle',
+          content: self.sanitizeHTML(v_details_clone).trim(),
+          toggleTitle: v_toggle_title,
+          collapsed: !node.hasAttribute('open')
+        });
+        return;
+      }
+
       // Manejar HR
       if (tagName === 'HR') {
         blocksToInsert.push({
@@ -6783,14 +6836,19 @@
     for (var j = 0; j < allElements.length; j++) {
       var el = allElements[j];
 
-      // Si es un átomo meWYSE (mewyse-tag / mewyse-mention / mewyse-emoji),
-      // saltarse el cleanup completo. Estos spans son contenido legítimo del
-      // editor — quitarles la class o el style los rompería visualmente y
-      // perderían su semántica.
+      // Si es un átomo meWYSE (mewyse-tag / mewyse-mention / mewyse-emoji) o un
+      // bloque estructural propio (page-break / callout / toc / callout-content),
+      // saltarse el cleanup completo. Es contenido legítimo del editor — quitarles
+      // la class los rompería y perderían su semántica (además, la detección de
+      // estos bloques en _htmlToBlocks se apoya justo en esa class).
       if (el.classList && (
           el.classList.contains('mewyse-tag') ||
           el.classList.contains('mewyse-mention') ||
-          el.classList.contains('mewyse-emoji'))) {
+          el.classList.contains('mewyse-emoji') ||
+          el.classList.contains('mewyse-page-break') ||
+          el.classList.contains('mewyse-callout') ||
+          el.classList.contains('mewyse-callout-content') ||
+          el.classList.contains('mewyse-toc'))) {
         continue;
       }
 
@@ -6931,6 +6989,15 @@
     var emptyCandidates = doc.querySelectorAll('div');
     for (var ec = emptyCandidates.length - 1; ec >= 0; ec--) {
       var candidate = emptyCandidates[ec];
+      // No eliminar bloques estructurales propios de meWYSE aunque estén vacíos:
+      // el salto de página es un <div class="mewyse-page-break"></div> vacío por
+      // diseño; también protegemos callout/toc por robustez.
+      if (candidate.classList && (
+          candidate.classList.contains('mewyse-page-break') ||
+          candidate.classList.contains('mewyse-callout') ||
+          candidate.classList.contains('mewyse-toc'))) {
+        continue;
+      }
       var txt = (candidate.textContent || '').replace(/\s/g, '');
       if (txt === '' && candidate.querySelectorAll('img, br, hr, table, iframe, video, audio, p').length === 0) {
         candidate.remove();
