@@ -2098,8 +2098,18 @@
     var wrapperRect = editorWrapper.getBoundingClientRect();
     var blockRect = blockElement.getBoundingClientRect();
 
-    // Compensar padding-top del bloque para alinear con la primera linea de texto
-    var paddingTop = parseFloat(window.getComputedStyle(blockElement).paddingTop) || 0;
+    // Centrar el handle con el CENTRO de la primera línea de texto del bloque
+    // (no con el borde superior). Así queda bien alineado tanto en párrafos como
+    // en títulos grandes (line-height alto) o bloques con padding/borde.
+    var v_cs = window.getComputedStyle(blockElement);
+    var paddingTop = parseFloat(v_cs.paddingTop) || 0;
+    var borderTop = parseFloat(v_cs.borderTopWidth) || 0;
+    var v_line_height = parseFloat(v_cs.lineHeight);
+    if (isNaN(v_line_height)) {
+      // line-height: normal → aproximar con font-size * 1.2
+      v_line_height = (parseFloat(v_cs.fontSize) || 16) * 1.2;
+    }
+    var v_handle_h = this.floatingHandle.offsetHeight || 24;
 
     // Calcular posicion del handle.
     //
@@ -2108,10 +2118,10 @@
     // editor (var --mewyse-padding-handle desde mewyse.css) — siempre DENTRO
     // del wrapper, para que un parent con `overflow: hidden` no lo recorte.
     //
-    // Offset = blockRect.left - wrapperRect.left - 28: el handle ocupa
-    // ~24-28px de ancho, así que con 32px de padding queda holgado a 4px
-    // del borde izquierdo del wrapper.
-    var top = blockRect.top - wrapperRect.top - 4 + paddingTop;
+    // Vertical: centro de la primera línea (paddingTop + borderTop + lineHeight/2)
+    // menos la mitad de la altura del handle.
+    var top = blockRect.top - wrapperRect.top + paddingTop + borderTop +
+              (v_line_height / 2) - (v_handle_h / 2);
     var left = blockRect.left - wrapperRect.left - 20;
 
     this.floatingHandle.style.top = top + 'px';
