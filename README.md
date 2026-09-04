@@ -223,11 +223,11 @@ new meWYSE({ target: '#ed', toolbar: false });
 | Inserción inline | `link` `forecolor` (color) `specialchars` `mergetags` |
 | Alineación / sangría | `align` `outdent` `indent` |
 | Bloques | `table` `image` `video` `audio` `pagebreak` |
-| Vistas / herramientas | `find` `wordwrap` `summary` `showblocks` `sourcecode` (ver/editar HTML) `markdown` (ver/editar Markdown) `fullscreen` |
-| Exportar | `print` `exportword` `exportpdf` |
+| Vistas / herramientas | `find` `wordwrap` `summary` `showblocks` `sourcecode` (ver/editar HTML) `markdown` (ver/editar Markdown) `fullscreen` `print` |
+| Exportar | `exportword` `exportpdf` |
 | Mover bloque | `moveup` `movedown` |
 
-> `mergetags` solo aparece si pasas `mergeTags`; `table`/`image`/`video`/`audio` respetan `disabledBlocks`. Los ítems de exportar no están en el default: añádelos a la spec si los quieres.
+> `mergetags` solo aparece si pasas `mergeTags`; `table`/`image`/`video`/`audio` respetan `disabledBlocks`. `print` está en el default (imprime solo el contenido del editor); `exportword`/`exportpdf` no están en el default: añádelos a la spec si los quieres.
 
 ### Métodos
 

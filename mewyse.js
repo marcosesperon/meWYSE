@@ -14364,7 +14364,7 @@
     'bold italic underline strikethrough subscript superscript case removeformat | ' +
     'link forecolor font lineheight specialchars mergetags | ' +
     'align outdent indent | table image video audio pagebreak | ' +
-    'find wordwrap summary showblocks sourcecode markdown fullscreen | moveup movedown';
+    'find wordwrap summary showblocks sourcecode markdown fullscreen print | moveup movedown';
 
   // Config de los botones de formato inline (comando execCommand o wrap de tag).
   var TOOLBAR_FORMAT_TOOLS = {
@@ -19443,7 +19443,12 @@
    * el HTML saneado + la hoja de estilos de documento y lanza print().
    */
   meWYSE.prototype.print = function() {
-    var v_html = this.getSafeHTML();
+    // getHTML (no getSafeHTML): el modelo ya está saneado en su frontera de
+    // confianza (constructor/loadFromJSON/loadFromHTML/paste), y getSafeHTML
+    // aplanaría los wrappers de bloque (salto de pagina, callout, toc) y el
+    // divider al re-sanear el documento completo. Aqui imprimimos el documento
+    // FIEL en una ventana independiente.
+    var v_html = this.getHTML();
     var v_win = window.open('', '_blank');
     if (!v_win) return; // popup bloqueado
     var v_doc = v_win.document;
@@ -19463,7 +19468,9 @@
    * @param {string} filename - nombre sin extensión (default 'documento')
    */
   meWYSE.prototype.exportWord = function(filename) {
-    var v_html = this.getSafeHTML();
+    // getHTML (no getSafeHTML): documento fiel desde el modelo ya saneado
+    // (ver nota en print). Evita perder salto de pagina/callout/toc/divider.
+    var v_html = this.getHTML();
     var v_pre = '<html xmlns:o="urn:schemas-microsoft-com:office:office" ' +
       'xmlns:w="urn:schemas-microsoft-com:office:word" ' +
       'xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8">' +
@@ -19577,8 +19584,8 @@
 
   /**
    * Exporta a PDF. Si hay `pdfLib` (URL de html2pdf.js) la carga lazy y genera el
-   * PDF desde getSafeHTML(); si no hay lib o falla, cae a print() (el usuario elige
-   * "Guardar como PDF" del navegador). Siempre parte de contenido saneado.
+   * PDF desde getHTML() (documento fiel desde el modelo saneado); si no hay lib o
+   * falla, cae a print() (el usuario elige "Guardar como PDF" del navegador).
    * @param {string} filename - nombre sin extensión (default 'documento')
    */
   meWYSE.prototype.exportPdf = function(filename) {
@@ -19590,7 +19597,9 @@
       if (!ok || typeof window.html2pdf === 'undefined') { v_fallback(); return; }
       try {
         var wrap = document.createElement('div');
-        wrap.innerHTML = '<style>' + self._documentStyles() + '</style>' + self.getSafeHTML();
+        // getHTML (no getSafeHTML): documento fiel desde el modelo ya saneado
+        // (ver nota en print). Evita perder salto de pagina/callout/toc/divider.
+        wrap.innerHTML = '<style>' + self._documentStyles() + '</style>' + self.getHTML();
         window.html2pdf().set({ filename: v_name, margin: 10 }).from(wrap).save();
       } catch (e) { v_fallback(); }
     });
