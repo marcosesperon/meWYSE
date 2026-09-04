@@ -223,7 +223,7 @@ new meWYSE({ target: '#ed', toolbar: false });
 | Inserción inline | `link` `forecolor` (color) `specialchars` `mergetags` |
 | Alineación / sangría | `align` `outdent` `indent` |
 | Bloques | `table` `image` `video` `audio` |
-| Vistas / herramientas | `find` `wordwrap` `summary` `showblocks` `fullscreen` |
+| Vistas / herramientas | `find` `wordwrap` `summary` `showblocks` `sourcecode` (ver/editar HTML) `markdown` (ver/editar Markdown) `fullscreen` |
 | Exportar | `print` `exportword` `exportpdf` |
 | Mover bloque | `moveup` `movedown` |
 

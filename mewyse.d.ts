@@ -49,7 +49,7 @@ export interface MeWyseOptions {
    *  Ítems: undo redo blocktype fontsize bold italic underline strikethrough
    *  subscript superscript case removeformat link forecolor font specialchars
    *  mergetags align outdent indent table image video audio find wordwrap summary
-   *  showblocks fullscreen print exportword exportpdf moveup movedown. */
+   *  showblocks sourcecode markdown fullscreen print exportword exportpdf moveup movedown. */
   toolbar?: boolean | string | string[];
   summary?: boolean;
   /** Tema: 'dark' (oscuro), 'auto' (sigue prefers-color-scheme del OS en vivo),

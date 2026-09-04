@@ -101,6 +101,8 @@
         fullscreen: 'Pantalla completa',
         fullscreenExit: 'Salir de pantalla completa',
         showBlocks: 'Mostrar bloques',
+        sourceCode: 'Código fuente (HTML)',
+        markdown: 'Markdown',
         wordWrap: 'Ajuste de texto',
         removeFormat: 'Limpiar formato',
         codeLanguage: 'Lenguaje del código',
@@ -159,6 +161,9 @@
         toolbarLabel: 'Herramientas de tabla'
       },
       modals: {
+        sourceCodeTitle: 'Código fuente (HTML)',
+        markdownTitle: 'Markdown',
+        markdownNote: 'El Markdown no conserva colores, tamaños de fuente ni algunas tablas.',
         configureImageDimensions: 'Configurar dimensiones de imagen',
         editImageDimensions: 'Editar dimensiones de imagen',
         originalDimensions: 'Dimensiones originales: {width}x{height}px',
@@ -377,6 +382,8 @@
         fullscreen: 'Fullscreen',
         fullscreenExit: 'Exit fullscreen',
         showBlocks: 'Show blocks',
+        sourceCode: 'Source code (HTML)',
+        markdown: 'Markdown',
         wordWrap: 'Word wrap',
         removeFormat: 'Clear formatting',
         codeLanguage: 'Code language',
@@ -435,6 +442,9 @@
         toolbarLabel: 'Table tools'
       },
       modals: {
+        sourceCodeTitle: 'Source code (HTML)',
+        markdownTitle: 'Markdown',
+        markdownNote: 'Markdown does not preserve colors, font sizes or some tables.',
         configureImageDimensions: 'Configure image dimensions',
         editImageDimensions: 'Edit image dimensions',
         originalDimensions: 'Original dimensions: {width}x{height}px',
@@ -859,6 +869,8 @@
     fullscreen: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><polyline points="3,6 3,3 6,3"/><polyline points="10,3 13,3 13,6"/><polyline points="13,10 13,13 10,13"/><polyline points="6,13 3,13 3,10"/></svg>',
     fullscreenExit: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><polyline points="6,3 6,6 3,6"/><polyline points="13,6 10,6 10,3"/><polyline points="10,13 10,10 13,10"/><polyline points="3,10 6,10 6,13"/></svg>',
     showBlocks: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="12" height="3" rx="0.5"/><rect x="2" y="6.5" width="12" height="3" rx="0.5"/><rect x="2" y="11" width="12" height="3" rx="0.5"/></svg>',
+    sourceCode: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><polyline points="5,4 1.5,8 5,12"/><polyline points="11,4 14.5,8 11,12"/><line x1="9" y1="3" x2="7" y2="13"/></svg>',
+    markdown: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="1" y="3.5" width="14" height="9" rx="1.5"/><path d="M3.5 10.5V6l2 2 2-2v4.5"/><path d="M10.5 6v3.2M9.2 8.2l1.3 1.3 1.3-1.3"/></svg>',
     wordWrap: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><line x1="2" y1="3.5" x2="14" y2="3.5"/><path d="M2 8h9a2.5 2.5 0 0 1 0 5h-3"/><polyline points="9.5,11 7.5,13 9.5,15"/><line x1="2" y1="12.5" x2="5" y2="12.5"/></svg>',
     removeFormat: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M3 3h9M6 3v10M5 13h4"/><line x1="11" y1="10" x2="15" y2="14"/><line x1="15" y1="10" x2="11" y2="14"/></svg>',
     font: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M3 13l3.5-9 3.5 9"/><line x1="4.2" y1="10" x2="8.8" y2="10"/><path d="M12 8.5c1.5 0 2.5 1 2.5 2.3S13.5 13 12 13s-2-.7-2-1.5c0-1 1-1.4 2.5-1.4h2"/></svg>',
@@ -2427,6 +2439,16 @@
         v_sb.setAttribute('aria-pressed', 'false');
         this.showBlocksButton = v_sb;
         return v_sb;
+      case 'sourcecode':
+        return this._makeToolbarButton({
+          icon: WYSIWYG_ICONS.sourceCode, title: this.t('tooltips.sourceCode'),
+          onclick: function(e) { e.preventDefault(); self._showCodeSourceModal('html'); }
+        });
+      case 'markdown':
+        return this._makeToolbarButton({
+          icon: WYSIWYG_ICONS.markdown, title: this.t('tooltips.markdown'),
+          onclick: function(e) { e.preventDefault(); self._showCodeSourceModal('markdown'); }
+        });
       case 'fullscreen':
         var v_fsn = this._makeToolbarButton({
           icon: WYSIWYG_ICONS.fullscreen, title: this.t('tooltips.fullscreen'),
@@ -14308,7 +14330,7 @@
     'bold italic underline strikethrough subscript superscript case removeformat | ' +
     'link forecolor font lineheight specialchars mergetags | ' +
     'align outdent indent | table image video audio | ' +
-    'find wordwrap summary showblocks fullscreen | moveup movedown';
+    'find wordwrap summary showblocks sourcecode markdown fullscreen | moveup movedown';
 
   // Config de los botones de formato inline (comando execCommand o wrap de tag).
   var TOOLBAR_FORMAT_TOOLS = {
@@ -15275,6 +15297,76 @@
       self._add_doc_click(v_click_handler);
     }, 0);
     this._showBackdrop('lineHeightMenu', closeMenu);
+  };
+
+  /**
+   * Modal de "ver/editar fuente": muestra el HTML (getHTMLSource) o el Markdown
+   * (getMarkdown) del contenido en un textarea editable. Al Guardar, reimporta con
+   * loadFromHTML / loadFromMarkdown (con historial → deshacible con Ctrl+Z). El
+   * HTML editado pasa por el sanitizer al reimportar.
+   * @param {string} mode - 'html' | 'markdown'
+   */
+  meWYSE.prototype._showCodeSourceModal = function(mode) {
+    var self = this;
+    var v_is_md = mode === 'markdown';
+    var v_code = v_is_md ? this.getMarkdown() : this.getHTMLSource();
+
+    var overlay = document.createElement('div');
+    overlay.className = 'mewyse-modal-overlay';
+
+    var container = document.createElement('div');
+    container.className = 'mewyse-modal-container mewyse-code-modal';
+    self._applyMenuTheme(container);
+
+    var title = document.createElement('h3');
+    title.className = 'mewyse-modal-title';
+    title.textContent = self.t(v_is_md ? 'modals.markdownTitle' : 'modals.sourceCodeTitle');
+    container.appendChild(title);
+
+    if (v_is_md) {
+      var note = document.createElement('p');
+      note.className = 'mewyse-modal-note';
+      note.textContent = self.t('modals.markdownNote');
+      container.appendChild(note);
+    }
+
+    var textarea = document.createElement('textarea');
+    textarea.className = 'mewyse-code-textarea';
+    textarea.value = v_code;
+    textarea.spellcheck = false;
+    textarea.setAttribute('aria-label', title.textContent);
+    container.appendChild(textarea);
+
+    var buttons = document.createElement('div');
+    buttons.className = 'mewyse-modal-buttons';
+
+    var close = function() { if (overlay.parentNode) document.body.removeChild(overlay); };
+
+    var cancelBtn = document.createElement('button');
+    cancelBtn.type = 'button';
+    cancelBtn.className = 'mewyse-modal-button mewyse-modal-button-cancel';
+    cancelBtn.textContent = self.t('modals.cancel');
+    cancelBtn.onclick = close;
+
+    var saveBtn = document.createElement('button');
+    saveBtn.type = 'button';
+    saveBtn.className = 'mewyse-modal-button mewyse-modal-button-primary';
+    saveBtn.textContent = self.t('modals.save');
+    saveBtn.onclick = function() {
+      var v_val = textarea.value;
+      if (v_is_md) self.loadFromMarkdown(v_val);
+      else self.loadFromHTML(v_val);
+      close();
+    };
+
+    buttons.appendChild(cancelBtn);
+    buttons.appendChild(saveBtn);
+    container.appendChild(buttons);
+
+    overlay.appendChild(container);
+    document.body.appendChild(overlay);
+    overlay.onclick = function(e) { if (e.target === overlay) close(); };
+    setTimeout(function() { textarea.focus(); }, 0);
   };
 
   /**
