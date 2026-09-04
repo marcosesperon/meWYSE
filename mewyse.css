@@ -1281,6 +1281,27 @@
   border-color: var(--mewyse-text-muted);
 }
 
+/* Stepper de tamaño de fuente en la toolbar: [−] [valor] [+] */
+.mewyse-font-size-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.mewyse-font-size-stepper .mewyse-font-size-step {
+  min-width: 26px;
+  width: 26px;
+  padding: 0;
+}
+.mewyse-font-size-value {
+  min-width: 42px;
+  text-align: center;
+  font-size: 0.8125rem;
+  color: var(--mewyse-text-primary);
+  font-variant-numeric: tabular-nums;
+  user-select: none;
+  white-space: nowrap;
+}
+
 /* Picker de caracteres especiales */
 .mewyse-special-chars-menu {
   position: fixed;

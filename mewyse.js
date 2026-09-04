@@ -112,6 +112,8 @@
         caseSentence: 'Tipo oración',
         caseToggle: 'Invertir tipo',
         font: 'Fuente y tamaño',
+        fontSizeDecrease: 'Reducir tamaño de fuente',
+        fontSizeIncrease: 'Aumentar tamaño de fuente',
         specialChars: 'Caracteres especiales',
         print: 'Imprimir',
         exportWord: 'Exportar a Word',
@@ -385,6 +387,8 @@
         caseSentence: 'Sentence case',
         caseToggle: 'tOGGLE cASE',
         font: 'Font and size',
+        fontSizeDecrease: 'Decrease font size',
+        fontSizeIncrease: 'Increase font size',
         specialChars: 'Special characters',
         print: 'Print',
         exportWord: 'Export to Word',
@@ -831,6 +835,7 @@
     mergeCells: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="12" height="12" rx="1"/><line x1="8" y1="2" x2="8" y2="5"/><line x1="8" y1="11" x2="8" y2="14"/><polyline points="5,7 8,5 11,7"/><polyline points="5,9 8,11 11,9"/></svg>',
     unmergeCells: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="12" height="12" rx="1"/><line x1="8" y1="2" x2="8" y2="14"/><polyline points="5,6 8,3 11,6"/><polyline points="5,10 8,13 11,10"/></svg>',
     plus: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" xmlns="http://www.w3.org/2000/svg"><line x1="8" y1="3" x2="8" y2="13"/><line x1="3" y1="8" x2="13" y2="8"/></svg>',
+    minus: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" xmlns="http://www.w3.org/2000/svg"><line x1="3" y1="8" x2="13" y2="8"/></svg>',
     resetWidth: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><line x1="3" y1="8" x2="13" y2="8"/><polyline points="5,5.5 2,8 5,10.5"/><polyline points="11,5.5 14,8 11,10.5"/></svg>',
     eraser: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M4 13h8"/><path d="M9.5 3.5l3 3a1.2 1.2 0 0 1 0 1.7l-4 4h-3l-2-2a1.2 1.2 0 0 1 0-1.7l5-5a1.2 1.2 0 0 1 1.7 0z"/><line x1="6" y1="6.5" x2="9.5" y2="10"/></svg>',
     // Iconos específicos de tabla. Convención: píldora horizontal = FILA,
@@ -2380,6 +2385,39 @@
 
     // Botón de fuente (familia/tamaño/interlineado) — opt-in con `fontControls`.
     if (this.fontControls) {
+      // Stepper de tamaño de fuente: [−] [valor] [+]. Refleja el tamaño de la
+      // selección/caret y aplica un font-size inline recorriendo FONT_SIZE_SCALE.
+      var v_fs_stepper = document.createElement('div');
+      v_fs_stepper.className = 'mewyse-font-size-stepper';
+
+      var v_fs_dec = document.createElement('button');
+      v_fs_dec.type = 'button';
+      v_fs_dec.className = 'mewyse-toolbar-button mewyse-font-size-step';
+      v_fs_dec.innerHTML = WYSIWYG_ICONS.minus;
+      v_fs_dec.title = this.t('tooltips.fontSizeDecrease');
+      v_fs_dec.setAttribute('aria-label', this.t('tooltips.fontSizeDecrease'));
+      v_fs_dec.onmousedown = function(e) { e.preventDefault(); };
+      v_fs_dec.onclick = function(e) { e.preventDefault(); self._stepFontSize(-1); };
+
+      var v_fs_val = document.createElement('span');
+      v_fs_val.className = 'mewyse-font-size-value';
+      v_fs_val.textContent = '—';
+      this._fontSizeDisplay = v_fs_val;
+
+      var v_fs_inc = document.createElement('button');
+      v_fs_inc.type = 'button';
+      v_fs_inc.className = 'mewyse-toolbar-button mewyse-font-size-step';
+      v_fs_inc.innerHTML = WYSIWYG_ICONS.plus;
+      v_fs_inc.title = this.t('tooltips.fontSizeIncrease');
+      v_fs_inc.setAttribute('aria-label', this.t('tooltips.fontSizeIncrease'));
+      v_fs_inc.onmousedown = function(e) { e.preventDefault(); };
+      v_fs_inc.onclick = function(e) { e.preventDefault(); self._stepFontSize(1); };
+
+      v_fs_stepper.appendChild(v_fs_dec);
+      v_fs_stepper.appendChild(v_fs_val);
+      v_fs_stepper.appendChild(v_fs_inc);
+      extrasGroup.appendChild(v_fs_stepper);
+
       var fontButton = document.createElement('button');
       fontButton.className = 'mewyse-toolbar-button mewyse-toolbar-dropdown';
       fontButton.innerHTML = WYSIWYG_ICONS.font + ' <span class="dropdown-arrow">' + WYSIWYG_ICONS.chevronDown + '</span>';
@@ -6415,6 +6453,24 @@
           }
         }
 
+        // SPAN con estilo de contenido intencional (font-size / color /
+        // background): preservarlo con su style saneado (permite importar el
+        // tamaño y color del texto). El resto de spans se desenvuelven abajo.
+        if (tagName === 'SPAN') {
+          var v_span_style = node.getAttribute('style');
+          if (v_span_style) {
+            var v_clean_span = self._sanitizeStyle(v_span_style);
+            if (v_clean_span &&
+                (v_clean_span.indexOf('font-size') !== -1 || v_clean_span.indexOf('color') !== -1)) {
+              var v_span_inner = '';
+              for (var vsi = 0; vsi < node.childNodes.length; vsi++) {
+                v_span_inner += cleanNode(node.childNodes[vsi]);
+              }
+              return '<span style="' + escAttr(v_clean_span) + '">' + v_span_inner + '</span>';
+            }
+          }
+        }
+
         // Si no es una etiqueta permitida, extraer el contenido de sus hijos
         if (allowedInlineTags.indexOf(tagName) === -1) {
           var childContent = '';
@@ -6874,6 +6930,17 @@
       var inheritedItalic = /font-style\s*:\s*italic/i.test(styleStr);
       var inheritedUnderline = /text-decoration[^;]*underline/i.test(styleStr);
 
+      // Conservar en spans los estilos de contenido intencionales (font-size /
+      // color / background) que el usuario querría mantener al importar. Se
+      // capturan YA saneados y se reaplican tras el cleanup del atributo style.
+      var v_keep_style = '';
+      if (el.tagName === 'SPAN' && styleStr) {
+        var v_cs = this._sanitizeStyle(styleStr);
+        if (v_cs && (v_cs.indexOf('font-size') !== -1 || v_cs.indexOf('color') !== -1)) {
+          v_keep_style = v_cs;
+        }
+      }
+
       el.removeAttribute('class');
       el.removeAttribute('style');
       el.removeAttribute('id');
@@ -6910,6 +6977,10 @@
       for (var l = 0; l < attrsToRemove.length; l++) {
         el.removeAttribute(attrsToRemove[l]);
       }
+
+      // Reaplicar el style de contenido conservado (font-size/color/background) al
+      // span, para que el paso 6 no lo desenvuelva y se importe el formato.
+      if (v_keep_style) el.setAttribute('style', v_keep_style);
 
       // Preservar formato inline inferido de estilos (bold/italic/underline) envolviendo el contenido
       if (inheritedBold && el.tagName !== 'B' && el.tagName !== 'STRONG' && el.tagName !== 'H1' &&
@@ -6959,6 +7030,19 @@
             elUnwrap.classList.contains('mewyse-mention') ||
             elUnwrap.classList.contains('mewyse-emoji'))) {
           continue;
+        }
+        // NO desenvolver spans con estilos de formato intencionales que el usuario
+        // querría conservar al importar (font-size / color / background-color).
+        // Se reasigna el style YA saneado (quita mso-* y demás basura); el
+        // sanitizer del contenido lo vuelve a validar después.
+        var v_span_style = elUnwrap.getAttribute && elUnwrap.getAttribute('style');
+        if (v_span_style) {
+          var v_clean_style = this._sanitizeStyle(v_span_style);
+          if (v_clean_style &&
+              (v_clean_style.indexOf('font-size') !== -1 || v_clean_style.indexOf('color') !== -1)) {
+            elUnwrap.setAttribute('style', v_clean_style);
+            continue;
+          }
         }
         if (!elUnwrap.getAttribute('href')) {
           while (elUnwrap.firstChild) {
@@ -13478,6 +13562,8 @@
     this.formatMenuTimeout = setTimeout(function() {
       // Reevaluar la toolbar de tabla en cada cambio de selección/caret
       self._updateTableToolbar();
+      // Reflejar el tamaño de fuente del caret en el stepper (si existe).
+      self._updateFontSizeStepper();
 
       var selection = window.getSelection();
 
@@ -14394,6 +14480,9 @@
     left: 'alignLeft', center: 'alignCenter', right: 'alignRight', justify: 'alignJustify'
   };
 
+  // Escala de tamaños de fuente (px) que recorre el stepper [−]/[+].
+  var FONT_SIZE_SCALE = [8, 9, 10, 11, 12, 13, 14, 16, 18, 20, 24, 28, 32, 36, 42, 48, 56, 64, 72, 96];
+
   var CASE_TRANSFORMERS = {
     'upper': function(s) { return s.toUpperCase(); },
     'lower': function(s) { return s.toLowerCase(); },
@@ -15090,6 +15179,64 @@
     if (self._applyInlineAcrossSelection(function() { self.applyInlineStyle(styleProp, value); })) return;
     self.applyInlineStyle(styleProp, value);
     self._persistActiveBlockContent();
+  };
+
+  /**
+   * Tamaño de fuente (px, redondeado) en la posición del caret/selección, o null.
+   * @returns {?number}
+   */
+  meWYSE.prototype._getCurrentFontSize = function() {
+    if (!this.container) return null;
+    var v_node = null;
+    var sel = window.getSelection ? window.getSelection() : null;
+    if (sel && sel.rangeCount) {
+      v_node = sel.anchorNode;
+      if (v_node && v_node.nodeType === 3) v_node = v_node.parentElement;
+    }
+    if (!v_node || !this.container.contains(v_node)) {
+      // Fallback: el editable del bloque con foco.
+      var v_bid = this._getFocusedBlockId();
+      if (v_bid !== null) {
+        var v_el = this.container.querySelector('[data-block-id="' + v_bid + '"]');
+        v_node = v_el ? (this.getEditableElement(v_el) || v_el) : null;
+      }
+    }
+    if (!v_node || v_node.nodeType !== 1 || !this.container.contains(v_node)) return null;
+    var v_px = parseFloat(window.getComputedStyle(v_node).fontSize);
+    return isNaN(v_px) ? null : Math.round(v_px);
+  };
+
+  /**
+   * Refresca el valor mostrado en el stepper de tamaño de fuente (si existe).
+   */
+  meWYSE.prototype._updateFontSizeStepper = function() {
+    if (!this._fontSizeDisplay) return;
+    var v = this._getCurrentFontSize();
+    this._fontSizeDisplay.textContent = (v != null) ? (v + 'px') : '—';
+  };
+
+  /**
+   * Sube (dir>0) o baja (dir<0) el tamaño de fuente de la selección al siguiente
+   * valor de FONT_SIZE_SCALE, y aplica el font-size inline.
+   * @param {number} dir - +1 o -1
+   */
+  meWYSE.prototype._stepFontSize = function(dir) {
+    var v_cur = this._getCurrentFontSize();
+    if (v_cur == null) v_cur = 16;
+    var v_next, i;
+    if (dir > 0) {
+      v_next = FONT_SIZE_SCALE[FONT_SIZE_SCALE.length - 1];
+      for (i = 0; i < FONT_SIZE_SCALE.length; i++) {
+        if (FONT_SIZE_SCALE[i] > v_cur) { v_next = FONT_SIZE_SCALE[i]; break; }
+      }
+    } else {
+      v_next = FONT_SIZE_SCALE[0];
+      for (i = FONT_SIZE_SCALE.length - 1; i >= 0; i--) {
+        if (FONT_SIZE_SCALE[i] < v_cur) { v_next = FONT_SIZE_SCALE[i]; break; }
+      }
+    }
+    this._applyFontStyle('fontSize', v_next + 'px', false);
+    this._updateFontSizeStepper();
   };
 
   /**
@@ -16833,10 +16980,11 @@
    * Actualiza el estado enabled/disabled de los botones de mover
    */
   meWYSE.prototype._updateMoveButtons = function() {
-    // Actualizar también los botones de sangría y de alineación (comparten los
-    // disparadores de foco).
+    // Actualizar también los botones de sangría y de alineación y el stepper de
+    // tamaño de fuente (comparten los disparadores de foco).
     this._updateIndentButtons();
     this._updateAlignButton();
+    this._updateFontSizeStepper();
     if (!this.moveUpButton || !this.moveDownButton) return;
     var blockId = this._getFocusedBlockId();
     if (blockId === null) {
