@@ -620,9 +620,9 @@ editor.focus(blockId); // bloque especifico
   target: '#dirtyTrackingSource',   // textarea ya con HTML
   toolbar: true,
   onBlur: function (data) {
-    if (data.hasChanges) {          // o editor.hasChanges() / editor.isDirty()
+    if (data.hasChanges) {          // o data.editor.hasChanges() / data.editor.isDirty()
       guardar(data.html);           // solo si realmente cambio algo
-      editor.resetDirty();          // restablecer isDirty a false tras guardar
+      data.editor.resetDirty();     // referencia al editor en el payload (sin variable externa)
     }
   }
 });</code></pre>
@@ -1277,10 +1277,11 @@ new meWYSE({ target: '#vhHeightEditor', minHeight: '10em', maxHeight: '35vh' });
           var log = document.getElementById('dirtyBlurLog');
           if (data.hasChanges) {
             // Caso real: hubo cambios -> "guardar" y restablecer isDirty a false.
+            // Usamos data.editor (referencia del payload), sin variable externa.
             // guardar(data.html);
-            dirtyEditor.resetDirty();   // deja isDirty()/hasChanges() en false
+            data.editor.resetDirty();   // deja isDirty()/hasChanges() en false
             updateDirtyStatus(false);
-            if (log) log.textContent = 'onBlur: habia cambios  ->  guardado (data.html) + resetDirty()  ->  ahora sin cambios';
+            if (log) log.textContent = 'onBlur: habia cambios  ->  guardado (data.html) + data.editor.resetDirty()  ->  ahora sin cambios';
           } else {
             updateDirtyStatus(false);
             if (log) log.textContent = 'onBlur: hasChanges = false  ->  nada que guardar (entraste y saliste sin editar)';

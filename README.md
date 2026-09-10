@@ -123,6 +123,7 @@ var editor = new meWYSE({
 
 ```javascript
 {
+  editor: meWYSE,         // referencia al propio editor (API sin variable externa)
   blocks: Array,          // array de bloques internos
   plainText: String,      // texto plano de bloques
   html: String,           // getHTML()
@@ -290,9 +291,9 @@ pulsaciones: si editas y luego deshaces hasta el estado original, vuelve a
 var editor = new meWYSE({
   target: '#mi-textarea',      // textarea ya con HTML
   onBlur: function (data) {
-    if (data.hasChanges) {     // o editor.hasChanges() / editor.isDirty()
-      guardar(data.html);      // solo si realmente cambió algo
-      editor.resetDirty();     // restablecer isDirty a false tras guardar
+    if (data.hasChanges) {       // o data.editor.hasChanges() / data.editor.isDirty()
+      guardar(data.html);        // solo si realmente cambió algo
+      data.editor.resetDirty();  // restablecer isDirty (referencia al editor en el payload)
     }
   }
 });

@@ -21,6 +21,10 @@ export interface MeWyseBlock {
 }
 
 export interface MeWyseChangePayload {
+  /** Referencia al propio editor: permite usar su API pública (isDirty,
+   *  resetDirty, getHTML…) desde el callback sin capturar la instancia en una
+   *  variable externa. */
+  editor: meWYSE;
   blocks: MeWyseBlock[];
   html: string;
   markdown: string;

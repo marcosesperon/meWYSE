@@ -13354,6 +13354,9 @@
     if (v_plain === null) v_plain = this.getPlainText();
     var v_json_change = this.getJSON();
     this._fireChangeCallback({
+      // Referencia al propio editor (ver _buildEventPayload): API accesible desde
+      // el callback sin capturar la instancia en una variable externa.
+      editor: this,
       blocks: this.blocks,
       plainText: v_plain,
       html: this.getHTML(),
@@ -13428,6 +13431,10 @@
   meWYSE.prototype._buildEventPayload = function(focusedElement) {
     var v_json = this.getJSON();
     var payload = {
+      // Referencia al propio editor: permite llamar a la API (editor.isDirty(),
+      // editor.resetDirty(), editor.getHTML()…) desde el callback sin depender
+      // de una variable externa que capture la instancia.
+      editor: this,
       blocks: this.blocks,
       plainText: this.getPlainText(),
       html: this.getHTML(),
