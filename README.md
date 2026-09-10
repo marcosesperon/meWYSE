@@ -128,6 +128,7 @@ var editor = new meWYSE({
   html: String,           // getHTML()
   json: String,           // getJSON()
   markdown: String,       // getMarkdown()
+  isDirty: Boolean,       // ¿cambió respecto a la línea base? (ver isDirty())
   focusedBlockId: Number, // id del bloque enfocado/que perdió foco (solo onFocus/onBlur)
   focusedBlockType: String // tipo del bloque (paragraph/heading1/...)
 }
@@ -266,6 +267,34 @@ editor.loadFromHTML(
 );
 // Detecta iframes YouTube/Vimeo, <video>, <audio>, <img>, tablas y listas
 // automáticamente y los convierte al modelo de bloques.
+```
+
+#### Detección de cambios (dirty tracking)
+
+```javascript
+editor.isDirty();      // ¿Ha cambiado el contenido respecto a la línea base "limpia"?
+editor.hasChanges();   // Alias de isDirty()
+editor.markPristine(); // Marca el estado actual como "limpio" (llámalo tras guardar)
+```
+
+La **línea base** se captura tras la carga inicial —incluida la normalización
+HTML→bloques cuando montas sobre un `<textarea>` con HTML— y tras cada
+`loadFromHTML/JSON/Markdown` y `markPristine()`. Por eso, si cargas contenido,
+entras con el foco y **sales sin editar nada**, `isDirty()` devuelve `false`
+(la conversión a bloques no cuenta como cambio). Compara **contenido**, no
+pulsaciones: si editas y luego deshaces hasta el estado original, vuelve a
+`false`. El payload de `onChange`/`onFocus`/`onBlur` también incluye `isDirty`.
+
+```javascript
+var editor = new meWYSE({
+  target: '#mi-textarea',      // textarea ya con HTML
+  onBlur: function (data) {
+    if (data.isDirty) {        // o editor.isDirty()
+      guardar(data.html);      // solo si realmente cambió algo
+      editor.markPristine();   // fijar nueva base tras guardar
+    }
+  }
+});
 ```
 
 #### Manipular bloques

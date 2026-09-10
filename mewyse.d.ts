@@ -26,6 +26,9 @@ export interface MeWyseChangePayload {
   markdown: string;
   plainText: string;
   json: string;
+  /** true si el contenido difiere de la última línea base "limpia"
+   *  (carga inicial, último loadFrom*, o última llamada a markPristine). */
+  isDirty: boolean;
   focusedBlockId?: number;
   focusedBlockType?: string;
 }
@@ -102,6 +105,16 @@ export default class meWYSE {
   loadFromJSON(json: string | MeWyseBlock[]): void;
   loadFromHTML(html: string): void;
   loadFromMarkdown(md: string): void;
+  /** ¿El contenido ha cambiado respecto a la última línea base "limpia"?
+   *  La base se captura tras la carga inicial (incluida la normalización
+   *  HTML→bloques de un textarea) y tras cada loadFrom*/markPristine, así que
+   *  entrar y salir sin editar devuelve false. */
+  isDirty(): boolean;
+  /** Alias semántico de isDirty(). */
+  hasChanges(): boolean;
+  /** Marca el estado actual como "limpio" (nueva línea base). Úsalo tras
+   *  guardar. Encadenable. */
+  markPristine(): this;
   getResolvedHTML?(values: Record<string, string>): string;
   hasDraft(): boolean;
   restoreDraft(): boolean;

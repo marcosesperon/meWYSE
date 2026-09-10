@@ -1040,6 +1040,7 @@
     this.draggedBlockId = null; // ID del bloque siendo arrastrado (reorder)
     this._draggedImage = null;  // estado del drag de imagen interna
     this._destroyed = false;   // marca de ciclo de vida (idempotencia de destroy)
+    this._pristine_signature = null; // firma del contenido "limpio" (dirty tracking)
     this._doc_click_handlers = null; // registro de listeners click en document
     this.slashMenu = null;
     this.formatMenu = null;
@@ -1874,6 +1875,13 @@
         this.loadFromText(v_initial_value);
       }
     }
+
+    // Línea base para el dirty tracking: el contenido inicial ya normalizado
+    // (bloques) es el estado "limpio". Se captura SIEMPRE (aunque el editor
+    // esté vacío) para que isDirty()/hasChanges() funcionen desde el arranque.
+    // loadFromHTML/JSON/Markdown ya la recapturan si se llama a alguno arriba;
+    // este capture cubre además loadFromText y el caso sin contenido inicial.
+    this._capture_pristine();
 
     // Habilitar drag & drop de imágenes sobre el editor.
     // No aplica en readOnly: no se puede insertar nada nuevo.
@@ -12625,6 +12633,55 @@
   };
 
   /**
+   * Captura la firma del contenido actual como "línea base limpia". Se usa para
+   * el dirty tracking: se llama tras cada carga inicial/explícita de contenido
+   * (para que la normalización HTML→bloques NO cuente como cambio) y desde
+   * markPristine() tras guardar. La firma es el JSON del modelo (determinista y
+   * ya normalizado); dos estados con el mismo contenido producen la misma firma.
+   */
+  meWYSE.prototype._capture_pristine = function() {
+    this._pristine_signature = this.getJSON();
+  };
+
+  /**
+   * Indica si el contenido del editor ha cambiado respecto a la última "línea
+   * base limpia" (la carga inicial, la última carga explícita loadFrom*, o la
+   * última llamada a markPristine). API pública.
+   *
+   * Pensado para, p. ej., decidir en onBlur si guardar: si se carga un textarea
+   * con HTML y el usuario entra y sale SIN tocar nada, devuelve false (la
+   * conversión HTML→bloques no se considera un cambio, porque la base se captura
+   * tras esa normalización).
+   *
+   * @returns {boolean} true si hay cambios sin "confirmar" respecto a la base.
+   */
+  meWYSE.prototype.isDirty = function() {
+    // Si aún no hay base (editor recién construido, sin initDomEditor), no hay
+    // cambios que reportar.
+    if (this._pristine_signature === null) return false;
+    return this.getJSON() !== this._pristine_signature;
+  };
+
+  /**
+   * Alias semántico de isDirty(): ¿se han producido cambios? API pública.
+   * @returns {boolean}
+   */
+  meWYSE.prototype.hasChanges = function() {
+    return this.isDirty();
+  };
+
+  /**
+   * Marca el estado ACTUAL como "limpio" (nueva línea base). Se llama tras
+   * guardar el contenido, para que isDirty()/hasChanges() midan los cambios a
+   * partir de este punto. API pública.
+   * @returns {meWYSE} this (encadenable)
+   */
+  meWYSE.prototype.markPristine = function() {
+    this._capture_pristine();
+    return this;
+  };
+
+  /**
    * Convierte HTML inline a Markdown inline
    * @param {string} html - HTML con formato inline
    * @returns {string} Markdown equivalente
@@ -13142,6 +13199,8 @@
     this.blocks = this._sanitizeBlocks(newBlocks);
     this.render();
     this.triggerChange();
+    // Nueva línea base para dirty tracking (carga explícita = estado "limpio").
+    this._capture_pristine();
   };
 
   /**
@@ -13170,6 +13229,9 @@
     // Igual que loadFromHTML/loadFromMarkdown: refresca el panel de esquema si
     // está abierto, sincroniza el textarea y el contador, y dispara onChange.
     this.triggerChange();
+    // Nueva línea base para dirty tracking: una carga explícita es el nuevo
+    // estado "limpio" (cubre también restoreDraft, que llama aquí).
+    this._capture_pristine();
   };
 
   /**
@@ -13218,6 +13280,8 @@
     }
     this.render();
     this.triggerChange();
+    // Nueva línea base para dirty tracking (carga explícita = estado "limpio").
+    this._capture_pristine();
   };
 
   /**
@@ -13347,12 +13411,17 @@
    * Incluye el snapshot del contenido + info opcional del bloque enfocado.
    */
   meWYSE.prototype._buildEventPayload = function(focusedElement) {
+    var v_json = this.getJSON();
     var payload = {
       blocks: this.blocks,
       plainText: this.getPlainText(),
       html: this.getHTML(),
-      json: this.getJSON(),
+      json: v_json,
       markdown: this.getMarkdown(),
+      // Dirty tracking: cambios respecto a la última línea base "limpia". Se
+      // reutiliza v_json (evita recalcular). Con base null (sin capturar aún),
+      // no hay cambios.
+      isDirty: this._pristine_signature !== null && v_json !== this._pristine_signature,
       focusedBlockId: null,
       focusedBlockType: null
     };
