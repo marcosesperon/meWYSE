@@ -4362,14 +4362,20 @@
         proportionsContainer.appendChild(proportionsLabel);
         modalContainer.appendChild(proportionsContainer);
 
+        // ¿El usuario tocó los campos de ancho/alto? Si NO los modifica, no se
+        // aplican dimensiones al bloque (la imagen queda a su tamaño natural).
+        var v_dims_touched = false;
+
         // Event listeners para mantener proporciones
         widthInput.oninput = function() {
+          v_dims_touched = true;
           if (proportionsCheckbox.checked) {
             heightInput.value = Math.round(widthInput.value / aspectRatio);
           }
         };
 
         heightInput.oninput = function() {
+          v_dims_touched = true;
           if (proportionsCheckbox.checked) {
             widthInput.value = Math.round(heightInput.value * aspectRatio);
           }
@@ -4395,8 +4401,10 @@
         insertButton.textContent = self.t('modals.insert');
         insertButton.className = 'mewyse-modal-button mewyse-modal-button-primary';
         insertButton.onclick = function() {
-          var width = parseInt(widthInput.value);
-          var height = parseInt(heightInput.value);
+          // Solo se pasan dimensiones si el usuario tocó los campos; si no, null
+          // → createImageBlock NO las guarda y la imagen queda a tamaño natural.
+          var width = v_dims_touched ? parseInt(widthInput.value) : null;
+          var height = v_dims_touched ? parseInt(heightInput.value) : null;
 
           // Crear el bloque de imagen con el blob + opciones avanzadas
           self.createImageBlock(file, e.target.result, width, height, insertIndex, advanced.getValues(), replaceBlockId);
@@ -4437,10 +4445,16 @@
       var content = {
         blob: finalBlob,
         fileName: file.name,
-        fileType: file.type,
-        width: finalWidth || width,
-        height: finalHeight || height
+        fileType: file.type
       };
+      // Dimensiones OPCIONALES: las del hook onImageUpload (finalWidth/Height) o,
+      // si no, las recibidas por parámetro (del modal). Solo se guardan si son
+      // números válidos; si llegan null (el usuario no tocó los campos) la
+      // imagen queda a su tamaño natural, sin width/height en el modelo.
+      var v_w = (typeof finalWidth === 'number') ? finalWidth : width;
+      var v_h = (typeof finalHeight === 'number') ? finalHeight : height;
+      if (typeof v_w === 'number' && v_w > 0) content.width = v_w;
+      if (typeof v_h === 'number' && v_h > 0) content.height = v_h;
       // Adjuntar opciones avanzadas si hay
       if (advanced && (advanced.border || advanced.margin || advanced.alignment)) {
         content.advanced = advanced;
@@ -4510,9 +4524,18 @@
 
     if (!block || block.type !== 'image') return;
 
-    var currentWidth = parseInt(imgElement.style.width) || block.content.width;
-    var currentHeight = parseInt(imgElement.style.height) || block.content.height;
-    var aspectRatio = currentWidth / currentHeight;
+    // ¿El bloque tiene dimensiones fijadas? Si NO (imagen a tamaño natural), el
+    // modal se precarga con las dimensiones REALES renderizadas/naturales para
+    // que se vean números y el ratio funcione, pero al Guardar NO se aplican
+    // salvo que el usuario toque los campos (v_dims_touched).
+    var v_had_dims = (typeof block.content.width === 'number' && block.content.width > 0) &&
+                     (typeof block.content.height === 'number' && block.content.height > 0);
+    var currentWidth = parseInt(imgElement.style.width) || block.content.width ||
+                       imgElement.naturalWidth || imgElement.offsetWidth || 0;
+    var currentHeight = parseInt(imgElement.style.height) || block.content.height ||
+                        imgElement.naturalHeight || imgElement.offsetHeight || 0;
+    var aspectRatio = (currentWidth && currentHeight) ? (currentWidth / currentHeight) : 1;
+    var v_dims_touched = false;
 
     // Crear el overlay del modal
     var modalOverlay = document.createElement('div');
@@ -4595,12 +4618,14 @@
 
     // Event listeners para mantener proporciones
     widthInput.oninput = function() {
+      v_dims_touched = true;
       if (proportionsCheckbox.checked) {
         heightInput.value = Math.round(widthInput.value / aspectRatio);
       }
     };
 
     heightInput.oninput = function() {
+      v_dims_touched = true;
       if (proportionsCheckbox.checked) {
         widthInput.value = Math.round(heightInput.value * aspectRatio);
       }
@@ -4630,12 +4655,20 @@
     saveButton.textContent = self.t('modals.save');
     saveButton.className = 'mewyse-modal-button mewyse-modal-button-primary';
     saveButton.onclick = function() {
-      var width = parseInt(widthInput.value);
-      var height = parseInt(heightInput.value);
-
-      // Actualizar las dimensiones del bloque
-      block.content.width = width;
-      block.content.height = height;
+      // Solo se aplican dimensiones si el usuario tocó los campos. Si no y el
+      // bloque no tenía (imagen a tamaño natural), se mantiene sin dimensiones.
+      if (v_dims_touched) {
+        var width = parseInt(widthInput.value);
+        var height = parseInt(heightInput.value);
+        if (!isNaN(width) && width > 0) block.content.width = width;
+        else delete block.content.width;
+        if (!isNaN(height) && height > 0) block.content.height = height;
+        else delete block.content.height;
+      } else if (!v_had_dims) {
+        // No tocó nada y no había dims: asegurar que siguen sin fijarse.
+        delete block.content.width;
+        delete block.content.height;
+      }
 
       // Persistir las opciones avanzadas (borde/espaciado/alineación) en el modelo.
       var v_adv = advancedPanel.getValues();
@@ -5919,10 +5952,17 @@
     if (typeof block.content === 'object' && block.content.blob) {
       img.src = block.content.blob;
       img.alt = block.content.fileName || 'Imagen';
-      img.style.width = block.content.width + 'px';
-      img.style.height = block.content.height + 'px';
-      img.setAttribute('data-original-width', block.content.width);
-      img.setAttribute('data-original-height', block.content.height);
+      // Dimensiones OPCIONALES: solo se aplican al style/atributos si el bloque
+      // las tiene. Sin ellas, la imagen se muestra a su tamaño natural (el CSS
+      // .mewyse-image ya la limita con max-width:100%).
+      if (typeof block.content.width === 'number' && block.content.width > 0) {
+        img.style.width = block.content.width + 'px';
+        img.setAttribute('data-original-width', block.content.width);
+      }
+      if (typeof block.content.height === 'number' && block.content.height > 0) {
+        img.style.height = block.content.height + 'px';
+        img.setAttribute('data-original-height', block.content.height);
+      }
 
       // Aplicar opciones avanzadas (border/margin/alignment)
       this._applyImageAdvancedStyles(img, imageWrapper, block.content.advanced);
@@ -5949,9 +5989,19 @@
 
     var isResizing = false;
     var startX, startY, startWidth;
-    var aspectRatio = block.content && block.content.width && block.content.height
-      ? block.content.width / block.content.height
-      : 1;
+    // Ratio: de las dimensiones del bloque si existen; si no (imagen a tamaño
+    // natural, sin dims), de las dimensiones naturales del <img>. Se recalcula
+    // al iniciar el arrastre por si la imagen aún no había cargado al renderizar.
+    var v_get_aspect_ratio = function() {
+      if (block.content && block.content.width && block.content.height) {
+        return block.content.width / block.content.height;
+      }
+      if (img.naturalWidth && img.naturalHeight) {
+        return img.naturalWidth / img.naturalHeight;
+      }
+      return 1;
+    };
+    var aspectRatio = v_get_aspect_ratio();
 
     var mousemoveHandler = function(e) {
       if (!isResizing) return;
@@ -5996,7 +6046,10 @@
       isResizing = true;
       startX = e.clientX;
       startY = e.clientY;
-      startWidth = parseInt(img.style.width) || 200;
+      // Recalcular ratio ahora (la imagen ya está cargada) y partir del ancho
+      // real renderizado si el bloque no tenía dimensiones fijadas.
+      aspectRatio = v_get_aspect_ratio();
+      startWidth = parseInt(img.style.width) || img.offsetWidth || 200;
       document.body.style.cursor = 'nwse-resize';
       imageContainer.classList.add('mewyse-image-resizing');
       document.body.style.userSelect = 'none';
@@ -6567,10 +6620,13 @@
           if ((isNaN(imgH) || imgH < 1) && node.__mewyse_sh) imgH = node.__mewyse_sh;
           var v_img_content = {
             blob: imgSrc,
-            fileName: node.getAttribute('alt') || 'image',
-            width: (isNaN(imgW) || imgW < 1) ? 300 : imgW,
-            height: (isNaN(imgH) || imgH < 1) ? 200 : imgH
+            fileName: node.getAttribute('alt') || 'image'
           };
+          // Dimensiones OPCIONALES: solo se fijan si venían en el HTML (atributo
+          // width/height o style inline). Si el <img> no las trae, NO forzamos
+          // 300x200: la imagen se mostrará a su tamaño natural.
+          if (!isNaN(imgW) && imgW >= 1) v_img_content.width = imgW;
+          if (!isNaN(imgH) && imgH >= 1) v_img_content.height = imgH;
           // Opciones avanzadas (border/margin/alignment) del style inline, leídas
           // antes de la limpieza (node.__mewyse_adv).
           if (node.__mewyse_adv) v_img_content.advanced = node.__mewyse_adv;
@@ -12340,8 +12396,17 @@
               }
               // El blob solo se emite si pasa la validación de URL de imagen;
               // tanto src como alt se escapan como atributo (anti break-out).
+              // width/height se emiten SOLO si el bloque los tiene (round-trip:
+              // una imagen sin dimensiones se exporta sin ellas).
               if (self._isSafeImageUrl(block.content.blob)) {
-                html += '<img src="' + escape_attr(block.content.blob) + '" alt="' + escape_attr(block.content.fileName || 'Imagen') + '" width="' + block.content.width + '" height="' + block.content.height + '"' + imgStyle + ' />';
+                var v_dim_attr = '';
+                if (typeof block.content.width === 'number' && block.content.width > 0) {
+                  v_dim_attr += ' width="' + block.content.width + '"';
+                }
+                if (typeof block.content.height === 'number' && block.content.height > 0) {
+                  v_dim_attr += ' height="' + block.content.height + '"';
+                }
+                html += '<img src="' + escape_attr(block.content.blob) + '" alt="' + escape_attr(block.content.fileName || 'Imagen') + '"' + v_dim_attr + imgStyle + ' />';
               }
             }
             break;
@@ -12491,9 +12556,17 @@
                 if (parts.length) imgStyle = ' style="' + parts.join('; ') + '"';
               }
               // El blob solo se emite si pasa la validación de URL de imagen;
-              // src y alt se escapan como atributo (anti break-out).
+              // src y alt se escapan como atributo (anti break-out). width/height
+              // solo si el bloque los tiene (sin dims → sin atributos).
               if (self._isSafeImageUrl(block.content.blob)) {
-                html += '<img src="' + escape_attr(block.content.blob) + '" alt="' + escape_attr(block.content.fileName || 'Imagen') + '" width="' + block.content.width + '" height="' + block.content.height + '"' + imgStyle + ' />';
+                var v_dim_attr_src = '';
+                if (typeof block.content.width === 'number' && block.content.width > 0) {
+                  v_dim_attr_src += ' width="' + block.content.width + '"';
+                }
+                if (typeof block.content.height === 'number' && block.content.height > 0) {
+                  v_dim_attr_src += ' height="' + block.content.height + '"';
+                }
+                html += '<img src="' + escape_attr(block.content.blob) + '" alt="' + escape_attr(block.content.fileName || 'Imagen') + '"' + v_dim_attr_src + imgStyle + ' />';
               }
             }
             break;
@@ -19338,10 +19411,13 @@
       var h = parseInt(c.height, 10);
       clean.content = {
         blob: c.blob,
-        fileName: typeof c.fileName === 'string' ? c.fileName.substring(0, 200) : 'image',
-        width: (isNaN(w) || w < 1) ? 300 : Math.min(w, 10000),
-        height: (isNaN(h) || h < 1) ? 200 : Math.min(h, 10000)
+        fileName: typeof c.fileName === 'string' ? c.fileName.substring(0, 200) : 'image'
       };
+      // Dimensiones OPCIONALES: solo se conservan si son válidas. Sin ellas la
+      // imagen se renderiza a su tamaño natural (no se fuerzan 300x200). Es lo
+      // que permite importar HTML sin width/height y mantenerlo así.
+      if (!isNaN(w) && w >= 1) clean.content.width = Math.min(w, 10000);
+      if (!isNaN(h) && h >= 1) clean.content.height = Math.min(h, 10000);
       // Preservar opciones avanzadas (border/margin/alignment) si existen y son válidas
       if (c.advanced && typeof c.advanced === 'object') {
         var adv = {};
