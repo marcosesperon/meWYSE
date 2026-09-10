@@ -6265,7 +6265,10 @@
                              v_curBlock.content.trim() === '' && v_curBlock.type !== 'divider') ? blockId : null;
           self._processImageFile(file, function(imgData) {
             if (!imgData) return;
-            self.createImageBlock(file, imgData.blob, imgData.width, imgData.height, insertIndex, null, v_replaceId);
+            // Pegado desde el portapapeles: NO fijar width/height (se pasan null)
+            // para que la imagen quede a su tamaño natural, sin dimensiones en el
+            // style del <img>. createImageBlock omite las claves cuando son null.
+            self.createImageBlock(file, imgData.blob, null, null, insertIndex, null, v_replaceId);
           });
           return;
         }
