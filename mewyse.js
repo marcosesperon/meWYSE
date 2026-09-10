@@ -1862,7 +1862,17 @@
       this.loadFromHTML(this._initialHTML);
       this._initialHTML = null; // libera referencia
     } else if (this.target.value) {
-      this.loadFromText(this.target.value);
+      // El target original ERA un textarea: su value suele traer HTML (uso como
+      // reemplazo de TinyMCE). Si parece HTML, parsearlo con loadFromHTML para
+      // trocearlo en bloques (párrafos, imágenes, listas, tablas…) — así el
+      // editor trata cada elemento como su propio bloque. Si es texto plano,
+      // se mantiene el comportamiento línea→párrafo de loadFromText.
+      var v_initial_value = this.target.value;
+      if (this._looks_like_html(v_initial_value)) {
+        this.loadFromHTML(v_initial_value);
+      } else {
+        this.loadFromText(v_initial_value);
+      }
     }
 
     // Habilitar drag & drop de imágenes sobre el editor.
@@ -6679,6 +6689,24 @@
       var isBlockElement = tagToBlockType[tagName] !== undefined;
 
       if (isBlockElement) {
+        // Caso especial: bloque cuyo ÚNICO contenido es <br>/espacios (p. ej.
+        // <p><br></p>, la "línea en blanco" típica de TinyMCE/editores). Sin
+        // este atajo el <br> activa hasBlockChildren, se recurre y el <br> se
+        // descarta → 0 bloques (se perdería la separación intencionada). Lo
+        // tratamos como un bloque de texto VACÍO. El recorte de vacíos de los
+        // extremos se aplica después, así que solo se conservan los intermedios.
+        var v_text_only = (node.textContent || '').replace(/\s/g, '');
+        if (v_text_only === '' &&
+            node.querySelectorAll(
+              'img, iframe, video, audio, table, ul, ol, p, h1, h2, h3, h4, h5, h6, blockquote, pre, hr'
+            ).length === 0) {
+          blocksToInsert.push({
+            type: tagToBlockType[tagName] || 'paragraph',
+            content: ''
+          });
+          return;
+        }
+
         // Verificar si contiene otros elementos de bloque anidados
         var hasBlockChildren = false;
         var children = node.childNodes;
@@ -12093,6 +12121,21 @@
    * Carga contenido desde texto plano
    * @param {string} text
    */
+  /**
+   * Heurística: decide si un string "parece" HTML (contiene alguna etiqueta de
+   * apertura, cierre o self-closing). Se usa para enrutar el contenido inicial
+   * de un <textarea> a loadFromHTML (trocea en bloques) o a loadFromText (texto
+   * plano línea→párrafo). No pretende validar HTML, solo detectar markup; un
+   * "a < b" suelto (sin nombre de etiqueta) NO se considera HTML.
+   * @param {string} v_text
+   * @returns {boolean}
+   */
+  meWYSE.prototype._looks_like_html = function(v_text) {
+    if (typeof v_text !== 'string' || v_text === '') return false;
+    // <tag ...>  |  </tag>  |  <tag/>  → nombre de etiqueta que empieza por letra
+    return /<([a-z][a-z0-9-]*)(\s[^>]*)?\/?>|<\/[a-z][a-z0-9-]*\s*>/i.test(v_text);
+  };
+
   meWYSE.prototype.loadFromText = function(text) {
     var lines = text.split('\n');
     var self = this;
