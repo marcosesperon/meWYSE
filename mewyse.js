@@ -1388,6 +1388,17 @@
       this.render();
     }
 
+    // Con el contenido inicial ya asentado (incluido el párrafo por defecto si el
+    // textarea venía vacío), fijar la línea base:
+    //  - dirty tracking: estado "limpio" para isDirty()/hasChanges().
+    //  - historial: una sola entrada (undo deshabilitado hasta el primer cambio),
+    //    sin el estado vacío intermedio que rompía el foco al deshacer.
+    // Se hace AQUÍ (no en initDomEditor) para que la base sea SIEMPRE ≥1 bloque.
+    // Solo la carga INICIAL; un loadFrom* manual a mitad de sesión conserva su
+    // historial y recaptura su propia base de dirty.
+    this._capture_pristine();
+    this._reset_history();
+
     // Cargar (lazy) la librería de resaltado de sintaxis si la feature está activa.
     // Tras cargar re-pinta los bloques de código ya renderizados.
     this._initCodeHighlight();
@@ -1876,19 +1887,11 @@
       }
     }
 
-    // Línea base para el dirty tracking: el contenido inicial ya normalizado
-    // (bloques) es el estado "limpio". Se captura SIEMPRE (aunque el editor
-    // esté vacío) para que isDirty()/hasChanges() funcionen desde el arranque.
-    // loadFromHTML/JSON/Markdown ya la recapturan si se llama a alguno arriba;
-    // este capture cubre además loadFromText y el caso sin contenido inicial.
-    this._capture_pristine();
-
-    // Reiniciar el historial: la carga inicial (loadFromHTML/Text) deja varias
-    // entradas y dejaría "deshacer" activo sin haber tocado nada. Tras la carga,
-    // el contenido inicial es la única base del historial (undo deshabilitado
-    // hasta el primer cambio real). Solo la carga INICIAL; un loadFrom* manual a
-    // mitad de sesión conserva su historial.
-    this._reset_history();
+    // NOTA: la línea base de dirty tracking (_capture_pristine) y el reinicio de
+    // historial (_reset_history) se hacen en init(), DESPUÉS de garantizar ≥1
+    // bloque (párrafo por defecto si el textarea venía vacío). Si se hicieran
+    // aquí con blocks=[] (textarea vacío), el historial quedaría [[], ['paragraph']]
+    // y deshacer restauraría un estado SIN bloques (editor sin editable).
 
     // Habilitar drag & drop de imágenes sobre el editor.
     // No aplica en readOnly: no se puede insertar nada nuevo.
