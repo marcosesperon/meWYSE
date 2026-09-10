@@ -609,6 +609,35 @@ editor.focus(blockId); // bloque especifico
       </div>
     </div>
 
+    <!-- Demo: Deteccion de cambios (dirty tracking) -->
+    <div class="demo-section">
+      <h2>Detecci&oacute;n de cambios (dirty tracking)</h2>
+      <p>Este editor se monta sobre un <code>&lt;textarea&gt;</code> que <strong>ya trae HTML</strong> (contenido guardado previamente). <code>isDirty()</code> / <code>hasChanges()</code> indican si el contenido cambi&oacute; respecto a la <strong>l&iacute;nea base "limpia"</strong>, que se captura tras la conversi&oacute;n HTML&rarr;bloques. As&iacute;, si <strong>entras con el foco y sales sin editar nada, NO se reporta cambio</strong>. El payload de <code>onBlur</code> incluye <code>hasChanges</code>.</p>
+      <div class="config-hint">
+        Prueba: haz clic dentro del editor y luego fuera <em>sin tocar nada</em> &rarr; el estado sigue en <strong>&laquo;sin cambios&raquo;</strong> (la conversi&oacute;n HTML&rarr;bloques no cuenta). Ahora <em>edita</em> cualquier texto &rarr; mientras escribes pasa a <strong>&laquo;con cambios&raquo;</strong>; al hacer clic <em>fuera</em>, el <code>onBlur</code> de este demo llama a <code>resetDirty()</code> (simulando guardar) y vuelve a <strong>&laquo;sin cambios&raquo;</strong>.
+      </div>
+      <pre class="docs-code"><code>var editor = new meWYSE({
+  target: '#dirtyTrackingSource',   // textarea ya con HTML
+  toolbar: true,
+  onBlur: function (data) {
+    if (data.hasChanges) {          // o editor.hasChanges() / editor.isDirty()
+      guardar(data.html);           // solo si realmente cambio algo
+      editor.resetDirty();          // restablecer isDirty a false tras guardar
+    }
+  }
+});</code></pre>
+      <textarea id="dirtyTrackingSource" style="display:none;"></textarea>
+      <div class="controls">
+        <div class="button-group" style="align-items:center;">
+          <span>Estado:</span>
+          <span id="dirtyStatus" style="font-weight:700;padding:2px 10px;border-radius:6px;">&mdash;</span>
+          <button class="btn" onclick="markDirtySaved()">Restablecer (resetDirty)</button>
+          <button class="btn btn-secondary" onclick="refreshDirtyStatus()">Consultar isDirty()</button>
+        </div>
+        <div id="dirtyBlurLog" class="output" style="margin-top:10px;">Interact&uacute;a con el editor para ver el estado&hellip;</div>
+      </div>
+    </div>
+
     <!-- Demo: Editor con Summary -->
     <div class="demo-section">
       <h2>Editor con Summary</h2>
@@ -1147,6 +1176,7 @@ new meWYSE({ target: '#vhHeightEditor', minHeight: '10em', maxHeight: '35vh' });
     var wrapEditor;
     var noToolbarEditor;
     var pageBreakEditor;
+    var dirtyEditor;
     var summaryEditor;
     var mentionsEditor;
     var tagsEditor;
@@ -1225,6 +1255,66 @@ new meWYSE({ target: '#vhHeightEditor', minHeight: '10em', maxHeight: '35vh' });
           { id: 5, type: 'paragraph', content: 'Este contenido empieza en una pagina nueva. Pulsa "Imprimir" para comprobarlo.' }
         ]
       });
+    }
+
+    // Demo de dirty tracking: editor montado sobre un textarea que ya trae HTML.
+    function initDirtyEditor() {
+      // Simula un textarea que llega con contenido guardado previamente (HTML).
+      var v_source = document.getElementById('dirtyTrackingSource');
+      v_source.value =
+        '<h2>Acta de reunion</h2>' +
+        '<p>Asistentes: equipo de desarrollo.</p>' +
+        '<p>Se revisan los <strong>puntos pendientes</strong> del sprint.</p>' +
+        '<ul><li>Cerrar la migracion desde TinyMCE</li><li>Documentar la API publica</li></ul>';
+
+      dirtyEditor = new meWYSE({
+        target: '#dirtyTrackingSource',
+        toolbar: true,
+        // El payload trae hasChanges; tambien vale dirtyEditor.hasChanges()/isDirty().
+        onChange: function(data) { updateDirtyStatus(data.hasChanges); },
+        onFocus:  function(data) { updateDirtyStatus(data.hasChanges); },
+        onBlur:   function(data) {
+          var log = document.getElementById('dirtyBlurLog');
+          if (data.hasChanges) {
+            // Caso real: hubo cambios -> "guardar" y restablecer isDirty a false.
+            // guardar(data.html);
+            dirtyEditor.resetDirty();   // deja isDirty()/hasChanges() en false
+            updateDirtyStatus(false);
+            if (log) log.textContent = 'onBlur: habia cambios  ->  guardado (data.html) + resetDirty()  ->  ahora sin cambios';
+          } else {
+            updateDirtyStatus(false);
+            if (log) log.textContent = 'onBlur: hasChanges = false  ->  nada que guardar (entraste y saliste sin editar)';
+          }
+        }
+      });
+
+      // Estado inicial: recien cargado el HTML => sin cambios.
+      updateDirtyStatus(dirtyEditor.hasChanges());
+    }
+
+    // Pinta el badge de estado segun haya cambios o no.
+    function updateDirtyStatus(v_has_changes) {
+      var v_el = document.getElementById('dirtyStatus');
+      if (!v_el) return;
+      v_el.textContent = v_has_changes ? 'con cambios' : 'sin cambios';
+      v_el.style.background = v_has_changes ? '#fee2e2' : '#dcfce7';
+      v_el.style.color = v_has_changes ? '#b91c1c' : '#166534';
+    }
+
+    // Boton "Restablecer": deja isDirty()/hasChanges() en false (resetDirty).
+    function markDirtySaved() {
+      dirtyEditor.resetDirty();
+      updateDirtyStatus(dirtyEditor.hasChanges());
+      var log = document.getElementById('dirtyBlurLog');
+      if (log) log.textContent = 'resetDirty(): isDirty restablecido a false (nueva linea base).';
+    }
+
+    // Boton "Consultar isDirty()": muestra el valor actual bajo demanda.
+    function refreshDirtyStatus() {
+      var v_dirty = dirtyEditor.isDirty();
+      updateDirtyStatus(v_dirty);
+      var log = document.getElementById('dirtyBlurLog');
+      if (log) log.textContent = 'editor.isDirty() = ' + v_dirty;
     }
 
     // Inicializar editor con summary
@@ -2109,6 +2199,7 @@ new meWYSE({ target: '#vhHeightEditor', minHeight: '10em', maxHeight: '35vh' });
       initWrapEditor();
       initNoToolbarEditor();
       initPageBreakEditor();
+      initDirtyEditor();
       initSummaryEditor();
       initMentionsEditor();
       initReadOnlyEditor();

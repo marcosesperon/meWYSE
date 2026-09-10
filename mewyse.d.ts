@@ -27,8 +27,9 @@ export interface MeWyseChangePayload {
   plainText: string;
   json: string;
   /** true si el contenido difiere de la última línea base "limpia"
-   *  (carga inicial, último loadFrom*, o última llamada a markPristine). */
-  isDirty: boolean;
+   *  (carga inicial, último loadFrom*, o última llamada a markPristine).
+   *  Equivale a editor.hasChanges()/isDirty(). */
+  hasChanges: boolean;
   focusedBlockId?: number;
   focusedBlockType?: string;
 }
@@ -115,6 +116,10 @@ export default class meWYSE {
   /** Marca el estado actual como "limpio" (nueva línea base). Úsalo tras
    *  guardar. Encadenable. */
   markPristine(): this;
+  /** Restablece la detección de cambios: deja isDirty()/hasChanges() en false
+   *  fijando el contenido actual como base. Alias de markPristine(); pensado
+   *  para llamarse dentro de onBlur. Encadenable. */
+  resetDirty(): this;
   getResolvedHTML?(values: Record<string, string>): string;
   hasDraft(): boolean;
   restoreDraft(): boolean;

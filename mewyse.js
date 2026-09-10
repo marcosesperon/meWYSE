@@ -12682,6 +12682,17 @@
   };
 
   /**
+   * Restablece el estado de cambios: deja `isDirty()`/`hasChanges()` en `false`
+   * fijando el contenido ACTUAL como nueva línea base. Alias explícito de
+   * markPristine(). Pensado para llamarse, p. ej., dentro de `onBlur` tras
+   * guardar, para "resetear" la detección de cambios. API pública.
+   * @returns {meWYSE} this (encadenable)
+   */
+  meWYSE.prototype.resetDirty = function() {
+    return this.markPristine();
+  };
+
+  /**
    * Convierte HTML inline a Markdown inline
    * @param {string} html - HTML con formato inline
    * @returns {string} Markdown equivalente
@@ -13341,12 +13352,16 @@
     if (typeof this.onChange !== 'function') return;
 
     if (v_plain === null) v_plain = this.getPlainText();
+    var v_json_change = this.getJSON();
     this._fireChangeCallback({
       blocks: this.blocks,
       plainText: v_plain,
       html: this.getHTML(),
-      json: this.getJSON(),
-      markdown: this.getMarkdown()
+      json: v_json_change,
+      markdown: this.getMarkdown(),
+      // Mismo dirty tracking que onFocus/onBlur (ver _buildEventPayload): permite
+      // reaccionar a cambios en vivo. Reutiliza v_json_change (no recalcula).
+      hasChanges: this._pristine_signature !== null && v_json_change !== this._pristine_signature
     });
   };
 
@@ -13420,8 +13435,9 @@
       markdown: this.getMarkdown(),
       // Dirty tracking: cambios respecto a la última línea base "limpia". Se
       // reutiliza v_json (evita recalcular). Con base null (sin capturar aún),
-      // no hay cambios.
-      isDirty: this._pristine_signature !== null && v_json !== this._pristine_signature,
+      // no hay cambios. En el payload el campo se llama `hasChanges` (los
+      // métodos públicos siguen siendo isDirty()/hasChanges()).
+      hasChanges: this._pristine_signature !== null && v_json !== this._pristine_signature,
       focusedBlockId: null,
       focusedBlockType: null
     };

@@ -128,7 +128,7 @@ var editor = new meWYSE({
   html: String,           // getHTML()
   json: String,           // getJSON()
   markdown: String,       // getMarkdown()
-  isDirty: Boolean,       // ¿cambió respecto a la línea base? (ver isDirty())
+  hasChanges: Boolean,    // ¿cambió respecto a la línea base? (ver isDirty()/hasChanges())
   focusedBlockId: Number, // id del bloque enfocado/que perdió foco (solo onFocus/onBlur)
   focusedBlockType: String // tipo del bloque (paragraph/heading1/...)
 }
@@ -275,6 +275,7 @@ editor.loadFromHTML(
 editor.isDirty();      // ¿Ha cambiado el contenido respecto a la línea base "limpia"?
 editor.hasChanges();   // Alias de isDirty()
 editor.markPristine(); // Marca el estado actual como "limpio" (llámalo tras guardar)
+editor.resetDirty();   // Restablece isDirty()/hasChanges() a false (alias de markPristine)
 ```
 
 La **línea base** se captura tras la carga inicial —incluida la normalización
@@ -289,9 +290,9 @@ pulsaciones: si editas y luego deshaces hasta el estado original, vuelve a
 var editor = new meWYSE({
   target: '#mi-textarea',      // textarea ya con HTML
   onBlur: function (data) {
-    if (data.isDirty) {        // o editor.isDirty()
+    if (data.hasChanges) {     // o editor.hasChanges() / editor.isDirty()
       guardar(data.html);      // solo si realmente cambió algo
-      editor.markPristine();   // fijar nueva base tras guardar
+      editor.resetDirty();     // restablecer isDirty a false tras guardar
     }
   }
 });
