@@ -1883,6 +1883,13 @@
     // este capture cubre además loadFromText y el caso sin contenido inicial.
     this._capture_pristine();
 
+    // Reiniciar el historial: la carga inicial (loadFromHTML/Text) deja varias
+    // entradas y dejaría "deshacer" activo sin haber tocado nada. Tras la carga,
+    // el contenido inicial es la única base del historial (undo deshabilitado
+    // hasta el primer cambio real). Solo la carga INICIAL; un loadFrom* manual a
+    // mitad de sesión conserva su historial.
+    this._reset_history();
+
     // Habilitar drag & drop de imágenes sobre el editor.
     // No aplica en readOnly: no se puede insertar nada nuevo.
     if (!this.readOnly) {
@@ -17208,6 +17215,23 @@
    * Guarda un snapshot del estado actual en el historial
    * @param {boolean} force - Si true, guarda inmediatamente sin debounce
    */
+  /**
+   * Reinicia el historial de undo/redo dejando UNA sola entrada: el contenido
+   * actual como línea base. Con ello `historyIndex = 0` y el botón de deshacer
+   * queda deshabilitado hasta que haya un cambio real. Se usa tras la carga
+   * INICIAL del contenido (para que abrir el editor sobre un textarea con HTML
+   * no active "deshacer" sin haber tocado nada). Limpia además el snapshot
+   * debounced pendiente de esa carga (que, al coincidir con la base, se
+   * deduplicaría igualmente).
+   */
+  meWYSE.prototype._reset_history = function() {
+    clearTimeout(this.historyDebounceTimer);
+    this.historyDebounceTimer = null;
+    this.history = [JSON.parse(JSON.stringify(this.blocks))];
+    this.historyIndex = 0;
+    this.updateUndoRedoButtons();
+  };
+
   meWYSE.prototype.pushHistory = function(force) {
     if (this.isUndoRedo) return;
 
