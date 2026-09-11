@@ -1663,6 +1663,35 @@
   };
 
   /**
+   * Render INCREMENTAL de UN grupo de lista: reconstruye SOLO el `.mewyse-list-group`
+   * (con su anidación) que contiene a `blockId`, sin tocar el resto del documento.
+   * Útil cuando cambia la anidación de un ítem (indentar/desindentar), donde el DOM
+   * del grupo se reestructura pero los demás bloques quedan intactos.
+   * Devuelve false (→ el llamador hace `render()` completo) si el bloque no es de
+   * lista o no se encuentra el wrapper del grupo.
+   * @param {number} blockId
+   * @returns {boolean}
+   */
+  meWYSE.prototype._patch_list_group = function(blockId) {
+    var v_block = this.getBlock(blockId);
+    if (!v_block || !this._isListBlockType(v_block.type)) return false;
+    var v_index = this.getBlockIndex(blockId);
+    if (v_index === -1) return false;
+    // Inicio del grupo contiguo del MISMO tipo de lista (lo que agrupa el builder).
+    var v_start = v_index;
+    while (v_start > 0 && this.blocks[v_start - 1].type === v_block.type) v_start--;
+    // Wrapper DOM antiguo: el nodo de primer nivel que contiene al ítem.
+    var v_old = this._top_level_block_node(this.getBlockElementById(blockId));
+    if (!v_old || !v_old.parentNode || !v_old.classList ||
+        !v_old.classList.contains('mewyse-list-group')) {
+      return false;
+    }
+    var v_built = this._buildNestedListWrapper(this.blocks, v_start);
+    v_old.parentNode.replaceChild(v_built.wrapper, v_old);
+    return true;
+  };
+
+  /**
    * Obtiene el elemento editable de un bloque
    * @param {HTMLElement} blockElement - Elemento del bloque
    * @returns {HTMLElement|null}
@@ -4005,7 +4034,13 @@
 
     this.pushHistory(true);
     block.indentLevel = newLevel;
-    this.render();
+
+    // Render INCREMENTAL (Fase 5): reconstruir SOLO el grupo de lista afectado
+    // (la anidación cambia dentro del grupo), conservando el resto del DOM.
+    // Fallback a render() completo si no se pudo parchear el grupo.
+    if (!this._patch_list_group(blockId)) {
+      this.render();
+    }
     this.triggerChange();
 
     // Restaurar foco al bloque. IMPORTANTE: enfocar el editable PROPIO del bloque
@@ -4570,7 +4605,21 @@
       // El render recrea el DOM (blur transitorio del bloque que tenía el foco):
       // suprimir onBlur durante la transición.
       self._suppressBlurUntil = Date.now() + 300;
-      self.render();
+
+      // Render INCREMENTAL (Fase 5):
+      //  - reemplazo (bloque vacío → imagen): `_patch_block` recrea SOLO ese bloque.
+      //  - inserción (bloque nuevo): fast-path `render(v_targetId)` inserta solo la
+      //    imagen (no roba foco de texto: el bloque imagen no es contenteditable).
+      //  - fallback: render() completo.
+      var v_img_ok;
+      if (v_canReplace) {
+        v_img_ok = self._patch_block(v_targetId);
+      } else {
+        self.render(v_targetId);
+        v_img_ok = !!self.getBlockElementById(v_targetId);
+      }
+      if (!v_img_ok) self.render();
+
       self.triggerChange();
       // Mantener el foco DENTRO del editor: seleccionar la imagen recién
       // insertada (la selección la enfoca y muestra el handle).
