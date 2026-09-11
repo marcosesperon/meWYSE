@@ -12393,44 +12393,82 @@
     this.pushHistory(true);
 
     var self = this;
-    // Ordenar los índices de mayor a menor para eliminar sin afectar índices anteriores
-    var indices = this.selectedBlocks.map(function(blockId) {
+    // Índices ASCENDENTES (para detectar tramos contiguos) de los seleccionados.
+    var v_asc = this.selectedBlocks.map(function(blockId) {
       return self.getBlockIndex(blockId);
     }).filter(function(index) {
       return index !== -1;
     }).sort(function(a, b) {
-      return b - a;
+      return a - b;
     });
+    if (v_asc.length === 0) { this.selectedBlocks = []; return; }
 
-    // Eliminar los bloques
-    indices.forEach(function(index) {
-      self.blocks.splice(index, 1);
-    });
+    // ¿Se puede borrar INCREMENTALMENTE (quitar solo los elementos del DOM)?
+    // SEGURO si: no se vacía el documento, NINGÚN bloque borrado es de lista, y
+    // ningún TRAMO contiguo de borrados tiene listas a AMBOS lados (fusionaría dos
+    // grupos). Si no → render() completo (reagrupa/renumera).
+    var v_safe = this.blocks.length > v_asc.length;
+    if (v_safe) {
+      for (var a = 0; a < v_asc.length; a++) {
+        if (this._isListBlockType(this.blocks[v_asc[a]].type)) { v_safe = false; break; }
+      }
+    }
+    if (v_safe) {
+      var r = 0;
+      while (r < v_asc.length) {
+        var lo = v_asc[r], hi = lo;
+        while (r + 1 < v_asc.length && v_asc[r + 1] === hi + 1) { r++; hi = v_asc[r]; }
+        var v_pb = lo > 0 ? this.blocks[lo - 1] : null;
+        var v_nb = hi < this.blocks.length - 1 ? this.blocks[hi + 1] : null;
+        if (v_pb && v_nb && this._isListBlockType(v_pb.type) && this._isListBlockType(v_nb.type)) {
+          v_safe = false; break;
+        }
+        r++;
+      }
+    }
+    // Capturar los elementos DOM ANTES de mutar el modelo (el DOM aún está intacto).
+    var v_els = null;
+    if (v_safe) {
+      v_els = [];
+      for (var c = 0; c < v_asc.length; c++) {
+        var v_bid = this.blocks[v_asc[c]].id;
+        var v_tl = this._top_level_block_node(this.getBlockElementById(v_bid));
+        if (v_tl && v_tl.getAttribute && v_tl.getAttribute('data-block-id') === String(v_bid)) {
+          v_els.push(v_tl);
+        } else { v_safe = false; break; }
+      }
+    }
+
+    // Eliminar del modelo (DESCENDENTE, para no desplazar índices anteriores).
+    var v_desc = v_asc.slice().sort(function(a, b) { return b - a; });
+    v_desc.forEach(function(index) { self.blocks.splice(index, 1); });
 
     // Limpiar selección
     this.selectedBlocks = [];
 
-    // Si no quedan bloques, crear un párrafo vacío
+    // Si no quedan bloques, crear un párrafo vacío (fuerza render completo).
     if (this.blocks.length === 0) {
-      this.blocks.push({
-        id: ++this.currentBlockId,
-        type: 'paragraph',
-        content: ''
-      });
+      this.blocks.push({ id: ++this.currentBlockId, type: 'paragraph', content: '' });
+      v_safe = false;
     }
 
     // Re-normalizar niveles de lista tras el borrado múltiple
     this._normalizeListModel();
 
-    // Re-renderizar
-    this.render();
+    if (v_safe && v_els) {
+      // Render INCREMENTAL: quitar solo los elementos de los bloques borrados.
+      this._suppressBlurUntil = Date.now() + 300;
+      for (var d = 0; d < v_els.length; d++) {
+        if (v_els[d].parentNode) v_els[d].parentNode.removeChild(v_els[d]);
+      }
+    } else {
+      this.render();
+    }
 
     // Actualizar listas numeradas si es necesario
-    if (indices.length > 0) {
-      var minIndex = Math.min.apply(null, indices);
-      if (minIndex < this.blocks.length) {
-        this.updateConsecutiveNumberLists(minIndex);
-      }
+    var minIndex = v_asc[0];
+    if (minIndex < this.blocks.length) {
+      this.updateConsecutiveNumberLists(minIndex);
     }
 
     this.triggerChange();
@@ -21639,16 +21677,32 @@
                         this._customClassWhitelist[customClass]) ? customClass : null;
     var v_nonConvertible = { table: 1, image: 1, divider: 1, pageBreak: 1, video: 1, audio: 1, toc: 1 };
 
+    // ¿Involucra listas? (tipo destino lista, o algún bloque convertible es lista).
+    // Si sí, el cambio de tipo reestructura la agrupación → render() completo. Si
+    // no, se puede parchear cada bloque en su sitio (texto↔texto).
+    var v_involves_list = this._isListBlockType(type);
+    var v_convertible_ids = [];
     for (var i = 0; i < info.ids.length; i++) {
       var v_block = this.getBlock(info.ids[i]);
       if (!v_block || v_nonConvertible[v_block.type]) continue;
+      if (this._isListBlockType(v_block.type)) v_involves_list = true;
+      v_convertible_ids.push(info.ids[i]);
       v_block.type = type;
       if (v_validClass) v_block.customClass = v_validClass;
       else delete v_block.customClass;
     }
 
     if (info.mode === 'cross') { this.clearCrossBlockSelection(); this.closeFormatMenu(); }
-    this.render();
+
+    var v_all_patched = false;
+    if (!v_involves_list) {
+      v_all_patched = true;
+      for (var j = 0; j < v_convertible_ids.length; j++) {
+        if (!this._patch_block(v_convertible_ids[j])) { v_all_patched = false; break; }
+      }
+    }
+    if (!v_all_patched) this.render();
+
     if (info.mode === 'blocks') this._reapplyBlockSelectionVisuals();
     this.triggerChange();
     return true;
@@ -21664,17 +21718,27 @@
     if (info.mode === 'none') return false;
 
     this.pushHistory(true);
+    // Render INCREMENTAL (Fase 6): la alineación es solo `text-align`; se aplica
+    // DIRECTAMENTE al elemento de cada bloque seleccionado (sin render → sin
+    // perder la selección de bloques ni el caret). Fallback a render() si a algún
+    // bloque le falta el elemento.
+    var v_missing_el = false;
     for (var i = 0; i < info.ids.length; i++) {
       var v_block = this.getBlock(info.ids[i]);
       if (!v_block || !TEXT_ALIGN_BLOCK_TYPES[v_block.type]) continue;
       // 'left' es el valor por defecto: no ensuciar el modelo con él.
       if (alignment === 'left') delete v_block.alignment;
       else v_block.alignment = alignment;
+      var v_el = this.getBlockElementById(info.ids[i]);
+      if (v_el) v_el.style.textAlign = v_block.alignment || '';
+      else v_missing_el = true;
     }
 
     if (info.mode === 'cross') { this.clearCrossBlockSelection(); this.closeFormatMenu(); }
-    this.render();
-    if (info.mode === 'blocks') this._reapplyBlockSelectionVisuals();
+    if (v_missing_el) {
+      this.render();
+      if (info.mode === 'blocks') this._reapplyBlockSelectionVisuals();
+    }
     this.triggerChange();
     return true;
   };
