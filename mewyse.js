@@ -12024,6 +12024,30 @@
     // Obtener el bloque arrastrado
     var draggedBlock = this.blocks[draggedIndex];
 
+    // ¿Hay LISTAS implicadas en el origen o el destino? Mover un bloque suelto de
+    // entre dos ítems de lista los FUSIONA (origen), y meterlo entre ítems los
+    // PARTE (destino) — cambios de agrupación que el movimiento incremental de un
+    // solo elemento no sabe hacer → render() completo. Si NO hay listas cerca
+    // (bloques sueltos), se mueve solo el elemento del DOM (incremental).
+    var v_src_prev = draggedIndex > 0 ? this.blocks[draggedIndex - 1] : null;
+    var v_src_next = draggedIndex < this.blocks.length - 1 ? this.blocks[draggedIndex + 1] : null;
+    var v_tgt_blk = this.blocks[targetIndex];
+    var v_tgt_prev = targetIndex > 0 ? this.blocks[targetIndex - 1] : null;
+    var v_involves_list =
+      this._isListBlockType(draggedBlock.type) ||
+      (v_src_prev && this._isListBlockType(v_src_prev.type)) ||
+      (v_src_next && this._isListBlockType(v_src_next.type)) ||
+      (v_tgt_blk && this._isListBlockType(v_tgt_blk.type)) ||
+      (v_tgt_prev && this._isListBlockType(v_tgt_prev.type));
+
+    // Capturar el elemento del bloque arrastrado ANTES de mutar el modelo.
+    var v_dragged_el = !v_involves_list
+      ? this._top_level_block_node(this.getBlockElementById(draggedBlockId)) : null;
+    if (v_dragged_el && v_dragged_el.getAttribute &&
+        v_dragged_el.getAttribute('data-block-id') !== String(draggedBlockId)) {
+      v_dragged_el = null; // envuelto (lista) → no incremental
+    }
+
     // Eliminar el bloque de su posición actual
     this.blocks.splice(draggedIndex, 1);
 
@@ -12035,8 +12059,24 @@
     // Insertar el bloque en la nueva posición
     this.blocks.splice(targetIndex, 0, draggedBlock);
 
-    // Re-renderizar
-    this.render();
+    if (v_dragged_el && v_dragged_el.parentNode) {
+      // Render INCREMENTAL (Fase 3): mover el MISMO elemento del DOM a su nueva
+      // posición (insertBefore lo saca de la vieja). El ancla es el elemento del
+      // bloque que quedará DESPUÉS del arrastrado (targetIndex+1); si no hay,
+      // se anexa al final. El foco (si estaba dentro) se conserva al ser el mismo
+      // nodo; moveBlockUp/Down además reenfocan por rAF.
+      var v_after_blk = (targetIndex + 1 < this.blocks.length) ? this.blocks[targetIndex + 1] : null;
+      var v_after_el = v_after_blk
+        ? this._top_level_block_node(this.getBlockElementById(v_after_blk.id)) : null;
+      if (v_after_el && v_after_el.parentNode === this.container) {
+        this.container.insertBefore(v_dragged_el, v_after_el);
+      } else {
+        this.container.appendChild(v_dragged_el);
+      }
+    } else {
+      // Fallback: listas de por medio → render() completo (reagrupa).
+      this.render();
+    }
     this.triggerChange();
   };
 
