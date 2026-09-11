@@ -35,7 +35,10 @@ Si este proyecto te resulta util, puedes apoyar su desarrollo:
 - **Resumen y estadísticas**: Índice de navegación, conteo de palabras, caracteres, párrafos y tiempo de lectura
 - **Drag & drop**: Reordena bloques arrastrando el handle flotante
 - **Selección multi-bloque**: Ctrl+click y Shift+click para seleccionar, formatear o eliminar múltiples bloques
-- **Undo/Redo**: Historial de hasta 50 estados con debounce
+- **Undo/Redo**: Historial de hasta 50 estados con debounce (limpio tras la carga inicial: "deshacer" arranca deshabilitado)
+- **Render incremental**: las operaciones de bloque (insertar, borrar, convertir, mover, duplicar, alinear, indentar, editar imagen…) actualizan **solo el DOM del bloque afectado** en vez de reconstruir el documento — conservan el foco/caret del resto, sin flicker, y escalan en documentos grandes (con fallback automático a re-render cuando cambia la agrupación de listas)
+- **Detección de cambios (dirty tracking)**: `isDirty()`/`hasChanges()` para saber si el contenido cambió respecto a la última base "limpia"; `markPristine()`/`resetDirty()` para resetear tras guardar
+- **`onChange` eficiente**: payload **perezoso** (solo serializa `html`/`json`/`markdown` si el callback los lee) y `onChangeDebounce` opcional para agrupar los cambios al teclear
 - **Exportación múltiple**: JSON, HTML, Markdown y texto plano
 - **Importación Markdown**: Carga contenido desde cadenas Markdown
 - **Buscar y reemplazar**: Panel flotante (`Ctrl/Cmd+F`) con navegación prev/next, case-sensitive, palabra completa y reemplazo masivo
@@ -45,6 +48,7 @@ Si este proyecto te resulta util, puedes apoyar su desarrollo:
 - **Soporte RTL**: Direccionalidad derecha-a-izquierda para árabe, hebreo, etc.
 - **Paste inteligente**: Limpieza automática de markup de Microsoft Word/Excel/Google Docs; convierte listas simuladas con viñetas a `<ul>`/`<ol>` reales; preserva bold/italic/underline inferidos de estilos inline. Opción `pasteAsText: true` para forzar todo paste como texto plano
 - **Seguridad XSS**: Sanitización automática contra inyección en todos los puntos de entrada (constructor, `loadFromJSON`, `loadFromMarkdown`, paste). Whitelist estricto de tags/atributos/URLs. Método `getSafeHTML()` para exportación segura
+- **Robustez de datos**: los bloques de **tipo desconocido** (p. ej. de una versión más nueva o de un plugin no instalado) se **preservan íntegros** al cargar/exportar JSON en vez de perderse — se muestran como placeholder de solo lectura y se re-emiten tal cual en `getJSON()`
 - **Internacionalización (i18n)**: Español, inglés y traducciones personalizadas
 - **Temas**: Dark mode con auto-detección del sistema, tema compact, temas custom
 - **Content Styles**: Opción para heredar estilos CSS de la página
@@ -274,6 +278,12 @@ editor.loadFromHTML(
 // Detecta iframes YouTube/Vimeo, <video>, <audio>, <img>, tablas y listas
 // automáticamente y los convierte al modelo de bloques.
 ```
+
+> **Bloques de tipo desconocido**: si el JSON incluye un bloque cuyo `type` esta
+> versión no reconoce (p. ej. de una versión más nueva o de un plugin), **no se
+> pierde**: se conserva íntegro (con todas sus propiedades), se muestra como un
+> placeholder de solo lectura y `getJSON()` lo re-emite tal cual. Así puedes cargar
+> y volver a guardar documentos sin destruir contenido que no entiendes.
 
 #### Detección de cambios (dirty tracking)
 
@@ -687,6 +697,17 @@ Permite seleccionar y operar sobre múltiples bloques simultáneamente:
 - Historial de hasta **50 estados** con snapshots del array de bloques
 - **Debounce de 300ms** para agrupar ediciones rápidas en un solo estado
 - Accesible desde toolbar (botones ⟲/⟳) o atajos de teclado
+- Tras la **carga inicial** el historial arranca limpio (una sola entrada): "deshacer" queda deshabilitado hasta el primer cambio real
+
+## Render incremental
+
+Las operaciones de bloque no reconstruyen el documento entero: actualizan **solo el DOM del bloque afectado** y dejan el resto intacto.
+
+- **Cubre**: insertar, borrar, convertir tipo, mover/reordenar, duplicar, alinear, indentar/desindentar, insertar/editar/redimensionar imagen, y las de multi-selección (alinear/tipo/borrar).
+- **Ventajas**: se conserva el **foco y el caret** del resto de bloques, no hay parpadeo (flicker), y escala en documentos grandes.
+- **Fallback automático**: cuando la operación reestructura la **agrupación de listas** (fusionar o partir un `<ul>/<ol>`), se hace un re-render completo — siempre correcto.
+
+Es transparente: no requiere configuración ni cambios en tu código.
 
 ## Temas
 
