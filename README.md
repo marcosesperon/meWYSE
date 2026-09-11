@@ -135,6 +135,10 @@ var editor = new meWYSE({
 }
 ```
 
+> **Payload perezoso**: `plainText`/`html`/`json`/`markdown`/`hasChanges` se serializan **solo al leerlos** (getters memoizados). Si tu callback solo usa `data.html`, no se calculan Markdown/JSON — importante en documentos grandes. Por eso **no** hagas `JSON.stringify(data)` (además `editor` es circular): usa `data.json`.
+>
+> **Debounce de `onChange`**: con la opción `onChangeDebounce: <ms>` (default `0` = síncrono), `onChange` se agrupa en una sola llamada tras ese tiempo de inactividad al teclear. No afecta al textarea, autosave ni al historial (siguen inmediatos); `onFocus`/`onBlur` tampoco se debouncean.
+
 ### Comportamiento de onFocus / onBlur
 
 - **`onFocus`** se dispara **solo cuando el editor gana foco desde el exterior**. No se dispara cuando el caret se mueve entre bloques del editor.
@@ -190,7 +194,8 @@ new meWYSE(options)
 | `mentions` | Array | `[]` | Lista de usuarios para menciones `@` |
 | `autoFocus` | boolean | `false` | Enfocar automáticamente el primer bloque al inicializar |
 | `blocks` | Array | `[]` | Contenido inicial como array de bloques |
-| `onChange` | Function | `function(){}` | Callback cuando cambia el contenido |
+| `onChange` | Function | `function(){}` | Callback cuando cambia el contenido (payload perezoso; ver arriba) |
+| `onChangeDebounce` | number | `0` | ms para agrupar (debounce) `onChange` al teclear. `0` = síncrono. No afecta a autosave/textarea/historial |
 | `onFocus` | Function | `function(){}` | Callback cuando el editor gana foco (entrar al editor desde fuera). No se dispara al moverse entre bloques internamente |
 | `onBlur` | Function | `function(){}` | Callback cuando el editor pierde foco. No se dispara al hacer click en toolbar/menús/modales/pickers del editor |
 

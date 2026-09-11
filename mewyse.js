@@ -989,6 +989,15 @@
     this.autosaveKey = (typeof this.options.autosaveKey === 'string' && this.options.autosaveKey)
       ? this.options.autosaveKey : 'mewyse-draft';
 
+    // onChangeDebounce (ms): agrupa las llamadas a onChange mientras se teclea.
+    // 0 (default) = comportamiento clásico (onChange síncrono en cada cambio).
+    // >0 = onChange se dispara una sola vez tras `ms` de inactividad. NO afecta a
+    // los efectos internos de triggerChange (textarea, autosave, historial, TOC),
+    // que siguen siendo inmediatos. El payload es PEREZOSO en cualquier caso.
+    var v_ocd = parseInt(this.options.onChangeDebounce, 10);
+    this.onChangeDebounce = (!isNaN(v_ocd) && v_ocd > 0) ? v_ocd : 0;
+    this._onChangeTimer = null;
+
     // styleFormats: lista de estilos custom definidos por el consumidor.
     // Cada uno: { title, block, className }
     this.styleFormats = [];
@@ -13408,25 +13417,27 @@
     // callbacks (onChange/onFocus/onBlur) deben ser inertes.
     if (this.readOnly) return;
 
-    // El payload es costoso (serializa HTML + JSON + Markdown, con DOMParser por
-    // bloque). Solo construirlo si hay un consumidor de onChange.
+    // Solo construir/disparar si hay un consumidor de onChange.
     if (typeof this.onChange !== 'function') return;
 
-    if (v_plain === null) v_plain = this.getPlainText();
-    var v_json_change = this.getJSON();
-    this._fireChangeCallback({
-      // Referencia al propio editor (ver _buildEventPayload): API accesible desde
-      // el callback sin capturar la instancia en una variable externa.
-      editor: this,
-      blocks: this.blocks,
-      plainText: v_plain,
-      html: this.getHTML(),
-      json: v_json_change,
-      markdown: this.getMarkdown(),
-      // Mismo dirty tracking que onFocus/onBlur (ver _buildEventPayload): permite
-      // reaccionar a cambios en vivo. Reutiliza v_json_change (no recalcula).
-      hasChanges: this._pristine_signature !== null && v_json_change !== this._pristine_signature
-    });
+    // Payload PEREZOSO: html/json/markdown/hasChanges se calculan solo si el
+    // consumidor los lee. Se reutiliza el `v_plain` ya calculado para el textarea
+    // (si el target era textarea); el resto queda lazy.
+    var v_payload = this._make_change_payload(null, { plainText: v_plain });
+
+    if (this.onChangeDebounce > 0) {
+      // Debounce: agrupa ráfagas de cambios en una sola llamada a onChange tras
+      // `onChangeDebounce` ms de inactividad. El payload perezoso se evalúa al
+      // dispararse (mismo estado, porque el debounce implica reposo).
+      var v_self2 = this;
+      if (this._onChangeTimer) clearTimeout(this._onChangeTimer);
+      this._onChangeTimer = setTimeout(function() {
+        v_self2._onChangeTimer = null;
+        v_self2._fireChangeCallback(v_payload);
+      }, this.onChangeDebounce);
+    } else {
+      this._fireChangeCallback(v_payload);
+    }
   };
 
   /**
@@ -13435,6 +13446,8 @@
    * @param {Object} payload
    */
   meWYSE.prototype._fireChangeCallback = function(payload) {
+    // Guarda por si un onChange debounced se dispara tras destroy() (carrera).
+    if (this._destroyed) return;
     if (typeof this.onChange !== 'function') return;
     try {
       this.onChange(payload);
@@ -13489,37 +13502,87 @@
    * Construye el payload estándar pasado a callbacks (onChange/onFocus/onBlur).
    * Incluye el snapshot del contenido + info opcional del bloque enfocado.
    */
-  meWYSE.prototype._buildEventPayload = function(focusedElement) {
-    var v_json = this.getJSON();
+  /**
+   * Construye el payload de eventos (onChange/onFocus/onBlur) con SERIALIZACIONES
+   * PEREZOSAS: `plainText`/`html`/`json`/`markdown`/`hasChanges` se calculan SOLO
+   * al acceder a ellos (getters memoizados), no de forma anticipada. Antes se
+   * serializaban los 4 formatos (getHTML/getMarkdown hacen DOMParser por bloque)
+   * en CADA cambio aunque el consumidor solo leyera uno → coste innecesario en
+   * documentos grandes.
+   *
+   * @param {HTMLElement} [v_focused_el] - elemento con foco (para focusedBlock*)
+   * @param {Object} [v_seed] - valores ya calculados a reutilizar (p. ej.
+   *   `{ plainText }` que triggerChange calcula igualmente para el textarea).
+   * @returns {Object} payload con getters perezosos
+   */
+  meWYSE.prototype._make_change_payload = function(v_focused_el, v_seed) {
+    var self = this;
+    v_seed = v_seed || {};
+    // Cache de valores calculados. `undefined` = aún no calculado; un seed
+    // string (incluido '') cuenta como ya calculado.
+    var v_cache = {
+      plainText: (typeof v_seed.plainText === 'string') ? v_seed.plainText : undefined,
+      html: (typeof v_seed.html === 'string') ? v_seed.html : undefined,
+      json: (typeof v_seed.json === 'string') ? v_seed.json : undefined,
+      markdown: (typeof v_seed.markdown === 'string') ? v_seed.markdown : undefined
+    };
+
     var payload = {
-      // Referencia al propio editor: permite llamar a la API (editor.isDirty(),
-      // editor.resetDirty(), editor.getHTML()…) desde el callback sin depender
-      // de una variable externa que capture la instancia.
+      // Referencia al propio editor (API accesible desde el callback sin capturar
+      // la instancia en una variable externa).
       editor: this,
       blocks: this.blocks,
-      plainText: this.getPlainText(),
-      html: this.getHTML(),
-      json: v_json,
-      markdown: this.getMarkdown(),
-      // Dirty tracking: cambios respecto a la última línea base "limpia". Se
-      // reutiliza v_json (evita recalcular). Con base null (sin capturar aún),
-      // no hay cambios. En el payload el campo se llama `hasChanges` (los
-      // métodos públicos siguen siendo isDirty()/hasChanges()).
-      hasChanges: this._pristine_signature !== null && v_json !== this._pristine_signature,
       focusedBlockId: null,
       focusedBlockType: null
     };
-    if (focusedElement && focusedElement.closest) {
-      var blockEl = focusedElement.closest('[data-block-id]');
-      if (blockEl) {
-        var bid = parseInt(blockEl.getAttribute('data-block-id'), 10);
-        if (!isNaN(bid)) {
-          payload.focusedBlockId = bid;
-          payload.focusedBlockType = blockEl.getAttribute('data-block-type') || null;
+
+    if (v_focused_el && v_focused_el.closest) {
+      var v_block_el = v_focused_el.closest('[data-block-id]');
+      if (v_block_el) {
+        var v_bid = parseInt(v_block_el.getAttribute('data-block-id'), 10);
+        if (!isNaN(v_bid)) {
+          payload.focusedBlockId = v_bid;
+          payload.focusedBlockType = v_block_el.getAttribute('data-block-type') || null;
         }
       }
     }
+
+    // Getter perezoso memoizado (Object.defineProperty es ES5; enumerable para
+    // que el payload se comporte como un objeto normal al iterar/serializar).
+    var v_define_lazy = function(v_key, v_compute) {
+      Object.defineProperty(payload, v_key, {
+        enumerable: true,
+        configurable: true,
+        get: function() {
+          if (v_cache[v_key] === undefined) v_cache[v_key] = v_compute();
+          return v_cache[v_key];
+        }
+      });
+    };
+    v_define_lazy('plainText', function() { return self.getPlainText(); });
+    v_define_lazy('html', function() { return self.getHTML(); });
+    v_define_lazy('json', function() { return self.getJSON(); });
+    v_define_lazy('markdown', function() { return self.getMarkdown(); });
+
+    // hasChanges: depende de `json` (comparte cache, no recalcula si ya se leyó).
+    Object.defineProperty(payload, 'hasChanges', {
+      enumerable: true,
+      configurable: true,
+      get: function() {
+        if (self._pristine_signature === null) return false;
+        if (v_cache.json === undefined) v_cache.json = self.getJSON();
+        return v_cache.json !== self._pristine_signature;
+      }
+    });
+
     return payload;
+  };
+
+  /**
+   * Payload para onFocus/onBlur (delega en el builder perezoso; añade el foco).
+   */
+  meWYSE.prototype._buildEventPayload = function(focusedElement) {
+    return this._make_change_payload(focusedElement);
   };
 
   /**
@@ -13720,6 +13783,7 @@
     if (this.floatingHandleHideTimeout) { clearTimeout(this.floatingHandleHideTimeout); this.floatingHandleHideTimeout = null; }
     if (this._handleHideTimer) { clearTimeout(this._handleHideTimer); this._handleHideTimer = null; }
     if (this._autosaveTimer) { clearTimeout(this._autosaveTimer); this._autosaveTimer = null; }
+    if (this._onChangeTimer) { clearTimeout(this._onChangeTimer); this._onChangeTimer = null; }
     if (this._crossBlockRafId) { cancelAnimationFrame(this._crossBlockRafId); this._crossBlockRafId = null; }
 
     // Red de seguridad: retirar cualquier listener de click en document que

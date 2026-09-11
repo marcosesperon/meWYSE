@@ -97,6 +97,11 @@ export interface MeWyseOptions {
     file: File,
     cb: (data: { url: string; fileName?: string; width?: number; height?: number }) => void
   ) => void;
+  /** ms para agrupar (debounce) las llamadas a onChange mientras se teclea.
+   *  0 (default) = onChange síncrono en cada cambio. >0 = una sola llamada tras
+   *  ese tiempo de inactividad. No afecta a los efectos internos (textarea,
+   *  autosave, historial), que siguen siendo inmediatos. */
+  onChangeDebounce?: number;
   onChange?: (data: MeWyseChangePayload) => void;
   onFocus?: (data: MeWyseChangePayload) => void;
   onBlur?: (data: MeWyseChangePayload) => void;
