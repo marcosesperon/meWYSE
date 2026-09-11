@@ -241,7 +241,8 @@
         markdownVideo: 'Vídeo',
         markdownAudio: 'Audio',
         playVideo: 'Reproducir vídeo',
-        closeVideo: 'Volver a la previsualización'
+        closeVideo: 'Volver a la previsualización',
+        unknownBlock: 'Bloque no reconocido'
       },
       aria: {
         mentions: 'Menciones',
@@ -527,7 +528,8 @@
         markdownVideo: 'Video',
         markdownAudio: 'Audio',
         playVideo: 'Play video',
-        closeVideo: 'Back to preview'
+        closeVideo: 'Back to preview',
+        unknownBlock: 'Unrecognized block'
       },
       aria: {
         mentions: 'Mentions',
@@ -5695,12 +5697,28 @@
         element = this._buildTocElement(block.id);
         break;
 
-      default: // paragraph
-        element = document.createElement('p');
-        element.contentEditable = true;
-        element.innerHTML = block.content || '';
-        element.setAttribute('data-placeholder', self.t('placeholders.slashCommand'));
-        this.attachBlockEvents(element, block.id);
+      default:
+        if (!VALID_BLOCK_TYPES[block.type]) {
+          // Tipo DESCONOCIDO (preservado por _sanitizeBlock para no perder datos):
+          // placeholder de SOLO LECTURA. NUNCA se hace innerHTML del contenido
+          // crudo (no ha pasado por el sanitizer de contenido) — solo se muestra,
+          // escapado, el tipo del bloque. El dato íntegro sigue en getJSON.
+          element = document.createElement('div');
+          element.className = 'mewyse-unknown-block';
+          element.setAttribute('contenteditable', 'false');
+          element.setAttribute('title', self.t('misc.unknownBlock'));
+          var v_unknown_label = document.createElement('span');
+          v_unknown_label.className = 'mewyse-unknown-block-label';
+          v_unknown_label.textContent = self.t('misc.unknownBlock') + ' (' + String(block.type) + ')';
+          element.appendChild(v_unknown_label);
+        } else {
+          // paragraph
+          element = document.createElement('p');
+          element.contentEditable = true;
+          element.innerHTML = block.content || '';
+          element.setAttribute('data-placeholder', self.t('placeholders.slashCommand'));
+          this.attachBlockEvents(element, block.id);
+        }
     }
 
     // Añadir clase y atributos comunes
@@ -12257,13 +12275,17 @@
       }
     }
 
-    // Si el último bloque está vacío, no incluirlo
+    // Si el último bloque está vacío, no incluirlo. SOLO se recorta un tipo
+    // CONOCIDO (el párrafo vacío por defecto del editor). Un bloque de tipo
+    // desconocido preservado no tiene `content` string y NO debe recortarse
+    // (contiene datos íntegros que hay que conservar en el export).
     if (blocks.length > 0) {
       var lastBlock = blocks[blocks.length - 1];
       var isEmpty = !lastBlock.content ||
                     (typeof lastBlock.content === 'string' && lastBlock.content.trim() === '');
 
-      if (isEmpty && lastBlock.type !== 'divider' && lastBlock.type !== 'pageBreak' && lastBlock.type !== 'image') {
+      if (isEmpty && VALID_BLOCK_TYPES[lastBlock.type] &&
+          lastBlock.type !== 'divider' && lastBlock.type !== 'pageBreak' && lastBlock.type !== 'image') {
         blocks.pop();
       }
     }
@@ -12344,6 +12366,16 @@
     while (i < blocks.length) {
       var block = blocks[i];
       var content = block.content || '';
+
+      // Bloque de tipo DESCONOCIDO (preservado para no perder datos): NO se emite
+      // como HTML (su contenido es dato crudo, no HTML del editor). Se degrada a
+      // un comentario con el tipo saneado, dejando rastro sin romper el documento.
+      // El dato íntegro sigue disponible en getJSON.
+      if (!VALID_BLOCK_TYPES[block.type]) {
+        html += '<!-- mewyse:unknown-block ' + String(block.type).replace(/[^a-zA-Z0-9_-]/g, '') + ' -->';
+        i++;
+        continue;
+      }
 
       // Agrupar listas consecutivas del mismo tipo (con anidación por indentLevel)
       if (block.type === 'bulletList' || block.type === 'numberList' || block.type === 'checklist') {
@@ -12507,6 +12539,13 @@
 
     while (i < blocks.length) {
       var block = blocks[i];
+
+      // Bloque de tipo DESCONOCIDO (preservado): degradar a comentario (ver getHTML).
+      if (!VALID_BLOCK_TYPES[block.type]) {
+        html += '<!-- mewyse:unknown-block ' + String(block.type).replace(/[^a-zA-Z0-9_-]/g, '') + ' -->';
+        i++;
+        continue;
+      }
 
       // Agrupar listas consecutivas del mismo tipo (con anidación por indentLevel)
       if (block.type === 'bulletList' || block.type === 'numberList' || block.type === 'checklist') {
@@ -12800,6 +12839,15 @@
     while (i < blocks.length) {
       var block = blocks[i];
       var content = block.content || '';
+
+      // Bloque de tipo DESCONOCIDO (preservado): no tiene representación Markdown;
+      // se degrada a un comentario HTML (Markdown admite comentarios). El dato
+      // íntegro sigue en getJSON.
+      if (!VALID_BLOCK_TYPES[block.type]) {
+        lines.push('<!-- mewyse:unknown-block ' + String(block.type).replace(/[^a-zA-Z0-9_-]/g, '') + ' -->');
+        i++;
+        continue;
+      }
 
       // Agrupar listas consecutivas
       if (block.type === 'bulletList' || block.type === 'numberList' || block.type === 'checklist') {
@@ -19512,13 +19560,31 @@
   meWYSE.prototype._sanitizeBlock = function(block, fallbackId) {
     if (!block || typeof block !== 'object') return null;
 
-    // Validar type
-    var type = VALID_BLOCK_TYPES[block.type] ? block.type : 'paragraph';
-
-    // Validar id
+    // Validar id (se hace ANTES del tipo: la rama de preservación lo necesita)
     var id = (typeof block.id === 'number' && isFinite(block.id)) ? block.id : fallbackId;
     if (typeof id !== 'number') id = ++this.currentBlockId;
     if (id > this.currentBlockId) this.currentBlockId = id;
+
+    // Tipo de bloque DESCONOCIDO (string no vacío que no está en VALID_BLOCK_TYPES):
+    // PRESERVAR el bloque íntegro en vez de coaccionarlo a un párrafo vacío (que
+    // perdería el dato). Se guarda un clon seguro (JSON: sin funciones/prototipo)
+    // con el id saneado; render lo pinta como placeholder de solo lectura (NUNCA
+    // innerHTML del contenido crudo) y getJSON lo re-emite intacto (round-trip
+    // fiel). Así, importar un JSON con tipos de otra versión o custom no destruye
+    // contenido. Si el bloque no es serializable (p. ej. circular), se degrada a
+    // párrafo vacío como red de seguridad.
+    if (typeof block.type === 'string' && block.type !== '' && !VALID_BLOCK_TYPES[block.type]) {
+      try {
+        var v_preserved = JSON.parse(JSON.stringify(block));
+        v_preserved.id = id;
+        return v_preserved;
+      } catch (e) {
+        return { id: id, type: 'paragraph', content: '' };
+      }
+    }
+
+    // Validar type (tipo válido conocido, o párrafo si venía sin tipo/no-string)
+    var type = VALID_BLOCK_TYPES[block.type] ? block.type : 'paragraph';
 
     // Construir bloque limpio (descartando cualquier propiedad no esperada)
     var clean = { id: id, type: type, content: '' };

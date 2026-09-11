@@ -511,6 +511,25 @@
   user-select: none;
   position: relative;
 }
+
+/* Bloque de tipo desconocido (preservado para no perder datos): placeholder de
+   solo lectura, discreto, que indica que hay contenido no representable pero
+   conservado (íntegro en getJSON). */
+.mewyse-unknown-block {
+  margin: 0.5em 0;
+  padding: 6px 10px;
+  border: 1px dashed var(--mewyse-border-medium);
+  border-radius: var(--mewyse-radius-md, 6px);
+  background: var(--mewyse-bg-hover);
+  color: var(--mewyse-text-muted);
+  font-size: 0.8em;
+  user-select: none;
+  cursor: default;
+}
+.mewyse-unknown-block-label::before {
+  content: '\26A0\FE0F';
+  margin-right: 6px;
+}
 .mewyse-page-break-label {
   display: inline-block;
   transform: translateY(-50%);

@@ -18,6 +18,11 @@ export interface MeWyseBlock {
   calloutVariant?: 'info' | 'warning' | 'success' | 'danger';
   width?: number;
   height?: number;
+  /** Un bloque de tipo DESCONOCIDO (no soportado por esta versión) se preserva
+   *  íntegro con todas sus propiedades originales (no se pierde el dato). El
+   *  editor lo muestra como placeholder de solo lectura y lo re-emite tal cual
+   *  en getJSON. Por eso se admiten propiedades arbitrarias. */
+  [key: string]: any;
 }
 
 export interface MeWyseChangePayload {
