@@ -4760,16 +4760,26 @@
 
       self.triggerChange();
 
-      // Re-render para que los estilos avanzados se apliquen al <img> (antes solo
-      // se mutaba width/height inline y los avanzados no se reflejaban). Se
-      // re-selecciona la imagen recreada para conservar selección + handle.
+      // Aplicar los estilos (dims/advanced) recreando el elemento de la imagen y
+      // re-seleccionarla (conserva selección + handle).
       if (modalOverlay.parentNode) document.body.removeChild(modalOverlay);
       self._suppressBlurUntil = Date.now() + 300;
-      self.render();
-      setTimeout(function() {
-        var v_new_img = self.container.querySelector('[data-block-id="' + blockId + '"] .mewyse-image');
-        if (v_new_img) self.selectImage(v_new_img, v_cell ? null : blockId, !!v_cell, v_cell || null);
-      }, 0);
+
+      // Render INCREMENTAL (Fase 4) para una imagen SUELTA: `_patch_block` recrea
+      // SOLO su bloque, sin tocar el resto del documento; la re-selección es
+      // síncrona (el elemento ya existe tras el patch). Para imágenes DENTRO de
+      // una celda de tabla (v_cell), el bloque es la tabla → render() completo.
+      var v_img_patched = !v_cell && self._patch_block(blockId);
+      if (v_img_patched) {
+        var v_img_now = self.container.querySelector('[data-block-id="' + blockId + '"] .mewyse-image');
+        if (v_img_now) self.selectImage(v_img_now, blockId, false, null);
+      } else {
+        self.render();
+        setTimeout(function() {
+          var v_new_img = self.container.querySelector('[data-block-id="' + blockId + '"] .mewyse-image');
+          if (v_new_img) self.selectImage(v_new_img, v_cell ? null : blockId, !!v_cell, v_cell || null);
+        }, 0);
+      }
     };
 
     buttonsContainer.appendChild(cancelButton);
@@ -11736,7 +11746,17 @@
       if (block.collapsed === true) duplicatedBlock.collapsed = true;
 
       this.blocks.splice(index + 1, 0, duplicatedBlock);
-      this.render();
+
+      // Render INCREMENTAL (Fase 4): insertar SOLO el bloque duplicado usando el
+      // fast-path de render(focusBlockId) (maneja agrupación de listas + guard de
+      // split). Con `_skipAutoFocus` se evita que el fast-path enfoque el
+      // duplicado: así el foco se queda donde estaba (el DOM del resto no se
+      // toca), preservando el comportamiento previo (el render completo restauraba
+      // el foco al bloque activo, no al nuevo).
+      this._skipAutoFocus = true;
+      this.render(duplicatedBlock.id);
+      this._skipAutoFocus = false;
+
       this.triggerChange();
     }
   };
