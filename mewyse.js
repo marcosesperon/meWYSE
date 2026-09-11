@@ -1646,6 +1646,23 @@
   };
 
   /**
+   * Devuelve el nodo DOM de PRIMER NIVEL (hijo directo del container) que
+   * contiene a `el`: para un bloque suelto es su propio elemento; para un ítem
+   * de lista es el `.mewyse-list-group` (`<ul>/<ol>`) que lo envuelve. Sirve al
+   * render incremental para insertar/quitar al nivel correcto del container.
+   * @param {HTMLElement} el
+   * @returns {HTMLElement|null} hijo directo del container, o null
+   */
+  meWYSE.prototype._top_level_block_node = function(el) {
+    if (!el || !this.container) return null;
+    var v_node = el;
+    while (v_node.parentNode && v_node.parentNode !== this.container) {
+      v_node = v_node.parentNode;
+    }
+    return (v_node.parentNode === this.container) ? v_node : null;
+  };
+
+  /**
    * Obtiene el elemento editable de un bloque
    * @param {HTMLElement} blockElement - Elemento del bloque
    * @returns {HTMLElement|null}
@@ -5241,6 +5258,19 @@
             newBlock = this.blocks[i];
             newBlockIndex = i;
             break;
+          }
+        }
+
+        // Guard del fast-path incremental: si el bloque nuevo es NO-lista y se
+        // inserta ENTRE dos ítems de lista, PARTIRÍA el grupo (el <ul>/<ol> se
+        // dividiría en dos). El fast-path no sabe re-partir el wrapper → forzar
+        // el render() completo (fallback correcto) anulando newBlock aquí.
+        if (newBlock && !this._isListBlockType(newBlock.type)) {
+          var v_ib_prev = newBlockIndex > 0 ? this.blocks[newBlockIndex - 1] : null;
+          var v_ib_next = newBlockIndex < this.blocks.length - 1 ? this.blocks[newBlockIndex + 1] : null;
+          if (v_ib_prev && v_ib_next &&
+              this._isListBlockType(v_ib_prev.type) && this._isListBlockType(v_ib_next.type)) {
+            newBlock = null;
           }
         }
 
@@ -11735,31 +11765,68 @@
         return;
       }
 
+      // ¿Se puede borrar INCREMENTALMENTE (quitar solo el elemento del bloque del
+      // DOM, sin reconstruir todo)? Condiciones SEGURAS (si no, render() completo):
+      //  - el bloque NO es de lista (borrar un <li> puede tocar la agrupación),
+      //  - sus vecinos NO son AMBOS de lista (borrar el bloque intermedio fusionaría
+      //    dos grupos → cambio de agrupación),
+      //  - su nodo de primer nivel es su PROPIO elemento (bloque suelto, no envuelto).
+      var v_del_block = this.blocks[index];
+      var v_del_prev = index > 0 ? this.blocks[index - 1] : null;
+      var v_del_next = index < this.blocks.length - 1 ? this.blocks[index + 1] : null;
+      var v_del_el = null;
+      if (!this._isListBlockType(v_del_block.type) &&
+          !(v_del_prev && this._isListBlockType(v_del_prev.type) &&
+            v_del_next && this._isListBlockType(v_del_next.type))) {
+        var v_tl = this._top_level_block_node(this.getBlockElementById(blockId));
+        // El top-level debe ser el propio bloque (data-block-id) — no un grupo.
+        if (v_tl && v_tl.getAttribute &&
+            v_tl.getAttribute('data-block-id') === String(blockId)) {
+          v_del_el = v_tl;
+        }
+      }
+
+      // ¿El foco estaba DENTRO del bloque que se borra? Decide si hay que reponer
+      // el foco tras quitarlo. En el camino incremental, si el foco estaba en OTRO
+      // bloque, ese bloque conserva su foco (DOM intacto) y NO se toca.
+      var v_focus_in_deleted = !!(v_del_el && document.activeElement &&
+                                  v_del_el.contains(document.activeElement));
+
       this.blocks.splice(index, 1);
 
       // Re-normalizar los niveles de lista: borrar un ítem padre puede dejar un
       // hijo huérfano con un salto de nivel; lo corregimos en el modelo.
       this._normalizeListModel();
 
-      // El re-render destruye el editable que tenía el foco (p. ej. la celda de
-      // la tabla que se borra). Sin reenfocar, el focusout dejaría el foco en
-      // <body> y dispararía un onBlur espurio. Suprimimos el blur durante la
-      // transición y reenfocamos un bloque vecino tras el render.
+      // Suprimir el blur durante la transición y reenfocar un vecino después
+      // (evita onBlur espurio al perder el editable borrado).
       this._suppressBlurUntil = Date.now() + 300;
 
-      this.render();
+      var v_incremental = !!(v_del_el && v_del_el.parentNode);
+      if (v_incremental) {
+        // Render INCREMENTAL (Fase 2): quitar solo el elemento del bloque; el
+        // resto del DOM (y su foco) se conserva intacto.
+        v_del_el.parentNode.removeChild(v_del_el);
+      } else {
+        // Fallback: casos con listas de por medio (agrupación) → render completo.
+        this.render();
+      }
 
       // Actualizar las listas numeradas si es necesario
       if (index < this.blocks.length) {
         this.updateConsecutiveNumberLists(index);
       }
 
-      // Mantener el foco dentro del editor: enfocar el bloque que ocupa ahora la
-      // posición borrada (o el anterior si era el último). Se hace SÍNCRONO tras
-      // el render (el DOM ya está reconstruido) para no depender de rAF/timers
-      // que pueden retrasarse; así el focusout ya encuentra el foco dentro del
-      // editor y no dispara onBlur.
-      this._focusBlockNear(Math.min(index, this.blocks.length - 1));
+      // Reponer el foco dentro del editor. En el camino de render() completo el
+      // DOM se reconstruye → SIEMPRE hay que reenfocar (bloque que ocupa la
+      // posición borrada, o el anterior si era el último). En el incremental,
+      // solo si el foco estaba en el bloque borrado (o se perdió fuera del
+      // editor); si estaba en otro bloque, ese lo conserva. Síncrono para que el
+      // focusout ya encuentre el foco dentro del editor (sin onBlur espurio).
+      if (!v_incremental || v_focus_in_deleted ||
+          !this.container.contains(document.activeElement)) {
+        this._focusBlockNear(Math.min(index, this.blocks.length - 1));
+      }
 
       this.triggerChange();
     }
