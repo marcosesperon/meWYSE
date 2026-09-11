@@ -638,6 +638,32 @@ editor.focus(blockId); // bloque especifico
       </div>
     </div>
 
+    <!-- Demo: Bloques de tipo desconocido (robustez de datos) -->
+    <div class="demo-section">
+      <h2>Bloques de tipo desconocido</h2>
+      <p>Se carga un JSON con un bloque cuyo <code>type</code> el editor <strong>no reconoce</strong> (aqu&iacute; <code>chart</code>, como si viniera de una versi&oacute;n m&aacute;s nueva o de un plugin). En vez de perderlo o aplanarlo a un p&aacute;rrafo, meWYSE lo <strong>preserva &iacute;ntegro</strong>: lo muestra como un <em>placeholder de solo lectura</em> y lo re-emite tal cual en <code>getJSON()</code>. As&iacute; puedes cargar y volver a guardar sin destruir contenido que no entiendes.</p>
+      <div class="config-hint">
+        El bloque <code>chart</code> aparece como &laquo;Bloque no reconocido&raquo;. Pulsa <em>Ver JSON</em>: el bloque sigue ah&iacute; con su <code>data</code> intacto (round-trip fiel).
+      </div>
+      <pre class="docs-code"><code>editor.loadFromJSON([
+  { type: 'heading2', content: 'Informe' },
+  { type: 'paragraph', content: 'Texto normal.' },
+  { type: 'chart', data: { kind: 'bar', values: [4, 8, 15] }, caption: 'Ventas' },
+  { type: 'paragraph', content: 'Sigue el documento.' }
+]);
+// El bloque 'chart' se conserva integro y getJSON() lo re-emite tal cual.</code></pre>
+      <div id="unknownEditor"></div>
+      <div class="controls">
+        <div class="button-group">
+          <button class="btn" onclick="showOutput('unknownOutput','unknownOutputContent', unknownEditor.getJSON())">Ver JSON</button>
+          <button class="btn btn-secondary" onclick="showOutput('unknownOutput','unknownOutputContent', unknownEditor.getHTML())">Ver HTML</button>
+        </div>
+        <div id="unknownOutput" class="output" style="display:none;">
+          <pre id="unknownOutputContent"></pre>
+        </div>
+      </div>
+    </div>
+
     <!-- Demo: Editor con Summary -->
     <div class="demo-section">
       <h2>Editor con Summary</h2>
@@ -1177,6 +1203,7 @@ new meWYSE({ target: '#vhHeightEditor', minHeight: '10em', maxHeight: '35vh' });
     var noToolbarEditor;
     var pageBreakEditor;
     var dirtyEditor;
+    var unknownEditor;
     var summaryEditor;
     var mentionsEditor;
     var tagsEditor;
@@ -1316,6 +1343,18 @@ new meWYSE({ target: '#vhHeightEditor', minHeight: '10em', maxHeight: '35vh' });
       updateDirtyStatus(v_dirty);
       var log = document.getElementById('dirtyBlurLog');
       if (log) log.textContent = 'editor.isDirty() = ' + v_dirty;
+    }
+
+    // Demo de bloques de tipo desconocido: se preservan integros (no se pierden).
+    function initUnknownEditor() {
+      unknownEditor = new meWYSE({ target: '#unknownEditor', toolbar: true });
+      // Cargar un JSON con un bloque 'chart' que el editor NO reconoce.
+      unknownEditor.loadFromJSON([
+        { type: 'heading2', content: 'Informe de ventas' },
+        { type: 'paragraph', content: 'Texto normal, editable con normalidad.' },
+        { type: 'chart', data: { kind: 'bar', values: [4, 8, 15, 16] }, caption: 'Ventas Q1' },
+        { type: 'paragraph', content: 'El resto del documento sigue intacto.' }
+      ]);
     }
 
     // Inicializar editor con summary
@@ -2201,6 +2240,7 @@ new meWYSE({ target: '#vhHeightEditor', minHeight: '10em', maxHeight: '35vh' });
       initNoToolbarEditor();
       initPageBreakEditor();
       initDirtyEditor();
+      initUnknownEditor();
       initSummaryEditor();
       initMentionsEditor();
       initReadOnlyEditor();
