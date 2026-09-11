@@ -1612,6 +1612,40 @@
   };
 
   /**
+   * Render INCREMENTAL (Fase 1): recrea el elemento DOM de UN solo bloque
+   * (`createBlockElement`) y lo sustituye EN SU SITIO, sin tocar el resto del
+   * documento. Así el foco/caret de los demás bloques se conserva de forma
+   * nativa (a diferencia de `render()`, que hace `innerHTML=''` y reconstruye
+   * todo, obligando a recapturar/reponer el foco).
+   *
+   * NO aplicable a bloques de LISTA: el DOM de las listas agrupa ítems
+   * consecutivos en `<ul>/<ol>` anidados (no es 1:1 con el modelo), así que
+   * recrear un `<li>` aislado rompería la agrupación → devuelve `false` para que
+   * el llamador caiga a `render()` completo. También devuelve `false` si el
+   * bloque no existe o no tiene elemento en el DOM.
+   *
+   * @param {number} blockId
+   * @returns {boolean} true si se parcheó; false si hay que hacer render() completo
+   */
+  meWYSE.prototype._patch_block = function(blockId) {
+    var v_block = this.getBlock(blockId);
+    if (!v_block) return false;
+    // Bloques de lista → fuera (agrupación no 1:1). Ver doc arriba.
+    if (v_block.type === 'bulletList' || v_block.type === 'numberList' ||
+        v_block.type === 'checklist') {
+      return false;
+    }
+    var v_old = this.getBlockElementById(blockId);
+    if (!v_old || !v_old.parentNode) return false;
+    // Salvaguarda: si por lo que sea el elemento cuelga de un grupo de lista,
+    // no parchear (dejar el reagrupado al render completo).
+    if (v_old.closest && v_old.closest('.mewyse-list-group')) return false;
+    var v_new = this.createBlockElement(v_block);
+    v_old.parentNode.replaceChild(v_new, v_old);
+    return true;
+  };
+
+  /**
    * Obtiene el elemento editable de un bloque
    * @param {HTMLElement} blockElement - Elemento del bloque
    * @returns {HTMLElement|null}
@@ -4948,11 +4982,9 @@
         return;
       }
 
-      // Cambiar el tipo de bloque
-      this.changeBlockType(blockId, type);
-
-      // Aplicar customClass (styleFormats) si se pasó. Se asigna al block tras
-      // el cambio de tipo para que sobreviva al render.
+      // Aplicar customClass (styleFormats) ANTES del cambio de tipo, para que el
+      // render incremental de changeBlockType (createBlockElement) ya la aplique
+      // al nuevo elemento (antes se asignaba después y forzaba un render() extra).
       var targetBlock = this.getBlock(blockId);
       if (targetBlock) {
         if (customClass && this._customClassWhitelist && this._customClassWhitelist[customClass]) {
@@ -4960,8 +4992,11 @@
         } else {
           delete targetBlock.customClass;
         }
-        this.render();
       }
+
+      // Cambiar el tipo de bloque (parchea in situ si es texto↔texto; el foco/caret
+      // real lo repone el setTimeout de abajo con el offset guardado del menú).
+      this.changeBlockType(blockId, type);
 
       // Restaurar el foco y la selección después del render
       setTimeout(function() {
@@ -11483,13 +11518,62 @@
     var block = this.getBlock(blockId);
     if (block) {
       var oldType = block.type;
+
+      // ¿El foco/caret está DENTRO de este bloque? Se usa `document.activeElement`
+      // como fuente de verdad (fiable, a diferencia del anchorNode de la selección
+      // que puede quedar obsoleto). Si lo tiene, se captura el offset del caret
+      // para reponerlo tras el patch; si NO (p. ej. changeBlockType por API con el
+      // foco en otro bloque), NO se toca el foco → el otro bloque lo conserva.
+      var v_old_el = this.getBlockElementById(blockId);
+      var v_had_focus = !!(v_old_el && document.activeElement &&
+                           v_old_el.contains(document.activeElement));
+      var v_caret_offset = null;
+      if (v_had_focus) {
+        var v_ed_old = this.getEditableElement(v_old_el);
+        var v_sel = window.getSelection ? window.getSelection() : null;
+        if (v_ed_old && v_sel && v_sel.rangeCount && v_ed_old.contains(v_sel.anchorNode)) {
+          try {
+            var v_r = v_sel.getRangeAt(0);
+            var v_pre = document.createRange();
+            v_pre.selectNodeContents(v_ed_old);
+            v_pre.setEnd(v_r.endContainer, v_r.endOffset);
+            v_caret_offset = v_pre.toString().length;
+          } catch (e) { v_caret_offset = null; }
+        }
+      }
+
       block.type = newType;
-      // El render recrea el bloque enfocado: el contenteditable viejo se destruye
-      // (focusout) y el nuevo recibe foco (focusin). Sin esta ventana, ese blur
-      // transitorio dispararía onBlur indebidamente. Cubre el cambio de tipo
-      // desde el menú slash y otras rutas que pasan por aquí.
+
+      // El cambio de tipo mueve el foco del editable viejo al nuevo: suprimir el
+      // onBlur transitorio.
       this._suppressBlurUntil = Date.now() + 300;
-      this.render(blockId);
+
+      // Render INCREMENTAL (Fase 1): si NINGÚN tipo (viejo/nuevo) es lista, la
+      // conversión es texto↔texto y no cambia la agrupación → basta recrear ESTE
+      // bloque en su sitio (_patch_block), conservando el DOM/foco del resto (sin
+      // flicker). Con listas de por medio, la agrupación cambia → render() completo.
+      var v_is_list = function(t) {
+        return t === 'bulletList' || t === 'numberList' || t === 'checklist';
+      };
+      var v_patched = false;
+      if (!v_is_list(oldType) && !v_is_list(newType)) {
+        v_patched = this._patch_block(blockId);
+        // Reponer el caret en el nuevo editable SOLO si el foco estaba en ESTE
+        // bloque (v_had_focus). Si se convierte un bloque NO enfocado (p. ej. por
+        // API, o mientras otro bloque tiene el caret), NO se toca el foco → el
+        // otro bloque lo conserva (la clave del render incremental).
+        if (v_patched && v_had_focus) {
+          var v_new_el = this.getBlockElementById(blockId);
+          var v_editable = v_new_el ? this.getEditableElement(v_new_el) : null;
+          if (v_editable) {
+            v_editable.focus();
+            this._setCaretAtOffset(v_editable, v_caret_offset);
+          }
+        }
+      }
+      if (!v_patched) {
+        this.render(blockId);
+      }
 
       // Si el cambio involucra listas numeradas, actualizar la numeración
       if (oldType === 'numberList' || newType === 'numberList') {
@@ -15333,31 +15417,27 @@
 
     if (!TEXT_ALIGN_BLOCK_TYPES[v_block.type]) return;
 
-    // Evitar onBlur espurio durante el render/refoco.
-    this._suppressBlurUntil = Date.now() + 300;
     this.pushHistory(true);
     if (align === 'left') delete v_block.alignment; // 'left' = default, no ensuciar
     else v_block.alignment = align;
 
-    // El menú flotante de formato (si estaba abierto) queda obsoleto tras el
-    // render porque su selección de referencia desaparece.
+    // El menú flotante de formato (si estaba abierto) queda obsoleto.
     if (this.formatMenu) this.closeFormatMenu();
 
-    this.render();
+    // Render INCREMENTAL: la alineación es solo `text-align` en el elemento del
+    // bloque. Se aplica DIRECTAMENTE al DOM existente (createBlockElement hace
+    // lo mismo: element.style.textAlign). Sin render() → sin perder caret/foco,
+    // sin flicker ni setTimeout de refoco. '' quita el estilo (= 'left' default).
+    // Fallback a render() completo si por algún motivo no hay elemento.
+    var v_el = this.getBlockElementById(v_block_id);
+    if (v_el) {
+      v_el.style.textAlign = v_block.alignment || '';
+    } else {
+      this._suppressBlurUntil = Date.now() + 300;
+      this.render();
+    }
     this.triggerChange();
-
-    // Refocar el editable PROPIO del bloque (patrón de indentBlock) y refrescar
-    // el icono del botón.
-    var self = this;
-    setTimeout(function() {
-      var el = self.container.querySelector('[data-block-id="' + v_block_id + '"]');
-      if (el) {
-        var editable = (el.getAttribute('contenteditable') === 'true')
-          ? el : el.querySelector('[contenteditable="true"]');
-        if (editable) editable.focus();
-      }
-      self._updateAlignButton();
-    }, 0);
+    this._updateAlignButton();
   };
 
   /**
